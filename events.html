@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - Green Tile Social Club</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav class="sticky-nav">
+        <div class="nav-left"><div class="nav-logo-box">GT</div></div>
+        <div class="nav-center">
+            <a href="index.html" class="type-sub2">Home</a>
+            <a href="events.html" class="type-sub2" style="border-bottom: 2px solid currentColor;">Events</a>
+            <a href="#" class="type-sub2">Shop</a>
+            <a href="about.html" class="type-sub2">About</a>
+        </div>
+        <div class="nav-right"><a href="#" class="type-sub2">Contact</a></div>
+    </nav>
+
+    <div class="calendar-page" id="cal-page-container">
+        
+        <div class="calendar-header">
+            <h1 class="type-display-hero" style="text-align: left; line-height: 0.85; margin-bottom: 0;">
+                <p class="header-desktop" style="font-size: 9vw;">Spring Calendar 2025</p>
+                <p class="header-mobile">Spring 2025</p>
+            </h1>
+
+            <div class="calendar-controls">
+                <div style="display: flex; align-items: center;">
+                    <div class="filters-list">
+                        <button class="filter-btn type-body2 active">All</button>
+                        <button class="filter-btn type-body2">March</button>
+                        <button class="filter-btn type-body2">April</button>
+                        <button class="filter-btn type-body2">May</button>
+                        <button class="filter-btn type-body2">Skill</button>
+                    </div>
+                    
+                    <div class="view-controls">
+                        <button class="view-btn active" id="btn-list">List</button>
+                        <span style="color: var(--color-placeholder); font-size: 14px;">/</span>
+                        <button class="view-btn" id="btn-grid">Grid</button>
+                    </div>
+                </div>
+
+                <div class="archive-link">
+                    <button class="filter-btn type-body2">Archives</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="calendar-list">
+            <div class="calendar-row" data-img="images/poster1.png" data-title="Intro to Mahjong">
+                <span class="cal-date type-h2">03.07</span><span class="cal-name type-h2">Intro to Mahjong</span>
+            </div>
+            <div class="calendar-row" data-img="images/poster2.png" data-title="Monthly Meetup">
+                <span class="cal-date type-h2">03.10</span><span class="cal-name type-h2">Monthly Meetup</span>
+            </div>
+            <div class="calendar-row" data-img="images/poster3.png" data-title="Mott Street Girls x GTSC">
+                <span class="cal-date type-h2">03.23</span><span class="cal-name type-h2">Mott Street Girls x GTSC</span>
+            </div>
+            <div class="calendar-row" data-img="images/poster1.png" data-title="Mahjong After Hours">
+                <span class="cal-date type-h2">04.04</span><span class="cal-name type-h2">Mahjong After Hours</span>
+            </div>
+            <div class="calendar-row" data-img="images/poster2.png" data-title="Monthly Meetup">
+                <span class="cal-date type-h2">04.14</span><span class="cal-name type-h2">Monthly Meetup</span>
+            </div>
+            <div class="calendar-row" data-img="images/poster3.png" data-title="Spring Mahjong Supperclub">
+                <span class="cal-date type-h2">05.02</span><span class="cal-name type-h2">Spring Mahjong Supperclub</span>
+            </div>
+            <div class="calendar-row" data-img="images/poster1.png" data-title="Mahjong After Hours">
+                <span class="cal-date type-h2">05.05</span><span class="cal-name type-h2">Mahjong After Hours</span>
+            </div>
+            <div class="calendar-row" data-img="images/poster2.png" data-title="Monthly Meetup">
+                <span class="cal-date type-h2">05.18</span><span class="cal-name type-h2">Monthly Meetup</span>
+            </div>
+        </div>
+
+        <div class="calendar-grid">
+            <a href="event-detail.html" class="grid-item">
+                <img src="https://placehold.co/400x500/ff6b35/FFF?text=Intro+Mahjong" class="grid-poster">
+            </a>
+            <a href="event-detail.html" class="grid-item">
+                <img src="https://placehold.co/400x500/5e2bff/FFF?text=Monthly+Meetup" class="grid-poster">
+            </a>
+            <a href="event-detail.html" class="grid-item">
+                <img src="https://placehold.co/400x500/ffcc00/000?text=Mott+St+Girls" class="grid-poster">
+            </a>
+            <a href="event-detail.html" class="grid-item">
+                <img src="https://placehold.co/400x500/32CD32/000?text=After+Hours" class="grid-poster">
+            </a>
+            <a href="event-detail.html" class="grid-item">
+                <img src="https://placehold.co/400x500/1a3c1a/FFF?text=Monthly+Meetup" class="grid-poster">
+            </a>
+            <a href="event-detail.html" class="grid-item">
+                <img src="https://placehold.co/400x500/e0e0e0/000?text=Supperclub" class="grid-poster">
+            </a>
+            <a href="event-detail.html" class="grid-item">
+                <img src="https://placehold.co/400x500/ff6b35/FFF?text=After+Hours" class="grid-poster">
+            </a>
+            <a href="event-detail.html" class="grid-item">
+                <img src="https://placehold.co/400x500/5e2bff/FFF?text=Monthly+Meetup" class="grid-poster">
+            </a>
+        </div>
+
+        <div class="calendar-poster-wrapper" id="poster-wrapper">
+            <img src="" alt="Event Poster" class="calendar-poster-img" id="poster-img">
+        </div>
+
+        <div class="mobile-event-display" id="mobile-display">
+            <img src="" class="mobile-poster" id="mobile-poster-img">
+            <div class="mobile-title" id="mobile-title-text">Event Name</div>
+        </div>
+
+    </div>
+
+    <script>
+        const rows = document.querySelectorAll('.calendar-row');
+        const listContainer = document.querySelector('.calendar-list');
+        const posterWrapper = document.getElementById('poster-wrapper');
+        const posterImg = document.getElementById('poster-img');
+        const mobilePoster = document.getElementById('mobile-poster-img');
+        const mobileTitle = document.getElementById('mobile-title-text');
+
+        const btnList = document.getElementById('btn-list');
+        const btnGrid = document.getElementById('btn-grid');
+        const pageContainer = document.getElementById('cal-page-container');
+
+        btnList.addEventListener('click', () => {
+            pageContainer.classList.remove('mode-grid');
+            btnList.classList.add('active');
+            btnGrid.classList.remove('active');
+        });
+
+        btnGrid.addEventListener('click', () => {
+            pageContainer.classList.add('mode-grid');
+            btnGrid.classList.add('active');
+            btnList.classList.remove('active');
+        });
+
+        rows.forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 768 && !pageContainer.classList.contains('mode-grid')) {
+                    const imgUrl = row.getAttribute('data-img');
+                    if(imgUrl) {
+                        posterImg.src = imgUrl;
+                        posterWrapper.classList.add('active');
+                    }
+                }
+            });
+
+            row.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) {
+                    posterWrapper.classList.remove('active');
+                }
+            });
+
+            row.addEventListener('click', () => {
+                if(window.innerWidth > 768) {
+                    window.location.href = 'event-detail.html';
+                }
+            });
+        });
+
+        function updateMobileActiveState() {
+            if (window.innerWidth > 768) return;
+            const listCenter = listContainer.getBoundingClientRect().width / 2;
+            let closestRow = null; let closestDist = Infinity;
+
+            rows.forEach(row => {
+                const rowRect = row.getBoundingClientRect();
+                const listRect = listContainer.getBoundingClientRect();
+                const rowCenter = (rowRect.left - listRect.left) + (rowRect.width / 2);
+                const dist = Math.abs(listCenter - rowCenter);
+                if (dist < closestDist) { closestDist = dist; closestRow = row; }
+            });
+
+            if (closestRow && !closestRow.classList.contains('mobile-active')) {
+                rows.forEach(r => r.classList.remove('mobile-active'));
+                closestRow.classList.add('mobile-active');
+                mobilePoster.src = closestRow.getAttribute('data-img');
+                mobileTitle.innerText = closestRow.getAttribute('data-title');
+            }
+        }
+        listContainer.addEventListener('scroll', updateMobileActiveState);
+        window.addEventListener('load', () => { if(window.innerWidth <= 768) updateMobileActiveState(); });
+        window.addEventListener('resize', updateMobileActiveState);
+    </script>
+
+</body>
+</html>

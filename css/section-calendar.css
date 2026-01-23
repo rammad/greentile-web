@@ -1,0 +1,261 @@
+/* =========================================
+   EVENTS CALENDAR
+   ========================================= */
+
+.calendar-page {
+    position: relative;
+    width: 100%;
+    background-color: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+    height: 100vh; 
+    overflow: hidden;
+    padding-top: 100px;
+    padding-bottom: 40px;
+}
+
+.calendar-header {
+    padding: 0 20px 24px 20px;
+    flex-shrink: 0;
+}
+
+.header-desktop { display: block; }
+.header-mobile { display: none; }
+
+.calendar-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 16px;
+}
+
+.filters-list { display: flex; gap: 24px; }
+.filter-btn {
+    /* font-family: var(--font-subheader); */
+    /* font-size: 14px;
+    font-weight: 700; */
+    /* text-transform: uppercase; */
+    color: var(--color-placeholder);
+    background: none; border: none; padding: 0; cursor: pointer;
+    /* font-variation-settings: 'SRFF' 0; */
+}
+.filter-btn:hover, .filter-btn.active { color: var(--color-text-main); }
+
+
+.calendar-list {
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.calendar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.cal-date, .cal-name {
+    font-family: var(--font-header);
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--color-placeholder);
+    font-variation-settings: 'SRFF' 25;
+    transition: color 0.2s ease;
+}
+.cal-name { text-align: right; text-transform: uppercase; }
+
+@media (min-width: 769px) {
+    /* .calendar-list:hover .calendar-row {
+        opacity: 0.3;
+    }
+    .calendar-list .calendar-row:hover {
+        opacity: 1;
+    } */
+    .calendar-row:hover .cal-date,
+    .calendar-row:hover .cal-name {
+        color: var(--color-text-main);
+    }
+}
+
+.calendar-poster-wrapper {
+    position: fixed;
+    top: 472px; left: 118px;
+    transform: translateY(-50%);
+    width: 300px; aspect-ratio: 4/5;
+    z-index: 1; pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.calendar-poster-wrapper.active { opacity: 1; }
+.calendar-poster-img {
+    width: 100%; height: 100%; object-fit: cover;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.mobile-event-display { display: none; }
+
+.view-controls {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-left: 32px;
+}
+
+.view-btn {
+    background: none; border: none; padding: 0; cursor: pointer;
+    font-family: var(--font-subheader);
+    font-weight: 700; font-size: 14px;
+    color: var(--color-placeholder);
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+}
+
+.view-btn.active, .view-btn:hover {
+    color: var(--color-text-main);
+}
+
+/* --- THE GRID CONTAINER --- */
+.calendar-grid {
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: min-content;
+    gap: 20px; 
+    
+    /* Scroll & Layout Logic */
+    width: 100%;
+    /* Use flex to fill remaining vertical space */
+    flex-grow: 1; 
+    height: 0; /* CRITICAL: Allows flex-grow to work without overflowing */
+    min-height: 0;
+    
+    overflow-y: auto; /* Scroll inside this grid only */
+    padding: 0 20px 80px 20px; /* Bottom padding for scroll space */
+    
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.calendar-grid::-webkit-scrollbar { display: none; }
+
+
+/* --- THE GRID CARD (The Wrapper) --- */
+.grid-item {
+    position: relative;
+    width: 100%;
+    /* This creates the vertical size automatically based on width */
+    aspect-ratio: 4/5; 
+    background-color: var(--color-placeholder, #eee); /* Fallback color */
+    overflow: hidden; /* Crops the image zoom */
+    display: block;
+    text-decoration: none;
+}
+
+
+/* --- THE IMAGE (The Content) --- */
+.grid-poster {
+    /* Absolute positioning breaks the "intrinsic size" loop */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    
+    object-fit: cover; /* Ensures image fills the box without stretching */
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    display: block;
+}
+
+/* Hover Effect */
+.grid-item:hover .grid-poster {
+    transform: scale(1.05);
+}
+
+/* --- TOGGLE STATE --- */
+/* Ensure this override works */
+.calendar-page.mode-grid .calendar-grid {
+    display: grid !important;
+}
+
+.calendar-page.mode-grid .calendar-list,
+.calendar-page.mode-grid .calendar-poster-wrapper {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .view-controls { display: none; }
+}
+
+@media (max-width: 768px) {
+    .calendar-page {
+        padding-top: 80px;
+    }
+
+    .header-desktop { display: none; }
+    .header-mobile { display: block; font-size: 14vw; }
+    .calendar-controls { display: none; }
+    .calendar-header { margin-bottom: 24px; }
+
+    .calendar-list {
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        flex-grow: 0;
+        overflow-x: auto;
+        gap: 32px;
+        padding-bottom: 20px;
+        height: auto;
+        scroll-snap-type: x mandatory;
+        padding-left: calc(50vw - 40px);
+        padding-right: calc(50vw - 40px);
+        scrollbar-width: none;
+    }
+    .calendar-list::-webkit-scrollbar { display: none; }
+
+    .calendar-row {
+        flex-direction: column;
+        align-items: center;
+        opacity: 0.3;
+        scroll-snap-align: center;
+        min-width: 80px;
+    }
+    
+    .calendar-row.mobile-active { opacity: 1; }
+    .calendar-row.mobile-active .cal-date { color: var(--color-text-main); }
+
+    .cal-name { display: none; }
+    .cal-date { font-size: 48px; white-space: nowrap; }
+
+    .calendar-poster-wrapper { display: none; }
+
+    .mobile-event-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 1;
+        text-align: center;
+        padding: 0 20px 40px 20px;
+        opacity: 1;
+    }
+    .mobile-poster {
+        width: 280px; aspect-ratio: 4/5;
+        object-fit: cover;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 32px;
+    }
+    .mobile-title {
+        font-family: var(--font-header);
+        font-size: 32px; font-weight: 800;
+        text-transform: uppercase; line-height: 1;
+        color: var(--color-text-main);
+    }
+}

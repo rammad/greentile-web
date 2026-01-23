@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details - Green Tile Social Club</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="sticky-nav">
+        <div class="nav-left"><div class="nav-logo-box">GT</div></div>
+        <div class="nav-center">
+            <a href="index.html" class="type-sub2">Home</a>
+            <a href="events.html" class="type-sub2" style="border-bottom: 2px solid currentColor;">Events</a>
+            <a href="#" class="type-sub2">Shop</a>
+            <a href="about.html" class="type-sub2">About</a>
+        </div>
+        <div class="nav-right"><a href="#" class="type-sub2">Contact</a></div>
+    </nav>
+
+    <section class="pdp-section">
+        <div class="pdp-grid">
+            
+            <div class="pdp-info">
+                <a href="events.html" class="back-link">&larr;</a>
+                
+                <span class="pdp-date">Thursday, July 11 &bull; 7PM - 10PM</span>
+                <h1 class="pdp-title">Mahjong After Hours</h1>
+                <div class="pdp-location">301 Ten Eyck St</div>
+                
+                <div>
+                    <span class="pdp-tag">3 Point Hong Kong Style</span>
+                </div>
+
+                <div class="pdp-desc">
+                    <p>Join us for our second all-day, seven-hour, play-till-you-drop mahjong extravaganza!!! Set against the vibey 2-in-1 backdrop of @trans.pecos + @nha_minh.</p>
+                    <p>Seven hours of what again???<br>
+                    🀄 Played the classic GTSC way. Like pickup style, swap in and out of tables by simply asking to sub in next game!<br>
+                    🎧 Seven hours of of live DJs featuring @erniechanders @gammavibes @ailee.n<br>
+                    🍖 Viet BBQ, Banh Mis, cocktails and more for purchase!!</p>
+                </div>
+
+                <div class="ticket-actions">
+                    <div class="pdp-tag" style="margin: 0; background: none; padding: 0;">Max Quantity of Tickets: 4</div>
+                </div>
+                <div class="ticket-actions" style="margin-top: 16px;">
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(-1)">&minus;</button>
+                        <span class="qty-val" id="ticket-qty">1</span>
+                        <button class="qty-btn" onclick="updateQty(1)">&plus;</button>
+                    </div>
+                    <button class="btn-buy">
+                        <span>$25 - Buy Now</span>
+                        <span>&rarr;</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pdp-image-col">
+                <img src="https://placehold.co/480x600/5e2bff/FFF?text=Mahjong+Event" class="pdp-poster" alt="Event Poster">
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        let qty = 1;
+        const qtyDisplay = document.getElementById('ticket-qty');
+        
+        function updateQty(change) {
+            qty += change;
+            if (qty < 1) qty = 1;
+            if (qty > 10) qty = 10; // Optional cap
+            qtyDisplay.innerText = qty;
+        }
+    </script>
+
+</body>
+</html>

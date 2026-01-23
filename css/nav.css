@@ -1,0 +1,72 @@
+/* =========================================
+   NAV
+   ========================================= */
+
+.sticky-nav {
+    position: fixed;
+    top: 0; 
+    left: 50%; /* Always center align the container */
+    transform: translateX(-50%); /* Keeps it perfectly centered */
+    
+    /* INITIAL STATE (At Top) */
+    width: 100%; /* Full width */
+    max-width: 100%;
+    padding: 24px 40px;
+    border-radius: 0px;
+    background: transparent;
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+
+    /* SMOOTH POP ANIMATION */
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --- SCROLLED STATE (The Floating Pill) --- */
+.sticky-nav.scrolled {
+    /* Float down slightly */
+    top: 20px;
+    
+    /* Shrink width to look like a pill */
+    width: 96%; 
+    /* max-width: 600px;  */
+    
+    /* Pill Shape */
+    border-radius: 100px;
+    padding: 12px 30px; /* Compress padding slightly */
+
+    /* GLASS EFFECT */
+    /* Adjust the 0.6 to make it more or less transparent */
+    background: rgba(255, 255, 255, 0.3); 
+    backdrop-filter: blur(12px); /* This creates the blurry glass look */
+    -webkit-backdrop-filter: blur(12px); /* Safari support */
+    
+    /* Pop-out Shadow */
+    /* box-shadow: 0 10px 30px rgba(0,0,0,0.1); */
+    /* border: 1px solid rgba(255,255,255, 0.3); Subtle border */
+}
+
+.nav-center { 
+    display: flex; 
+    gap: 24px; 
+}
+
+.nav-logo {
+    width: 30px; 
+    height: 30px;
+    display: block;
+}
+
+/* Links color transition */
+.sticky-nav a {
+    color: var(--color-text-main);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .sticky-nav { padding: 20px; }
+    .sticky-nav.scrolled { width: 95%; }
+}

@@ -1,0 +1,123 @@
+/* =========================================
+   SCROLL (WHAT WE DO)
+   ========================================= */
+
+.menu-section {
+    height: 400vh; 
+    position: relative;
+    z-index: 10;
+    background: var(--color-bg);
+    margin-bottom: 0; 
+    padding-bottom: 120px; 
+}
+
+.menu-sticky {
+    position: sticky; 
+    top: 0; 
+    width: 100%; 
+    height: 100vh;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    overflow: hidden; 
+}
+
+.menu-stage {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1; 
+    pointer-events: none;
+}
+
+.menu-group {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0; 
+    transition: opacity 0.5s ease;
+}
+.menu-group.active { opacity: 1; }
+
+.menu-photo {
+    position: absolute; 
+    object-fit: cover; 
+    aspect-ratio: 4 / 5;
+    background-color: var(--color-placeholder);
+}
+
+.menu-container {
+    position: relative; 
+    z-index: 10; 
+    text-align: center;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+    max-width: 1000px;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.menu-label {
+    font-family: var(--font-subheader);
+    font-size: 14px; 
+    font-weight: 700; 
+    letter-spacing: 0.1em;
+    text-transform: uppercase; 
+    margin-bottom: 48px; 
+    color: var(--color-text-main); 
+}
+
+.menu-list { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0 0 48px 0; 
+}
+
+.menu-item { /* doesnt match other type settings >:( */
+    font-family: var(--font-header);
+    font-size: 64px;
+    line-height: 1.1; 
+    font-weight: 800;
+    text-transform: uppercase; 
+    letter-spacing: -0.02em; 
+    cursor: pointer;
+    color: var(--c-light-grey);
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.menu-item.active { 
+    color: var(--color-text-main);
+}
+
+.cta-container {
+    position: relative; 
+    width: 100%; 
+    max-width: 600px; 
+    height: 200px;
+}
+
+.cta-block {
+    position: absolute; top: 0; left: 0; width: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    opacity: 0; 
+    pointer-events: none; 
+    transition: opacity 0.4s ease;
+}
+
+.cta-block.active { 
+    opacity: 1; 
+    pointer-events: auto; 
+}
+
+.cta-text { 
+    font-family: var(--font-body);
+    font-size: 18px;
+    line-height: 1.6; 
+    color: var(--color-text-main); 
+    margin-bottom: 32px; 
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .menu-item { font-size: 36px; }
+    .menu-photo { opacity: 0.15 !important; }
+    .menu-section { height: 350vh; }
+}

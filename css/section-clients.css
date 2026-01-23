@@ -1,0 +1,38 @@
+/* =========================================
+   NEWS / CLIENTS
+   ========================================= */
+.clients-section {
+    padding: 64px 0 120px 0;
+    background-color: var(--color-bg);
+    text-align: center;
+    overflow: hidden; 
+}
+
+.clients-header {
+    margin-bottom: 48px;
+    color: var(--color-text-main);
+}
+
+.logo-marquee {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+}
+
+.logo-track {
+    display: flex;
+    align-items: center;
+    gap: 64px;
+    animation: marquee 30s linear infinite;
+    padding-left: 64px;
+}
+
+.client-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+    opacity: 0.3; 
+    filter: grayscale(100%);
+    transition: opacity 0.3s ease;
+}

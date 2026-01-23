@@ -1,0 +1,58 @@
+
+/* =========================================
+   SOCIALS
+   ========================================= */
+
+.socials-section {
+    padding: 120px 0; 
+    /* background-color: var(--color-bg);  */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.socials-header {
+    margin-bottom: 64px;
+    padding: 0 20px;
+}
+
+.socials-icons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 32px;
+}
+
+.icon-circle {
+    width: 64px;
+    height: 64px;
+    background-color: var(--color-placeholder);
+    border-radius: 50%;
+}
+
+.socials-gallery {
+    width: 100%;
+    display: flex;
+    gap: 4px;
+    justify-content: center; 
+    padding: 0 20px;
+    align-items: flex-start; 
+}
+
+.social-img {
+    width: 400px; 
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    flex-shrink: 0; 
+}
+
+.social-img:nth-child(even) {
+        margin-top: 64px;
+}
+
+@media (max-width: 768px) {
+    .social-img{
+        width: 250px;
+    }
+}

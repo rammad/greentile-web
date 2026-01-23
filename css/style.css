@@ -1,0 +1,31 @@
+/* =========================================
+   MASTER STYLESHEET
+   ========================================= */
+
+/* universal variables */
+@import 'base.css';
+
+/* universal sections */
+@import 'nav.css';
+@import 'footer.css';
+
+/* home sections */
+@import 'section-hero.css';
+@import 'section-about.css';
+@import 'section-menu.css';
+@import 'section-events.css';
+@import 'section-featured.css';
+@import 'section-socials.css';
+
+/* about us sections */
+@import 'section-mission.css';
+@import 'section-menu.css';
+@import 'section-clients.css';
+
+/* events page sections */
+@import 'section-calendar.css';
+
+
+@import 'section-pdp.css';
+
+@import 'section-archives.css';

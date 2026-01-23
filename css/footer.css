@@ -1,0 +1,118 @@
+/* =========================================
+   FOOTER
+   ========================================= */
+
+/* footer.css */
+
+.footer-section {
+    position: relative;
+    width: 100%;
+    background-color: transparent; 
+    min-height: 90vh; 
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Clips the giant canvas */
+}
+
+#footer-gradient-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+#footer-canvas {
+    /* REMOVED width/height 100%. 
+       We let JS size this to the full window, 
+       and let the container clip the excess. */
+    display: block;
+}
+
+/* --- YOUR ORIGINAL LAYOUT STYLES BELOW --- */
+
+.marquee-bar {
+    width: 100%;
+    overflow: hidden;
+    padding: 8px 0;
+    margin-top: 4px;
+    white-space: nowrap;
+    display: flex;
+    background-color: var(--color-accent);
+    /* Ensures the two copies sit side-by-side */
+    flex-direction: row; 
+}
+
+.marquee-content { 
+    display: flex;
+    /* IMPORTANT: Prevents the text from squishing */
+    flex-shrink: 0; 
+    
+    /* The Animation: 
+       - marquee-scroll: name of keyframe
+       - 20s: speed (higher = slower)
+       - linear: constant speed (no easing)
+       - infinite: never stops
+    */
+    animation: marquee-scroll 30s linear infinite;
+    animation-direction: reverse;
+}
+
+/* Optional: Make the second bar go the other way */
+/* .marquee-bar.reverse .marquee-content {
+    animation-direction: reverse;
+} */
+
+.marquee-item {
+    font-family: var(--font-subheader);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    padding: 0 48px;
+    color: var(--color-text-main);
+    font-variation-settings: 'SRFF' 0; 
+}
+
+/* --- KEYFRAMES --- */
+@keyframes marquee-scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        /* Move left by exactly 100% of its own width. 
+           Since there is an identical copy behind it, 
+           the reset to 0% is invisible. */
+        transform: translateX(-100%);
+    }
+}
+
+.footer-main {
+    padding: 32px 20px 0 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; 
+    flex-grow: 1; 
+    margin-top: 4px;
+    position: relative;
+    z-index: 1; /* Ensures text sits on top of blobs */
+}
+
+.footer-links {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: flex-end;
+}
+
+.footer-link {
+    font-family: var(--font-body);
+    font-weight: 300;
+    text-decoration: none;
+    color: var(--color-text-main);
+    margin-bottom: 0; 
+    line-height: 1; 
+    font-variation-settings: 'SRFF' 25; 
+}

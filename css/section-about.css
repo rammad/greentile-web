@@ -1,0 +1,114 @@
+/* =========================================
+   ABOUT (Sticky Scrollytelling - Fixed Layout)
+   ========================================= */
+
+.about {
+    position: relative;
+    width: 100%;
+    /* The track length (3x screen height) */
+    height: 300vh; 
+    
+    /* Animation Variables */
+    --text-progress: 0;
+    --img-progress: 0;
+}
+
+/* STICKY WRAPPER */
+.about-sticky-wrapper {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    /* REMOVED: justify-content: center (This was bunching them up) */
+    justify-content: flex-start;
+}
+
+/* --- ANIMATION PHASE 1: TEXT --- */
+.about-content {
+    z-index: 10;
+    max-width: 750px;
+    text-align: center;
+    
+    /* RESTORED: Auto margins center this element vertically,
+       but push the button down */
+    margin-top: auto;
+    margin-bottom: auto;
+
+    opacity: var(--text-progress);
+    filter: blur(calc(15px * (1 - var(--text-progress))));
+    transform: scale(calc(0.9 + (0.1 * var(--text-progress))));
+}
+
+.about .cta-btn {
+    z-index: 10;
+    
+    /* RESTORED: Pushes button 96px from the bottom of the viewport */
+    margin-bottom: 96px; 
+
+    opacity: var(--text-progress);
+    transform: translateY(calc(20px * (1 - var(--text-progress))));
+    filter: blur(calc(10px * (1 - var(--text-progress))));
+}
+
+/* --- ANIMATION PHASE 2: IMAGES --- */
+.scatter-img {
+    position: absolute;
+    object-fit: cover;
+    aspect-ratio: 4 / 5;
+    z-index: 1;
+
+    opacity: var(--img-progress);
+    filter: blur(calc(20px * (1 - var(--img-progress))));
+
+    transform: 
+        translate(
+            calc(var(--x-start) * (1 - var(--img-progress))), 
+            calc(var(--y-start) * (1 - var(--img-progress)))
+        )
+        scale(calc(1.8 - (0.8 * var(--img-progress))));
+}
+
+/* --- START POSITIONS (Original Coordinates) --- */
+
+/* Top Left Group */
+.pos-1 { 
+    --x-start: -100%; --y-start: -100%; 
+    top: -251px; left: -70px; width: 200px; 
+}
+.pos-2 { 
+    --x-start: -50%; --y-start: -100%; 
+    top: -96px; left: 250px; width: 140px; 
+}
+.pos-3 { 
+    --x-start: 50%; --y-start: -100%; 
+    top: 30px; left: 343px; width: 126px; 
+}
+
+/* Bottom Left Group */
+.pos-4 { 
+    --x-start: -100%; --y-start: 100%; 
+    bottom: 189px; left: -22px; width: 255px; 
+}
+.pos-5 { 
+    --x-start: -20%; --y-start: 100%; 
+    bottom: 111px; left: 278px; width: 191px; 
+}
+
+/* Right Side Group */
+.pos-6 { 
+    --x-start: 100%; --y-start: -50%; 
+    top: 51px; right: 318px; width: 95px; 
+}
+.pos-7 { 
+    --x-start: 100%; --y-start: -100%; 
+    top: -170px; right: 53px; width: 178px; 
+}
+.pos-8 { 
+    --x-start: 100%; --y-start: 100%; 
+    bottom: 304px; right: 113px; width: 185px; 
+}
