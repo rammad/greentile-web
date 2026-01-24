@@ -3,36 +3,72 @@
    ========================================= */
 .clients-section {
     padding: 64px 0 120px 0;
-    background-color: var(--color-bg);
+    /* background-color: var(--color-bg); */ /* Optional */
     text-align: center;
     overflow: hidden; 
+    margin-bottom: 200px;
 }
 
 .clients-header {
-    margin-bottom: 48px;
+    margin-bottom: 64px;
     color: var(--color-text-main);
 }
 
+/* The Window */
 .logo-marquee {
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
-    display: flex;
+    position: relative;
+    overflow-anchor: none;
+    /* Fade edges so logos don't pop out of existence */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
 }
 
 .logo-track {
     display: flex;
     align-items: center;
-    gap: 64px;
-    animation: marquee 30s linear infinite;
-    padding-left: 64px;
+    gap: 64px; 
+    width: max-content; 
+    
+    /* Ensure items don't shrink */
+    flex-shrink: 0;
+    
+    /* Animation */
+    animation: marquee-scroll 60s linear infinite; /* Slower speed for longer track */
+    will-change: transform;
+}
+
+@keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { 
+        /* If you used 2 sets: -50%
+           If you used 4 sets: -25% 
+           
+           Use -25% if you pasted the list 4 times. 
+           This resets the loop seamlessly after the first set passes.
+        */
+        transform: translateX(-25%); 
+    }
+}
+/* Pause on hover (Optional user experience tweak) */
+.logo-track:hover {
+    animation-play-state: paused;
 }
 
 .client-logo {
     height: 40px;
     width: auto;
     object-fit: contain;
-    opacity: 0.3; 
+    
+    /* Make them subtle until hovered? */
+    opacity: 0.5; 
     filter: grayscale(100%);
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.client-logo:hover {
+    opacity: 1;
+    filter: grayscale(0%);
 }

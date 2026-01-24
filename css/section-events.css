@@ -108,3 +108,42 @@
         margin-top: 64px;
     }
 }
+
+@media (max-width: 768px) {
+
+    .events-section {
+        height: auto; 
+        min-height: auto;
+    }
+
+    .events-sticky-wrapper {
+        position: relative;
+        top: auto;
+        height: auto;
+        overflow: visible;
+        padding-top: 60px;
+        display: block;
+    }
+
+    .events-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        margin-bottom: 64px;
+    }
+       
+    #event-title {
+        transform: scale(1) !important; 
+        opacity: 1 !important;
+    }
+
+    #event-btn {
+        opacity: 1 !important;
+        transform: none !important;
+        margin-top: 16px;
+    }
+
+    .event-card, .card-1, .card-2, .card-3 {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}

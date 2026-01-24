@@ -1,9 +1,7 @@
 /* =========================================
    FOOTER
    ========================================= */
-
-/* footer.css */
-
+   
 .footer-section {
     position: relative;
     width: 100%;
@@ -11,7 +9,7 @@
     min-height: 90vh; 
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Clips the giant canvas */
+    overflow: hidden;
 }
 
 #footer-gradient-container {
@@ -25,13 +23,8 @@
 }
 
 #footer-canvas {
-    /* REMOVED width/height 100%. 
-       We let JS size this to the full window, 
-       and let the container clip the excess. */
     display: block;
 }
-
-/* --- YOUR ORIGINAL LAYOUT STYLES BELOW --- */
 
 .marquee-bar {
     width: 100%;
@@ -41,29 +34,16 @@
     white-space: nowrap;
     display: flex;
     background-color: var(--color-accent);
-    /* Ensures the two copies sit side-by-side */
     flex-direction: row; 
+    overflow-anchor: none;
 }
 
 .marquee-content { 
     display: flex;
-    /* IMPORTANT: Prevents the text from squishing */
     flex-shrink: 0; 
-    
-    /* The Animation: 
-       - marquee-scroll: name of keyframe
-       - 20s: speed (higher = slower)
-       - linear: constant speed (no easing)
-       - infinite: never stops
-    */
     animation: marquee-scroll 30s linear infinite;
     animation-direction: reverse;
 }
-
-/* Optional: Make the second bar go the other way */
-/* .marquee-bar.reverse .marquee-content {
-    animation-direction: reverse;
-} */
 
 .marquee-item {
     font-family: var(--font-subheader);
@@ -76,15 +56,11 @@
     font-variation-settings: 'SRFF' 0; 
 }
 
-/* --- KEYFRAMES --- */
 @keyframes marquee-scroll {
     0% {
         transform: translateX(0);
     }
     100% {
-        /* Move left by exactly 100% of its own width. 
-           Since there is an identical copy behind it, 
-           the reset to 0% is invisible. */
         transform: translateX(-100%);
     }
 }
@@ -97,7 +73,7 @@
     flex-grow: 1; 
     margin-top: 4px;
     position: relative;
-    z-index: 1; /* Ensures text sits on top of blobs */
+    z-index: 1;
 }
 
 .footer-links {
@@ -105,6 +81,7 @@
     justify-content: space-between;
     width: 100%;
     align-items: flex-end;
+    margin-bottom: 20px;
 }
 
 .footer-link {
