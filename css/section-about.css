@@ -1,114 +1,211 @@
 /* =========================================
-   ABOUT (Sticky Scrollytelling - Fixed Layout)
+   ABOUT (Decoupled: Anchor > Parallax > Img)
    ========================================= */
 
 .about {
+    height: 600vh; 
     position: relative;
-    width: 100%;
-    /* The track length (3x screen height) */
-    height: 300vh; 
-    
-    /* Animation Variables */
-    --text-progress: 0;
-    --img-progress: 0;
+    z-index: 2; 
+    background-color: transparent; 
 }
 
-/* STICKY WRAPPER */
 .about-sticky-wrapper {
     position: sticky;
     top: 0;
     height: 100vh;
     width: 100%;
-    overflow: hidden;
-    
     display: flex;
     flex-direction: column;
-    align-items: center; 
-    /* REMOVED: justify-content: center (This was bunching them up) */
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: center;
 }
 
-/* --- ANIMATION PHASE 1: TEXT --- */
-.about-content {
-    z-index: 10;
-    max-width: 750px;
-    text-align: center;
-    
-    /* RESTORED: Auto margins center this element vertically,
-       but push the button down */
-    margin-top: auto;
-    margin-bottom: auto;
-
-    opacity: var(--text-progress);
-    filter: blur(calc(15px * (1 - var(--text-progress))));
-    transform: scale(calc(0.9 + (0.1 * var(--text-progress))));
-}
-
-.about .cta-btn {
-    z-index: 10;
-    
-    /* RESTORED: Pushes button 96px from the bottom of the viewport */
-    margin-bottom: 96px; 
-
-    opacity: var(--text-progress);
-    transform: translateY(calc(20px * (1 - var(--text-progress))));
-    filter: blur(calc(10px * (1 - var(--text-progress))));
-}
-
-/* --- ANIMATION PHASE 2: IMAGES --- */
-.scatter-img {
+/* --- PERSISTENT CTA --- */
+.about-persistent-cta {
     position: absolute;
-    object-fit: cover;
-    aspect-ratio: 4 / 5;
+    width: 400px;
+    bottom: 96px; 
+    z-index: 20;
+}
+
+/* --- SLIDES --- */
+.about-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
     z-index: 1;
-
-    opacity: var(--img-progress);
-    filter: blur(calc(20px * (1 - var(--img-progress))));
-
-    transform: 
-        translate(
-            calc(var(--x-start) * (1 - var(--img-progress))), 
-            calc(var(--y-start) * (1 - var(--img-progress)))
-        )
-        scale(calc(1.8 - (0.8 * var(--img-progress))));
 }
 
-/* --- START POSITIONS (Original Coordinates) --- */
-
-/* Top Left Group */
-.pos-1 { 
-    --x-start: -100%; --y-start: -100%; 
-    top: -251px; left: -70px; width: 200px; 
-}
-.pos-2 { 
-    --x-start: -50%; --y-start: -100%; 
-    top: -96px; left: 250px; width: 140px; 
-}
-.pos-3 { 
-    --x-start: 50%; --y-start: -100%; 
-    top: 30px; left: 343px; width: 126px; 
+/* --- TEXT ANIMATION --- */
+.about-content {
+    position: relative;
+    z-index: 15; 
+    text-align: center;
+    max-width: 750px;
+    opacity: 0;
+    filter: blur(10px);
+    transition: opacity 0.8s ease-out, filter 0.8s ease-out;
 }
 
-/* Bottom Left Group */
-.pos-4 { 
-    --x-start: -100%; --y-start: 100%; 
-    bottom: 189px; left: -22px; width: 255px; 
-}
-.pos-5 { 
-    --x-start: -20%; --y-start: 100%; 
-    bottom: 111px; left: 278px; width: 191px; 
+.about-slide.slide-visible .about-content {
+    opacity: 1;
+    filter: blur(0px);
 }
 
-/* Right Side Group */
-.pos-6 { 
-    --x-start: 100%; --y-start: -50%; 
-    top: 51px; right: 318px; width: 95px; 
+/* =========================================
+   1. ANCHOR (Grandparent)
+   Handles: Position, Opacity, Blur, "Explosion" Fly
+   Delay: YES (0.3s)
+   ========================================= */
+.scatter-anchor {
+    position: absolute;
+    z-index: 1;
+    width: 180px;
+    
+    /* Animation Variables */
+    --fly-x: 0px;
+    --fly-y: 100px;
+    
+    opacity: 0; 
+    filter: blur(15px);
+    transform: translate(0, 0); 
+    
+    will-change: transform, opacity;
+
+    transition: 
+        opacity 1.5s ease-out,
+        transform 1.8s cubic-bezier(0.2, 0.9, 0.2, 1), 
+        filter 1.5s ease-out;
 }
-.pos-7 { 
-    --x-start: 100%; --y-start: -100%; 
-    top: -170px; right: 53px; width: 178px; 
+
+/* =========================================
+   2. PARALLAX WRAPPER (Parent)
+   Handles: Scroll Y
+   Delay: NONE (Instant update for smooth scroll)
+   ========================================= */
+.scatter-parallax {
+    width: 100%;
+    height: 100%;
+    
+    /* Variable from JS */
+    --scroll-y: 0px;
+    
+    /* INSTANT MOVEMENT - Key to fixing stutter */
+    transform: translateY(var(--scroll-y));
+    transition: none; 
+    will-change: transform;
 }
-.pos-8 { 
-    --x-start: 100%; --y-start: 100%; 
-    bottom: 304px; right: 113px; width: 185px; 
+
+/* =========================================
+   3. IMAGE (Child)
+   Handles: Mouse Avoidance, Scale
+   Delay: NONE, but Slow Transition (Floaty feel)
+   ========================================= */
+.scatter-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    
+    --base-scale: 1;
+    --avoid-x: 0px;
+    --avoid-y: 0px;
+
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+
+    /* Slow transition allows mouse movement to feel floaty 
+       without fighting the scroll, because scroll is on the parent */
+    transition: transform 1.8s cubic-bezier(0.2, 0.9, 0.2, 1);
+    
+    transform: translate(var(--avoid-x), var(--avoid-y)) scale(var(--base-scale));
+}
+
+/* =========================================
+   SLIDE STATES (Applied to Anchor)
+   ========================================= */
+
+/* --- SLIDE 1 --- */
+#slide-1:not(.slide-visible) .scatter-anchor {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translate(var(--fly-x), var(--fly-y)); 
+}
+#slide-1.slide-visible .scatter-anchor {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0);
+    transition-delay: 0.3s;
+}
+#slide-1.slide-exit .scatter-anchor {
+    opacity: 0;
+    transform: translateY(-30px);
+    transition-delay: 0s;
+}
+
+/* --- SLIDE 2 --- */
+#slide-2:not(.slide-visible) .scatter-anchor {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateY(40px);
+}
+#slide-2.slide-visible .scatter-anchor {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0);
+    transition-delay: 0.3s;
+}
+#slide-2.slide-exit .scatter-anchor {
+    opacity: 0;
+    transform: translateY(-30px);
+    transition-delay: 0s;
+}
+
+/* --- SLIDE 3 --- */
+#slide-3:not(.slide-visible):not(.slide-exit) .scatter-anchor {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateY(40px);
+}
+#slide-3.slide-visible .scatter-anchor {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0);
+    transition-delay: 0.3s;
+}
+#slide-3.slide-exit .scatter-anchor {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translate(var(--fly-x), var(--fly-y));
+    transition-delay: 0s;
+}
+
+/* =========================================
+   POSITIONS (Applied to Anchor)
+   ========================================= */
+
+.pos-1 { top: 5%; left: 5%; }       
+.pos-2 { top: 5%; right: 5%; }      
+.pos-3 { bottom: 15%; left: 5%; }   
+.pos-4 { bottom: 15%; right: 5%; }  
+.pos-5 { top: 5%; left: 40%; }      
+.pos-6 { bottom: 15%; right: 40%; } 
+.pos-7 { top: 40%; left: 2%; }      
+.pos-8 { top: 40%; right: 2%; }     
+
+@media (max-width: 768px) {
+    .about-persistent-cta { bottom: 60px; }
+    .scatter-anchor { width: 100px; } 
+    .scatter-img { opacity: 0.8; } 
+    
+    .pos-1, .pos-2, .pos-5 { top: 12%; }
+    .pos-3, .pos-4, .pos-6 { bottom: 20%; }
+    .pos-7, .pos-8 { top: 45%; }
 }

@@ -1,56 +1,45 @@
 /* =========================================
-   NAV
+   NAV (Permanent Pill + Rolling Text)
    ========================================= */
 
 .sticky-nav {
     position: fixed;
-    top: 0; 
-    left: 50%; /* Always center align the container */
-    transform: translateX(-50%); /* Keeps it perfectly centered */
+    top: 20px;
+    left: 20px;
+    right: 20px;
     
-    /* INITIAL STATE (At Top) */
-    width: 100%; /* Full width */
-    max-width: 100%;
-    padding: 24px 40px;
-    border-radius: 0px;
-    background: transparent;
+    width: auto; 
+    max-width: none; 
+    
+    transform: translate3d(0, 0, 0); 
+    
+    padding: 12px 30px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.3); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    border: 1px solid rgba(255,255,255, 0.2);
     
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 1000;
 
-    /* SMOOTH POP ANIMATION */
-    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                background 0.3s ease;
 }
 
-/* --- SCROLLED STATE (The Floating Pill) --- */
-.sticky-nav.scrolled {
-    /* Float down slightly */
-    top: 20px;
-    
-    /* Shrink width to look like a pill */
-    width: 96%; 
-    /* max-width: 600px;  */
-    
-    /* Pill Shape */
-    border-radius: 100px;
-    padding: 12px 30px; /* Compress padding slightly */
-
-    /* GLASS EFFECT */
-    /* Adjust the 0.6 to make it more or less transparent */
-    background: rgba(255, 255, 255, 0.3); 
-    backdrop-filter: blur(12px); /* This creates the blurry glass look */
-    -webkit-backdrop-filter: blur(12px); /* Safari support */
-    
-    /* Pop-out Shadow */
-    /* box-shadow: 0 10px 30px rgba(0,0,0,0.1); */
-    /* border: 1px solid rgba(255,255,255, 0.3); Subtle border */
+/* HIDDEN STATE */
+.sticky-nav.nav-hidden {
+    /* Only move vertically now. 
+       We translate Y by -200% (or -100px) to move it off the top edge. */
+    transform: translate3d(0, -150%, 0);
 }
 
 .nav-center { 
     display: flex; 
-    gap: 24px; 
+    gap: 32px; 
+    align-items: center;
 }
 
 .nav-logo {
@@ -59,14 +48,74 @@
     display: block;
 }
 
-/* Links color transition */
+/* --- ROLLING TEXT LINKS --- */
+
 .sticky-nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Crop the rolling text */
+    
+    height: 1.25em; /* Lock height to font size */
+    line-height: 1.25;
+    
     color: var(--color-text-main);
     text-decoration: none;
-    transition: color 0.3s ease;
+    font-weight: 500;
+}
+
+/* The Visible Text */
+.sticky-nav a span {
+    display: inline-block;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The Duplicate Text (from data-text attr) */
+.sticky-nav a::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%; /* Start just below visibility */
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--color-text-main);
+    
+    text-align: center;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* HOVER EFFECT */
+.sticky-nav a:hover span {
+    transform: translateY(-100%); /* Move original UP and out */
+}
+.sticky-nav a:hover::after {
+    transform: translateY(-100%); /* Move duplicate UP and in */
+}
+
+/* UNDERLINE EFFECT */
+.sticky-nav a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: var(--color-text-main);
+    
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sticky-nav a:hover::before {
+    transform: scaleX(1);
+    transform-origin: left center;
 }
 
 @media (max-width: 768px) {
-    .sticky-nav { padding: 20px; }
-    .sticky-nav.scrolled { width: 95%; }
+    .sticky-nav { 
+        width: 95%; 
+        padding: 12px 20px;
+    }
 }
