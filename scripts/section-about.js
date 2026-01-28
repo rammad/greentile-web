@@ -1,151 +1,148 @@
 /* =========================================
-   SECTION: ABOUT
-   Handles: Image Setup, Parallax Calculations, Scroll Sequence
+   STEP 2: ABOUT (Restored Functionality)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-    if(!document.querySelector('.about')) return;
+    // 1. SELECTORS
+    const aboutSection = document.querySelector('.about');
+    if(!aboutSection) return;
 
-    setupAboutImages();
-    initAboutScroll();
+    const slides = document.querySelectorAll('.about-slide');
+    const cta = document.querySelector('.about-persistent-cta');
+
+    // 2. SETUP (Run once)
+    setupAboutImages(); 
+
+    // 3. HELPERS
+    const showSlide = (index) => {
+        slides.forEach((s, i) => {
+            if (i === index) {
+                s.classList.add('slide-visible');
+                s.classList.remove('slide-exit');
+            } else {
+                s.classList.remove('slide-visible');
+                s.classList.add('slide-exit'); 
+            }
+        });
+    };
+
+    const setExplosionState = (shouldExplode) => {
+        const anchors = document.querySelectorAll('.scatter-anchor');
+        anchors.forEach(anchor => {
+            if (shouldExplode) {
+                anchor.classList.add('is-exploded');
+            } else {
+                anchor.classList.remove('is-exploded');
+            }
+        });
+    };
+
+    // 4. DEFINE SCROLL STEPS
+    const aboutSteps = [0, 1, 2].map(index => {
+        return {
+            id: `about-${index}`,
+            
+            onEnter: (direction) => {
+                aboutSection.classList.add('is-active');
+                if(cta) cta.classList.remove('not-active');
+                
+                showSlide(index);
+
+                // Slide 0 = Imploded (Center), Slide 1+ = Exploded (Out)
+                if (index === 0) {
+                    setExplosionState(false); 
+                } else {
+                    setExplosionState(true);
+                }
+
+                return 1000; 
+            },
+            
+            onExit: (direction) => {
+                const isLeavingTop = (index === 0 && direction === 'up');
+                const isLeavingBottom = (index === 2 && direction === 'down');
+
+                if (isLeavingTop || isLeavingBottom) {
+                    if(cta) cta.classList.add('not-active');
+                    
+                    if (isLeavingBottom) {
+                        setTimeout(() => aboutSection.classList.remove('is-active'), 600);
+                    } else {
+                        aboutSection.classList.remove('is-active');
+                    }
+                }
+                return 600; 
+            }
+        };
+    });
+
+    // 5. REGISTER
+    if (window.ScrollManager) {
+        ScrollManager.addSteps(aboutSteps);
+    } else {
+        console.error("ScrollManager not found.");
+    }
 });
 
+/* =========================================
+   IMAGE SETUP UTILITY (Original Logic)
+   ========================================= */
 function setupAboutImages() {
     const images = document.querySelectorAll('.about-slide > .scatter-img');
 
     images.forEach(img => {
-        // Create Wrappers: Anchor (Pos) -> Parallax (Scroll) -> Img (Mouse)
+        // 1. Create Wrappers
         const anchor = document.createElement('div');
         anchor.classList.add('scatter-anchor');
         
         const parallax = document.createElement('div');
         parallax.classList.add('scatter-parallax');
 
-        // Move Pos Classes
+        // 2. Transfer Classes (The original way)
+        // We move pos-X from img to anchor so CSS handles position
         const classesToMove = [];
-        img.classList.forEach(cls => { if (cls.startsWith('pos-')) classesToMove.push(cls); });
-        classesToMove.forEach(cls => { anchor.classList.add(cls); img.classList.remove(cls); });
+        img.classList.forEach(cls => { 
+            if (cls.startsWith('pos-')) classesToMove.push(cls); 
+        });
+        classesToMove.forEach(cls => { 
+            anchor.classList.add(cls); 
+            img.classList.remove(cls); 
+        });
 
-        // Randomize
-        const jitterX = Math.floor(Math.random() * 100) - 50;
-        const jitterY = Math.floor(Math.random() * 100) - 50;
-        const scale = 0.7 + Math.random() * 0.6;
+        // 3. Randomize Jitter (Texture only, not positioning)
+        const jitterX = Math.floor(Math.random() * 40) - 20;
+        const jitterY = Math.floor(Math.random() * 40) - 20;
 
         anchor.style.marginLeft = `${jitterX}px`;
         anchor.style.marginTop = `${jitterY}px`;
         
-        // --- FLY VECTORS (Restored Full Logic) ---
+        // 4. CALCULATE FLY VECTORS (For Explosion)
         let flyX = '0px', flyY = '0px';
-        const distV = '25vh', distH = '15vw';  
+        const distV = '30vh'; 
+        const distH = '20vw';  
 
-        // 1. TOP LEFT
-        if (anchor.classList.contains('pos-1')) {       
-            flyX = `-${distH}`; flyY = `-${distV}`;
-        } 
-        // 2. TOP RIGHT
-        else if (anchor.classList.contains('pos-2')) { 
-            flyX = `${distH}`; flyY = `-${distV}`;
-        } 
-        // 3. BOTTOM LEFT
-        else if (anchor.classList.contains('pos-3')) { 
-            flyX = `-${distH}`; flyY = `${distV}`;
-        } 
-        // 4. BOTTOM RIGHT
-        else if (anchor.classList.contains('pos-4')) { 
-            flyX = `${distH}`; flyY = `${distV}`;
-        } 
-        // 5. TOP CENTER
-        else if (anchor.classList.contains('pos-5')) { 
-            flyX = '0px'; flyY = `-${distV}`;
-        } 
-        // 6. BOTTOM CENTER
-        else if (anchor.classList.contains('pos-6')) { 
-            flyX = '0px'; flyY = `${distV}`;
-        } 
-        // 7. LEFT CENTER
-        else if (anchor.classList.contains('pos-7')) { 
-            flyX = `-${distH}`; flyY = '0px';
-        } 
-        // 8. RIGHT CENTER
-        else if (anchor.classList.contains('pos-8')) { 
-            flyX = `${distH}`; flyY = '0px';
-        }
-        // FALLBACK (Down)
-        else { 
-            flyX = '0px'; flyY = `${distV}`; 
-        } 
-
+        // Determine direction based on class
+        if (anchor.classList.contains('pos-1')) { flyX = `-${distH}`; flyY = `-${distV}`; } 
+        else if (anchor.classList.contains('pos-2')) { flyX = `${distH}`; flyY = `-${distV}`; } 
+        else if (anchor.classList.contains('pos-3')) { flyX = `-${distH}`; flyY = `${distV}`; } 
+        else if (anchor.classList.contains('pos-4')) { flyX = `${distH}`; flyY = `${distV}`; } 
+        else if (anchor.classList.contains('pos-5')) { flyX = '0px'; flyY = `-${distV}`; } 
+        else if (anchor.classList.contains('pos-6')) { flyX = '0px'; flyY = `${distV}`; } 
+        else if (anchor.classList.contains('pos-7')) { flyX = `-${distH}`; flyY = '0px'; } 
+        else if (anchor.classList.contains('pos-8')) { flyX = `${distH}`; flyY = '0px'; }
+        
         anchor.style.setProperty('--fly-x', flyX);
         anchor.style.setProperty('--fly-y', flyY);
 
-        // Init Vars
-        parallax._targetY = 0;
-        parallax._currentY = 0;
-        parallax.style.setProperty('--scroll-y', '0px');
-        
+        // 5. SCALE
+        const scale = 0.4 + Math.random() * 0.4; // 0.4 to 0.8 size
         img.style.setProperty('--base-scale', scale);
-        img.style.setProperty('--avoid-x', '0px');
-        img.style.setProperty('--avoid-y', '0px');
-
+        
+        // 6. ASSEMBLE
         img.parentNode.insertBefore(anchor, img);
         anchor.appendChild(parallax);
         parallax.appendChild(img);
-    });
-}
-
-function initAboutScroll() {
-    const slides = document.querySelectorAll('.about-slide');
-    const ctaBtn = document.querySelector('.about-persistent-cta');
-    const cachedParallaxWrappers = [
-        document.querySelectorAll('#slide-1 .scatter-parallax'),
-        document.querySelectorAll('#slide-2 .scatter-parallax'),
-        document.querySelectorAll('#slide-3 .scatter-parallax')
-    ];
-
-    // Helper to update parallax targets
-    const updateParallaxTargets = (slideIndex, progress, start, end) => {
-        const wrappers = cachedParallaxWrappers[slideIndex];
-        if(!wrappers) return;
-        const localP = (progress - start) / (end - start);
-        const moveY = 25 - (localP * 50); 
-        wrappers.forEach(w => w._targetY = moveY);
-    };
-
-    new ScrollAnimator('.about', (data) => {
-        const p = data.stickyProgress; 
         
-        const setStage = (activeIndex) => {
-            slides.forEach((slide, index) => {
-                if (index === activeIndex) {
-                    slide.classList.add('slide-visible');
-                    slide.classList.remove('slide-exit');
-                } else if (index < activeIndex) {
-                    slide.classList.remove('slide-visible');
-                    slide.classList.add('slide-exit');
-                } else {
-                    slide.classList.remove('slide-visible', 'slide-exit');
-                }
-            });
-
-            // CTA Button Logic
-            if (ctaBtn) {
-                (activeIndex >= 0 && activeIndex <= 2) 
-                    ? ctaBtn.classList.remove('not-active') 
-                    : ctaBtn.classList.add('not-active');
-            }
-        };
-
-        // Timeline
-        if (p < 0.10) {
-             setStage(-1);
-        } else if (p >= 0.10 && p < 0.35) {
-            setStage(0); updateParallaxTargets(0, p, 0.05, 0.25);
-        } else if (p >= 0.35 && p < 0.60) {
-            setStage(1); updateParallaxTargets(1, p, 0.25, 0.50);
-        } else if (p >= 0.60 && p < 0.8) {
-            setStage(2); updateParallaxTargets(2, p, 0.50, 0.75);
-        } else {
-            setStage(4);
-        }
+        parallax._targetY = 0;
     });
 }

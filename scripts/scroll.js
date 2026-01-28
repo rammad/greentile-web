@@ -1,51 +1,95 @@
-/**
- * SCROLL ENGINE
- * A reusable class that handles the heavy lifting of scroll math.
- * It calculates progress and passes it to a callback function.
- */
-class ScrollAnimator {
-    constructor(targetSelector, onUpdate) {
-        this.target = document.querySelector(targetSelector);
-        if (!this.target) return;
+/* =========================================
+   SCROLL MANAGER (formerly Director)
+   Manages the "Steps" of the website.
+   ========================================= */
 
-        // The function to run every frame (defined in animations.js)
-        this.onUpdate = onUpdate;
+window.ScrollManager = {
+    currentStep: 0,
+    isLocked: false, 
+    steps: [],      
 
-        this.update = this.update.bind(this);
-        window.addEventListener('scroll', this.update, { passive: true });
-        window.addEventListener('resize', this.update);
+    init() {
+        console.log("ScrollManager: Starting...");
+
+        // 1. LISTEN FOR INPUT (Wheel + Touch)
+        // passive: false is CRITICAL for preventing native scroll
+        window.addEventListener('wheel', this.handleInput.bind(this), { passive: false });
         
-        this.update(); // Initial check
+        let touchStartY = 0;
+        window.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY, { passive: false });
+        window.addEventListener('touchend', e => {
+            const touchEndY = e.changedTouches[0].clientY;
+            const delta = touchStartY - touchEndY;
+            if (Math.abs(delta) > 30) this.trigger(delta > 0 ? 1 : -1);
+        }, { passive: false });
+
+        // 2. INITIALIZE FIRST STEP
+        // We check after a short delay to allow other scripts to register steps
+        setTimeout(() => {
+            console.log(`ScrollManager: Registered ${this.steps.length} steps.`);
+            
+            if(this.steps.length > 0) {
+                // Activate the first step immediately
+                this.steps[0].onEnter('down');
+            } else {
+                console.error("ScrollManager: No steps found! Unlocking native scroll.");
+                document.body.style.overflow = "auto"; // Emergency Fallback
+            }
+        }, 300);
+    },
+
+    // Allow other scripts to add their logic
+    addSteps(newSteps) {
+        this.steps = this.steps.concat(newSteps);
+    },
+
+    handleInput(e) {
+        // Prevent default browser scrolling
+        e.preventDefault();
+        
+        if (this.isLocked) return;
+
+        // TRACKPAD SENSITIVITY FIX
+        // Trackpads give small deltaY (e.g., 4 or 5). Mice give large (100).
+        // Threshold of 2 catches everything without misfiring on jitter.
+        if (e.deltaY > 2) this.trigger(1);  
+        else if (e.deltaY < -2) this.trigger(-1);
+    },
+
+    trigger(direction) {
+        const nextIndex = this.currentStep + direction;
+
+        // Bounds Check (Start/End)
+        if (nextIndex < 0 || nextIndex >= this.steps.length) return;
+
+        this.isLocked = true;
+        const currentScene = this.steps[this.currentStep];
+        const nextScene = this.steps[nextIndex];
+
+        // 1. EXIT CURRENT
+        const exitDuration = currentScene.onExit(direction > 0 ? 'down' : 'up');
+
+        // 2. ENTER NEXT (Delayed overlap)
+        setTimeout(() => {
+            // Reset active classes
+            document.querySelectorAll('section').forEach(s => s.classList.remove('is-active'));
+            
+            // Run Enter Logic
+            const enterDuration = nextScene.onEnter(direction > 0 ? 'down' : 'up');
+            
+            // 3. UNLOCK INPUT
+            const totalLockTime = Math.max(exitDuration, enterDuration, 600); 
+            
+            setTimeout(() => {
+                this.currentStep = nextIndex;
+                this.isLocked = false;
+            }, totalLockTime);
+
+        }, 100); // Overlap delay
     }
+};
 
-    update() {
-        const rect = this.target.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-
-        // 1. NORMAL SCROLL PROGRESS (0.0 to 1.0)
-        // Good for fading things in as they enter the screen.
-        const startOffset = windowHeight * 0.9; 
-        const endOffset = windowHeight * 0.2;
-        let scrollProgress = (startOffset - rect.top) / (startOffset - endOffset);
-        scrollProgress = Math.min(Math.max(scrollProgress, 0), 1);
-
-        // 2. STICKY PROGRESS (0.0 to 1.0)
-        // Good for pinned sections. Calculates based on how deep we are into the track.
-        const totalDistance = rect.height - windowHeight;
-        let stickyProgress = (rect.top * -1) / totalDistance;
-        stickyProgress = Math.min(Math.max(stickyProgress, 0), 1);
-
-        // 3. HAND OFF DATA
-        // We pass these numbers to your custom logic
-        if (this.onUpdate) {
-            this.onUpdate({ 
-                target: this.target, 
-                scrollProgress: scrollProgress, 
-                stickyProgress: stickyProgress 
-            });
-        }
-    }
-}
-
-// Make it available globally so animations.js can see it
-window.ScrollAnimator = ScrollAnimator;
+// Start when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    window.ScrollManager.init();
+});

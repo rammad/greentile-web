@@ -1,19 +1,24 @@
 /* =========================================
-   EVENTS SECTION (4-Column Layout + Side Slide)
+   EVENTS SECTION (Director Mode)
    ========================================= */
 
 .events-section {
-    position: relative;
-    height: 350vh; 
+    /* RESET: No longer a tall scroll track */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; 
+    background: transparent;
 }
 
 .events-sticky-wrapper {
-    position: sticky;
-    top: 0;
-    height: 100vh;
+    /* RESET: No longer sticky */
+    position: relative;
+    height: 100%;
     width: 100%;
     overflow: hidden;
-    
+    padding: 0; 
     display: flex;
     flex-direction: column;
 }
@@ -28,25 +33,21 @@
     z-index: 10;
 }
 
-/* INITIAL STATE: Big & Bottom (Hero Match) */
 #event-title {
     position: absolute;
     
-    /* 20px from Bottom & Sides */
-    bottom: 0; 
-    left: 0; 
-    padding: 0 20px;
-    width: 100%;  
-
-    overflow: hidden;
+    /* Positioning */
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    width: auto; 
     
-    /* STYLE */
-    font-size: 9vw; 
-    /* line-height: 0.9; */
+    font-size: var(--size-display-hero); 
+    line-height: 0.9;
     text-align: center;
     transform-origin: center center;
     
-    /* ANIMATION */
+    /* Animation Physics */
     transition: 
         bottom 1.2s cubic-bezier(0.19, 1, 0.22, 1),
         font-size 1.2s cubic-bezier(0.19, 1, 0.22, 1),
@@ -55,67 +56,61 @@
     will-change: bottom, font-size, transform;
 }
 
-/* SHRUNK STATE: Small & Top */
+/* SHRUNK STATE */
 #event-title.state-shrunk {
-    /* Move to Top (Adjust this px value to clear your nav height) */
-    bottom: calc(100% - 180px); 
-    
+    bottom: calc(100% - 140px); 
     font-size: var(--size-h2);   
     text-align: left;           
 }
 
-/* --- BUTTON (Fades in at top right) --- */
+/* --- BUTTON --- */
 #event-btn {
     position: absolute;
-    top: 120px; /* Align with shrunk title */
-    right: 0;  /* Align to right edge of container */
-/*     
+    top: 60px; 
+    right: 20px;  
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.6s ease, transform 0.6s ease;
     pointer-events: auto; 
-    z-index: 12; */
+    z-index: 12;
 }
-/* 
+
 #event-btn.is-visible {
     opacity: 1;
     transform: translateY(0);
-} */
+}
 
-/* --- GRID (4 Columns + Side Entrance) --- */
+/* --- GRID --- */
 .events-grid {
     position: absolute;
-    top: 240px; /* Below the shrunk header */
-    padding: 0 20px;
-    width: 100%;
+    top: 180px; 
+    left: 20px;
+    right: 20px;
+    width: auto;
     
     display: grid;
-    /* 4 Columns */
     grid-template-columns: repeat(4, 1fr); 
-    
-    /* 8px Gap */
     gap: 8px;
-    
     z-index: 5;
+}
+
+/* STAGGER EFFECT (Desktop Only) */
+@media (min-width: 769px) {
+    .events-grid .event-card:nth-child(even) {
+        margin-top: 64px; 
+    }
 }
 
 .event-card {
     opacity: 0;
-    filter: blur(8px);
-    
-    /* SLIDE IN FROM RIGHT */
     transform: translateX(100px); 
-    
-    /* Smooth entrance */
     transition: 
-        opacity 0.4s ease, 
-        blur 0.4s ease,
+        opacity 0.8s ease, 
         transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .event-card.is-visible {
     opacity: 1;
-    filter: blur(0);
     transform: translateX(0);
 }
 
@@ -125,13 +120,6 @@
     object-fit: cover;
     background-color: var(--color-placeholder);
     display: block;
-}
-
-@media (min-width: 769px) {
-    /* Push every 2nd card (2, 4, 6...) down to create the rhythm */
-    .events-grid .event-card:nth-child(even) {
-        margin-top: 64px; /* Adjust this value for more/less offset */
-    }
 }
 
 /* --- MOBILE --- */
@@ -144,7 +132,7 @@
         bottom: calc(100% - 100px);
     }
     .events-grid {
-        grid-template-columns: 1fr; /* Stack on mobile */
+        grid-template-columns: 1fr;
         top: 140px;
         gap: 20px;
         padding-bottom: 100px;

@@ -1,18 +1,17 @@
 /* =========================================
-   ABOUT (Decoupled: Anchor > Parallax > Img)
+   ABOUT (Restored & Fixed)
    ========================================= */
 
 .about {
-    height: 600vh; 
-    position: relative;
     z-index: 2; 
     background-color: transparent; 
 }
 
+/* --- WRAPPERS --- */
 .about-sticky-wrapper {
-    position: sticky;
+    position: relative;
     top: 0;
-    height: 100vh;
+    height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -20,15 +19,6 @@
     justify-content: center;
 }
 
-/* --- PERSISTENT CTA --- */
-.about-persistent-cta {
-    position: absolute;
-    width: 400px;
-    bottom: 96px; 
-    z-index: 20;
-}
-
-/* --- SLIDES --- */
 .about-slide {
     position: absolute;
     top: 0;
@@ -36,14 +26,81 @@
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     pointer-events: none;
     z-index: 1;
 }
 
-/* --- TEXT ANIMATION --- */
+/* --- ANCHORS (The Position Logic) --- */
+.scatter-anchor {
+    position: absolute;
+    
+    /* Default: No transform offset, rely on top/left */
+    transform: translate(0, 0);
+    
+    transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+    will-change: transform;
+    z-index: 1;
+    width: 0; 
+    height: 0;
+}
+
+/* --- EXPLODED STATE (Generic) --- */
+/* For corners (1,2,3,4), this simple vector works */
+.scatter-anchor.is-exploded {
+    transform: translate(var(--fly-x), var(--fly-y));
+}
+
+/* --- IMAGES --- */
+.scatter-img {
+    display: block;
+    position: relative;
+    
+    /* Strict Size Controls */
+    width: 28vw;      
+    max-width: 300px; 
+    height: auto;
+    
+    /* Scale & Mouse Avoidance */
+    transform: scale(var(--base-scale, 0.6)) translate(var(--avoid-x, 0px), var(--avoid-y, 0px));
+    transition: transform 0.1s linear; 
+}
+
+
+/* =========================================
+   POSITIONS (The Grid)
+   ========================================= */
+
+/* CORNERS (No transform needed) */
+.pos-1 { top: 10%; left: 10%; }       
+.pos-2 { top: 10%; right: 10%; }      
+.pos-3 { bottom: 10%; left: 10%; }   
+.pos-4 { bottom: 10%; right: 10%; }  
+
+/* CENTERS (Need transforms to center themselves) */
+
+/* Top Center */
+.pos-5 { top: 8%; left: 50%; transform: translateX(-50%); } 
+/* When exploded, keep the centering + add fly vector */
+.scatter-anchor.pos-5.is-exploded { transform: translateX(-50%) translate(var(--fly-x), var(--fly-y)); }
+
+/* Bottom Center */
+.pos-6 { bottom: 8%; left: 50%; transform: translateX(-50%); } 
+.scatter-anchor.pos-6.is-exploded { transform: translateX(-50%) translate(var(--fly-x), var(--fly-y)); }
+
+/* Left Center */
+.pos-7 { top: 50%; left: 5%; transform: translateY(-50%); }      
+.scatter-anchor.pos-7.is-exploded { transform: translateY(-50%) translate(var(--fly-x), var(--fly-y)); }
+
+/* Right Center */
+.pos-8 { top: 50%; right: 5%; transform: translateY(-50%); }     
+.scatter-anchor.pos-8.is-exploded { transform: translateY(-50%) translate(var(--fly-x), var(--fly-y)); }
+
+
+/* =========================================
+   TEXT FADES
+   ========================================= */
 .about-content {
     position: relative;
     z-index: 15; 
@@ -57,155 +114,4 @@
 .about-slide.slide-visible .about-content {
     opacity: 1;
     filter: blur(0px);
-}
-
-/* =========================================
-   1. ANCHOR (Grandparent)
-   Handles: Position, Opacity, Blur, "Explosion" Fly
-   Delay: YES (0.3s)
-   ========================================= */
-.scatter-anchor {
-    position: absolute;
-    z-index: 1;
-    width: 180px;
-    
-    /* Animation Variables */
-    --fly-x: 0px;
-    --fly-y: 100px;
-    
-    opacity: 0; 
-    filter: blur(15px);
-    transform: translate(0, 0); 
-    
-    will-change: transform, opacity;
-
-    transition: 
-        opacity 1.5s ease-out,
-        transform 1.8s cubic-bezier(0.2, 0.9, 0.2, 1), 
-        filter 1.5s ease-out;
-}
-
-/* =========================================
-   2. PARALLAX WRAPPER (Parent)
-   Handles: Scroll Y
-   Delay: NONE (Instant update for smooth scroll)
-   ========================================= */
-.scatter-parallax {
-    width: 100%;
-    height: 100%;
-    
-    /* Variable from JS */
-    --scroll-y: 0px;
-    
-    /* INSTANT MOVEMENT - Key to fixing stutter */
-    transform: translateY(var(--scroll-y));
-    transition: none; 
-    will-change: transform;
-}
-
-/* =========================================
-   3. IMAGE (Child)
-   Handles: Mouse Avoidance, Scale
-   Delay: NONE, but Slow Transition (Floaty feel)
-   ========================================= */
-.scatter-img {
-    display: block;
-    width: 100%;
-    height: auto;
-    
-    --base-scale: 1;
-    --avoid-x: 0px;
-    --avoid-y: 0px;
-
-    will-change: transform;
-    backface-visibility: hidden;
-    perspective: 1000px;
-
-    /* Slow transition allows mouse movement to feel floaty 
-       without fighting the scroll, because scroll is on the parent */
-    transition: transform 1.8s cubic-bezier(0.2, 0.9, 0.2, 1);
-    
-    transform: translate(var(--avoid-x), var(--avoid-y)) scale(var(--base-scale));
-}
-
-/* =========================================
-   SLIDE STATES (Applied to Anchor)
-   ========================================= */
-
-/* --- SLIDE 1 --- */
-#slide-1:not(.slide-visible) .scatter-anchor {
-    opacity: 0;
-    filter: blur(15px);
-    transform: translate(var(--fly-x), var(--fly-y)); 
-}
-#slide-1.slide-visible .scatter-anchor {
-    opacity: 1;
-    filter: blur(0);
-    transform: translate(0, 0);
-    transition-delay: 0.3s;
-}
-#slide-1.slide-exit .scatter-anchor {
-    opacity: 0;
-    transform: translateY(-30px);
-    transition-delay: 0s;
-}
-
-/* --- SLIDE 2 --- */
-#slide-2:not(.slide-visible) .scatter-anchor {
-    opacity: 0;
-    filter: blur(15px);
-    transform: translateY(40px);
-}
-#slide-2.slide-visible .scatter-anchor {
-    opacity: 1;
-    filter: blur(0);
-    transform: translate(0, 0);
-    transition-delay: 0.3s;
-}
-#slide-2.slide-exit .scatter-anchor {
-    opacity: 0;
-    transform: translateY(-30px);
-    transition-delay: 0s;
-}
-
-/* --- SLIDE 3 --- */
-#slide-3:not(.slide-visible):not(.slide-exit) .scatter-anchor {
-    opacity: 0;
-    filter: blur(15px);
-    transform: translateY(40px);
-}
-#slide-3.slide-visible .scatter-anchor {
-    opacity: 1;
-    filter: blur(0);
-    transform: translate(0, 0);
-    transition-delay: 0.3s;
-}
-#slide-3.slide-exit .scatter-anchor {
-    opacity: 0;
-    filter: blur(15px);
-    transform: translate(var(--fly-x), var(--fly-y));
-    transition-delay: 0s;
-}
-
-/* =========================================
-   POSITIONS (Applied to Anchor)
-   ========================================= */
-
-.pos-1 { top: 10%; left: 5%; }       
-.pos-2 { top: 10%; right: 5%; }      
-.pos-3 { bottom: 10%; left: 5%; }   
-.pos-4 { bottom: 10%; right: 5%; }  
-.pos-5 { top: 5%; left: 20%; }      
-.pos-6 { bottom: 5%; right: 20%; } 
-.pos-7 { top: 40%; left: 2%; }      
-.pos-8 { top: 40%; right: 2%; }     
-
-@media (max-width: 768px) {
-    .about-persistent-cta { bottom: 60px; }
-    .scatter-anchor { width: 100px; } 
-    .scatter-img { opacity: 0.8; } 
-    
-    .pos-1, .pos-2, .pos-5 { top: 12%; }
-    .pos-3, .pos-4, .pos-6 { bottom: 20%; }
-    .pos-7, .pos-8 { top: 45%; }
 }

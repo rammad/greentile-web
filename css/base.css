@@ -94,6 +94,60 @@
 /* basic reset */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* =========================================
+   SCROLL DIRECTOR SETUP (New)
+   ========================================= */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* The Stage */
+main {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* All Sections are now Layers */
+section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100% !important;
+    
+    opacity: 0; /* Hidden by default */
+    pointer-events: none; /* Clicks pass through */
+    transition: opacity 0.6s ease;
+    z-index: 1;
+}
+
+/* The Active Layer */
+section.is-active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+/* Sticky Wrappers are no longer needed for height, 
+   but we keep them for internal layout */
+.sticky-wrapper, 
+.about-sticky-wrapper, 
+.events-sticky-wrapper {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    top: auto;
+    /* Ensure flex centering or layout matches your design */
+    display: flex;
+    flex-direction: column;
+}
+
 body {
     font-family: var(--font-body);
     color: var(--color-text-main);
