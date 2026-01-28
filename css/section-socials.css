@@ -9,17 +9,15 @@
     align-items: center;
     justify-content: center;
     
-    /* Full screen height to allow ScrollManager to lock it */
     height: 100vh; 
     width: 100%;
     position: absolute;
     z-index: 10;
     
-    /* Default hidden state for the whole container */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.6s ease;
-    background-color: var(--color-bg); /* Ensure it covers layers behind */
+    background-color: var(--color-bg); 
 }
 
 .socials-section.is-active {
@@ -34,14 +32,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0px;
 }
 
-/* Delays for staggering */
+/* Stagger Utilities */
 .delay-1 { transition-delay: 0.1s; }
 .delay-2 { transition-delay: 0.2s; }
 .delay-3 { transition-delay: 0.3s; }
-
 
 /* =========================================
    ICONS
@@ -69,7 +65,6 @@
     background-color: var(--color-placeholder);
     border-radius: 50%;
     display: block;
-    /* Add hover effect if needed */
     transition: transform 0.2s ease;
 }
 .icon-circle:hover {
@@ -77,15 +72,13 @@
 }
 
 /* =========================================
-   MARQUEE
+   MARQUEE (Seamless)
    ========================================= */
 .socials-marquee-wrapper {
     width: 100%;
     position: relative;
     overflow-anchor: none;
-    overflow: hidden;
-    
-    /* Initial State */
+    /* overflow: hidden; */
     opacity: 0;
     transition: opacity 1s ease 0.5s;
 }
@@ -96,13 +89,23 @@
 
 .socials-track {
     display: flex;
-    /* UPDATED: Gap set to 8px */
     gap: 8px; 
     width: max-content;
     align-items: flex-start;
     
-    animation: scroll-socials 60s linear infinite;
+    /* Default static state */
+    transform: translateX(0);
     will-change: transform;
+}
+
+/* ACTIVATED BY JS */
+.socials-track.has-seamless-animation {
+    animation: seamless-scroll var(--marquee-duration, 20s) linear infinite;
+}
+
+@keyframes seamless-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(var(--marquee-end)); }
 }
 
 .social-img {
@@ -110,15 +113,12 @@
     aspect-ratio: 4 / 5;
     object-fit: cover;
     flex-shrink: 0;
+    border-radius: 4px;
 }
 
-.social-img:nth-child(even) {
-    margin-top: 64px;
-}
-
-@keyframes scroll-socials {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+/* MANUAL STAGGER CLASS (Use this instead of nth-child) */
+.social-img.push-down {
+    transform: translateY(64px); 
 }
 
 @media (max-width: 768px) {

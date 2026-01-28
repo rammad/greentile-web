@@ -3,15 +3,13 @@
    ========================================= */
    
 .footer-section {
-    /* Make it a Layer */
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh; /* Full screen lock */
-    padding-top: 25%;
+    height: 100vh;
+    padding-top: 15%;
     
-    /* Default Hidden State */
     opacity: 0;
     pointer-events: none;
     z-index: 1;
@@ -23,15 +21,13 @@
     overflow: hidden;
 }
 
-/* Active State (Controlled by Scroll Manager) */
 .footer-section.is-active {
     opacity: 1;
     pointer-events: auto;
-    z-index: 20; /* High z-index to sit on top */
+    z-index: 20;
 }
 
-/* ... Keep your Gradient/Marquee styles below ... */
-
+/* Backgrounds */
 #footer-gradient-container {
     position: absolute;
     top: 0;
@@ -48,11 +44,20 @@
     height: 100%;
 }
 
+/* =========================================
+   MARQUEE (Seamless)
+   ========================================= */
+.marquee-wrapper {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
 .marquee-bar {
     width: 100%;
     overflow: hidden;
     padding: 8px 0;
-    margin-top: 4px;
+    margin-top: 8px;
     white-space: nowrap;
     display: flex;
     background-color: var(--color-accent);
@@ -62,9 +67,20 @@
 
 .marquee-content { 
     display: flex;
-    flex-shrink: 0; 
-    animation: marquee-scroll 30s linear infinite;
-    animation-direction: reverse;
+    flex-shrink: 0;
+    gap: 0px; 
+    transform: translateX(0);
+    will-change: transform;
+}
+
+/* ACTIVATED BY JS */
+.marquee-content.has-seamless-animation {
+    animation: seamless-scroll var(--marquee-duration, 20s) linear infinite;
+}
+
+@keyframes seamless-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(var(--marquee-end)); }
 }
 
 .marquee-item {
@@ -78,24 +94,31 @@
     font-variation-settings: 'SRFF' 0; 
 }
 
-@keyframes marquee-scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-}
-
+/* =========================================
+   MAIN FOOTER CONTENT
+   ========================================= */
 .footer-main {
-    padding: 32px 20px 0 20px;
+    padding: 0px 20px 0 20px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end; 
     flex-grow: 1; 
-    margin-top: 4px;
+    margin-top: 8px;
     position: relative;
     z-index: 1;
 }
 
-.footer-main.type-display-hero {
-   display: inline;
+/* FOOTER TITLE STYLES */
+/* We target it specifically here to override any Hero collisions */
+.footer-main .type-display-hero {
+    display: block;        
+    width: 100%;
+    position: relative;    /* Ensures it sits in flow */
+    bottom: auto;
+    left: auto;
+    transform: none;
+    margin-top: 32px;
+    overflow: visible;     /* Important for char animations */
 }
 
 .footer-links {
@@ -116,8 +139,14 @@
     font-variation-settings: 'SRFF' 25; 
 }
 
+/* MOBILE FIX (Baseline for later) */
 @media (max-width: 768px) {
-    .footer-main.type-display-hero {
-        display: inline;
+    /* Stack the lines */
+    .footer-main .type-display-hero > span {
+        display: block;
+    }
+    /* Keep letters inline */
+    .footer-main .type-display-hero > span .char-reveal {
+        display: inline-block;
     }
 }

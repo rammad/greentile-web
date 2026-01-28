@@ -85,7 +85,7 @@ window.ScrollManager = {
                 this.isLocked = false;
             }, totalLockTime);
 
-        }, 100); // Overlap delay
+        }, 50); // Overlap delay
     }
 };
 
