@@ -128,59 +128,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-/* =========================================
-   IMAGE SETUP UTILITY (Unchanged)
-   ========================================= */
 function setupAboutImages() {
-    const images = document.querySelectorAll('.about-slide > .scatter-img');
+    const slides = document.querySelectorAll('.about-slide');
+    
+    // We need the section to be visible to measure positions
+    // If it's hidden via display:none, this math fails.
+    // Assuming opacity:0 or visibility:hidden is used, this works.
 
-    images.forEach(img => {
-        const anchor = document.createElement('div');
-        anchor.classList.add('scatter-anchor');
-        
-        const parallax = document.createElement('div');
-        parallax.classList.add('scatter-parallax');
+    slides.forEach(slide => {
+        const images = slide.querySelectorAll('.scatter-img');
+        const slideRect = slide.getBoundingClientRect();
+        const centerX = slideRect.width / 2;
+        const centerY = slideRect.height / 2;
 
-        // Transfer Classes
-        const classesToMove = [];
-        img.classList.forEach(cls => { 
-            if (cls.startsWith('pos-')) classesToMove.push(cls); 
+        images.forEach(img => {
+            const anchor = document.createElement('div');
+            anchor.classList.add('scatter-anchor');
+            
+            const parallax = document.createElement('div');
+            parallax.classList.add('scatter-parallax');
+
+            // 1. Move CSS Classes (Your manual positioning)
+            const classesToMove = [];
+            img.classList.forEach(cls => { 
+                if (cls.startsWith('pos-')) classesToMove.push(cls); 
+            });
+            classesToMove.forEach(cls => { 
+                anchor.classList.add(cls); 
+                img.classList.remove(cls); 
+            });
+
+            // 2. Add Jitter (Texture)
+            const jitterX = Math.floor(Math.random() * 40) - 20;
+            const jitterY = Math.floor(Math.random() * 40) - 20;
+            anchor.style.marginLeft = `${jitterX}px`;
+            anchor.style.marginTop = `${jitterY}px`;
+
+            // 3. ASSEMBLE (Put it in DOM so it has a position)
+            img.parentNode.insertBefore(anchor, img);
+            anchor.appendChild(parallax);
+            parallax.appendChild(img);
+            
+            // 4. READ LIVE POSITION
+            // We force the browser to tell us where the anchor ended up
+            // relative to the slide center.
+            
+            // Note: Since anchor is 0x0 and centered, its offsetLeft/Top 
+            // is exactly its coordinate.
+            const anchorX = anchor.offsetLeft;
+            const anchorY = anchor.offsetTop;
+
+            // Calculate Vector from Center
+            const deltaX = anchorX - centerX;
+            const deltaY = anchorY - centerY;
+
+            // Calculate Angle
+            const angle = Math.atan2(deltaY, deltaX);
+
+            // Distance to fly (Fixed Amount)
+            const flyDistance = 10; // 45vw/vh
+
+            const vecX = Math.cos(angle) * flyDistance;
+            const vecY = Math.sin(angle) * flyDistance;
+
+            anchor.style.setProperty('--fly-x', `${vecX}vw`);
+            anchor.style.setProperty('--fly-y', `${vecY}vh`);
+
+            // 5. SCALE
+            const scale = 0.5 + Math.random() * 0.3; 
+            img.style.setProperty('--base-scale', scale);
+            
+            parallax._targetY = 0;
         });
-        classesToMove.forEach(cls => { 
-            anchor.classList.add(cls); 
-            img.classList.remove(cls); 
-        });
-
-        // Jitter
-        const jitterX = Math.floor(Math.random() * 40) - 20;
-        const jitterY = Math.floor(Math.random() * 80) - 40;
-        anchor.style.marginLeft = `${jitterX}px`;
-        anchor.style.marginTop = `${jitterY}px`;
-        
-        // Vectors
-        let flyX = '0px', flyY = '0px';
-        const distV = '30vh'; 
-        const distH = '20vw';  
-
-        if (anchor.classList.contains('pos-1')) { flyX = `-${distH}`; flyY = `-${distV}`; } 
-        else if (anchor.classList.contains('pos-2')) { flyX = `${distH}`; flyY = `-${distV}`; } 
-        else if (anchor.classList.contains('pos-3')) { flyX = `-${distH}`; flyY = `${distV}`; } 
-        else if (anchor.classList.contains('pos-4')) { flyX = `${distH}`; flyY = `${distV}`; } 
-        else if (anchor.classList.contains('pos-5')) { flyX = '0px'; flyY = `-${distV}`; } 
-        else if (anchor.classList.contains('pos-6')) { flyX = '0px'; flyY = `${distV}`; } 
-        else if (anchor.classList.contains('pos-7')) { flyX = `-${distH}`; flyY = '0px'; } 
-        else if (anchor.classList.contains('pos-8')) { flyX = `${distH}`; flyY = '0px'; }
-        
-        anchor.style.setProperty('--fly-x', flyX);
-        anchor.style.setProperty('--fly-y', flyY);
-
-        const scale = 0.4 + Math.random() * 0.4; 
-        img.style.setProperty('--base-scale', scale);
-        
-        img.parentNode.insertBefore(anchor, img);
-        anchor.appendChild(parallax);
-        parallax.appendChild(img);
-        
-        parallax._targetY = 0;
     });
 }

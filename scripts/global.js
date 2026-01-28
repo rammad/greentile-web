@@ -85,7 +85,7 @@ function initSmoothMotion() {
             const dx = mouseX - imgX;
             const dy = mouseY - imgY;
             const dist = Math.sqrt(dx*dx + dy*dy);
-            const radius = 500;
+            const radius = 750;
             
             if (dist < radius) {
                 const force = (radius - dist) / radius;
