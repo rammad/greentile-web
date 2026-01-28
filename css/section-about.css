@@ -1,5 +1,5 @@
 /* =========================================
-   ABOUT (Restored & Fixed)
+   ABOUT (Fixed Positioning & Scroll Flow)
    ========================================= */
 
 .about {
@@ -17,8 +17,20 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    overflow: hidden; 
 }
 
+/* --- PERSISTENT CTA --- */
+.about-persistent-cta {
+    position: absolute;
+    width: 400px;
+    bottom: 96px; 
+    left: 50%;
+    transform: translateX(-50%); /* Centered X */
+    z-index: 20;
+}
+
+/* --- SLIDE CONTAINER --- */
 .about-slide {
     position: absolute;
     top: 0;
@@ -32,83 +44,117 @@
     z-index: 1;
 }
 
-/* --- ANCHORS (The Position Logic) --- */
+/* =========================================
+   ANCHORS: The Animation Engine
+   ========================================= */
 .scatter-anchor {
     position: absolute;
     
-    /* Default: No transform offset, rely on top/left */
-    transform: translate(0, 0);
+    /* FIX: Allow anchor to take the size of the image */
+    /* This allows translate(-50%, -50%) to actually calculate center */
+    width: auto;
+    height: auto;
+    display: flex; /* Ensures tight wrapping around the child */
+    justify-content: center;
+    align-items: center;
     
-    transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
-    will-change: transform;
+    /* 1. PERMANENT CENTERING: Centers the anchor on the pos-X coordinate */
+    /* 2. DYNAMIC OFFSET: Controlled by state classes */
+    transform: translate(-50%, -50%) translate(var(--offset-x, 0px), var(--offset-y, 0px));
+    
+    /* Animation Physics */
+    transition: 
+        transform 1.2s cubic-bezier(0.19, 1, 0.22, 1),
+        opacity 0.8s ease,
+        filter 0.8s ease;
+        
+    will-change: transform, opacity;
     z-index: 1;
-    width: 0; 
-    height: 0;
+    
+    /* Default visibility */
+    opacity: 0;
+    filter: blur(10px);
 }
 
-/* --- EXPLODED STATE (Generic) --- */
-/* For corners (1,2,3,4), this simple vector works */
-.scatter-anchor.is-exploded {
-    transform: translate(var(--fly-x), var(--fly-y));
+/* --- THE 4 STATES (User Requested Flow) --- */
+
+/* 1. CENTERED (Reading State) */
+.scatter-anchor.state-center {
+    opacity: 1;
+    filter: blur(0px);
+    --offset-x: 0px;
+    --offset-y: 0px;
 }
+
+/* 2. EXPLODED (Intro Start / Outro End) */
+.scatter-anchor.state-exploded {
+    opacity: 0;
+    filter: blur(20px);
+    --offset-x: var(--fly-x);
+    --offset-y: var(--fly-y);
+}
+
+/* 3. OFF-SCREEN UP (Slide Exit Up) */
+.scatter-anchor.state-up {
+    opacity: 0;
+    filter: blur(10px);
+    --offset-x: 0px;
+    --offset-y: -10vh; /* Fly up */
+}
+
+/* 4. OFF-SCREEN DOWN (Slide Enter Down) */
+.scatter-anchor.state-down {
+    opacity: 0;
+    filter: blur(10px);
+    --offset-x: 0px;
+    --offset-y: 10vh; /* Fly down */
+}
+
 
 /* --- IMAGES --- */
 .scatter-img {
     display: block;
     position: relative;
-    
-    /* Strict Size Controls */
     width: 28vw;      
     max-width: 300px; 
     height: auto;
     
-    /* Scale & Mouse Avoidance */
+    /* Scale & Mouse Avoidance only */
     transform: scale(var(--base-scale, 0.6)) translate(var(--avoid-x, 0px), var(--avoid-y, 0px));
     transition: transform 0.1s linear; 
 }
 
 
 /* =========================================
-   POSITIONS (The Grid)
+   POSITIONS (Perimeter Grid)
    ========================================= */
 
-/* CORNERS (No transform needed) */
-.pos-1 { top: 10%; left: 10%; }       
-.pos-2 { top: 10%; right: 10%; }      
-.pos-3 { bottom: 10%; left: 10%; }   
-.pos-4 { bottom: 10%; right: 10%; }  
+/* CORNERS */
+.pos-1 { top: 15%; left: 10%; }       
+.pos-2 { top: 10%; right: -15%; }      
+.pos-3 { bottom: -15%; left: 10%; }   
+.pos-4 { bottom: -10%; right: -10%; }  
 
-/* CENTERS (Need transforms to center themselves) */
-
-/* Top Center */
-.pos-5 { top: 8%; left: 50%; transform: translateX(-50%); } 
-/* When exploded, keep the centering + add fly vector */
-.scatter-anchor.pos-5.is-exploded { transform: translateX(-50%) translate(var(--fly-x), var(--fly-y)); }
-
-/* Bottom Center */
-.pos-6 { bottom: 8%; left: 50%; transform: translateX(-50%); } 
-.scatter-anchor.pos-6.is-exploded { transform: translateX(-50%) translate(var(--fly-x), var(--fly-y)); }
-
-/* Left Center */
-.pos-7 { top: 50%; left: 5%; transform: translateY(-50%); }      
-.scatter-anchor.pos-7.is-exploded { transform: translateY(-50%) translate(var(--fly-x), var(--fly-y)); }
-
-/* Right Center */
-.pos-8 { top: 50%; right: 5%; transform: translateY(-50%); }     
-.scatter-anchor.pos-8.is-exploded { transform: translateY(-50%) translate(var(--fly-x), var(--fly-y)); }
+/* CENTERS */
+.pos-5 { top: 12%; left: 30%; } 
+.pos-6 { bottom: -30%; right: 5%; } 
+.pos-7 { bottom: -20%; left: 15%; }      
+.pos-8 { top: 30%; right: -25%; }     
 
 
 /* =========================================
-   TEXT FADES
+   TEXT CONTENT
    ========================================= */
 .about-content {
     position: relative;
     z-index: 15; 
     text-align: center;
     max-width: 750px;
+    
     opacity: 0;
     filter: blur(10px);
-    transition: opacity 0.8s ease-out, filter 0.8s ease-out;
+    
+    transition: opacity 0.8s ease, filter 0.8s ease;
 }
 
 .about-slide.slide-visible .about-content {

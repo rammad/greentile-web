@@ -49,7 +49,7 @@ function initEventsDirector() {
                 window.playCascade(title);
 
                 // 2. Shrink Title (1s)
-                addTimer(() => title.classList.add('state-shrunk'), 1000);
+                addTimer(() => title.classList.add('state-shrunk'), 750);
 
                 // 3. Show Content (1.8s)
                 addTimer(() => {

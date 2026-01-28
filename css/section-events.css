@@ -42,7 +42,7 @@
     bottom: 20px;
     width: auto; 
     
-    font-size: var(--size-display-hero); 
+    font-size: 9.25vw; 
     line-height: 0.9;
     text-align: center;
     transform-origin: center center;
@@ -58,7 +58,7 @@
 
 /* SHRUNK STATE */
 #event-title.state-shrunk {
-    bottom: calc(100% - 140px); 
+    bottom: calc(100% - 180px); 
     font-size: var(--size-h2);   
     text-align: left;           
 }
@@ -66,24 +66,16 @@
 /* --- BUTTON --- */
 #event-btn {
     position: absolute;
-    top: 60px; 
-    right: 20px;  
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    top: 120px; 
+    right: 20px;
     pointer-events: auto; 
     z-index: 12;
-}
-
-#event-btn.is-visible {
-    opacity: 1;
-    transform: translateY(0);
 }
 
 /* --- GRID --- */
 .events-grid {
     position: absolute;
-    top: 180px; 
+    top: 200px; 
     left: 20px;
     right: 20px;
     width: auto;
