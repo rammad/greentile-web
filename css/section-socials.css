@@ -110,7 +110,6 @@
     aspect-ratio: 4 / 5;
     object-fit: cover;
     flex-shrink: 0;
-    border-radius: 4px; /* Optional: matches 8px vibe */
 }
 
 .social-img:nth-child(even) {

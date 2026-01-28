@@ -10,27 +10,35 @@ document.addEventListener('DOMContentLoaded', () => {
     initSmoothMotion(); // Global mouse tracking
     initCascadeReveal(); // Auto-init for static headers
 
-    setTimeout(() => {
-        document.querySelector('nav').classList.add('nav-loaded');
-    }, 100);
-
     const cascadeElements = document.querySelectorAll('.animate-cascade');
+    
     cascadeElements.forEach(el => {
-        // Prevent double-splitting
         if(el.classList.contains('is-initialized')) return;
         
-        const text = el.innerText;
-        el.innerHTML = '';
-        
-        // Split text into spans
-        text.split('').forEach((char, i) => {
-            const span = document.createElement('span');
-            span.classList.add('char-reveal');
-            span.innerText = char;
-            // Preserves spaces
-            if (char === ' ') span.style.marginRight = '0.25em'; 
-            el.appendChild(span);
-        });
+        // Helper to split a specific node (used for both parent or children)
+        const splitTextInNode = (node) => {
+            const text = node.innerText;
+            node.innerHTML = ''; // Clear ONLY this node
+            
+            text.split('').forEach((char, i) => {
+                const span = document.createElement('span');
+                span.classList.add('char-reveal');
+                span.innerText = char;
+                if (char === ' ') span.style.marginRight = '0.25em'; 
+                node.appendChild(span);
+            });
+        };
+
+        // CHECK STRUCTURE: Does this element have child spans (lines)?
+        if (el.children.length > 0) {
+            // PRESERVE STRUCTURE: Split text inside each child span
+            Array.from(el.children).forEach(child => {
+                splitTextInNode(child);
+            });
+        } else {
+            // FLAT TEXT: Just split the parent
+            splitTextInNode(el);
+        }
         
         el.classList.add('is-initialized');
     });
