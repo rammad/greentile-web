@@ -1,6 +1,5 @@
-
 /* =========================================
-   SOCIALS
+   SOCIALS SECTION
    ========================================= */
 
 .socials-section {
@@ -8,19 +7,60 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 200px;
+    justify-content: center;
+    
+    /* Full screen height to allow ScrollManager to lock it */
+    height: 100vh; 
+    width: 100%;
+    position: absolute;
+    z-index: 10;
+    
+    /* Default hidden state for the whole container */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+    background-color: var(--color-bg); /* Ensure it covers layers behind */
+}
+
+.socials-section.is-active {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .socials-header {
+    margin-top: 80px;
     margin-bottom: 64px;
     padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
 }
 
+/* Delays for staggering */
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+
+
+/* =========================================
+   ICONS
+   ========================================= */
 .socials-icons {
     display: flex;
     gap: 16px;
     justify-content: center;
     margin-top: 32px;
+    
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    transition-delay: 0.4s;
+}
+
+.socials-section.is-active .socials-icons {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .icon-circle {
@@ -28,19 +68,36 @@
     height: 64px;
     background-color: var(--color-placeholder);
     border-radius: 50%;
+    display: block;
+    /* Add hover effect if needed */
+    transition: transform 0.2s ease;
+}
+.icon-circle:hover {
+    transform: scale(1.1);
 }
 
+/* =========================================
+   MARQUEE
+   ========================================= */
 .socials-marquee-wrapper {
     width: 100%;
     position: relative;
     overflow-anchor: none;
-/*     
-    padding-bottom: 20px;  */
+    overflow: hidden;
+    
+    /* Initial State */
+    opacity: 0;
+    transition: opacity 1s ease 0.5s;
+}
+
+.socials-section.is-active .socials-marquee-wrapper {
+    opacity: 1;
 }
 
 .socials-track {
     display: flex;
-    gap: 20px;
+    /* UPDATED: Gap set to 8px */
+    gap: 8px; 
     width: max-content;
     align-items: flex-start;
     
@@ -53,6 +110,7 @@
     aspect-ratio: 4 / 5;
     object-fit: cover;
     flex-shrink: 0;
+    border-radius: 4px; /* Optional: matches 8px vibe */
 }
 
 .social-img:nth-child(even) {
@@ -60,12 +118,8 @@
 }
 
 @keyframes scroll-socials {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
 }
 
 @media (max-width: 768px) {

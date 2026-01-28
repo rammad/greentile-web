@@ -12,11 +12,23 @@
     <nav class="sticky-nav standard-margins">
         <div class="nav-left"><img src="images/logo-edit.png" class="nav-logo"></img></div>
         <div class="nav-center">
-            <a href="events.html" class="type-sub2">Events</a>
-            <a href="#" class="type-sub2">Shop</a>
-            <a href="about-us.html" class="type-sub2">About</a>
+            <a href="events.html" class="type-sub2 ui-roll roll-hover">
+                <span class="ui-roll-layer ui-roll-visible">Events</span>
+                <span class="ui-roll-layer ui-roll-hidden">Events</span>
+            </a>
+            <a href="#" class="type-sub2 ui-roll roll-hover">
+                <span class="ui-roll-layer ui-roll-visible">Shop</span>
+                <span class="ui-roll-layer ui-roll-hidden">Shop</span>
+            </a>
+            <a href="about-us.html" class="type-sub2 ui-roll roll-hover">
+                <span class="ui-roll-layer ui-roll-visible">About</span>
+                <span class="ui-roll-layer ui-roll-hidden">About</span>
+            </a>
         </div>
-        <div class="nav-right"><a href="#" class="type-sub2">Contact</a></div>
+        <div class="nav-right"><a href="#" class="type-sub2 ui-roll roll-hover">
+            <span class="ui-roll-layer ui-roll-visible">Contact</span>
+            <span class="ui-roll-layer ui-roll-hidden">Contact</span>
+        </a></div>
     </nav>
 
     <section class="hero" data-colors="#32CD32, #f0f4f0, #FABA2F, #32CD32">
@@ -31,7 +43,7 @@
         
         <div class="about-sticky-wrapper">
             
-            <a href="#" class="cta-btn ui-roll about-persistent-cta">
+            <a href="#" class="cta-btn ui-roll roll-hover about-persistent-cta">
                 <span class="type-sub2 ui-roll-layer ui-roll-visible">
                     Get Tickets <span>&rarr;</span>
                 </span>
@@ -110,7 +122,7 @@
             <div class="events-section-header">
                 <h2 class="type-h2 animate-cascade" id="event-title">Spring 2025 Calendar</h2>
                 
-                <a href="#" class="cta-btn ui-roll type-sub2 manual-control" id="event-btn">
+                <a href="#" class="cta-btn ui-roll roll-hover type-sub2 manual-control" id="event-btn">
                     <span class="ui-roll-layer ui-roll-visible">All Events <span>&rarr;</span></span>
                     <span class="ui-roll-layer ui-roll-hidden">All Events <span>&rarr;</span></span>
                 </a>
@@ -135,7 +147,7 @@
     </section>
     <script src="scripts/section-events.js" defer></script>
 
-    <section class="featured-section standard-margins" data-colors="#32CD32, #f0f4f0, #FABA2F, #32CD32">
+    <!-- <section class="featured-section standard-margins" data-colors="#32CD32, #f0f4f0, #FABA2F, #32CD32">
         <div class="featured-grid">
             <div class="featured-content">
                 <span class="type-sub1">Featuring</span>
@@ -151,21 +163,28 @@
                 <img src="images/featured.png" class="featured-img" alt="Green Tile New Year Event">
             </div>
         </div>
-    </section>
+    </section> -->
 
-    <section class="socials-section standard-margins" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #32CD32">
+    <section class="socials-section" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #32CD32">
         <div class="socials-header">
-            <span class="type-sub1">Follow Our</span>
-            <div class="type-h1">Socials</div>
-            <p class="type-body1">
+            
+            <div class="text-mask">
+                <span class="type-sub1 text-reveal-inner">Follow Our</span>
+            </div>
+
+            <div class="type-h1 animate-cascade">Socials</div>
+
+            <p class="type-body1 delay-1">
                 To stay up to date on all our<br>events & activities
             </p>
+
             <div class="socials-icons">
                 <a class="icon-circle" href="https://instagram.com/greentilesocialclub"></a>
                 <a class="icon-circle" href="https://tiktok.com/@greentilesocialclub"></a>
                 <a class="icon-circle" href="https://discord.gg/mwgd9P3cb4"></a>
             </div>
         </div>
+
         <div class="socials-marquee-wrapper">
             <div class="socials-track">
                 
@@ -184,6 +203,8 @@
             </div>
         </div>
     </section>
+    
+    <script src="scripts/section-socials.js" defer></script>
 
     <footer class="footer-section">        
         <div class="marquee-wrapper">

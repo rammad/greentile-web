@@ -9,6 +9,37 @@ document.addEventListener('DOMContentLoaded', () => {
     initCTA();
     initSmoothMotion(); // Global mouse tracking
     initCascadeReveal(); // Auto-init for static headers
+
+    setTimeout(() => {
+        document.querySelector('nav').classList.add('nav-loaded');
+    }, 100);
+
+    const cascadeElements = document.querySelectorAll('.animate-cascade');
+    cascadeElements.forEach(el => {
+        // Prevent double-splitting
+        if(el.classList.contains('is-initialized')) return;
+        
+        const text = el.innerText;
+        el.innerHTML = '';
+        
+        // Split text into spans
+        text.split('').forEach((char, i) => {
+            const span = document.createElement('span');
+            span.classList.add('char-reveal');
+            span.innerText = char;
+            // Preserves spaces
+            if (char === ' ') span.style.marginRight = '0.25em'; 
+            el.appendChild(span);
+        });
+        
+        el.classList.add('is-initialized');
+    });
+    
+    // 2. TRIGGER NAV ON LOAD
+    setTimeout(() => {
+        const nav = document.querySelector('nav');
+        if(nav) nav.classList.add('nav-loaded');
+    }, 100);
 });
 
 /**
@@ -148,18 +179,30 @@ function initCascadeReveal() {
     });
 }
 
-// EXPORTED HELPER: Play Animation
-window.playCascade = function(el) {
-    if(!el) return;
-    const chars = el.querySelectorAll('.char-reveal');
-    chars.forEach(char => char.classList.add('is-visible'));
+window.playCascade = (element) => {
+    if (!element) return;
+    
+    const chars = element.querySelectorAll('.char-reveal');
+    chars.forEach((char, index) => {
+        // Set delay based on index (e.g., 30ms per char)
+        char.style.transitionDelay = `${index * 30}ms`;
+        char.classList.add('is-visible');
+    });
 };
 
-// EXPORTED HELPER: Reverse Animation (Exit)
-window.reverseCascade = function(el) {
-    if(!el) return;
-    const chars = el.querySelectorAll('.char-reveal');
-    chars.forEach(char => char.classList.remove('is-visible'));
+// REVERSE: Staggered Exit (The Reset)
+window.reverseCascade = (element) => {
+    if (!element) return;
+    
+    const chars = element.querySelectorAll('.char-reveal');
+    const total = chars.length;
+    
+    chars.forEach((char, index) => {
+        // Reverse delay: Last char leaves first
+        const delay = (total - index) * 20; 
+        char.style.transitionDelay = `${delay}ms`;
+        char.classList.remove('is-visible');
+    });
 };
 
 

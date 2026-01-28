@@ -46,7 +46,7 @@ function initEventsDirector() {
                 killAllTimers();
 
                 // 1. Cascade IN
-                window.playCascade(title);
+                if (title) window.playCascade(title);
 
                 // 2. Shrink Title (1s)
                 addTimer(() => title.classList.add('state-shrunk'), 750);
@@ -71,6 +71,8 @@ function initEventsDirector() {
 
             onExit: (direction) => {
                 killAllTimers();
+
+                if (title) window.reverseCascade(title);
 
                 // Reverse Stagger
                 const total = cards.length;
