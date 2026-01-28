@@ -1,15 +1,10 @@
+/* =========================================
+   EVENTS SECTION (4-Column Layout + Side Slide)
+   ========================================= */
+
 .events-section {
     position: relative;
-    width: 100%;
-    /* Tall track to allow animation time */
     height: 350vh; 
-
-    /* Animation Variables (Driven by JS) */
-    --title-progress: 0;
-    --card1-progress: 0;
-    --card2-progress: 0;
-    --card3-progress: 0;
-    --scale-start: 1;
 }
 
 .events-sticky-wrapper {
@@ -17,133 +12,142 @@
     top: 0;
     height: 100vh;
     width: 100%;
+    overflow: hidden;
     
     display: flex;
     flex-direction: column;
-    
-    /* FIX: Align to top, then push down. 
-       This guarantees space above the title for the scale effect. */
-    justify-content: flex-start;
-    padding-top: 100px; 
 }
 
-/* --- TITLE ANIMATION --- */
+/* --- TITLE TRANSITIONS --- */
+
 .events-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end; /* Align button to bottom of text */
-    margin-bottom: 64px;
     position: relative;
-    z-index: 2;
-}
-
-#event-title {
-    /* ANCHOR: Scale from top-left so the text 'grows' down and right 
-       or 'shrinks' up and left back to its origin. */
-    transform-origin: top left;
-
-    /* DYNAMIC SCALING FORMULA:
-       At 0% progress: Scale = var(--scale-start)
-       At 100% progress: Scale = 1
-    */
-    transform: scale(calc(var(--scale-start) - ( (var(--scale-start) - 1) * var(--title-progress) )));
-    
-    /* Optional: Ensure it doesn't overlap header items while huge */
-    /* will-change: transform; */
-}
-
-#event-btn {
-    /* Button fades in only after title finishes shrinking */
-    opacity: var(--card1-progress); 
-    transform: translateX(calc(20px * (1 - var(--card1-progress))));
-}
-
-/* --- POSTER ANIMATION (Waterfall Slide) --- */
-
-.events-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 4px;
-    align-items: flex-start; 
     width: 100%;
-    z-index: 1;
+    height: 100%; 
+    pointer-events: none; 
+    z-index: 10;
 }
 
-.event-card { 
-    width: 100%; 
-    will-change: transform; /* Hint to browser for smooth sliding */
+/* INITIAL STATE: Big & Bottom (Hero Match) */
+#event-title {
+    position: absolute;
+    
+    /* 20px from Bottom & Sides */
+    bottom: 0; 
+    left: 0; 
+    padding: 0 20px;
+    width: 100%;  
+
+    overflow: hidden;
+    
+    /* STYLE */
+    font-size: 9vw; 
+    /* line-height: 0.9; */
+    text-align: center;
+    transform-origin: center center;
+    
+    /* ANIMATION */
+    transition: 
+        bottom 1.2s cubic-bezier(0.19, 1, 0.22, 1),
+        font-size 1.2s cubic-bezier(0.19, 1, 0.22, 1),
+        transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+        
+    will-change: bottom, font-size, transform;
 }
 
-/* Base styles for posters */
+/* SHRUNK STATE: Small & Top */
+#event-title.state-shrunk {
+    /* Move to Top (Adjust this px value to clear your nav height) */
+    bottom: calc(100% - 180px); 
+    
+    font-size: var(--size-h2);   
+    text-align: left;           
+}
+
+/* --- BUTTON (Fades in at top right) --- */
+#event-btn {
+    position: absolute;
+    top: 120px; /* Align with shrunk title */
+    right: 0;  /* Align to right edge of container */
+/*     
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    pointer-events: auto; 
+    z-index: 12; */
+}
+/* 
+#event-btn.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+} */
+
+/* --- GRID (4 Columns + Side Entrance) --- */
+.events-grid {
+    position: absolute;
+    top: 240px; /* Below the shrunk header */
+    padding: 0 20px;
+    width: 100%;
+    
+    display: grid;
+    /* 4 Columns */
+    grid-template-columns: repeat(4, 1fr); 
+    
+    /* 8px Gap */
+    gap: 8px;
+    
+    z-index: 5;
+}
+
+.event-card {
+    opacity: 0;
+    filter: blur(8px);
+    
+    /* SLIDE IN FROM RIGHT */
+    transform: translateX(100px); 
+    
+    /* Smooth entrance */
+    transition: 
+        opacity 0.4s ease, 
+        blur 0.4s ease,
+        transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.event-card.is-visible {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0);
+}
+
 .event-poster {
     width: 100%;
-    aspect-ratio: 4 / 5; 
+    aspect-ratio: 4/5;
     object-fit: cover;
+    background-color: var(--color-placeholder);
     display: block;
-    background-color: var(--color-placeholder); 
 }
 
-/* Card 1 Animation */
-.card-1 {
-    opacity: var(--card1-progress);
-    /* Slide from 100% Right to 0 */
-    transform: translateX(calc(100% * (1 - var(--card1-progress))));
-}
-
-/* Card 2 Animation */
-.card-2 {
-    opacity: var(--card2-progress);
-    transform: translateX(calc(100% * (1 - var(--card2-progress))));
-}
-
-/* Card 3 Animation */
-.card-3 {
-    opacity: var(--card3-progress);
-    transform: translateX(calc(100% * (1 - var(--card3-progress))));
-}
-
-/* Keep the offset for desktop layout */
 @media (min-width: 769px) {
-    .event-card:nth-child(2) {
-        margin-top: 64px;
+    /* Push every 2nd card (2, 4, 6...) down to create the rhythm */
+    .events-grid .event-card:nth-child(even) {
+        margin-top: 64px; /* Adjust this value for more/less offset */
     }
 }
 
+/* --- MOBILE --- */
 @media (max-width: 768px) {
-
-    .events-section {
-        height: auto; 
-        min-height: auto;
-    }
-
-    .events-sticky-wrapper {
-        position: relative;
-        top: auto;
-        height: auto;
-        overflow: visible;
-        padding-top: 60px;
-        display: block;
-    }
-
-    .events-grid {
-        grid-template-columns: 1fr;
-        gap: 32px;
-        margin-bottom: 64px;
-    }
-       
     #event-title {
-        transform: scale(1) !important; 
-        opacity: 1 !important;
+        font-size: var(--size-display-hero-mobile);
     }
-
-    #event-btn {
-        opacity: 1 !important;
-        transform: none !important;
-        margin-top: 16px;
+    #event-title.state-shrunk {
+        font-size: var(--size-h2-mobile);
+        bottom: calc(100% - 100px);
     }
-
-    .event-card, .card-1, .card-2, .card-3 {
-        opacity: 1 !important;
-        transform: none !important;
+    .events-grid {
+        grid-template-columns: 1fr; /* Stack on mobile */
+        top: 140px;
+        gap: 20px;
+        padding-bottom: 100px;
+        overflow-y: auto; 
     }
 }

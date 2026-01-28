@@ -191,12 +191,12 @@
    POSITIONS (Applied to Anchor)
    ========================================= */
 
-.pos-1 { top: 5%; left: 5%; }       
-.pos-2 { top: 5%; right: 5%; }      
-.pos-3 { bottom: 15%; left: 5%; }   
-.pos-4 { bottom: 15%; right: 5%; }  
-.pos-5 { top: 5%; left: 40%; }      
-.pos-6 { bottom: 15%; right: 40%; } 
+.pos-1 { top: 10%; left: 5%; }       
+.pos-2 { top: 10%; right: 5%; }      
+.pos-3 { bottom: 10%; left: 5%; }   
+.pos-4 { bottom: 10%; right: 5%; }  
+.pos-5 { top: 5%; left: 20%; }      
+.pos-6 { bottom: 5%; right: 20%; } 
 .pos-7 { top: 40%; left: 2%; }      
 .pos-8 { top: 40%; right: 2%; }     
 

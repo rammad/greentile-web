@@ -15,6 +15,8 @@
     top: auto;
     bottom: 0;
     left: 50%;
+
+    overflow: hidden;
     
     transform: translateX(-50%);
     
