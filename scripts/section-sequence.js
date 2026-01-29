@@ -1,186 +1,137 @@
 /* =========================================
-   SECTION: SEQUENCE (Unified Logic)
-   Uses Original Physics (Distance: 10, Time: 1.5s)
+   STEP 2: ABOUT (Scroll Flow Animations)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. SELECTORS
+    const aboutSection = document.querySelector('.about');
+    if(!aboutSection) return;
+
+    const slides = document.querySelectorAll('.about-slide');
+    const cta = document.querySelector('.about-persistent-cta');
+
+    // 2. SETUP (Run once)
+    setupAboutImages(); 
     initSmoothMotion();
 
-    const sequences = document.querySelectorAll('.sequence-section');
-    if (sequences.length === 0) return;
-
-    sequences.forEach(section => {
-        // Run Logic immediately to register Steps
-        initSequenceSection(section);
-    });
-});
-
-function initSequenceSection(section) {
-    const sectionId = section.id || 'seq-' + Math.random().toString(36).substr(2, 5);
-
-    // 1. SETUP IMAGES 
-    const images = Array.from(section.querySelectorAll('.scatter-img'));
-    
-    // Delay geometry calculation to ensure CSS positions (negatives) are painted
-    setTimeout(() => {
-        setupOriginalScatterImages(section, images);
-    }, 100);
-
-    // 2. IDENTIFY STEPS
-    const contentBlocks = section.querySelectorAll('.sequence-content [data-step]');
-    let maxStep = 0;
-    const allStepped = section.querySelectorAll('[data-step]');
-    allStepped.forEach(el => {
-        const s = parseInt(el.getAttribute('data-step'));
-        if (s > maxStep) maxStep = s;
-    });
-    const totalSteps = maxStep + 1;
-
-    // 3. DEFINE SCROLL STEPS
-    const steps = [];
-
-    for (let i = 0; i < totalSteps; i++) {
-        steps.push({
-            id: `${sectionId}-${i}`,
+    // 3. HELPER: Set State on Anchors in a specific slide
+    const setSlideState = (index, stateClass, snap = false) => {
+        const s = slides[index];
+        if(!s) return;
+        
+        const anchors = s.querySelectorAll('.scatter-anchor');
+        
+        anchors.forEach(anchor => {
+            // Remove all motion classes
+            anchor.classList.remove('state-center', 'state-exploded', 'state-up', 'state-down');
             
-            onEnter: (direction) => {
-                section.classList.add('is-active');
-
-                // A. UPDATE IMAGES
-                images.forEach(img => {
-                    const imgStep = parseInt(img.getAttribute('data-step'));
-                    const anchor = img.parentElement; 
-                    if (!anchor || !anchor.classList.contains('scatter-anchor')) return;
-
-                    // Reset states
-                    anchor.classList.remove('state-center', 'state-exploded', 'state-up', 'state-down');
-
-                    // Force Reflow
-                    void anchor.offsetWidth; 
-
-                    if (imgStep === i) {
-                        // Current: Center
-                        anchor.classList.add('state-center');
-                    } 
-                    else if (imgStep < i) {
-                        // Previous: Explode (if going up) or Up (if going down)
-                        if (direction === 'down') anchor.classList.add('state-up');
-                        else anchor.classList.add('state-exploded');
-                    } 
-                    else if (imgStep > i) {
-                        // Next: Down
-                        anchor.classList.add('state-down'); 
-                    }
-                });
-
-                // B. UPDATE TEXT
-                contentBlocks.forEach(block => {
-                    const blockStep = parseInt(block.getAttribute('data-step'));
-                    if (blockStep === i) block.classList.add('is-active');
-                    else block.classList.remove('is-active');
-                });
-
-                return 1000;
-            },
-
-            onExit: (direction) => {
-                if ((i === 0 && direction === 'up') || (i === totalSteps - 1 && direction === 'down')) {
-                    section.classList.remove('is-active');
-                }
-                
-                // Exit States
-                images.forEach(img => {
-                     const imgStep = parseInt(img.getAttribute('data-step'));
-                     const anchor = img.parentElement;
-                     if (!anchor) return;
-
-                     if (imgStep === i) {
-                         anchor.classList.remove('state-center');
-                         if (direction === 'down') anchor.classList.add('state-up');
-                         else anchor.classList.add('state-down');
-                         
-                         // Special Exit: Explode on boundaries
-                         if ((i === 0 && direction === 'up') || (i === totalSteps - 1 && direction === 'down')) {
-                             anchor.classList.remove('state-up', 'state-down');
-                             anchor.classList.add('state-exploded');
-                         }
-                     }
-                });
-
-                return 800;
+            // If Snap is true, we kill transition, apply class, flush, then restore
+            if (snap) {
+                anchor.style.transition = 'none';
+                anchor.classList.add(stateClass);
+                void anchor.offsetWidth; // Flush
+                anchor.style.transition = '';
+            } else {
+                anchor.classList.add(stateClass);
             }
         });
-    }
+
+        // Toggle Text Visibility
+        if (stateClass === 'state-center') {
+            s.classList.add('slide-visible');
+        } else {
+            s.classList.remove('slide-visible');
+        }
+    };
+
+    // 4. DEFINE SCROLL STEPS
+    const aboutSteps = [0, 1, 2].map(index => {
+        return {
+            id: `about-${index}`,
+            
+            onEnter: (direction) => {
+                aboutSection.classList.add('is-active');
+                if(cta) cta.classList.remove('not-active');
+
+                // --- LOGIC PER SLIDE ---
+                
+                if (index === 0) { 
+                    // SLIDE 1: Implode from Sides
+                    // If coming from top (load), snap to exploded first
+                    if (direction === 'down') setSlideState(0, 'state-exploded', true); 
+                    
+                    // Animate to Center
+                    requestAnimationFrame(() => setSlideState(0, 'state-center'));
+                } 
+                
+                else if (index === 1) {
+                    // SLIDE 2: Scroll from Bottom
+                    if (direction === 'down') {
+                        // Entering from top: Snap to bottom, then move center
+                        setSlideState(1, 'state-down', true);
+                    } else {
+                        // Entering from bottom (backwards): Snap to top, move center
+                        setSlideState(1, 'state-up', true);
+                    }
+                    requestAnimationFrame(() => setSlideState(1, 'state-center'));
+                } 
+                
+                else if (index === 2) {
+                    // SLIDE 3: Scroll from Bottom
+                    if (direction === 'down') setSlideState(2, 'state-down', true);
+                    requestAnimationFrame(() => setSlideState(2, 'state-center'));
+                }
+
+                return 750; // Time for animation to settle
+            },
+            
+            onExit: (direction) => {
+                // --- EXIT LOGIC ---
+                
+                if (index === 0) {
+                    if (direction === 'down') setSlideState(0, 'state-up'); // Exit Up
+                    else setSlideState(0, 'state-exploded'); // Reverse (Explode)
+                }
+                
+                else if (index === 1) {
+                    if (direction === 'down') setSlideState(1, 'state-up'); // Exit Up
+                    else setSlideState(1, 'state-down'); // Reverse (Down)
+                }
+                
+                else if (index === 2) {
+                    if (direction === 'down') {
+                        // LAST SLIDE EXIT -> EXPLODE
+                        setSlideState(2, 'state-exploded');
+                        
+                        // Hide Section after animation
+                        if(cta) cta.classList.add('not-active');
+                        setTimeout(() => aboutSection.classList.remove('is-active'), 800);
+                    } else {
+                        setSlideState(2, 'state-down'); // Reverse
+                    }
+                }
+                
+                // Special case: Leaving Top of Slide 0
+                if (index === 0 && direction === 'up') {
+                    if(cta) cta.classList.add('not-active');
+                    aboutSection.classList.remove('is-active');
+                }
+
+                return 800; 
+            }
+        };
+    });
 
     if (window.ScrollManager) {
-        ScrollManager.addSteps(steps);
+        ScrollManager.addSteps(aboutSteps);
+    } else {
+        console.error("ScrollManager not found.");
     }
-}
-
-
-/* --- THE ORIGINAL MATH --- */
-function setupOriginalScatterImages(section, images) {
-    // Center point of the container
-    // We use innerWidth/Height because the section is 100vh/100vw absolute
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-
-    images.forEach(img => {
-        if(img.parentElement.classList.contains('scatter-anchor')) return;
-
-        const anchor = document.createElement('div');
-        anchor.classList.add('scatter-anchor');
-        
-        // 1. Move CSS Classes
-        const classesToMove = [];
-        img.classList.forEach(cls => { 
-            if (cls.startsWith('pos-')) classesToMove.push(cls); 
-        });
-        classesToMove.forEach(cls => { 
-            anchor.classList.add(cls); 
-            img.classList.remove(cls); 
-        });
-
-        // 2. Add Jitter
-        const jitterX = Math.floor(Math.random() * 40) - 20;
-        const jitterY = Math.floor(Math.random() * 40) - 20;
-        anchor.style.marginLeft = `${jitterX}px`;
-        anchor.style.marginTop = `${jitterY}px`;
-
-        // 3. Assemble
-        img.parentNode.insertBefore(anchor, img);
-        anchor.appendChild(img);
-
-        // 4. Calculate Explosion Vector
-        // This measures the 'pos-X' class location relative to window
-        const anchorX = anchor.offsetLeft;
-        const anchorY = anchor.offsetTop;
-
-        const deltaX = anchorX - centerX;
-        const deltaY = anchorY - centerY;
-        const angle = Math.atan2(deltaY, deltaX);
-        
-        // RESTORED DISTANCE: 10 (vw/vh) based on your uploaded file
-        const flyDistance = 10; 
-
-        const vecX = Math.cos(angle) * flyDistance;
-        const vecY = Math.sin(angle) * flyDistance;
-
-        anchor.style.setProperty('--fly-x', `${vecX}vw`);
-        anchor.style.setProperty('--fly-y', `${vecY}vh`);
-
-        // 5. Scale
-        const scale = 0.5 + Math.random() * 0.3; 
-        img.style.setProperty('--base-scale', scale);
-        
-        // Initial State: Exploded
-        anchor.classList.add('state-exploded');
-    });
-}
+});
 
 function initSmoothMotion() {
     const images = document.querySelectorAll('.scatter-img');
-    if(images.length === 0) return;
+    if(images.length === 0) return; // Exit if no images found
 
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
@@ -191,16 +142,10 @@ function initSmoothMotion() {
     });
 
     function animate() {
-        const activeSection = document.querySelector('.sequence-section.is-active');
-        if(!activeSection) {
-            requestAnimationFrame(animate);
-            return;
-        }
-
-        const activeImages = activeSection.querySelectorAll('.scatter-img');
-
-        activeImages.forEach(img => {
+        images.forEach(img => {
             const rect = img.getBoundingClientRect();
+            if (rect.bottom < -100 || rect.top > window.innerHeight + 100) return;
+
             const imgX = rect.left + rect.width / 2;
             const imgY = rect.top + rect.height / 2;
             const dx = mouseX - imgX;
@@ -220,4 +165,79 @@ function initSmoothMotion() {
         requestAnimationFrame(animate);
     }
     animate();
+}
+
+function setupAboutImages() {
+    const slides = document.querySelectorAll('.about-slide');
+    
+    // We need the section to be visible to measure positions
+    // If it's hidden via display:none, this math fails.
+    // Assuming opacity:0 or visibility:hidden is used, this works.
+
+    slides.forEach(slide => {
+        const images = slide.querySelectorAll('.scatter-img');
+        const slideRect = slide.getBoundingClientRect();
+        const centerX = slideRect.width / 2;
+        const centerY = slideRect.height / 2;
+
+        images.forEach(img => {
+            const anchor = document.createElement('div');
+            anchor.classList.add('scatter-anchor');
+            
+            const parallax = document.createElement('div');
+            parallax.classList.add('scatter-parallax');
+
+            // 1. Move CSS Classes (Your manual positioning)
+            const classesToMove = [];
+            img.classList.forEach(cls => { 
+                if (cls.startsWith('pos-')) classesToMove.push(cls); 
+            });
+            classesToMove.forEach(cls => { 
+                anchor.classList.add(cls); 
+                img.classList.remove(cls); 
+            });
+
+            // 2. Add Jitter (Texture)
+            const jitterX = Math.floor(Math.random() * 40) - 20;
+            const jitterY = Math.floor(Math.random() * 40) - 20;
+            anchor.style.marginLeft = `${jitterX}px`;
+            anchor.style.marginTop = `${jitterY}px`;
+
+            // 3. ASSEMBLE (Put it in DOM so it has a position)
+            img.parentNode.insertBefore(anchor, img);
+            anchor.appendChild(parallax);
+            parallax.appendChild(img);
+            
+            // 4. READ LIVE POSITION
+            // We force the browser to tell us where the anchor ended up
+            // relative to the slide center.
+            
+            // Note: Since anchor is 0x0 and centered, its offsetLeft/Top 
+            // is exactly its coordinate.
+            const anchorX = anchor.offsetLeft;
+            const anchorY = anchor.offsetTop;
+
+            // Calculate Vector from Center
+            const deltaX = anchorX - centerX;
+            const deltaY = anchorY - centerY;
+
+            // Calculate Angle
+            const angle = Math.atan2(deltaY, deltaX);
+
+            // Distance to fly (Fixed Amount)
+            const flyDistance = 10; // 45vw/vh
+
+            const vecX = Math.cos(angle) * flyDistance;
+            const vecY = Math.sin(angle) * flyDistance;
+
+            anchor.style.setProperty('--fly-x', `${vecX}vw`);
+            anchor.style.setProperty('--fly-y', `${vecY}vh`);
+
+            // 5. SCALE
+            const scale = 0.5 + Math.random() * 0.3; 
+            img.style.setProperty('--base-scale', scale);
+            
+            parallax._targetY = 0;
+        });
+    });
 }
