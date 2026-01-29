@@ -33,12 +33,17 @@ function initCascadeReveal() {
         const splitTextInNode = (node) => {
             const text = node.innerText;
             node.innerHTML = ''; 
-            text.split('').forEach((char, i) => {
-                const span = document.createElement('span');
-                span.classList.add('char-reveal');
-                if (char === ' ') span.innerHTML = '&nbsp;';
-                else span.innerText = char;
-                node.appendChild(span);
+            text.split('').forEach((char) => {
+                if (char === ' ') {
+                    // INSERT REAL SPACE (Allows wrapping)
+                    node.appendChild(document.createTextNode(' '));
+                } else {
+                    // WRAP LETTER (Allows animation)
+                    const span = document.createElement('span');
+                    span.classList.add('char-reveal');
+                    span.innerText = char;
+                    node.appendChild(span);
+                }
             });
         };
 

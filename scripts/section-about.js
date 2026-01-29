@@ -1,42 +1,39 @@
 /* =========================================
-   STEP 2: ABOUT (Scroll Flow Animations)
+   STEP 2: ABOUT / MENU (Unified Logic)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. SELECTORS
     const aboutSection = document.querySelector('.about');
     if(!aboutSection) return;
 
     const slides = document.querySelectorAll('.about-slide');
-    const cta = document.querySelector('.about-persistent-cta');
+    
+    // NEW: Get the persistent menu items
+    const menuItems = document.querySelectorAll('.menu-list-overlay .menu-item');
 
-    // 2. SETUP (Run once)
+    // SETUP
     setupAboutImages(); 
     initSmoothMotion();
 
-    // 3. HELPER: Set State on Anchors in a specific slide
+    // HELPER: Set Anchor States
     const setSlideState = (index, stateClass, snap = false) => {
         const s = slides[index];
         if(!s) return;
         
         const anchors = s.querySelectorAll('.scatter-anchor');
-        
         anchors.forEach(anchor => {
-            // Remove all motion classes
             anchor.classList.remove('state-center', 'state-exploded', 'state-up', 'state-down');
-            
-            // If Snap is true, we kill transition, apply class, flush, then restore
             if (snap) {
                 anchor.style.transition = 'none';
                 anchor.classList.add(stateClass);
-                void anchor.offsetWidth; // Flush
+                void anchor.offsetWidth; 
                 anchor.style.transition = '';
             } else {
                 anchor.classList.add(stateClass);
             }
         });
 
-        // Toggle Text Visibility
+        // Toggle Content Visibility
         if (stateClass === 'state-center') {
             s.classList.add('slide-visible');
         } else {
@@ -44,77 +41,117 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 4. DEFINE SCROLL STEPS
-    const aboutSteps = [0, 1, 2].map(index => {
+    // HELPER: Update Menu Highlight
+    const updateMenuHighlight = (activeIndex) => {
+        menuItems.forEach((item, i) => {
+            if (i === activeIndex) item.classList.add('active');
+            else item.classList.remove('active');
+        });
+    };
+
+    // DEFINE STEPS
+    // Map over slides (we expect 4 slides now)
+    const aboutSteps = Array.from(slides).map((slide, index) => {
+        
+        // Find Local CTA
+        const localCTA = slide.querySelector('.cta-btn');
+
         return {
             id: `about-${index}`,
             
             onEnter: (direction) => {
                 aboutSection.classList.add('is-active');
-                if(cta) cta.classList.remove('not-active');
 
-                // --- LOGIC PER SLIDE ---
-                
+                // 2. Activate Local CTA
+                if(localCTA) setTimeout(() => localCTA.classList.remove('not-active'), 100);
+
+                // 3. Physics Logic
                 if (index === 0) { 
-                    // SLIDE 1: Implode from Sides
-                    // If coming from top (load), snap to exploded first
-                    if (direction === 'down') setSlideState(0, 'state-exploded', true); 
-                    
-                    // Animate to Center
-                    requestAnimationFrame(() => setSlideState(0, 'state-center'));
-                } 
-                
-                else if (index === 1) {
-                    // SLIDE 2: Scroll from Bottom
                     if (direction === 'down') {
-                        // Entering from top: Snap to bottom, then move center
-                        setSlideState(1, 'state-down', true);
-                    } else {
-                        // Entering from bottom (backwards): Snap to top, move center
-                        setSlideState(1, 'state-up', true);
-                    }
-                    requestAnimationFrame(() => setSlideState(1, 'state-center'));
-                } 
-                
-                else if (index === 2) {
-                    // SLIDE 3: Scroll from Bottom
-                    if (direction === 'down') setSlideState(2, 'state-down', true);
-                    requestAnimationFrame(() => setSlideState(2, 'state-center'));
-                }
+                        // 1. SNAP MENU ITEMS HIDDEN (Preparation)
+                        menuItems.forEach(item => {
+                            item.style.transition = 'none';
+                            item.style.opacity = '0';
+                            item.style.filter = 'blur(10px)';
+                            item.style.transform = 'translateY(20px)';
+                        });
 
-                return 750; // Time for animation to settle
+                        updateMenuHighlight(-1);
+
+                        // Force Reflow
+                        void aboutSection.offsetWidth;
+
+                        // 2. CASCADE MENU IN (Animation)
+                        menuItems.forEach((item, i) => {
+                            // Define entrance physics (including color just in case)
+                            item.style.transition = 'opacity 0.6s ease, filter 0.6s ease, transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), color 1.0s ease';
+                            
+                            // Trigger the reveal
+                            setTimeout(() => {
+                                item.style.opacity = '1'; 
+                                item.style.filter = 'blur(0px)';
+                                item.style.transform = 'translateY(0)';
+                            }, i * 150); 
+
+                            // CLEANUP: Remove inline styles after animation ends.
+                            // This ensures your CSS file takes back control for future color swaps.
+                            setTimeout(() => {
+                                item.style.transition = '';
+                            }, (i * 150) + 700);
+                        });
+
+                        // 3. ANIMATE REST OF SLIDE (Delayed)
+                        // Wait 600ms for menu to finish, then explode images in
+                        setSlideState(0, 'state-exploded', true); 
+                        setTimeout(() => {
+                            setSlideState(0, 'state-center');
+                        }, 1200);
+
+                        setTimeout(() =>{
+                            updateMenuHighlight(index);
+                        }, 1200);
+
+                    } else {
+                        // Coming back UP from Slide 1 (No cascade needed)
+                        requestAnimationFrame(() => setSlideState(0, 'state-center'));
+
+                        setTimeout(() =>{
+                            updateMenuHighlight(index);
+                        }, 100);
+                    }
+                }
+                else {
+                    if (direction === 'down') setSlideState(index, 'state-down', true);
+                    else setSlideState(index, 'state-up', true);
+                    requestAnimationFrame(() => setSlideState(index, 'state-center'));
+
+                    setTimeout(() =>{
+                        updateMenuHighlight(index);
+                    }, 100);
+                }                
+
+                return 750;
             },
             
             onExit: (direction) => {
-                // --- EXIT LOGIC ---
-                
-                if (index === 0) {
-                    if (direction === 'down') setSlideState(0, 'state-up'); // Exit Up
-                    else setSlideState(0, 'state-exploded'); // Reverse (Explode)
-                }
-                
-                else if (index === 1) {
-                    if (direction === 'down') setSlideState(1, 'state-up'); // Exit Up
-                    else setSlideState(1, 'state-down'); // Reverse (Down)
-                }
-                
-                else if (index === 2) {
-                    if (direction === 'down') {
-                        // LAST SLIDE EXIT -> EXPLODE
-                        setSlideState(2, 'state-exploded');
-                        
-                        // Hide Section after animation
-                        if(cta) cta.classList.add('not-active');
+                if(localCTA) localCTA.classList.add('not-active');
+
+                if (direction === 'down') {
+                    setSlideState(index, 'state-up');
+                    
+                    // IF LAST SLIDE
+                    if (index === slides.length - 1) {
+                        setSlideState(index, 'state-exploded');
                         setTimeout(() => aboutSection.classList.remove('is-active'), 800);
-                    } else {
-                        setSlideState(2, 'state-down'); // Reverse
                     }
-                }
-                
-                // Special case: Leaving Top of Slide 0
-                if (index === 0 && direction === 'up') {
-                    if(cta) cta.classList.add('not-active');
-                    aboutSection.classList.remove('is-active');
+                } else {
+                    setSlideState(index, 'state-down'); 
+                    
+                    // IF FIRST SLIDE
+                    if (index === 0) {
+                        setSlideState(0, 'state-exploded');
+                        aboutSection.classList.remove('is-active');
+                    }
                 }
 
                 return 800; 
@@ -124,14 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (window.ScrollManager) {
         ScrollManager.addSteps(aboutSteps);
-    } else {
-        console.error("ScrollManager not found.");
     }
 });
 
+/* --- PHYSICS HELPERS (Unchanged) --- */
 function initSmoothMotion() {
     const images = document.querySelectorAll('.scatter-img');
-    if(images.length === 0) return; // Exit if no images found
+    if(images.length === 0) return; 
 
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
@@ -170,10 +206,6 @@ function initSmoothMotion() {
 function setupAboutImages() {
     const slides = document.querySelectorAll('.about-slide');
     
-    // We need the section to be visible to measure positions
-    // If it's hidden via display:none, this math fails.
-    // Assuming opacity:0 or visibility:hidden is used, this works.
-
     slides.forEach(slide => {
         const images = slide.querySelectorAll('.scatter-img');
         const slideRect = slide.getBoundingClientRect();
@@ -183,11 +215,9 @@ function setupAboutImages() {
         images.forEach(img => {
             const anchor = document.createElement('div');
             anchor.classList.add('scatter-anchor');
-            
             const parallax = document.createElement('div');
             parallax.classList.add('scatter-parallax');
 
-            // 1. Move CSS Classes (Your manual positioning)
             const classesToMove = [];
             img.classList.forEach(cls => { 
                 if (cls.startsWith('pos-')) classesToMove.push(cls); 
@@ -197,46 +227,28 @@ function setupAboutImages() {
                 img.classList.remove(cls); 
             });
 
-            // 2. Add Jitter (Texture)
             const jitterX = Math.floor(Math.random() * 40) - 20;
             const jitterY = Math.floor(Math.random() * 40) - 20;
             anchor.style.marginLeft = `${jitterX}px`;
             anchor.style.marginTop = `${jitterY}px`;
 
-            // 3. ASSEMBLE (Put it in DOM so it has a position)
             img.parentNode.insertBefore(anchor, img);
             anchor.appendChild(parallax);
             parallax.appendChild(img);
             
-            // 4. READ LIVE POSITION
-            // We force the browser to tell us where the anchor ended up
-            // relative to the slide center.
-            
-            // Note: Since anchor is 0x0 and centered, its offsetLeft/Top 
-            // is exactly its coordinate.
             const anchorX = anchor.offsetLeft;
             const anchorY = anchor.offsetTop;
-
-            // Calculate Vector from Center
             const deltaX = anchorX - centerX;
             const deltaY = anchorY - centerY;
-
-            // Calculate Angle
             const angle = Math.atan2(deltaY, deltaX);
-
-            // Distance to fly (Fixed Amount)
-            const flyDistance = 10; // 45vw/vh
-
+            const flyDistance = 10; 
             const vecX = Math.cos(angle) * flyDistance;
             const vecY = Math.sin(angle) * flyDistance;
 
             anchor.style.setProperty('--fly-x', `${vecX}vw`);
             anchor.style.setProperty('--fly-y', `${vecY}vh`);
-
-            // 5. SCALE
             const scale = 0.5 + Math.random() * 0.3; 
             img.style.setProperty('--base-scale', scale);
-            
             parallax._targetY = 0;
         });
     });

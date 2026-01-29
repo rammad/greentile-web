@@ -454,9 +454,11 @@ body {
 .char-reveal {
     display: inline-block;
     opacity: 1;
-    transform: translateY(110%) rotateX(-20deg); /* Start position */
+    transform: translateY(110%) rotateX(-20deg); 
     transform-origin: bottom center;
-    white-space: pre; /* Preserves spaces */
+    
+    /* FIX: Allow text to wrap automatically */
+    white-space: pre-wrap; 
     
     /* The Animation */
     transition: 
