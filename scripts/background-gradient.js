@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isFullScreen: false, // <--- CHANGED: Fits inside the footer div
         numPoints: 20,       
         distribution: [6, 3, 1, 1], 
-        radius: 0.6,        
+        radius: 0.8,        
         speed: 0.1, 
         // CHANGED: Use the vibrant colors (Dark Green, Light Green, Yellow, etc)
         colors: ["#32CD32", "#f0f4f0", "#FABA2F", "#32CD32"], 

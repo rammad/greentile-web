@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     requestAnimationFrame(() => setSlideState(2, 'state-center'));
                 }
 
-                return 1200; // Time for animation to settle
+                return 750; // Time for animation to settle
             },
             
             onExit: (direction) => {

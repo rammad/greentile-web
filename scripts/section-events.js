@@ -66,7 +66,7 @@ function initEventsDirector() {
                     }
                 }, 1800);
 
-                return 3000; 
+                return 2000; 
             },
 
             onExit: (direction) => {
