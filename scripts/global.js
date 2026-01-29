@@ -11,11 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initCascadeReveal();
     
     // 2. Initialize Marquees
-    // Socials: Images (Needs manual .push-down class in HTML for stagger)
-    new MarqueeManager('.socials-track', 60); 
+    // Socials: Images -> Pass 'true' for auto-stagger
+    new MarqueeManager('.socials-track', 60, true); 
 
-    // Footer: Text
-    new MarqueeManager('.marquee-content', 100); 
+    // Footer: Text -> Pass 'false' (no stagger)
+    new MarqueeManager('.marquee-content', 100, false); 
 
     // 3. Trigger Nav Load
     setTimeout(() => {
@@ -42,7 +42,6 @@ function initCascadeReveal() {
             text.split('').forEach((char, i) => {
                 const span = document.createElement('span');
                 span.classList.add('char-reveal');
-                // Preserve spaces to prevent word collapse
                 if (char === ' ') {
                     span.innerHTML = '&nbsp;';
                 } else {
@@ -52,14 +51,11 @@ function initCascadeReveal() {
             });
         };
 
-        // CHECK STRUCTURE: Does it have direct children (like Hero/Footer spans)?
         if (el.children.length > 0) {
-            // YES: Keep the wrappers, split inside them
             Array.from(el.children).forEach(child => {
                 splitTextInNode(child);
             });
         } else {
-            // NO: Just text, split the parent
             splitTextInNode(el);
         }
         
@@ -91,12 +87,13 @@ window.reverseCascade = (element) => {
 };
 
 /**
- * 3. MARQUEE MANAGER (Seamless Loop + Odd Count Fix)
+ * 3. MARQUEE MANAGER (Seamless Loop + Auto-Stagger)
  */
 class MarqueeManager {
-    constructor(selector, speed = 50) {
+    constructor(selector, speed = 50, autoStagger = false) {
         this.tracks = document.querySelectorAll(selector);
         this.speed = speed; 
+        this.autoStagger = autoStagger; // NEW: Option to auto-apply push-down
         this.init();
     }
 
@@ -105,7 +102,7 @@ class MarqueeManager {
             let originalContent = Array.from(track.children);
             if (originalContent.length === 0) return;
 
-            // A. PARITY CHECK (Fixes the "Seam" issue for staggered layouts)
+            // A. PARITY CHECK
             // If we have an odd number of items, duplicate the set once to make it even.
             if (originalContent.length % 2 !== 0) {
                 const fragment = document.createDocumentFragment();
@@ -114,14 +111,25 @@ class MarqueeManager {
                 originalContent = Array.from(track.children); // Update reference
             }
 
-            // B. MEASURE ONE FULL SET (Width of content + gaps)
-            // We clone it temporarily to measure the true rendered width
+            // B. AUTO-STAGGER (The Fix)
+            // Now that we have an even number, we apply the class 1-on 1-off
+            if (this.autoStagger) {
+                originalContent.forEach((child, index) => {
+                    if (index % 2 !== 0) {
+                        child.classList.add('push-down');
+                    } else {
+                        child.classList.remove('push-down');
+                    }
+                });
+            }
+
+            // C. MEASURE ONE FULL SET (Width of content + gaps)
             const measureDiv = document.createElement('div');
             measureDiv.style.display = 'flex';
             measureDiv.style.gap = getComputedStyle(track).gap;
             measureDiv.style.visibility = 'hidden';
             measureDiv.style.position = 'absolute';
-            measureDiv.style.whiteSpace = 'nowrap'; // Ensure it doesn't wrap
+            measureDiv.style.whiteSpace = 'nowrap'; 
             
             originalContent.forEach(child => measureDiv.appendChild(child.cloneNode(true)));
             document.body.appendChild(measureDiv);
@@ -130,12 +138,11 @@ class MarqueeManager {
             const gap = parseFloat(getComputedStyle(track).gap) || 0;
             document.body.removeChild(measureDiv);
 
-            // C. CALCULATE CLONES NEEDED
-            // We need enough width to cover the screen PLUS one full buffer set
+            // D. CALCULATE CLONES NEEDED
             const screenWidth = window.innerWidth;
             const setsNeeded = Math.ceil(screenWidth / (singleSetWidth + gap)) + 1;
 
-            // D. FILL TRACK
+            // E. FILL TRACK
             track.innerHTML = '';
             const fragment = document.createDocumentFragment();
             
@@ -148,9 +155,7 @@ class MarqueeManager {
             }
             track.appendChild(fragment);
 
-            // E. ANIMATE
-            // We animate exactly the width of the SINGLE SET (plus one gap)
-            // When it finishes, it snaps back to 0, where an identical copy sits.
+            // F. ANIMATE
             const moveDistance = singleSetWidth + gap;
             
             track.style.setProperty('--marquee-end', `-${moveDistance}px`);
@@ -174,7 +179,7 @@ function initNavbar() {
 
     links.forEach(link => {
         if (link.children.length === 0) {
-            link.innerText = link.innerText; // Simple fallback
+            link.innerText = link.innerText; 
         }
     });
 
