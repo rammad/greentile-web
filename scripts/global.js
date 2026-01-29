@@ -87,32 +87,39 @@ window.reverseCascade = (element) => {
 };
 
 /**
- * 3. MARQUEE MANAGER (Seamless Loop + Auto-Stagger)
+ * 3. MARQUEE MANAGER (Seamless Loop + Auto-Stagger + Font Safety)
  */
 class MarqueeManager {
     constructor(selector, speed = 50, autoStagger = false) {
-        this.tracks = document.querySelectorAll(selector);
+        this.selector = selector;
         this.speed = speed; 
-        this.autoStagger = autoStagger; // NEW: Option to auto-apply push-down
-        this.init();
+        this.autoStagger = autoStagger;
+        
+        // FIX: Wait for fonts to load before measuring text width
+        document.fonts.ready.then(() => {
+            this.init();
+        });
     }
 
     init() {
-        this.tracks.forEach(track => {
+        const tracks = document.querySelectorAll(this.selector);
+        
+        tracks.forEach(track => {
+            // Prevent double-init if fonts load twice
+            if(track.classList.contains('is-initialized')) return;
+
             let originalContent = Array.from(track.children);
             if (originalContent.length === 0) return;
 
-            // A. PARITY CHECK
-            // If we have an odd number of items, duplicate the set once to make it even.
+            // A. PARITY CHECK (Even number of items)
             if (originalContent.length % 2 !== 0) {
                 const fragment = document.createDocumentFragment();
                 originalContent.forEach(child => fragment.appendChild(child.cloneNode(true)));
                 track.appendChild(fragment);
-                originalContent = Array.from(track.children); // Update reference
+                originalContent = Array.from(track.children);
             }
 
-            // B. AUTO-STAGGER (The Fix)
-            // Now that we have an even number, we apply the class 1-on 1-off
+            // B. AUTO-STAGGER (Push-down pattern)
             if (this.autoStagger) {
                 originalContent.forEach((child, index) => {
                     if (index % 2 !== 0) {
@@ -123,19 +130,33 @@ class MarqueeManager {
                 });
             }
 
-            // C. MEASURE ONE FULL SET (Width of content + gaps)
+            // C. MEASURE ONE FULL SET (High Precision)
             const measureDiv = document.createElement('div');
+            const trackStyle = window.getComputedStyle(track);
+            
+            // Layout Safety: Ensure it measures as one long line
             measureDiv.style.display = 'flex';
-            measureDiv.style.gap = getComputedStyle(track).gap;
+            measureDiv.style.width = 'max-content';
             measureDiv.style.visibility = 'hidden';
             measureDiv.style.position = 'absolute';
-            measureDiv.style.whiteSpace = 'nowrap'; 
+            
+            // Style Mirroring: Copy gap and font settings to ensure accuracy
+            measureDiv.style.gap = trackStyle.gap || trackStyle.columnGap;
+            measureDiv.style.fontFamily = trackStyle.fontFamily;
+            measureDiv.style.fontSize = trackStyle.fontSize;
+            measureDiv.style.fontWeight = trackStyle.fontWeight;
+            measureDiv.style.letterSpacing = trackStyle.letterSpacing;
+            measureDiv.style.textTransform = trackStyle.textTransform;
             
             originalContent.forEach(child => measureDiv.appendChild(child.cloneNode(true)));
             document.body.appendChild(measureDiv);
             
-            const singleSetWidth = measureDiv.offsetWidth;
-            const gap = parseFloat(getComputedStyle(track).gap) || 0;
+            // Precision Measurement
+            const singleSetWidth = measureDiv.getBoundingClientRect().width;
+            
+            // Parse Gap safely
+            const gap = parseFloat(trackStyle.gap || trackStyle.columnGap) || 0;
+            
             document.body.removeChild(measureDiv);
 
             // D. CALCULATE CLONES NEEDED
@@ -146,7 +167,6 @@ class MarqueeManager {
             track.innerHTML = '';
             const fragment = document.createDocumentFragment();
             
-            // Add (Original + Clones)
             for (let i = 0; i <= setsNeeded; i++) {
                 originalContent.forEach(child => {
                     const clone = child.cloneNode(true);
@@ -164,6 +184,7 @@ class MarqueeManager {
             track.style.setProperty('--marquee-duration', `${duration}s`);
             
             track.classList.add('has-seamless-animation');
+            track.classList.add('is-initialized');
         });
     }
 }
