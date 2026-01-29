@@ -1,44 +1,34 @@
 /* =========================================
-   STEP 4: SOCIALS (Director Mode)
+   SECTION: SOCIALS
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. SELECTORS
     const section = document.querySelector('.socials-section');
-    const title = section.querySelector('.type-h1'); // "Socials"
-    
     if(!section) return;
 
-    // 2. DEFINE STEP
-    const socialStep = {
-        id: 'socials',
-        
-        onEnter: (direction) => {
-            section.classList.add('is-active');
-            
-            // Trigger Title Cascade (Standard Animation)
-            if (window.playCascade && title) {
-                window.playCascade(title);
-            }
+    // 1. SELF-INIT MARQUEE
+    // We check if MarqueeManager exists (from global.js)
+    if (typeof MarqueeManager !== 'undefined') {
+        // Init specifically for THIS section's track
+        new MarqueeManager('.socials-track', 60, true);
+    }
 
-            return 1000; // Duration
-        },
-
-        onExit: (direction) => {
-            section.classList.remove('is-active');
-            
-            if (window.reverseCascade && title) {
-                window.reverseCascade(title);
-            }
-            
-            return 800;
-        }
-    };
-
-    // 3. REGISTER
+    // 2. REGISTER STEP
     if (window.ScrollManager) {
-        ScrollManager.addSteps([socialStep]);
-    } else {
-        console.error("ScrollManager not found.");
+        ScrollManager.addSteps([{
+            id: 'socials',
+            onEnter: (direction) => {
+                section.classList.add('is-active');
+                const title = section.querySelector('.type-h1');
+                if (window.playCascade && title) window.playCascade(title);
+                return 1000;
+            },
+            onExit: (direction) => {
+                section.classList.remove('is-active');
+                const title = section.querySelector('.type-h1');
+                if (window.reverseCascade && title) window.reverseCascade(title);
+                return 800;
+            }
+        }]);
     }
 });

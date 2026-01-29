@@ -1,32 +1,28 @@
 /* =========================================
-   GLOBAL UTILITIES
+   GLOBAL UTILITIES (The Toolbelt)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
     initCTA();
-    initSmoothMotion();
     
     // 1. Initialize Text Animations (Structure-Aware)
+    // This is global because any section might use .animate-cascade
     initCascadeReveal();
-    
-    // 2. Initialize Marquees
-    // Socials: Images -> Pass 'true' for auto-stagger
-    new MarqueeManager('.socials-track', 60, true); 
 
-    // Footer: Text -> Pass 'false' (no stagger)
-    new MarqueeManager('.marquee-content', 100, false); 
-
-    // 3. Trigger Nav Load
+    // 2. Trigger Nav Load
     setTimeout(() => {
         const nav = document.querySelector('nav');
         if(nav) nav.classList.add('nav-loaded');
     }, 100);
 });
 
+/* =========================================
+   TOOLS (Available to all sections)
+   ========================================= */
+
 /**
- * 1. TEXT REVEAL (Structure-Aware Splitter)
- * Preserves <span> wrappers for mobile layout while splitting chars
+ * TEXT REVEAL (Structure-Aware Splitter)
  */
 function initCascadeReveal() {
     const targets = document.querySelectorAll('.animate-cascade');
@@ -34,38 +30,27 @@ function initCascadeReveal() {
     targets.forEach(el => {
         if(el.classList.contains('is-initialized')) return;
 
-        // Helper: Splits text inside a specific node
         const splitTextInNode = (node) => {
             const text = node.innerText;
-            node.innerHTML = ''; // Clear ONLY this node
-            
+            node.innerHTML = ''; 
             text.split('').forEach((char, i) => {
                 const span = document.createElement('span');
                 span.classList.add('char-reveal');
-                if (char === ' ') {
-                    span.innerHTML = '&nbsp;';
-                } else {
-                    span.innerText = char;
-                }
+                if (char === ' ') span.innerHTML = '&nbsp;';
+                else span.innerText = char;
                 node.appendChild(span);
             });
         };
 
         if (el.children.length > 0) {
-            Array.from(el.children).forEach(child => {
-                splitTextInNode(child);
-            });
+            Array.from(el.children).forEach(child => splitTextInNode(child));
         } else {
             splitTextInNode(el);
         }
-        
         el.classList.add('is-initialized');
     });
 }
 
-/**
- * 2. ANIMATION HELPERS (Window Scope)
- */
 window.playCascade = (element) => {
     if (!element) return;
     const chars = element.querySelectorAll('.char-reveal');
@@ -87,7 +72,7 @@ window.reverseCascade = (element) => {
 };
 
 /**
- * 3. MARQUEE MANAGER (Seamless Loop + Auto-Stagger + Font Safety)
+ * MARQUEE MANAGER
  */
 class MarqueeManager {
     constructor(selector, speed = 50, autoStagger = false) {
@@ -95,7 +80,6 @@ class MarqueeManager {
         this.speed = speed; 
         this.autoStagger = autoStagger;
         
-        // FIX: Wait for fonts to load before measuring text width
         document.fonts.ready.then(() => {
             this.init();
         });
@@ -105,13 +89,12 @@ class MarqueeManager {
         const tracks = document.querySelectorAll(this.selector);
         
         tracks.forEach(track => {
-            // Prevent double-init if fonts load twice
             if(track.classList.contains('is-initialized')) return;
 
             let originalContent = Array.from(track.children);
             if (originalContent.length === 0) return;
 
-            // A. PARITY CHECK (Even number of items)
+            // Parity Check
             if (originalContent.length % 2 !== 0) {
                 const fragment = document.createDocumentFragment();
                 originalContent.forEach(child => fragment.appendChild(child.cloneNode(true)));
@@ -119,28 +102,21 @@ class MarqueeManager {
                 originalContent = Array.from(track.children);
             }
 
-            // B. AUTO-STAGGER (Push-down pattern)
+            // Auto-Stagger
             if (this.autoStagger) {
                 originalContent.forEach((child, index) => {
-                    if (index % 2 !== 0) {
-                        child.classList.add('push-down');
-                    } else {
-                        child.classList.remove('push-down');
-                    }
+                    if (index % 2 !== 0) child.classList.add('push-down');
+                    else child.classList.remove('push-down');
                 });
             }
 
-            // C. MEASURE ONE FULL SET (High Precision)
+            // Measure
             const measureDiv = document.createElement('div');
             const trackStyle = window.getComputedStyle(track);
-            
-            // Layout Safety: Ensure it measures as one long line
             measureDiv.style.display = 'flex';
             measureDiv.style.width = 'max-content';
             measureDiv.style.visibility = 'hidden';
             measureDiv.style.position = 'absolute';
-            
-            // Style Mirroring: Copy gap and font settings to ensure accuracy
             measureDiv.style.gap = trackStyle.gap || trackStyle.columnGap;
             measureDiv.style.fontFamily = trackStyle.fontFamily;
             measureDiv.style.fontSize = trackStyle.fontSize;
@@ -150,23 +126,16 @@ class MarqueeManager {
             
             originalContent.forEach(child => measureDiv.appendChild(child.cloneNode(true)));
             document.body.appendChild(measureDiv);
-            
-            // Precision Measurement
             const singleSetWidth = measureDiv.getBoundingClientRect().width;
-            
-            // Parse Gap safely
             const gap = parseFloat(trackStyle.gap || trackStyle.columnGap) || 0;
-            
             document.body.removeChild(measureDiv);
 
-            // D. CALCULATE CLONES NEEDED
+            // Clone
             const screenWidth = window.innerWidth;
             const setsNeeded = Math.ceil(screenWidth / (singleSetWidth + gap)) + 1;
 
-            // E. FILL TRACK
             track.innerHTML = '';
             const fragment = document.createDocumentFragment();
-            
             for (let i = 0; i <= setsNeeded; i++) {
                 originalContent.forEach(child => {
                     const clone = child.cloneNode(true);
@@ -175,14 +144,11 @@ class MarqueeManager {
             }
             track.appendChild(fragment);
 
-            // F. ANIMATE
+            // Animate
             const moveDistance = singleSetWidth + gap;
-            
             track.style.setProperty('--marquee-end', `-${moveDistance}px`);
-            
             const duration = moveDistance / this.speed; 
             track.style.setProperty('--marquee-duration', `${duration}s`);
-            
             track.classList.add('has-seamless-animation');
             track.classList.add('is-initialized');
         });
@@ -190,7 +156,7 @@ class MarqueeManager {
 }
 
 /**
- * 4. NAVBAR LOGIC
+ * NAVBAR LOGIC
  */
 function initNavbar() {
     const nav = document.querySelector('.sticky-nav');
@@ -199,9 +165,7 @@ function initNavbar() {
     let scrollTimer;
 
     links.forEach(link => {
-        if (link.children.length === 0) {
-            link.innerText = link.innerText; 
-        }
+        if (link.children.length === 0) link.innerText = link.innerText; 
     });
 
     window.addEventListener('scroll', () => {
@@ -214,7 +178,7 @@ function initNavbar() {
 }
 
 /**
- * 5. CTA BUTTON LOGIC
+ * CTA BUTTON LOGIC
  */
 function initCTA() {
     const btns = document.querySelectorAll('.cta-btn');
@@ -232,43 +196,4 @@ function initCTA() {
             observer.observe(btn);
         }
     });
-}
-
-/**
- * 6. SMOOTH MOTION (Mouse Tracker)
- */
-function initSmoothMotion() {
-    const images = document.querySelectorAll('.scatter-img');
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-
-    window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
-
-    function animate() {
-        images.forEach(img => {
-            const rect = img.getBoundingClientRect();
-            if (rect.bottom < -100 || rect.top > window.innerHeight + 100) return;
-
-            const imgX = rect.left + rect.width / 2;
-            const imgY = rect.top + rect.height / 2;
-            const dx = mouseX - imgX;
-            const dy = mouseY - imgY;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            const radius = 750;
-            
-            if (dist < radius) {
-                const force = (radius - dist) / radius;
-                img.style.setProperty('--avoid-x', `${(-dx * force * 0.15).toFixed(2)}px`);
-                img.style.setProperty('--avoid-y', `${(-dy * force * 0.15).toFixed(2)}px`);
-            } else {
-                img.style.setProperty('--avoid-x', `0px`);
-                img.style.setProperty('--avoid-y', `0px`);
-            }
-        });
-        requestAnimationFrame(animate);
-    }
-    animate();
 }

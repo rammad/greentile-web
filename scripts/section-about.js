@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. SETUP (Run once)
     setupAboutImages(); 
+    initSmoothMotion();
 
     // 3. HELPER: Set State on Anchors in a specific slide
     const setSlideState = (index, stateClass, snap = false) => {
@@ -127,6 +128,44 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("ScrollManager not found.");
     }
 });
+
+function initSmoothMotion() {
+    const images = document.querySelectorAll('.scatter-img');
+    if(images.length === 0) return; // Exit if no images found
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    function animate() {
+        images.forEach(img => {
+            const rect = img.getBoundingClientRect();
+            if (rect.bottom < -100 || rect.top > window.innerHeight + 100) return;
+
+            const imgX = rect.left + rect.width / 2;
+            const imgY = rect.top + rect.height / 2;
+            const dx = mouseX - imgX;
+            const dy = mouseY - imgY;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            const radius = 750;
+            
+            if (dist < radius) {
+                const force = (radius - dist) / radius;
+                img.style.setProperty('--avoid-x', `${(-dx * force * 0.15).toFixed(2)}px`);
+                img.style.setProperty('--avoid-y', `${(-dy * force * 0.15).toFixed(2)}px`);
+            } else {
+                img.style.setProperty('--avoid-x', `0px`);
+                img.style.setProperty('--avoid-y', `0px`);
+            }
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
 
 function setupAboutImages() {
     const slides = document.querySelectorAll('.about-slide');
