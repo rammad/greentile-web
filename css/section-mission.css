@@ -1,14 +1,37 @@
 /* =========================================
-    PAGE SPECIFIC STYLES
-    ========================================= */
+   MISSION SECTION (Director Mode)
+   ========================================= */
 
 .mission-section {
-    background-color: var(--color-bg); 
-    min-height: 100vh; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    
+    /* Layout */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 20px; 
+    
+    /* Layer Logic */
+    background-color: var(--color-bg); 
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 0.8s ease;
+}
+
+.mission-section.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Ensure text doesn't span too wide */
+.mission-section .type-display-hero {
+    max-width: 1400px;
+    margin: 0 auto;
+    margin-top: 32px;
 }

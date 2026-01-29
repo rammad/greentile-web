@@ -4,29 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - Green Tile Social Club</title>
+    
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/section-mission.css">
+    <link rel="stylesheet" href="css/section-menu.css">
+    <link rel="stylesheet" href="css/section-clients.css">
+    <link rel="stylesheet" href="css/section-events.css"> 
+    <link rel="stylesheet" href="css/section-socials.css">
+    <link rel="stylesheet" href="css/footer.css">
 </head>
 <body>
+    <canvas id="gradient-canvas"></canvas>
 
-    <nav class="sticky-nav">
-        <div class="nav-left"><img src="images/logo-edit.png" class="nav-logo"></img></div>
+    <nav class="sticky-nav standard-margins">
+        <div class="nav-left"><img src="images/logo-edit.png" class="nav-logo"></div>
         <div class="nav-center">
-            <a href="events.html" class="type-sub2">Events</a>
-            <a href="#" class="type-sub2">Shop</a>
-            <a href="about-us.html" class="type-sub2" style="border-bottom: 2px solid currentColor;">About</a>
+            <a href="events.html" class="type-sub2 ui-roll roll-hover">
+                <span class="ui-roll-layer ui-roll-visible">Events</span>
+                <span class="ui-roll-layer ui-roll-hidden">Events</span>
+            </a>
+            <a href="#" class="type-sub2 ui-roll roll-hover">
+                <span class="ui-roll-layer ui-roll-visible">Shop</span>
+                <span class="ui-roll-layer ui-roll-hidden">Shop</span>
+            </a>
+            <a href="about-us.html" class="type-sub2 ui-roll roll-hover" style="border-bottom: 2px solid currentColor;">
+                <span class="ui-roll-layer ui-roll-visible">About</span>
+                <span class="ui-roll-layer ui-roll-hidden">About</span>
+            </a>
         </div>
-        <div class="nav-right"><a href="#" class="type-sub2">Contact</a></div>
+        <div class="nav-right">
+            <a href="#" class="type-sub2 ui-roll roll-hover">
+                <span class="ui-roll-layer ui-roll-visible">Contact</span>
+                <span class="ui-roll-layer ui-roll-hidden">Contact</span>
+            </a>
+        </div>
     </nav>
     
-    <section class="mission-section standard-margins">
+    <section class="mission-section standard-margins" data-colors="#32CD32, #f0f4f0, #FABA2F, #32CD32">
         <span class="type-sub1">MISSION</span>
         
-        <h1 class="type-display-hero" style="text-transform: none;">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        <h1 class="type-display-hero animate-cascade" style="text-transform: none;">
+            <span class="animate-cascade">Lorem ipsum dolor sit amet, consectetur</span>
+            <span class="animate-cascade">adipiscing elit, sed do eiusmod tempor</span>
+            <span class="animate-cascade">incididunt ut labore et dolore.</span>
         </h1>
     </section>
 
-    <section class="menu-section standard-margins section-spacer" id="menu-trigger">
+    <section class="menu-section" data-colors="#f0f4f0, #f0f4f0, #32CD32, #32CD32">
         <div class="menu-sticky">
             
             <div class="menu-stage">
@@ -58,28 +82,28 @@
                 <div class="menu-label">What We Do</div>
                 
                 <ul class="menu-list">
-                    <li class="menu-item">Community Events</li>
+                    <li class="menu-item active">Community Events</li>
                     <li class="menu-item">Brand Partnerships</li>
                     <li class="menu-item">Corporate & Private</li>
                     <li class="menu-item">Editorial Collabs</li>
                 </ul>
     
                 <div class="cta-container">
-                    <div class="cta-block">
+                    <div class="cta-block active">
                         <p class="cta-text">We host open play sessions, tournaments, and social mixers that bring people together over the clacking of tiles.</p>
-                        <a href="#" class="cta-btn">All Events <span>&rarr;</span></a>
+                        <a href="#" class="cta-btn ui-roll roll-hover"><span class="ui-roll-layer ui-roll-visible">All Events &rarr;</span><span class="ui-roll-layer ui-roll-hidden">All Events &rarr;</span></a>
                     </div>
                     <div class="cta-block">
                         <p class="cta-text">Collaborating with brands to create authentic, culturally rich experiences that resonate with modern audiences.</p>
-                        <a href="#" class="cta-btn">See Partnerships <span>&rarr;</span></a>
+                        <a href="#" class="cta-btn ui-roll roll-hover"><span class="ui-roll-layer ui-roll-visible">Partnerships &rarr;</span><span class="ui-roll-layer ui-roll-hidden">Partnerships &rarr;</span></a>
                     </div>
                     <div class="cta-block">
                         <p class="cta-text">Bring the Green Tile energy to your office or private party. We provide full instruction, sets, and vibe curation.</p>
-                        <a href="#" class="cta-btn">Book Event <span>&rarr;</span></a>
+                        <a href="#" class="cta-btn ui-roll roll-hover"><span class="ui-roll-layer ui-roll-visible">Book Event &rarr;</span><span class="ui-roll-layer ui-roll-hidden">Book Event &rarr;</span></a>
                     </div>
                     <div class="cta-block">
                         <p class="cta-text">Telling stories through fashion, photography, and written word to explore the Asian American identity.</p>
-                        <a href="#" class="cta-btn">Read More <span>&rarr;</span></a>
+                        <a href="#" class="cta-btn ui-roll roll-hover"><span class="ui-roll-layer ui-roll-visible">Read More &rarr;</span><span class="ui-roll-layer ui-roll-hidden">Read More &rarr;</span></a>
                     </div>
                 </div>
             </div>
@@ -87,7 +111,7 @@
         </div>
     </section>
 
-        <section class="events-section standard-margins sticky-track" data-colors="#f0f4f0, #f0f4f0, #FABA2F, #32CD32">
+    <section class="events-section sticky-track" data-colors="#f0f4f0, #f0f4f0, #FABA2F, #32CD32">
         <div class="events-sticky-wrapper">
 
             <div class="events-section-header">
@@ -96,25 +120,26 @@
 
             <div class="events-grid">
                 <div class="event-card card-1">
-                    <img src="images/social1.png" class="event-poster" alt="Event Poster 1">
+                    <img src="images/social1.png" class="event-poster" alt="Team 1">
                 </div>
                 <div class="event-card card-2">
-                    <img src="images/social2.png" class="event-poster" alt="Event Poster 2">
+                    <img src="images/social2.png" class="event-poster" alt="Team 2">
                 </div>
                 <div class="event-card card-3">
-                    <img src="images/social3.png" class="event-poster" alt="Event Poster 3">
+                    <img src="images/social3.png" class="event-poster" alt="Team 3">
                 </div>
             </div>
 
         </div>
     </section>
 
-
-    <section class="socials-section standard-margins" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #32CD32">
+    <section class="socials-section" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #32CD32">
         <div class="socials-header">
-            <span class="type-sub1">Follow Our</span>
-            <div class="type-h1">Socials</div>
-            <p class="type-body1">
+            <div class="text-mask">
+                <span class="type-sub1 text-reveal-inner">Follow Our</span>
+            </div>
+            <div class="type-h1 animate-cascade">Socials</div>
+            <p class="type-body1 delay-1">
                 To stay up to date on all our<br>events & activities
             </p>
             <div class="socials-icons">
@@ -125,24 +150,14 @@
         </div>
         <div class="socials-marquee-wrapper">
             <div class="socials-track">
-                
                 <img src="images/social1.png" class="social-img" alt="Social Post 1">
                 <img src="images/social2.png" class="social-img" alt="Social Post 2">
                 <img src="images/social3.png" class="social-img" alt="Social Post 3">
-                <img src="images/social1.png" class="social-img" alt="Social Post 4">
-                <img src="images/social2.png" class="social-img" alt="Social Post 5">
-
-                <img src="images/social1.png" class="social-img" alt="Social Post 1">
-                <img src="images/social2.png" class="social-img" alt="Social Post 2">
-                <img src="images/social3.png" class="social-img" alt="Social Post 3">
-                <img src="images/social1.png" class="social-img" alt="Social Post 4">
-                <img src="images/social2.png" class="social-img" alt="Social Post 5">
-
             </div>
         </div>
     </section>
 
-    <section class="clients-section standard-margins">
+    <section class="clients-section standard-margins" data-colors="#32CD32, #f0f4f0, #32CD32, #32CD32">
         <div class="clients-header">
             <span class="type-sub1">Previous Clients</span>
         </div>
@@ -153,67 +168,20 @@
                 <img src="images/client2.png" class="client-logo">
                 <img src="images/client3.png" class="client-logo">
                 <img src="images/client4.png" class="client-logo">
-
-                <img src="images/client1.png" class="client-logo">
-                <img src="images/client2.png" class="client-logo">
-                <img src="images/client3.png" class="client-logo">
-                <img src="images/client4.png" class="client-logo">
-
-                <img src="images/client1.png" class="client-logo">
-                <img src="images/client2.png" class="client-logo">
-                <img src="images/client3.png" class="client-logo">
-                <img src="images/client4.png" class="client-logo">
-                
-                <img src="images/client1.png" class="client-logo">
-                <img src="images/client2.png" class="client-logo">
-                <img src="images/client3.png" class="client-logo">
-                <img src="images/client4.png" class="client-logo">
-
             </div>
         </div>
-        
     </section>
 
     <footer class="footer-section">        
         <div class="marquee-wrapper">
-            
             <div class="marquee-bar">
                 <div class="marquee-content">
-                    <span class="marquee-item">Our Podcast Greenroom Now on Spotify</span>
-                    <span class="marquee-item">&rarr;</span>
-                    <span class="marquee-item">Our Podcast Greenroom Now on Spotify</span>
-                    <span class="marquee-item">&rarr;</span>
-                    <span class="marquee-item">Our Podcast Greenroom Now on Spotify</span>
-                    <span class="marquee-item">&rarr;</span>
-                </div>
-                <div class="marquee-content">
-                    <span class="marquee-item">Our Podcast Greenroom Now on Spotify</span>
-                    <span class="marquee-item">&rarr;</span>
-                    <span class="marquee-item">Our Podcast Greenroom Now on Spotify</span>
-                    <span class="marquee-item">&rarr;</span>
                     <span class="marquee-item">Our Podcast Greenroom Now on Spotify</span>
                     <span class="marquee-item">&rarr;</span>
                 </div>
             </div>
-
             <div class="marquee-bar">
                 <div class="marquee-content">
-                    <span class="marquee-item">Vibe to Music at Parlor</span>
-                    <span class="marquee-item">&rarr;</span>
-                    <span class="marquee-item">Vibe to Music at Parlor</span>
-                    <span class="marquee-item">&rarr;</span>
-                    <span class="marquee-item">Vibe to Music at Parlor</span>
-                    <span class="marquee-item">&rarr;</span>
-                    <span class="marquee-item">Vibe to Music at Parlor</span>
-                    <span class="marquee-item">&rarr;</span>
-                </div>
-                <div class="marquee-content">
-                    <span class="marquee-item">Vibe to Music at Parlor</span>
-                    <span class="marquee-item">&rarr;</span>
-                    <span class="marquee-item">Vibe to Music at Parlor</span>
-                    <span class="marquee-item">&rarr;</span>
-                    <span class="marquee-item">Vibe to Music at Parlor</span>
-                    <span class="marquee-item">&rarr;</span>
                     <span class="marquee-item">Vibe to Music at Parlor</span>
                     <span class="marquee-item">&rarr;</span>
                 </div>
@@ -233,20 +201,21 @@
                 <a href="#" class="type-body1 footer-link">Follow Us</a>
             </div>
 
-            <div class="type-display-hero no-wrap">
+            <div class="type-display-hero animate-cascade">
                 <span>Green Tile</span>
                 <span>Social Club</span>
             </div>
         </div>
-
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <script src="scripts/global.js" defer></script>
+    
     <script src="scripts/scroll.js" defer></script>
     <script src="scripts/background-gradient.js" defer></script>
-    <script src="scripts/animations.js" defer></script>
+    
+    <script src="scripts/page-about.js" defer></script>
 
 </body>
 </html>

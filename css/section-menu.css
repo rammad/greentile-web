@@ -1,31 +1,45 @@
 /* =========================================
-   MENU SECTION (Physics & Parallax)
+   MENU SECTION (Director Mode)
    ========================================= */
 
-/* =========================================
-   MENU SECTION (Vertical Scroll Stream)
-   ========================================= */
-
-/* ... Keep container styles same ... */
 .menu-section {
-    height: 500vh;
-    position: relative;
-    z-index: 30;
-    margin-bottom: 0; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    
+    /* Layer Logic */
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1; /* Sits behind active content until needed */
+    transition: opacity 0.6s ease;
+    background-color: var(--color-bg);
+}
+
+.menu-section.is-active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 20; /* High Z to sit on top */
 }
 
 .menu-sticky {
-    position: sticky; top: 0; width: 100%; height: 100vh;
-    display: flex; flex-direction: column; 
-    align-items: center; justify-content: center;
-    overflow: hidden; perspective: 1000px;
+    width: 100%; 
+    height: 100%;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    overflow: hidden; 
+    perspective: 1000px;
+    position: relative;
 }
 
 /* --- IMAGES --- */
 
 .menu-stage {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 50; pointer-events: none;
+    z-index: 10; pointer-events: none;
 }
 
 .menu-group {
@@ -34,55 +48,29 @@
 }
 
 .menu-photo {
-    position: absolute; object-fit: cover; aspect-ratio: 4 / 5;
-
-    /* DEFAULT BASE STATE (Fallback) */
-    opacity: 0; filter: blur(10px); 
-    will-change: transform, opacity, filter;
-}
-
-
-/* --- STATE 1: WAITING BELOW (The "Next" Page) --- */
-/* This mimics the content being "scrolled to" from below */
-.menu-group.next .menu-photo {
-    opacity: 0 !important;
-    filter: blur(10px) !important;
-    /* Start WAY down (50% of viewport height) */
-    transform: translate3d(0, 40px, 0)!important;
+    position: absolute; 
+    object-fit: cover; 
+    aspect-ratio: 4 / 5;
     
-    /* Reset transition so it snaps instantly to this position when hidden */
-    transition: none !important;
+    /* DEFAULT: WAITING (Hidden Below) */
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate3d(0, 40px, 0);
+    transition: opacity 0.5s ease, filter 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-
-/* --- STATE 2: ACTIVE (Center Stage) --- */
+/* STATE: ACTIVE (Center Stage) */
 .menu-group.active .menu-photo {
-    opacity: 1 !important; 
-    filter: blur(0px) !important;
-    
-    /* Physics + Scroll Drift (Drift is small, usually +/- 20px) */
-    transform: translate3d(var(--mx, 0px), calc(var(--drift, 0px) + var(--my, 0px)), 0) !important;
-    
-    /* THE "SNAP" EFFECT:
-       Quick transform (0.6s) makes it feel like a fast scroll. 
-       Opacity/Filter lag slightly behind for smoothness. */
-    transition: 
-        transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), 
-        opacity 0.5s ease, 
-        filter 0.5s ease !important;
+    opacity: 1;
+    filter: blur(0px);
+    transform: translate3d(var(--mx, 0px), calc(var(--drift, 0px) + var(--my, 0px)), 0);
 }
 
-
-/* --- STATE 3: EXITING (Above) --- */
+/* STATE: EXITING (Float Up) */
 .menu-group.prev .menu-photo {
-    opacity: 0 !important; 
-    filter: blur(10px) !important;
-    
-    /* Continue moving UP to -30% (simulating scrolling past it) */
-    transform: translate3d(0, -40px, 0) !important;
-    
-    /* Slower exit so it lingers slightly */
-    transition: transform 1.2s ease, opacity 0.8s ease !important;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate3d(0, -40px, 0);
 }
 
 /* --- TEXT CONTENT --- */
@@ -107,10 +95,6 @@
     text-transform: uppercase; 
     margin-bottom: 48px; 
     color: var(--color-text-main); 
-    
-    /* Animates in via JS */
-    opacity: 0; 
-    transition: opacity 0.5s ease;
 }
 
 .menu-list { 
@@ -121,14 +105,15 @@
     font-family: var(--font-header);
     font-size: 64px;
     font-weight: 800;
-    line-height: 1;
+    line-height: 1.1;
     text-transform: uppercase;
-    color: var(--c-light-grey);
+    color: var(--color-placeholder); /* Greyed out by default */
+    transition: color 0.5s ease, opacity 0.5s ease;
 }
 
 .menu-item.active { 
     color: var(--color-text-main); 
-    opacity: 1 !important;
+    opacity: 1;
 }
 
 /* --- CTA BLOCKS --- */
@@ -141,12 +126,14 @@
     display: flex; flex-direction: column; align-items: center;
     opacity: 0; 
     pointer-events: none; 
-    transition: opacity 0.5s ease;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 .cta-block.active { 
     opacity: 1; 
     pointer-events: auto; 
+    transform: translateY(0);
 }
 
 .cta-text { 
@@ -160,6 +147,5 @@
 
 @media (max-width: 768px) {
     .menu-item { font-size: 36px; }
-    .menu-section { height: 400vh; }
-    /* .menu-photo { opacity: 0.25 !important; } */
+    .cta-container { height: 200px; }
 }
