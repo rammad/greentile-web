@@ -4,102 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archives - Green Tile Social Club</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/section-archives.css?v=5">
+    
+    <style>
+        html, body { overflow: auto !important; height: auto !important; }
+    </style>
 </head>
 <body>
 
-    <nav class="sticky-nav">
+    <nav class="sticky-nav standard-margins">
         <div class="nav-left"><div class="nav-logo-box">GT</div></div>
         <div class="nav-center">
-            <a href="index.html" class="type-sub2">Home</a>
-            <a href="events.html" class="type-sub2" style="border-bottom: 2px solid currentColor;">Events</a>
-            <a href="#" class="type-sub2">Shop</a>
-            <a href="about.html" class="type-sub2">About</a>
+             <a href="index.html" class="type-sub2">Home</a>
+             <a href="events.html" class="type-sub2">Events</a>
         </div>
-        <div class="nav-right"><a href="#" class="type-sub2">Contact</a></div>
     </nav>
 
     <div class="archives-page">
-        
         <div class="archives-header">
-            <a href="events.html" class="back-arrow-fixed">&larr;</a>
-            <h1 class="archives-title">Event Archives</h1>
+            <a href="events.html" class="back-arrow-fixed">&larr; Back</a>
+            <h1 class="archives-title animate-cascade">Event Archives</h1>
         </div>
 
-        <div class="archive-grid">
+        <div id="dynamic-archive-container">
+            
+            <a href="#" class="archive-cell" data-month="March 2025"><img src="images/poster1.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="March 2025"><img src="images/poster2.png" class="archive-poster"></a>
 
-            <a href="#" class="archive-cell">
-                <div class="month-indicator">March 2025</div>
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Tiles+%26+Tea" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Supper+Club" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Speed+Friending" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Open+Play" class="archive-poster">
-            </a>
+            <a href="#" class="archive-cell" data-month="April 2025"><img src="images/poster1.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="April 2025"><img src="images/poster2.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="April 2025"><img src="images/poster3.png" class="archive-poster"></a>
 
-            <a href="#" class="archive-cell">
-                <div class="month-indicator">April 2025</div>
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=After+Hours" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=After+Hours" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=After+Hours" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Monthly+Meetup" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Monthly+Meetup" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Workshop" class="archive-poster">
-            </a>
+            <a href="#" class="archive-cell" data-month="May 2025"><img src="images/poster1.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="May 2025"><img src="images/poster2.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="May 2025"><img src="images/poster3.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="May 2025"><img src="images/poster1.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="May 2025"><img src="images/poster2.png" class="archive-poster"></a>
 
-            <a href="#" class="archive-cell">
-                <div class="month-indicator">May 2025</div>
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Tiles+%26+Tea" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Supper+Club" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Speed+Friending" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=After+Hours" class="archive-poster">
-            </a>
+            <a href="#" class="archive-cell" data-month="June 2025"><img src="images/poster1.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="June 2025"><img src="images/poster2.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="June 2025"><img src="images/poster3.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="June 2025"><img src="images/poster1.png" class="archive-poster"></a>
 
-            <a href="#" class="archive-cell">
-                <div class="month-indicator">June 2025</div>
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Summer+Kickoff" class="archive-poster">
-            </a>
-            <a href="#" class="archive-cell">
-                <img src="https://placehold.co/300x375/e0e0e0/1a3c1a?text=Outdoor+Play" class="archive-poster">
-            </a>
+            <a href="#" class="archive-cell" data-month="July 2025"><img src="images/poster1.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="July 2025"><img src="images/poster2.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="July 2025"><img src="images/poster3.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="July 2025"><img src="images/poster1.png" class="archive-poster"></a>
+
+            <a href="#" class="archive-cell" data-month="August 2025"><img src="images/poster3.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="August 2025"><img src="images/poster1.png" class="archive-poster"></a>
+
+            <a href="#" class="archive-cell" data-month="September 2025"><img src="images/poster2.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="September 2025"><img src="images/poster3.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="September 2025"><img src="images/poster1.png" class="archive-poster"></a>  
+            <a href="#" class="archive-cell" data-month="September 2025"><img src="images/poster2.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="September 2025"><img src="images/poster3.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="September 2025"><img src="images/poster1.png" class="archive-poster"></a>  
+            <a href="#" class="archive-cell" data-month="September 2025"><img src="images/poster2.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="September 2025"><img src="images/poster3.png" class="archive-poster"></a>
+            <a href="#" class="archive-cell" data-month="September 2025"><img src="images/poster1.png" class="archive-poster"></a>  
+            
 
         </div>
 
+        <div class="load-more-container">
+            <button id="btn-load-more" class="cta-btn">
+                <div class="ui-roll-layer"><span>Load More</span><span>+</span></div>
+            </button>
+        </div>
     </div>
 
-    <footer class="footer-section">
-        <div class="footer-main">
-            <div class="footer-links">
-                <a href="#" class="type-body1 footer-link">Privacy Policy</a>
-                <a href="#" class="type-body1 footer-link">Go Fund Me</a>
-                <a href="#" class="type-body1 footer-link">FAQ</a>
-                <a href="#" class="type-body1 footer-link">Contact Us</a>
-                <a href="#" class="type-body1 footer-link">Follow Us</a>
-            </div>
-            <div class="type-display-hero no-wrap">Green Tile Social Club</div>
-        </div>
-    </footer>
-
+    <script src="scripts/global.js?v=2"></script>
+    <script src="scripts/section-archives.js"></script>
 </body>
 </html>
