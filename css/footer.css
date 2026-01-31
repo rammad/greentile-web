@@ -98,7 +98,6 @@
    MAIN FOOTER CONTENT
    ========================================= */
 .footer-main {
-    padding: 0px 20px 0 20px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end; 
@@ -127,6 +126,8 @@
     width: 100%;
     align-items: flex-end;
     margin-bottom: 20px;
+    margin-right: 20px;
+    margin-left: 20px;
 }
 
 .footer-link {

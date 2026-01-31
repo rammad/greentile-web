@@ -1,24 +1,24 @@
 /* =========================================
-   PDP STYLES
+   PDP STYLES (Final Polish)
    ========================================= */
 
 .pdp-section {
-    position: absolute;
-    top: 0; left: 0;
-    height: 100vh;
+    position: relative; 
     width: 100%;
-    overflow: hidden;
-    padding-top: 100px;
-    padding-bottom: 40px;
-    padding-left: 40px;
-    padding-right: 40px;
+    
+    /* SCROLL SETUP */
+    height: auto;           
+    min-height: 100vh;      
+    overflow: visible !important;    
+    
+    padding: 120px 80px 80px 80px;
+    
     background-color: var(--color-bg);
     
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; 
     
-    /* Global Fade Entrance */
     opacity: 0; 
     transition: opacity 0.8s ease;
     z-index: 10;
@@ -29,94 +29,120 @@
     pointer-events: auto;
 }
 
-.pdp-grid {
-    display: grid;
-    grid-template-columns: 0.8fr 1fr; 
-    gap: 80px;
-    max-width: 1600px;
-    width: 100%;
-    height: 100%;
-    align-items: center;
-}
 
-.pdp-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    max-height: 100%; 
-    overflow-y: auto; 
-    scrollbar-width: none; 
-    padding-right: 20px;
-}
-.pdp-info::-webkit-scrollbar { display: none; }
-
-/* --- LINKS & SUBTITLES (Rolls) --- */
-.back-link {
-    margin-bottom: 32px;
-    display: inline-block;
-    color: var(--color-text-main);
-    text-decoration: none;
-    transform-origin: left center;
-}
-
-.pdp-meta-row {
-    margin-bottom: 8px;
-    overflow: hidden; /* Ensures the roll enters cleanly */
-}
-
-.pdp-date, .pdp-location {
-    color: var(--color-placeholder);
-    /* Ensure block display for roll to work */
-    display: inline-block; 
-}
-.pdp-location { margin-bottom: 16px; }
-
-/* --- TITLE --- */
+/* --- TITLE (Constant Size + Wrap) --- */
 .pdp-hero-title {
-    /* type-h1 handles font/size, this handles layout spacing */
+    /* FIXED SIZE: No clamp, no responsive scaling */
+    font-size: 96px; 
+    line-height: 0.95;
     margin-bottom: 24px;
     color: var(--color-text-main);
     width: 100%;
+    
+    /* WRAPPING LOGIC */
+    white-space: normal;      /* Allow wrapping */
+    overflow-wrap: break-word; /* Prevent horizontal overflow */
+    overflow: visible; 
 }
 
-/* --- BODY TEXT (Blur Fade) --- */
-.pdp-desc {
-    max-width: 90%;
-    margin-bottom: 40px;
+/* --- BACK LINK (Left Align) --- */
+.back-link {
+    margin-bottom: 32px;
+    display: inline-block;
+    text-decoration: none;
+    text-align: left;
+    transform-origin: left center; /* Ensures the roll animation starts from left */
 }
 
-.blur-fade-text {
+/* --- SUBTITLES --- */
+.pdp-meta-row {
+    margin-bottom: 12px;
+    width: 100%;
+    overflow: visible; 
+}
+
+.pdp-date, .pdp-location {
+    font-size: 18px;
+    color: var(--color-placeholder);
+    display: inline-block;
+}
+
+/* =========================================
+   PDP STYLES (The "Sticky Column" Method)
+   ========================================= */
+
+.pdp-grid {
+    display: grid;
+    grid-template-columns: 0.8fr 1fr;
+    gap: 80px;
+    width: 100%;
+    
+    /* 1. ALIGN TOP (Let columns be different heights) */
+    align-items: start !important; 
+    
+    overflow: visible !important;
+    height: auto !important;
+}
+
+/* THE LEFT COLUMN (Text) - Grows naturally */
+.pdp-info {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+}
+
+/* THE RIGHT COLUMN (Image) - Becomes the Sticky Element */
+.pdp-image-col {
+    display: block;
+    width: 100%;
+    height: auto; /* It's only as tall as the image */
+    
+    /* 2. MAKE THIS COLUMN STICKY */
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    
+    /* 3. SET THE TRIGGER POINT */
+    top: 140px; 
+    
+    z-index: 5;
+    
+}
+
+/* THE IMAGE (Just sits inside the sticky column) */
+.pdp-poster {
+    display: block;
+    width: 100%;
+    max-height: 80vh; 
+    object-fit: contain;
+    
     opacity: 0;
-    filter: blur(10px);
-    transform: translateY(15px);
-    transition: opacity 1s ease, filter 1s ease, transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+    transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-/* Triggered by JS stagger */
-.blur-fade-text.is-visible {
-    opacity: 1;
-    filter: blur(0px);
+.pdp-poster.is-visible {
+    opacity: 1; 
     transform: translateY(0);
 }
 
-.pdp-tag {
-    display: inline-block;
-    background-color: var(--color-placeholder);
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 32px;
+/* ... (Keep Responsive Styles) ... */
+@media (max-width: 1024px) {
+    /* ... */
+    .pdp-image-col {
+        position: relative; /* Disable sticky on mobile */
+        top: 0;
+    }
 }
 
-/* --- ACTIONS --- */
+
+/* --- BUTTONS --- */
 .ticket-actions {
     display: flex;
     align-items: center;
     gap: 16px;
     margin-top: auto;
+    width: 100%;
 }
 
 .qty-selector {
@@ -131,15 +157,21 @@
 }
 
 .qty-btn {
-    background: none; border: none;
-    font-weight: 700; font-size: 18px;
-    cursor: pointer; color: var(--color-text-main);
+    background: none; 
+    border: none;
+    font-weight: 700; 
+    font-size: 18px;
+    cursor: pointer; 
+    color: var(--color-text-main);
     padding: 0 8px;
 }
 
 .qty-val {
     font-family: var(--font-subheader);
-    font-weight: 700; font-size: 14px;
+    font-weight: 700; 
+    font-size: 14px;
+    min-width: 20px;
+    text-align: center;
 }
 
 .btn-buy {
@@ -147,7 +179,7 @@
     color: var(--color-text-main);
     border: none;
     border-radius: 50px;
-    padding: 0 48px;
+    padding: 0 32px;
     height: 48px;
     font-family: var(--font-subheader);
     font-weight: 700;
@@ -156,65 +188,77 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 12px;
+    flex-grow: 0; 
+    min-width: 200px;
     transition: transform 0.2s ease, background-color 0.2s ease;
 }
+
 .btn-buy:hover { 
-    transform: scale(1.05); 
+    transform: scale(1.02); 
     background-color: var(--color-text-main);
     color: var(--color-bg);
 }
 
-/* --- IMAGE --- */
-.pdp-image-col {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    overflow: hidden;
+.pdp-tag {
+    display: inline-block;
+    background-color: var(--color-placeholder);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 32px;
 }
 
-.pdp-poster {
-    width: auto; height: 85vh; 
-    max-width: 100%; object-fit: contain; 
-    display: block;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.15); 
-    
-    opacity: 0;
-    transform: translateY(20px) scale(0.98);
-    transition: opacity 1s ease, transform 1s cubic-bezier(0.19, 1, 0.22, 1);
-}
 
-.pdp-poster.is-visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
+/* =========================================
+   RESPONSIVE (Mobile/Tablet)
+   ========================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .pdp-section {
-        height: auto; 
-        overflow: visible;
-        align-items: flex-start;
-        padding: 80px 20px 40px 20px;
+        padding: 100px 20px 80px 20px;
+        display: block; 
     }
 
     .pdp-grid {
         display: flex;
-        flex-direction: column-reverse;
-        gap: 32px;
-        grid-template-columns: 1fr;
+        flex-direction: column-reverse; 
+        gap: 40px;
+    }
+    
+    .pdp-image-col {
+        position: relative; 
+        top: 0;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .pdp-poster {
+        max-height: none; 
+        width: 100%;
+        aspect-ratio: 4/5;
+        object-fit: cover;
+    }
+
+    /* Keep Title Large, allow wrapping */
+    .pdp-hero-title {
+        font-size: 64px; /* Slight adjust for mobile so 1 word doesn't break layout */
     }
     
     .ticket-actions {
         flex-direction: column;
         align-items: stretch;
-        width: 100%;
     }
-    .qty-selector, .btn-buy { width: 100%; justify-content: center; }
-    .btn-buy { justify-content: space-between; padding: 0 24px; }
-    
-    .pdp-poster { 
-        height: auto; width: 100%;
-        aspect-ratio: 4/5; object-fit: cover;
+    .qty-selector, .btn-buy { 
+        width: 100%; 
+        justify-content: center; 
+    }
+    .btn-buy { 
+        justify-content: space-between; 
+        padding: 0 24px; 
     }
 }

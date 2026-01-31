@@ -31,18 +31,32 @@ function initCascadeReveal() {
         if(el.classList.contains('is-initialized')) return;
 
         const splitTextInNode = (node) => {
+            // 1. Get text and clear it
             const text = node.innerText;
             node.innerHTML = ''; 
-            text.split('').forEach((char) => {
-                if (char === ' ') {
-                    // INSERT REAL SPACE (Allows wrapping)
+            
+            // 2. Split by Words first
+            const words = text.split(' ');
+            
+            words.forEach((wordText, wordIndex) => {
+                // Create a container for the word (prevents breaking)
+                const wordSpan = document.createElement('span');
+                wordSpan.classList.add('word-wrapper');
+                
+                // Split word into characters
+                wordText.split('').forEach(char => {
+                    const charSpan = document.createElement('span');
+                    charSpan.classList.add('char-reveal');
+                    charSpan.innerText = char;
+                    wordSpan.appendChild(charSpan);
+                });
+
+                // Append Word
+                node.appendChild(wordSpan);
+
+                // Append Space (unless it's the last word)
+                if (wordIndex < words.length - 1) {
                     node.appendChild(document.createTextNode(' '));
-                } else {
-                    // WRAP LETTER (Allows animation)
-                    const span = document.createElement('span');
-                    span.classList.add('char-reveal');
-                    span.innerText = char;
-                    node.appendChild(span);
                 }
             });
         };

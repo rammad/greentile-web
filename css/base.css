@@ -456,6 +456,8 @@ body {
     opacity: 1;
     transform: translateY(110%) rotateX(-20deg); 
     transform-origin: bottom center;
+
+    overflow: hidden;
     
     /* FIX: Allow text to wrap automatically */
     white-space: pre-wrap; 
@@ -488,4 +490,48 @@ body {
     height: 100%;
     z-index: -1; /* Behind everything */
     pointer-events: none; /* Let clicks pass through */
+}
+
+/* =========================================
+   SCROLL UTILITIES
+   ========================================= */
+
+/* Use this on any container (like .pdp-info or .about-text) 
+   that has more content than fits on the screen. */
+
+.scrollable-content {
+    height: 100%;       /* Fill the section */
+    overflow-y: auto;   /* Allow vertical scroll */
+    overflow-x: hidden;
+    
+    /* Crucial: Prevents scroll-chaining to the body, 
+       keeping the interaction clean */
+    overscroll-behavior: contain; 
+    
+    /* Hide Scrollbar (Optional - cleaner look) */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.scrollable-content::-webkit-scrollbar { 
+    display: none; /* Chrome/Safari */
+}
+
+/* ... existing char-reveal styles ... */
+
+/* NEW: Keeps words together during animation */
+/* css/base.css */
+
+.word-wrapper {
+    display: inline-block;
+    white-space: nowrap; /* Forces letters to stay together */
+}
+
+/* Update char-reveal to play nice inside the wrapper */
+.char-reveal {
+    display: inline-block !important;
+    opacity: 1;
+    transform: translateY(110%) rotateX(-20deg); 
+    transform-origin: bottom center;
+    transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+    will-change: transform;
 }
