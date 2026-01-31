@@ -10,97 +10,203 @@
     flex-direction: column;
     height: 100vh; 
     overflow: hidden;
-    padding-top: 100px;
+    padding-top: 100px; 
     padding-bottom: 40px;
 }
 
 .calendar-header {
-    padding: 0 20px 24px 20px;
+    padding: 0 0px 24px 0px;
     flex-shrink: 0;
+    width: 100%;
 }
 
-.header-desktop { display: block; }
-.header-mobile { display: none; }
+.calendar-header .type-display-hero {
+    font-size: 9.2vw;
+    margin: 0;
+    line-height: 0.85;
+    overflow: hidden;
+    
+    /* THE CSS FIX: Hide instantly on load */
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
 
+/* REVEAL STATE: Only show parent once JS has split the text */
+.calendar-header .type-display-hero.is-initialized {
+    opacity: 1;
+}
+
+/* --- CONTROLS --- */
 .calendar-controls {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-top: 16px;
+    align-items: flex-end; /* Align bottom */
+    margin: 24px 20px 0px 20px;
 }
 
 .filters-list { display: flex; gap: 24px; }
-.filter-btn {
-    /* font-family: var(--font-subheader); */
-    /* font-size: 14px;
-    font-weight: 700; */
-    /* text-transform: uppercase; */
+
+/* Reset button default styles so ui-roll works */
+.filter-btn, .view-btn {
+    background: none; 
+    border: none; 
+    padding: 0; 
+    cursor: pointer;
     color: var(--color-placeholder);
-    background: none; border: none; padding: 0; cursor: pointer;
-    /* font-variation-settings: 'SRFF' 0; */
+    transition: color 0.3s ease;
 }
-.filter-btn:hover, .filter-btn.active { color: var(--color-text-main); }
 
+.filter-btn.active, .filter-btn:hover,
+.view-btn.active, .view-btn:hover { 
+    color: var(--color-text-main); 
+}
 
+/* --- THE LIST --- */
 .calendar-list {
     display: flex;
     flex-direction: column;
     padding: 0 20px;
     position: relative;
     z-index: 2;
-    justify-content: center;
+    justify-content: flex-start; /* Start from top */
     flex-grow: 1;
+    overflow-y: auto; /* Allow list to scroll if needed */
+    scrollbar-width: none; /* Hide scrollbar Firefox */
 }
+.calendar-list::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome */
 
 .calendar-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    padding: 0;
+    padding: 8px 0; /* Tighter spacing */
     cursor: pointer;
     text-decoration: none;
-    transition: opacity 0.2s ease;
+    
+    /* ENTRANCE ANIMATION SETUP */
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(10px);
+    transition: 
+        opacity 0.6s ease,
+        transform 0.6s cubic-bezier(0.19, 1, 0.22, 1),
+        filter 0.6s ease;
+}
+
+/* The Active State (Triggered by JS) */
+.calendar-row.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
 }
 
 .cal-date, .cal-name {
     font-family: var(--font-header);
     font-size: 48px;
     font-weight: 800;
-    line-height: 1.2;
+    line-height: 1.1;
     color: var(--color-placeholder);
     font-variation-settings: 'SRFF' 25;
     transition: color 0.2s ease;
 }
 .cal-name { text-align: right; text-transform: uppercase; }
 
+/* Hover Effects */
 @media (min-width: 769px) {
-    /* .calendar-list:hover .calendar-row {
-        opacity: 0.3;
-    }
-    .calendar-list .calendar-row:hover {
-        opacity: 1;
-    } */
     .calendar-row:hover .cal-date,
     .calendar-row:hover .cal-name {
         color: var(--color-text-main);
     }
 }
 
+/* --- POSTER (Centered) --- */
 .calendar-poster-wrapper {
     position: fixed;
-    top: 472px; left: 118px;
-    transform: translateY(-50%);
-    width: 300px; aspect-ratio: 4/5;
-    z-index: 1; pointer-events: none;
+    /* CENTERING LOGIC */
+    top: 60%; 
+    left: 25%;
+    transform: translate(-50%, -50%);
+    
+    width: 320px; 
+    aspect-ratio: 4/5;
+    z-index: 1; 
+    pointer-events: none;
+    
     opacity: 0;
-    transition: opacity 0.2s ease;
-}
-.calendar-poster-wrapper.active { opacity: 1; }
-.calendar-poster-img {
-    width: 100%; height: 100%; object-fit: cover;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
+.calendar-poster-wrapper.active { 
+    opacity: 1; 
+    /* Slight parallax lift on active could go here if desired */
+}
+
+.calendar-poster-img {
+    opacity: 1;
+    width: 100%; height: 100%; object-fit: cover;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    border-radius: 4px;
+}
+
+/* --- STATUS OVERLAYS (Mask Method) --- */
+.status-overlay {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+
+    /* 1. The Color (Default fallback, overridden by Liquid) */
+    background-color: var(--color-accent); 
+    
+    /* 2. The Mask Settings (Standard + Webkit) */
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+/* 1. COMING SOON */
+#status-soon {
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    
+    /* Load the image as a mask */
+    -webkit-mask-image: url('../images/coming-soon.svg');
+    mask-image: url('../images/coming-soon.svg');
+    
+    animation: spin-slow 8s linear infinite;
+    
+    /* Optional: Assign specific liquid variable if different from accent */
+    background-color: var(--color-coming-soon, #e2b309);
+}
+
+/* 2. SOLD OUT */
+#status-sold {
+    width: 120px;
+    height: 120px; /* Needs explicit size since it's a div now */
+    
+    /* Load the image as a mask */
+    -webkit-mask-image: url('../images/sold-out.svg');
+    mask-image: url('../images/sold-out.svg');
+    
+    /* Optional: Assign specific liquid variable */
+    background-color: var(--color-sold-out, #FF0000);
+}
+
+@keyframes spin-slow {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* --- MOBILE & GRID --- */
 .mobile-event-display { display: none; }
 
 .view-controls {
@@ -110,100 +216,54 @@
     margin-left: 32px;
 }
 
-.view-btn {
-    background: none; border: none; padding: 0; cursor: pointer;
-    font-family: var(--font-subheader);
-    font-weight: 700; font-size: 14px;
-    color: var(--color-placeholder);
-    text-transform: uppercase;
-    transition: color 0.2s ease;
-}
-
-.view-btn.active, .view-btn:hover {
-    color: var(--color-text-main);
-}
-
-/* --- THE GRID CONTAINER --- */
+/* --- GRID MODE --- */
 .calendar-grid {
     display: none;
     grid-template-columns: repeat(3, 1fr);
     grid-auto-rows: min-content;
     gap: 20px; 
-    
-    /* Scroll & Layout Logic */
     width: 100%;
-    /* Use flex to fill remaining vertical space */
     flex-grow: 1; 
-    height: 0; /* CRITICAL: Allows flex-grow to work without overflowing */
+    height: 0; 
     min-height: 0;
-    
-    overflow-y: auto; /* Scroll inside this grid only */
-    padding: 0 20px 80px 20px; /* Bottom padding for scroll space */
-    
-    /* Hide scrollbar */
+    overflow-y: auto; 
+    padding: 0 20px 80px 20px; 
     scrollbar-width: none;
-    -ms-overflow-style: none;
 }
 .calendar-grid::-webkit-scrollbar { display: none; }
 
-
-/* --- THE GRID CARD (The Wrapper) --- */
 .grid-item {
     position: relative;
     width: 100%;
-    /* This creates the vertical size automatically based on width */
     aspect-ratio: 4/5; 
-    background-color: var(--color-placeholder, #eee); /* Fallback color */
-    overflow: hidden; /* Crops the image zoom */
+    background-color: var(--color-placeholder); 
+    overflow: hidden; 
     display: block;
     text-decoration: none;
+    opacity: 0; /* For fade in */
+    animation: fadeIn 0.5s ease forwards;
 }
 
+@keyframes fadeIn { to { opacity: 1; } }
 
-/* --- THE IMAGE (The Content) --- */
 .grid-poster {
-    /* Absolute positioning breaks the "intrinsic size" loop */
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%; 
-    height: 100%;
-    
-    object-fit: cover; /* Ensures image fills the box without stretching */
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover; 
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     display: block;
 }
+.grid-item:hover .grid-poster { transform: scale(1.05); }
 
-/* Hover Effect */
-.grid-item:hover .grid-poster {
-    transform: scale(1.05);
-}
-
-/* --- TOGGLE STATE --- */
-/* Ensure this override works */
-.calendar-page.mode-grid .calendar-grid {
-    display: grid !important;
-}
-
+/* Toggle Logic */
+.calendar-page.mode-grid .calendar-grid { display: grid !important; }
 .calendar-page.mode-grid .calendar-list,
-.calendar-page.mode-grid .calendar-poster-wrapper {
-    display: none !important;
-}
+.calendar-page.mode-grid .calendar-poster-wrapper { display: none !important; }
 
 @media (max-width: 768px) {
     .view-controls { display: none; }
-}
-
-@media (max-width: 768px) {
-    .calendar-page {
-        padding-top: 80px;
-    }
-
-    .header-desktop { display: none; }
-    .header-mobile { display: block; font-size: 14vw; }
+    .calendar-page { padding-top: 80px; }
     .calendar-controls { display: none; }
-    .calendar-header { margin-bottom: 24px; }
-
+    
     .calendar-list {
         flex-direction: row;
         justify-content: flex-start;
@@ -214,48 +274,31 @@
         padding-bottom: 20px;
         height: auto;
         scroll-snap-type: x mandatory;
-        padding-left: calc(50vw - 40px);
-        padding-right: calc(50vw - 40px);
-        scrollbar-width: none;
+        padding-left: calc(50vw - 140px); /* Centering logic for cards */
+        padding-right: 50vw;
     }
-    .calendar-list::-webkit-scrollbar { display: none; }
 
     .calendar-row {
         flex-direction: column;
         align-items: center;
-        opacity: 0.3;
+        opacity: 0.3; /* Default dim */
+        filter: blur(0px);
+        transform: none; /* Reset desktop animation */
         scroll-snap-align: center;
-        min-width: 80px;
+        min-width: 280px;
     }
     
-    .calendar-row.mobile-active { opacity: 1; }
-    .calendar-row.mobile-active .cal-date { color: var(--color-text-main); }
-
-    .cal-name { display: none; }
-    .cal-date { font-size: 48px; white-space: nowrap; }
-
-    .calendar-poster-wrapper { display: none; }
-
+    .calendar-row.is-visible { opacity: 0.3; } /* Override animation opacity */
+    .calendar-row.mobile-active { opacity: 1 !important; }
+    
+    .cal-name { display: block; font-size: 24px; text-align: center; margin-top: 10px;}
+    .cal-date { font-size: 24px; }
+    
+    /* On mobile, we might actually hide the row text and just show the image card logic from the JS */
     .mobile-event-display {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        flex-grow: 1;
-        text-align: center;
-        padding: 0 20px 40px 20px;
         opacity: 1;
-    }
-    .mobile-poster {
-        width: 280px; aspect-ratio: 4/5;
-        object-fit: cover;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        margin-bottom: 32px;
-    }
-    .mobile-title {
-        font-family: var(--font-header);
-        font-size: 32px; font-weight: 800;
-        text-transform: uppercase; line-height: 1;
-        color: var(--color-text-main);
     }
 }

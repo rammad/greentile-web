@@ -452,7 +452,7 @@ body {
 
 /* The wrapper for each character (Created by JS) */
 .char-reveal {
-    display: inline-block;
+    display: inline-block !important;
     opacity: 1;
     transform: translateY(110%) rotateX(-20deg); 
     transform-origin: bottom center;
