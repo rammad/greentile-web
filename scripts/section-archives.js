@@ -1,7 +1,6 @@
 /* =========================================
    PAGE: ARCHIVES (Row Packer Algorithm)
    ========================================= */
-
 document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.style.overflow = 'auto';
     document.body.style.overflow = 'auto';
@@ -9,6 +8,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const page = document.querySelector('.archives-page');
     if (page) setTimeout(() => page.classList.add('is-active'), 100);
 
+    // --- RESTORED: ANIMATE TITLE ---
+    const title = document.querySelector('.animate-cascade');
+    if (title) {
+        // We set an interval to wait for global.js to finish splitting the text
+        const checkInit = setInterval(() => {
+            if (title.classList.contains('is-initialized') && window.playCascade) {
+                clearInterval(checkInit);
+                // Slight delay so it doesn't happen instant the page loads
+                setTimeout(() => window.playCascade(title), 100); 
+            }
+        }, 50);
+    }
+
+    // Initialize Layout
     initRowPacker();
 });
 
