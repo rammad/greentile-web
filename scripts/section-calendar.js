@@ -48,6 +48,7 @@ function initEventInteractions() {
     const btnList = document.getElementById('btn-list');
     const btnGrid = document.getElementById('btn-grid');
     
+    // --- VIEW TOGGLE ---
     if(btnList && btnGrid && pageContainer) {
         btnList.addEventListener('click', () => {
             pageContainer.classList.remove('mode-grid');
@@ -62,10 +63,12 @@ function initEventInteractions() {
         });
     }
 
+    // --- HOVER LOGIC (LIST VIEW) ---
     const rows = document.querySelectorAll('.calendar-row');
     const posterWrapper = document.getElementById('poster-wrapper');
     const posterImg = document.getElementById('poster-img');
 
+    // These are the overlays inside the main poster wrapper
     const statusSoon = document.getElementById('status-soon');
     const statusSold = document.getElementById('status-sold');
 
@@ -76,28 +79,31 @@ function initEventInteractions() {
                     const imgUrl = row.getAttribute('data-img');
                     const status = row.getAttribute('data-status'); // Get status
 
-                    // 1. Set Main Poster
+                    // 1. Set Main Poster Source
                     if(imgUrl) {
                         posterImg.src = imgUrl;
                         posterWrapper.classList.add('active');
                     }
 
-                    // 2. Reset Status Images
-                    statusSoon.style.opacity = '0';
-                    statusSold.style.opacity = '0';
-                    posterImg.style.opacity = '0';
+                    // 2. Reset Status Images (Hide all initially)
+                    if(statusSoon) statusSoon.style.opacity = '0';
+                    if(statusSold) statusSold.style.opacity = '0';
+                    
+                    // Default: Show the poster image
+                    posterImg.style.opacity = '1';
 
                     // 3. Handle Status Logic
                     if (status === 'coming-soon') {
-                        statusSoon.style.opacity = '1';
+                        // Show "Coming Soon" spinner, Hide poster image if desired (or keep it dim)
+                        if(statusSoon) statusSoon.style.opacity = '1';
+                         posterImg.style.opacity = '0'; // Optional: Hide poster if it's just a placeholder
                     } 
                     else if (status === 'sold-out') {
-                        statusSold.style.opacity = '1';
-                        posterImg.style.opacity = '1';
-                        randomizeSticker(statusSold);
-                    }
-                    else {
-                        posterImg.style.opacity = '1';
+                        // Show "Sold Out" sticker over the poster
+                        if(statusSold) {
+                            statusSold.style.opacity = '1';
+                            randomizeSticker(statusSold);
+                        }
                     }
                 }
             });
@@ -114,31 +120,46 @@ function initEventInteractions() {
             });
         });
     }
+
+    // --- GRID LOGIC ---
+    // Trigger randomization for grid items on load
+    randomizeGridStickers();
 }
 
+// Scrambles the position of "Sold Out" stickers in the grid
+function randomizeGridStickers() {
+    const gridStickers = document.querySelectorAll('.grid-item .badge-sold');
+    gridStickers.forEach(el => {
+        randomizeSticker(el); 
+    });
+}
+
+// Helper: Calculates random position along the edge
 function randomizeSticker(element) {
     // Pick a side: 0=Top, 1=Right, 2=Bottom, 3=Left
     const side = Math.floor(Math.random() * 4);
-    const offset = Math.random() * 80 + 10; // Random position between 10% and 90%
+    
+    // Random position between 10% and 85% (to keep it visible)
+    const offset = Math.random() * 75 + 10; 
     
     let top, left;
 
     switch(side) {
         case 0: // Top Edge
-            top = -5; // Slightly off edge
+            top = 5; 
             left = offset;
             break;
         case 1: // Right Edge
             top = offset;
-            left = 95;
+            left = 85; 
             break;
         case 2: // Bottom Edge
-            top = 95;
+            top = 85;
             left = offset;
             break;
         case 3: // Left Edge
             top = offset;
-            left = -5;
+            left = 5; 
             break;
     }
 

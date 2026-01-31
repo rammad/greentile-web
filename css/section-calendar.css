@@ -138,7 +138,6 @@
 
 .calendar-poster-wrapper.active { 
     opacity: 1; 
-    /* Slight parallax lift on active could go here if desired */
 }
 
 .calendar-poster-img {
@@ -146,64 +145,91 @@
     width: 100%; height: 100%; object-fit: cover;
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     border-radius: 4px;
+    transition: opacity 0.2s ease;
 }
 
-/* --- STATUS OVERLAYS (Mask Method) --- */
-.status-overlay {
+/* =========================================
+   STATUS BADGES (Shared Logic for Grid & List)
+   ========================================= */
+
+.status-badge {
     position: absolute;
     pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 5;
-
-    /* 1. The Color (Default fallback, overridden by Liquid) */
-    background-color: var(--color-accent); 
+    z-index: 10;
     
-    /* 2. The Mask Settings (Standard + Webkit) */
+    /* Mask Settings */
     -webkit-mask-size: contain;
     mask-size: contain;
-    
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
-    
     -webkit-mask-position: center;
     mask-position: center;
 }
 
-/* 1. COMING SOON */
-#status-soon {
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    transform: translate(-50%, -50%);
+/* --- TYPE 1: COMING SOON --- */
+.badge-soon {
+    background-color: var(--color-coming-soon, #32CD32);
     
-    /* Load the image as a mask */
-    -webkit-mask-image: url('../images/coming-soon.svg');
+    /* Use local server path or Data URI */
+    -webkit-mask-image: url('../images/coming-soon.svg'); 
     mask-image: url('../images/coming-soon.svg');
     
+    /* The Slow Rotation */
     animation: spin-slow 8s linear infinite;
-    
-    /* Optional: Assign specific liquid variable if different from accent */
-    background-color: var(--color-coming-soon, #e2b309);
 }
 
-/* 2. SOLD OUT */
-#status-sold {
-    width: 120px;
-    height: 120px; /* Needs explicit size since it's a div now */
-    
-    /* Load the image as a mask */
-    -webkit-mask-image: url('../images/sold-out.svg');
-    mask-image: url('../images/sold-out.svg');
-    
-    /* Optional: Assign specific liquid variable */
+/* --- TYPE 2: SOLD OUT --- */
+.badge-sold {
     background-color: var(--color-sold-out, #FF0000);
+    
+    /* Use local server path or Data URI */
+    -webkit-mask-image: url('../images/sold-out.svg'); 
+    mask-image: url('../images/sold-out.svg');
 }
 
 @keyframes spin-slow {
     from { transform: translate(-50%, -50%) rotate(0deg); }
     to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* --- LIST VIEW OVERLAY CONTEXT --- */
+#status-soon {
+    top: 50%; left: 50%;
+    width: 100%; height: 100%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#status-sold {
+    width: 120px; height: 120px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    /* Position is handled by JS mouseenter */
+}
+
+/* --- GRID VIEW CONTEXT --- */
+.grid-item {
+    position: relative; 
+}
+
+/* Grid: Coming Soon (Centered) */
+.grid-item .badge-soon {
+    top: 50%; 
+    left: 50%;
+    width: 70%;  
+    height: 70%;
+    transform: translate(-50%, -50%);
+}
+
+/* Grid: Sold Out (Randomized by JS) */
+.grid-item .badge-sold {
+    width: 100px; 
+    height: 100px;
+    /* Default position if JS fails */
+    top: 10%;
+    right: 10%;
+    transform: rotate(-15deg);
 }
 
 /* --- MOBILE & GRID --- */
@@ -236,7 +262,6 @@
     position: relative;
     width: 100%;
     aspect-ratio: 4/5; 
-    background-color: var(--color-placeholder); 
     overflow: hidden; 
     display: block;
     text-decoration: none;
