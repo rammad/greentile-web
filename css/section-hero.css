@@ -27,9 +27,9 @@
     opacity: 1;
     filter: blur(0px);
     
-    transition: opacity 0.6s ease-out, 
-                filter 0.6s ease-out,
-                transform 0.6s ease-out;
+    transition: opacity var(--delay-fade-in) ease-out, 
+                filter var(--delay-fade-in) ease-out,
+                transform var(--delay-fade-in) ease-out;
 }
 
 .hero .type-display-hero span {
