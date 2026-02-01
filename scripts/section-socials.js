@@ -3,7 +3,7 @@
    ========================================= */
 
 (() => {
-    const { wait, waitForTransition, lockTime, staggerTime } = window.AnimationUtils;
+    const { wait, waitForTransition, lockTime, staggerTime, scrollSpeed } = window.AnimationUtils;
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.querySelector('.socials-section');
         if(!section) return;
@@ -12,7 +12,7 @@
         // We check if MarqueeManager exists (from global.js)
         if (typeof MarqueeManager !== 'undefined') {
             // Init specifically for THIS section's track
-            new MarqueeManager('.socials-track', 60, true);
+            new MarqueeManager('.socials-track', scrollSpeed, true);
         }
 
         // 2. REGISTER STEP

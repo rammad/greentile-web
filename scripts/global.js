@@ -7,6 +7,7 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 /* --- CONFIGURATION --- */
 const INTERACTION_LOCK_MS = 500; 
 const SEQUENTIAL_ELEMENT_STAGGER_MS = 300;
+const SCROLL_SPEED = 40;
 
 const waitForTransition = (element, overlap = 0) => {
     return new Promise(resolve => {
@@ -74,7 +75,8 @@ window.AnimationUtils = {
     playCascade: (el, ov) => window.playCascade(el, ov),
     reverseCascade: (el, ov) => window.reverseCascade(el, ov),
     lockTime: INTERACTION_LOCK_MS,
-    staggerTime: SEQUENTIAL_ELEMENT_STAGGER_MS
+    staggerTime: SEQUENTIAL_ELEMENT_STAGGER_MS,
+    scrollSpeed: SCROLL_SPEED
 };
 
 /* --- INITIALIZATION --- */
