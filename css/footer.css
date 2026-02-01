@@ -78,6 +78,11 @@
     animation: seamless-scroll var(--marquee-duration, 20s) linear infinite;
 }
 
+/* Pause the scrolling when hovering over the marquee content */
+.marquee-content.has-seamless-animation:hover {
+    animation-play-state: paused;
+}
+
 @keyframes seamless-scroll {
     0% { transform: translateX(0); }
     100% { transform: translateX(var(--marquee-end)); }
@@ -123,22 +128,19 @@
 .footer-links {
     display: flex;
     justify-content: space-between;
-    width: 100%;
+    width: auto;
     align-items: flex-end;
     margin-bottom: 20px;
     margin-right: 20px;
     margin-left: 20px;
 }
 
-.footer-link {
-    font-family: var(--font-body);
-    font-weight: 300;
+.footer-link a {
     text-decoration: none;
-    color: var(--color-text-main);
     margin-bottom: 0; 
     line-height: 1; 
-    font-variation-settings: 'SRFF' 25; 
 }
+
 
 /* MOBILE FIX (Baseline for later) */
 @media (max-width: 768px) {

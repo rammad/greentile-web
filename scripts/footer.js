@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. SELF-INIT MARQUEE
     if (typeof MarqueeManager !== 'undefined') {
-        new MarqueeManager('.marquee-content', 100, false);
+        new MarqueeManager('.marquee-content', 50, false);
     }
 
     // 2. HELPER: The "Hard Reset" & Play

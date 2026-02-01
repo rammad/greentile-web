@@ -22,25 +22,11 @@
     
     width: 100%;
     text-align: center;
-    z-index: 0; 
-    
-    opacity: 1;
-    filter: blur(0px);
-    
-    transition: opacity var(--delay-fade-in) ease-out, 
-                filter var(--delay-fade-in) ease-out,
-                transform var(--delay-fade-in) ease-out;
+    z-index: 0;
 }
 
 .hero .type-display-hero span {
     display: inline-block;
-}
-
-.hero .type-display-hero.hero-hidden {
-    opacity: 0;
-    filter: blur(20px);
-    
-    transform: translateX(-50%) scale(0.9);
 }
 
 @media (max-width: 768px) {

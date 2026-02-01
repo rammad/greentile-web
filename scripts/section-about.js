@@ -1,5 +1,5 @@
 /* =========================================
-   STEP 2: ABOUT (Conditional Menu Support)
+   STEP 2: ABOUT (Fixing the Exit Pop)
    ========================================= */
 
 (() => { 
@@ -10,153 +10,137 @@
         if(!aboutSection) return;
 
         const slides = document.querySelectorAll('.about-slide');
-        const persistentCTA = document.querySelector('.about-persistent-cta');
         
-        // --- OPTIONAL MENU SELECTORS ---
-        const menuOverlay = document.querySelector('.menu-list-overlay');
-        // If overlay exists, get items. If not, empty array (safe).
-        const menuItems = menuOverlay ? menuOverlay.querySelectorAll('.menu-item') : [];
-
         let currentSlideIndex = -1;
 
         setupAboutImages(); 
         initSmoothMotion();
 
+        /* --- HELPER 1: JUST THE TEXT --- */
+        const toggleSlideText = (index, isVisible) => {
+            const s = slides[index];
+            if (!s) return;
+            if (isVisible) s.classList.add('slide-visible');
+            else s.classList.remove('slide-visible');
+        };
 
-        /* --- HELPER: RESET OTHERS --- */
-        const forceResetSlides = (activeIdx) => {
-            slides.forEach((s, i) => {
-                if (i === activeIdx) return; 
-                const anchors = s.querySelectorAll('.scatter-anchor');
-                s.classList.remove('slide-visible');
+        /* --- HELPER 2: JUST THE IMAGES --- */
+        const moveSlideImages = (index, stateClass, snap = false) => {
+            const s = slides[index];
+            if(!s) return;
+            const anchors = s.querySelectorAll('.scatter-anchor');
+            
+            anchors.forEach(anchor => {
+                anchor.classList.remove('state-center', 'state-exploded', 'state-up', 'state-down');
                 
+                if (snap) {
+                    anchor.style.transition = 'none';
+                    anchor.classList.add(stateClass);
+                    void anchor.offsetWidth; 
+                    anchor.style.transition = ''; 
+                } else {
+                    anchor.classList.add(stateClass);
+                }
+            });
+        };
+
+        /* --- HELPER 3: RESET OTHERS (Updated) --- */
+        // Now accepts 'ignoreIndex' to prevent killing the exiting slide's animation
+        const forceResetSlides = (activeIdx, ignoreIdx = -1) => {
+            slides.forEach((s, i) => {
+                // Skip the active slide AND the one currently animating out
+                if (i === activeIdx || i === ignoreIdx) return; 
+                
+                // 1. Hide Text
+                s.classList.remove('slide-visible');
+
+                // 2. Hide Nested CTA
+                const localCTA = s.querySelector('.cta-btn');
+                if (localCTA) {
+                    localCTA.classList.remove('is-visible');
+                    localCTA.style.transition = 'none';
+                    void localCTA.offsetWidth;
+                    localCTA.style.transition = '';
+                }
+                
+                // 3. Reset Images (Snap Up)
+                const anchors = s.querySelectorAll('.scatter-anchor');
                 anchors.forEach(anchor => {
                     anchor.style.transition = 'none';
                     anchor.classList.remove('state-center'); 
                     anchor.classList.add('state-up'); 
                 });
-                
                 void s.offsetWidth; 
                 anchors.forEach(anchor => anchor.style.transition = '');
             });
         };
 
-        /* --- HELPER: SLIDE TRANSITION --- */
-        const transitionSlide = (index, stateClass, snap = false) => {
-            const s = slides[index];
-            if(!s) return;
-            const anchors = s.querySelectorAll('.scatter-anchor');
-            anchors.forEach(anchor => {
-                anchor.classList.remove('state-center', 'state-exploded', 'state-up', 'state-down');
-                if (snap) {
-                    anchor.style.transition = 'none';
-                    anchor.classList.add(stateClass);
-                    void anchor.offsetWidth; 
-                    anchor.style.transition = '';
-                } else {
-                    anchor.classList.add(stateClass);
-                }
-            });
-            if (stateClass === 'state-center') s.classList.add('slide-visible');
-            else s.classList.remove('slide-visible');
-        };
-
-        /* --- HELPER: ASYNC MENU REVEAL (Safe) --- */
-        const revealMenu = async () => {
-            // SAFEGUARD: Exit if no menu items exist
-            if (menuItems.length === 0) return;
-
-            menuItems.forEach(item => {
-                item.style.transition = 'none';
-                item.style.opacity = '0';
-                item.style.filter = 'blur(10px)';
-                item.style.transform = 'translateY(20px)';
-            });
-            void aboutSection.offsetWidth;
-
-            for (let i = 0; i < menuItems.length; i++) {
-                if (currentSlideIndex !== 0) return; 
-                const item = menuItems[i];
-                item.style.transition = 'opacity 0.6s ease, filter 0.6s ease, transform 0.6s cubic-bezier(0.19, 1, 0.22, 1)';
-                item.style.opacity = '1';
-                item.style.filter = 'blur(0px)';
-                item.style.transform = 'translateY(0)';
-                await wait(100); 
-            }
-            await wait(600);
-            if (currentSlideIndex === 0) {
-                menuItems.forEach(item => item.style.transition = '');
-            }
-        };
-
-        /* --- HELPER: MENU HIGHLIGHT (Safe) --- */
-        const updateMenuHighlight = (activeIndex) => {
-            // SAFEGUARD: Exit if no menu items exist
-            if (menuItems.length === 0) return;
-
-            menuItems.forEach((item, i) => {
-                if (i === activeIndex) item.classList.add('active');
-                else item.classList.remove('active');
-            });
-        };
-
-        /* --- STEP DEFINITIONS --- */
+        /* --- STEPS --- */
         const aboutSteps = Array.from(slides).map((slide, index) => {
+            const localCTA = slide.querySelector('.cta-btn');
+
             return {
                 id: `about-${index}`,
                 
                 onEnter: async (direction) => {
                     aboutSection.classList.add('is-active');
                     currentSlideIndex = index; 
-                    forceResetSlides(index); 
                     
-                    if(persistentCTA) {
-                        // Small delay to let slide settle
-                        setTimeout(() => persistentCTA.classList.add('is-visible'), 100);
-                    }
+                    // CALCULATE PREVIOUS SLIDE (To protect it from reset)
+                    let prevIndex = -1;
+                    if (direction === 'down') prevIndex = index - 1;
+                    else if (direction === 'up') prevIndex = index + 1;
 
-                    // --- SLIDE 0 LOGIC ---
+                    // Reset everything EXCEPT the one we just left
+                    forceResetSlides(index, prevIndex); 
+
+                    // 1. SETUP START POSITIONS (Hidden)
                     if (index === 0) {
                         if (direction === 'down') {
-                            // Try to animate menu (will skip if empty)
-                            updateMenuHighlight(-1);
-                            revealMenu(); 
-                            
-                            transitionSlide(0, 'state-exploded', true);
-                            await wait(50); 
-                            transitionSlide(0, 'state-center'); 
+                            moveSlideImages(0, 'state-exploded', true);
                         } else {
-                            transitionSlide(0, 'state-center', true); 
+                            moveSlideImages(0, 'state-up', true);
                         }
-                    } 
-                    // --- OTHER SLIDES ---
-                    else {
+                    } else {
                         const startState = (direction === 'down') ? 'state-down' : 'state-up';
-                        transitionSlide(index, startState, true); 
-                        void slide.offsetWidth; 
-                        transitionSlide(index, 'state-center'); 
+                        moveSlideImages(index, startState, true);
                     }
 
-                    // Try to highlight menu item (will skip if empty)
-                    updateMenuHighlight(index);
-                    
-                    await wait(lockTime);
+                    // 2. TEXT FADE IN
+                    toggleSlideText(index, true);
+
+                    // 3. STAGGER
+                    await wait(300);
+
+                    // 4. IMAGES FLY IN
+                    moveSlideImages(index, 'state-center');
+
+                    // 5. CTA FADE IN
+                    if (localCTA) {
+                        localCTA.classList.add('is-visible');
+                    }
+
+                    //await wait(lockTime);
                 },
                 
                 onExit: async (direction) => {
-                    if ((index === 0 && direction === 'up') || 
-                        (index === slides.length - 1 && direction === 'down')) {
-                        if(persistentCTA) persistentCTA.classList.remove('is-visible');
-                    }
+                    // 1. HIDE CTA & TEXT
+                    if (localCTA) localCTA.classList.remove('is-visible');
+                    toggleSlideText(index, false);
 
+                    // 2. CALCULATE EXIT
                     let exitState = (direction === 'down') ? 'state-up' : 'state-down';
                     if ((index === 0 && direction === 'up') || 
                         (index === slides.length - 1 && direction === 'down')) {
                         exitState = 'state-exploded';
                     }
 
-                    transitionSlide(index, exitState);
-                    await wait(lockTime);
+                    await wait(300); 
+
+                    // 3. MOVE IMAGES OUT (This will now play fully!)
+                    moveSlideImages(index, exitState);
+                    
+                    //await wait(lockTime);
 
                     if (exitState === 'state-exploded') {
                         aboutSection.classList.remove('is-active');
@@ -228,7 +212,7 @@
                 const deltaX = anchorX - centerX;
                 const deltaY = anchorY - centerY;
                 const angle = Math.atan2(deltaY, deltaX);
-                const flyDistance = 10; 
+                const flyDistance = 5; 
                 const vecX = Math.cos(angle) * flyDistance;
                 const vecY = Math.sin(angle) * flyDistance;
                 anchor.style.setProperty('--fly-x', `${vecX}vw`);

@@ -7,11 +7,11 @@
 
 /* universal sections */
 @import 'nav.css';
-@import 'footer.css';
+@import 'footer.css?v=2';
 
 /* home sections */
 @import 'section-hero.css';
-@import 'section-about.css';
+@import 'section-about.css?v=2';
 @import 'section-menu.css';
 @import 'section-events.css';
 @import 'section-featured.css';
