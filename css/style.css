@@ -3,7 +3,7 @@
    ========================================= */
 
 /* universal variables */
-@import 'base.css?v=2';
+@import 'base.css?v=3';
 
 /* universal sections */
 @import 'nav.css';
@@ -23,7 +23,7 @@
 @import 'section-clients.css';
 
 /* events page sections */
-@import 'section-calendar.css';
+@import 'section-calendar.css?v=2';
 
 
 @import 'section-product.css';

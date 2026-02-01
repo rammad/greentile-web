@@ -5,19 +5,30 @@
 .calendar-page {
     position: relative;
     width: 100%;
-    background-color: var(--color-bg);
+    height: 100vh; 
     display: flex;
     flex-direction: column;
-    height: 100vh; 
     overflow: hidden;
-    padding-top: 100px; 
-    padding-bottom: 40px;
+    padding-top: var(--space-for-nav);
+    padding-bottom: 20px;
 }
 
+/* --- HEADER --- */
 .calendar-header {
-    padding: 0 0px 24px 0px;
+    padding: 0 0 24px 0;
     flex-shrink: 0;
     width: 100%;
+    
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: 
+        opacity var(--time-fade-in) ease,
+        transform var(--time-fade-in) var(--ease-standard);
+}
+
+.calendar-header.is-active {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .calendar-header .type-display-hero {
@@ -25,35 +36,38 @@
     margin: 0;
     line-height: 0.85;
     overflow: hidden;
-    
-    /* THE CSS FIX: Hide instantly on load */
-    opacity: 0;
-    transition: opacity 0.2s ease;
 }
 
-/* REVEAL STATE: Only show parent once JS has split the text */
-.calendar-header .type-display-hero.is-initialized {
-    opacity: 1;
-}
-
-/* --- CONTROLS --- */
+/* --- CONTROLS (Alignment Fix) --- */
 .calendar-controls {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end; /* Align bottom */
-    margin: 24px 20px 0px 20px;
+    /* FIX: Ensures the left group and right group align vertically */
+    align-items: center; 
+    margin: 24px 20px 0 20px;
 }
 
-.filters-list { display: flex; gap: 24px; }
+.filters-list { 
+    display: flex; 
+    gap: 24px; 
+    align-items: baseline;
+}
 
-/* Reset button default styles so ui-roll works */
+.view-controls {
+    display: flex;
+    align-items: baseline;
+}
+
 .filter-btn, .view-btn {
     background: none; 
     border: none; 
     padding: 0; 
     cursor: pointer;
     color: var(--color-placeholder);
-    transition: color 0.3s ease;
+    transition: color var(--time-fade-in) var(--ease-standard);
+    
+    line-height: 1; 
+    display: inline-block;
 }
 
 .filter-btn.active, .filter-btn:hover,
@@ -61,269 +75,251 @@
     color: var(--color-text-main); 
 }
 
-/* --- THE LIST --- */
-.calendar-list {
+.divider {
+    color: var(--color-placeholder);
+    margin: 0 8px;
+    display: inline-block;
+    line-height: 1; 
+}
+
+/* =========================================
+   EVENTS CALENDAR
+   ========================================= */
+
+.calendar-body {
+    position: relative;
+    flex: 1; /* Fill remaining vertical space */
+    width: 100%;
+    
+    /* Center the interface vertically */
     display: flex;
     flex-direction: column;
+    justify-content: center; 
+    align-items: center; /* Center horizontally */
+    
     padding: 0 20px;
-    position: relative;
-    z-index: 2;
-    justify-content: flex-start; /* Start from top */
-    flex-grow: 1;
-    overflow-y: auto; /* Allow list to scroll if needed */
-    scrollbar-width: none; /* Hide scrollbar Firefox */
 }
-.calendar-list::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome */
+
+/* --- NEW: INTERFACE WRAPPER (The Shrink-Wrapper) --- */
+.calendar-interface-wrapper {
+    position: relative;
+    width: 100%;
+    
+    height: auto;
+    max-height: 100%;
+    
+    display: flex; /* Keeps list and poster sharing context */
+    justify-content: center;
+}
+
+/* --- THE LIST --- */
+.calendar-list {
+    position: relative;
+    z-index: 10;
+    
+    width: 100%; 
+    overflow-y: auto; 
+    scrollbar-width: none; 
+}
+.calendar-list::-webkit-scrollbar { display: none; }
 
 .calendar-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    padding: 8px 0; /* Tighter spacing */
     cursor: pointer;
     text-decoration: none;
+
+    color: var(--color-text-main); /* remove link color */
     
-    /* ENTRANCE ANIMATION SETUP */
     opacity: 0;
-    transform: translateY(20px);
-    filter: blur(10px);
+    filter: blur(var(--blur-standard));
     transition: 
-        opacity 0.6s ease,
-        transform 0.6s cubic-bezier(0.19, 1, 0.22, 1),
-        filter 0.6s ease;
+        opacity var(--time-fade-in) var(--ease-standard),
+        filter var(--time-fade-in) var(--ease-standard);
 }
 
-/* The Active State (Triggered by JS) */
 .calendar-row.is-visible {
     opacity: 1;
-    transform: translateY(0);
     filter: blur(0px);
 }
 
-.cal-date, .cal-name {
-    font-family: var(--font-header);
-    font-size: 48px;
-    font-weight: 800;
-    line-height: 1.1;
-    color: var(--color-placeholder);
-    font-variation-settings: 'SRFF' 25;
-    transition: color 0.2s ease;
-}
-.cal-name { text-align: right; text-transform: uppercase; }
-
-/* Hover Effects */
-@media (min-width: 769px) {
-    .calendar-row:hover .cal-date,
-    .calendar-row:hover .cal-name {
-        color: var(--color-text-main);
-    }
-}
-
-/* --- POSTER (Centered) --- */
+/* --- POSTER (The Exact Height Overlay) --- */
 .calendar-poster-wrapper {
-    position: fixed;
-    /* CENTERING LOGIC */
-    top: 60%; 
-    left: 25%;
-    transform: translate(-50%, -50%);
+    position: absolute; 
+    z-index: 1;
     
-    width: 320px; 
-    aspect-ratio: 4/5;
-    z-index: 1; 
-    pointer-events: none;
+    top: 0;
+    height: 100%; 
+    
+    left: 15%; 
+    
+    width: 35vw; 
+    max-width: 450px;
+    
+    display: flex;
+    align-items: center; /* Vertically center image in the strip */
+    justify-content: flex-start;
     
     opacity: 0;
-    transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    filter: blur(var(--blur-standard));
+    transition: 
+        filter var(--time-fade-in) var(--ease-standard),
+        opacity var(--time-fade-in) var(--ease-standard);
+        
+    pointer-events: none; /* Text remains clickable */
 }
 
 .calendar-poster-wrapper.active { 
     opacity: 1; 
+    filter: blur(0px);
 }
 
 .calendar-poster-img {
+    height: 100%; /* Stretches to fill the list height */
+    width: auto;
+    object-fit: cover;
     opacity: 1;
-    width: 100%; height: 100%; object-fit: cover;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    border-radius: 4px;
-    transition: opacity 0.2s ease;
 }
 
-/* =========================================
-   STATUS BADGES (Shared Logic for Grid & List)
-   ========================================= */
 
-.status-badge {
-    position: absolute;
-    pointer-events: none;
-    z-index: 10;
-    
-    /* Mask Settings */
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
+@media (max-width: 768px) {
+    /* Reset the wrapper for mobile to allow horizontal scroll */
+    .calendar-interface-wrapper {
+        display: block;
+        max-height: none;
+        height: auto;
+    }
+    /* ... (Rest of mobile styles) ... */
 }
 
-/* --- TYPE 1: COMING SOON --- */
-.badge-soon {
-    background-color: var(--color-coming-soon, #32CD32);
-    
-    /* Use local server path or Data URI */
-    -webkit-mask-image: url('../images/coming-soon.svg'); 
-    mask-image: url('../images/coming-soon.svg');
-    
-    /* The Slow Rotation */
-    animation: spin-slow 8s linear infinite;
-}
-
-/* --- TYPE 2: SOLD OUT --- */
-.badge-sold {
-    background-color: var(--color-sold-out, #FF0000);
-    
-    /* Use local server path or Data URI */
-    -webkit-mask-image: url('../images/sold-out.svg'); 
-    mask-image: url('../images/sold-out.svg');
-}
-
-@keyframes spin-slow {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to   { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-/* --- LIST VIEW OVERLAY CONTEXT --- */
-#status-soon {
-    top: 50%; left: 50%;
-    width: 100%; height: 100%;
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-#status-sold {
-    width: 120px; height: 120px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    /* Position is handled by JS mouseenter */
-}
-
-/* --- GRID VIEW CONTEXT --- */
-.grid-item {
-    position: relative; 
-}
-
-/* Grid: Coming Soon (Centered) */
-.grid-item .badge-soon {
-    top: 50%; 
-    left: 50%;
-    width: 70%;  
-    height: 70%;
-    transform: translate(-50%, -50%);
-}
-
-/* Grid: Sold Out (Randomized by JS) */
-.grid-item .badge-sold {
-    width: 100px; 
-    height: 100px;
-    /* Default position if JS fails */
-    top: 10%;
-    right: 10%;
-    transform: rotate(-15deg);
-}
-
-/* --- MOBILE & GRID --- */
-.mobile-event-display { display: none; }
-
-.view-controls {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    margin-left: 32px;
-}
-
-/* --- GRID MODE --- */
+/* --- GRID VIEW --- */
 .calendar-grid {
-    display: none;
+    display: none; 
+    width: 100%;
+    height: 100%;
     grid-template-columns: repeat(3, 1fr);
     grid-auto-rows: min-content;
     gap: 20px; 
-    width: 100%;
-    flex-grow: 1; 
-    height: 0; 
-    min-height: 0;
     overflow-y: auto; 
     padding: 0 20px 80px 20px; 
     scrollbar-width: none;
+    
+    /* Ensure grid sits on top of everything when active */
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 20;
 }
 .calendar-grid::-webkit-scrollbar { display: none; }
 
+.calendar-page.mode-grid .calendar-grid { display: grid !important; }
+
+/* Grid Item Animation */
 .grid-item {
     position: relative;
     width: 100%;
     aspect-ratio: 4/5; 
     overflow: hidden; 
     display: block;
-    text-decoration: none;
-    opacity: 0; /* For fade in */
-    animation: fadeIn 0.5s ease forwards;
+    opacity: 0; 
+    animation: fadeIn var(--time-fade-in) ease forwards;
 }
 
 @keyframes fadeIn { to { opacity: 1; } }
 
 .grid-poster {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    object-fit: cover; 
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    display: block;
+    width: 100%; height: 100%; object-fit: cover; 
+    transition: transform 0.5s var(--ease-standard);
 }
 .grid-item:hover .grid-poster { transform: scale(1.05); }
 
-/* Toggle Logic */
-.calendar-page.mode-grid .calendar-grid { display: grid !important; }
-.calendar-page.mode-grid .calendar-list,
-.calendar-page.mode-grid .calendar-poster-wrapper { display: none !important; }
+.status-badge {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+    -webkit-mask-size: contain; mask-size: contain;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: center; mask-position: center;
+}
+
+.badge-soon {
+    background-color: var(--color-accent);
+    -webkit-mask-image: url('../images/coming-soon.svg'); 
+    mask-image: url('../images/coming-soon.svg');
+    animation: spin-slow-centered 8s linear infinite;
+}
+
+.badge-sold {
+    background-color: var(--color-placeholder);
+    -webkit-mask-image: url('../images/sold-out.svg'); 
+    mask-image: url('../images/sold-out.svg');
+}
+
+@keyframes spin-slow-centered { 
+    from { transform: translate(-50%, -50%) rotate(0deg); } 
+    to   { transform: translate(-50%, -50%) rotate(360deg); } 
+}
+
+#status-soon { 
+    top: 50%; 
+    left: 50%; 
+    
+    width: 100%; 
+    height: 100%; 
+    
+    opacity: 0; 
+    transition: opacity 0.3s ease;
+}
+
+#status-sold { 
+    top: 50%; 
+    left: 50%; 
+    width: 140px; 
+    height: 140px; 
+    
+    transform: translate(-50%, -50%); 
+    
+    opacity: 0; 
+    transition: opacity 0.3s ease; 
+}
+
+/* Context: Grid View */
+.grid-item .badge-soon { top: 50%; left: 50%; width: 70%; height: 70%; transform: translate(-50%, -50%); }
+.grid-item .badge-sold { width: 100px; height: 100px; }
+
+/* --- MOBILE --- */
+.mobile-event-display { display: none; }
 
 @media (max-width: 768px) {
-    .view-controls { display: none; }
-    .calendar-page { padding-top: 80px; }
+    .calendar-page { padding-top: 80px; display: block; height: auto; min-height: 100vh; }
+    .calendar-header { padding-bottom: 0; }
     .calendar-controls { display: none; }
-    
+    .calendar-body { display: block; height: auto; padding: 0; overflow: visible; }
+    .calendar-poster-wrapper { display: none; }
+
     .calendar-list {
+        width: 100%;
+        height: auto;
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
-        flex-grow: 0;
         overflow-x: auto;
-        gap: 32px;
-        padding-bottom: 20px;
-        height: auto;
+        gap: 20px;
+        padding: 20px 50vw 40px 20px;
         scroll-snap-type: x mandatory;
-        padding-left: calc(50vw - 140px); /* Centering logic for cards */
-        padding-right: 50vw;
     }
 
     .calendar-row {
         flex-direction: column;
         align-items: center;
-        opacity: 0.3; /* Default dim */
-        filter: blur(0px);
-        transform: none; /* Reset desktop animation */
+        min-width: 260px;
         scroll-snap-align: center;
-        min-width: 280px;
+        opacity: 0.3;
+        transform: none;
     }
-    
-    .calendar-row.is-visible { opacity: 0.3; } /* Override animation opacity */
+    .calendar-row.is-visible { opacity: 0.3; } 
     .calendar-row.mobile-active { opacity: 1 !important; }
-    
-    .cal-name { display: block; font-size: 24px; text-align: center; margin-top: 10px;}
+
     .cal-date { font-size: 24px; }
-    
-    /* On mobile, we might actually hide the row text and just show the image card logic from the JS */
-    .mobile-event-display {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        opacity: 1;
-    }
+    .cal-name { font-size: 24px; text-align: center; margin-top: 8px; display: block; }
 }

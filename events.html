@@ -4,14 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Events - Green Tile Social Club</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/base.css?v=8">
+    <link rel="stylesheet" href="css/nav.css?v=4">
+    <link rel="stylesheet" href="css/section-calendar.css?v=5">
 </head>
 <body>
 
     <nav class="sticky-nav standard-margins">
-        <div class="nav-left"><img src="images/logo-edit.png" class="nav-logo"></div>
+        <div class="nav-left">
+            <a href="index.html" class="logo-link">
+                <img src="images/logo-edit.png" class="nav-logo" alt="Home">
+            </a>
+        </div>
         <div class="nav-center">
-            <a href="events.html" class="type-sub2 ui-roll roll-hover" style="border-bottom: 2px solid currentColor;">
+            <a href="events.html" class="type-sub2 ui-roll roll-hover" style="border-bottom: 1px solid currentColor;">
                 <span class="ui-roll-layer ui-roll-visible">Events</span>
                 <span class="ui-roll-layer ui-roll-hidden">Events</span>
             </a>
@@ -40,41 +46,38 @@
             </h1>
 
             <div class="calendar-controls">
-                <div style="display: flex; align-items: center;">
-                    
-                    <div class="filters-list">
-                        <button class="filter-btn type-sub2 ui-roll roll-hover active">
-                            <span class="ui-roll-layer ui-roll-visible">All</span>
-                            <span class="ui-roll-layer ui-roll-hidden">All</span>
-                        </button>
-                        <button class="filter-btn type-sub2 ui-roll roll-hover">
-                            <span class="ui-roll-layer ui-roll-visible">March</span>
-                            <span class="ui-roll-layer ui-roll-hidden">March</span>
-                        </button>
-                        <button class="filter-btn type-sub2 ui-roll roll-hover">
-                            <span class="ui-roll-layer ui-roll-visible">April</span>
-                            <span class="ui-roll-layer ui-roll-hidden">April</span>
-                        </button>
-                        <button class="filter-btn type-sub2 ui-roll roll-hover">
-                            <span class="ui-roll-layer ui-roll-visible">May</span>
-                            <span class="ui-roll-layer ui-roll-hidden">May</span>
-                        </button>
-                    </div>
-                    
+                <div class="filters-list">
+                    <button class="filter-btn type-sub2 ui-roll roll-hover active">
+                        <span class="ui-roll-layer ui-roll-visible">All</span>
+                        <span class="ui-roll-layer ui-roll-hidden">All</span>
+                    </button>
+                    <button class="filter-btn type-sub2 ui-roll roll-hover">
+                        <span class="ui-roll-layer ui-roll-visible">March</span>
+                        <span class="ui-roll-layer ui-roll-hidden">March</span>
+                    </button>
+                    <button class="filter-btn type-sub2 ui-roll roll-hover">
+                        <span class="ui-roll-layer ui-roll-visible">April</span>
+                        <span class="ui-roll-layer ui-roll-hidden">April</span>
+                    </button>
+                    <button class="filter-btn type-sub2 ui-roll roll-hover">
+                        <span class="ui-roll-layer ui-roll-visible">May</span>
+                        <span class="ui-roll-layer ui-roll-hidden">May</span>
+                    </button>
+                </div>
+
+                <div class="filters-list">
                     <div class="view-controls">
                         <button class="view-btn type-sub2 ui-roll roll-hover active" id="btn-list">
                             <span class="ui-roll-layer ui-roll-visible">List</span>
                             <span class="ui-roll-layer ui-roll-hidden">List</span>
                         </button>
-                        <span style="color: var(--color-placeholder); font-size: 14px; margin: 0 8px;">/</span>
+                        <span class="divider">/</span>
                         <button class="view-btn type-sub2 ui-roll roll-hover" id="btn-grid">
                             <span class="ui-roll-layer ui-roll-visible">Grid</span>
                             <span class="ui-roll-layer ui-roll-hidden">Grid</span>
                         </button>
                     </div>
-                </div>
 
-                <div class="archive-link">
                     <a href="archives.html" class="filter-btn type-sub2 ui-roll roll-hover">
                         <span class="ui-roll-layer ui-roll-visible">Archives</span>
                         <span class="ui-roll-layer ui-roll-hidden">Archives</span>
@@ -83,53 +86,58 @@
             </div>
         </div>
 
-        <div class="calendar-list">
-            <a href="product.html" class="calendar-row" data-img="images/poster1.png" data-title="Intro to Mahjong">
-                <span class="cal-date type-h2">03.07</span><span class="cal-name type-h2">Intro to Mahjong</span>
-            </a>
-            <a href="product.html" class="calendar-row" data-img="images/poster2.png" data-title="Monthly Meetup" data-status="coming-soon">
-                <span class="cal-date type-h2">03.10</span><span class="cal-name type-h2">Monthly Meetup</span>
-            </a>
-            <a href="product.html" class="calendar-row" data-img="images/poster3.png" data-title="Mott Street Girls x GTSC" data-status="sold-out">
-                <span class="cal-date type-h2">03.23</span><span class="cal-name type-h2">Mott Street Girls x GTSC</span>
-            </a>
-            <a href="product.html" class="calendar-row" data-img="images/poster1.png" data-title="Mahjong After Hours">
-                <span class="cal-date type-h2">04.04</span><span class="cal-name type-h2">Mahjong After Hours</span>
-            </a>
-            <a href="product.html" class="calendar-row" data-img="images/poster2.png" data-title="Monthly Meetup">
-                <span class="cal-date type-h2">04.14</span><span class="cal-name type-h2">Monthly Meetup</span>
-            </a>
-            <a href="product.html" class="calendar-row" data-img="images/poster3.png" data-title="Spring Mahjong Supperclub">
-                <span class="cal-date type-h2">05.02</span><span class="cal-name type-h2">Spring Mahjong Supperclub</span>
-            </a>
-            <a href="product.html" class="calendar-row" data-img="images/poster1.png" data-title="Mahjong After Hours">
-                <span class="cal-date type-h2">05.05</span><span class="cal-name type-h2">Mahjong After Hours</span>
-            </a>
-            <a href="product.html" class="calendar-row" data-img="images/poster2.png" data-title="Monthly Meetup">
-                <span class="cal-date type-h2">05.18</span><span class="cal-name type-h2">Monthly Meetup</span>
-            </a>
-        </div>
+        <div class="calendar-body">
 
-        <div class="calendar-grid">
-            <a href="product.html" class="grid-item"><img src="images/poster1.png" class="grid-poster"></a>
+            <div class="calendar-interface-wrapper">
             
-            <a href="product.html" class="grid-item">
-                <div class="status-badge badge-soon"></div>
-            </a>
+                <div class="calendar-list">
+                    <a href="product.html" class="calendar-row" data-img="images/poster1.png" data-title="Intro to Mahjong">
+                        <span class="cal-date type-h2">03.07</span><span class="cal-name type-h2">Intro to Mahjong</span>
+                    </a>
+                    <a href="product.html" class="calendar-row" data-img="images/poster2.png" data-title="Monthly Meetup" data-status="coming-soon">
+                        <span class="cal-date type-h2">03.10</span><span class="cal-name type-h2">Monthly Meetup</span>
+                    </a>
+                    <a href="product.html" class="calendar-row" data-img="images/poster3.png" data-title="Mott Street Girls x GTSC" data-status="sold-out">
+                        <span class="cal-date type-h2">03.23</span><span class="cal-name type-h2">Mott Street Girls x GTSC</span>
+                    </a>
+                    <a href="product.html" class="calendar-row" data-img="images/poster1.png" data-title="Mahjong After Hours">
+                        <span class="cal-date type-h2">04.04</span><span class="cal-name type-h2">Mahjong After Hours</span>
+                    </a>
+                    <a href="product.html" class="calendar-row" data-img="images/poster2.png" data-title="Monthly Meetup">
+                        <span class="cal-date type-h2">04.14</span><span class="cal-name type-h2">Monthly Meetup</span>
+                    </a>
+                    <a href="product.html" class="calendar-row" data-img="images/poster3.png" data-title="Spring Mahjong Supperclub">
+                        <span class="cal-date type-h2">05.02</span><span class="cal-name type-h2">Spring Mahjong Supperclub</span>
+                    </a>
+                    <a href="product.html" class="calendar-row" data-img="images/poster1.png" data-title="Mahjong After Hours">
+                        <span class="cal-date type-h2">05.05</span><span class="cal-name type-h2">Mahjong After Hours</span>
+                    </a>
+                    <a href="product.html" class="calendar-row" data-img="images/poster2.png" data-title="Monthly Meetup">
+                        <span class="cal-date type-h2">05.18</span><span class="cal-name type-h2">Monthly Meetup</span>
+                    </a>
+                </div>
 
-            <a href="product.html" class="grid-item">
-                <img src="images/poster3.png" class="grid-poster">
-                <div class="status-badge badge-sold"></div>
-            </a>
-            <a href="product.html" class="grid-item"><img src="images/poster1.png" class="grid-poster"></a>
-            <a href="product.html" class="grid-item"><img src="images/poster2.png" class="grid-poster"></a>
-            <a href="product.html" class="grid-item"><img src="images/poster3.png" class="grid-poster"></a>
-        </div>
+                <div class="calendar-poster-wrapper" id="poster-wrapper">
+                    <img src="" alt="Event Poster" class="calendar-poster-img" id="poster-img">
+                    <div class="status-badge badge-soon" id="status-soon"></div>
+                    <div class="status-badge badge-sold" id="status-sold"></div>
+                </div>
 
-        <div class="calendar-poster-wrapper" id="poster-wrapper">
-            <img src="" alt="Event Poster" class="calendar-poster-img" id="poster-img">
-            <div class="status-badge badge-soon" id="status-soon"></div>
-            <div class="status-badge badge-sold" id="status-sold"></div>
+            </div>
+
+            <div class="calendar-grid">
+                <a href="product.html" class="grid-item"><img src="images/poster1.png" class="grid-poster"></a>
+                <a href="product.html" class="grid-item">
+                    <div class="status-badge badge-soon"></div>
+                </a>
+                <a href="product.html" class="grid-item">
+                    <img src="images/poster3.png" class="grid-poster">
+                    <div class="status-badge badge-sold"></div>
+                </a>
+                <a href="product.html" class="grid-item"><img src="images/poster1.png" class="grid-poster"></a>
+                <a href="product.html" class="grid-item"><img src="images/poster2.png" class="grid-poster"></a>
+                <a href="product.html" class="grid-item"><img src="images/poster3.png" class="grid-poster"></a>
+            </div>
         </div>
 
         <div class="mobile-event-display" id="mobile-display">

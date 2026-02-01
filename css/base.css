@@ -64,6 +64,8 @@
 
     --blur-standard: 10px;
 
+    --space-for-nav: 120px;
+
     /* --- SIZING --- */
     --size-display-hero: 8.6vw; 
     --size-display-xl: 160px;

@@ -3,20 +3,17 @@
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. ANIMATE HERO TITLE
-    // We simply wait for the element. The CSS handles the visibility state.
-    // The Global JS handles the splitting.
+    const { staggerTime, wait } = window.AnimationUtils;
+
+    // 1. ANIMATE HERO TITLE (Wait for Global JS)
     const title = document.querySelector('.animate-cascade');
-    
-    // Simple check loop to wait for Global JS to finish init
     if (title) {
         const checkInit = setInterval(() => {
             if (title.classList.contains('is-initialized')) {
                 clearInterval(checkInit);
                 if (window.playCascade) window.playCascade(title);
             }
-        }, 50); // Check every 50ms
+        }, 50);
     }
 
     // 2. ANIMATE UI CONTROLS
@@ -24,18 +21,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (header) {
         setTimeout(() => {
             header.classList.add('is-active');
-        }, 600); 
+        }, 200); 
     }
 
-    // 3. ANIMATE CALENDAR LIST
+    // 3. ANIMATE CALENDAR LIST (Cleaned up)
     const rows = document.querySelectorAll('.calendar-row');
-    const startDelay = 800; 
+    
+    // Start after header is mostly visible
+    const initialDelay = 400; 
 
     if (rows.length > 0) {
         rows.forEach((row, index) => {
             setTimeout(() => {
                 row.classList.add('is-visible');
-            }, startDelay + (index * 100)); 
+            }, initialDelay + (index * 100)); // 100ms stagger is cleaner for lists than 300ms
         });
     }
 
@@ -54,6 +53,9 @@ function initEventInteractions() {
             pageContainer.classList.remove('mode-grid');
             btnList.classList.add('active');
             btnGrid.classList.remove('active');
+            // Trigger animation for poster wrapper if active
+            const wrapper = document.getElementById('poster-wrapper');
+            if(wrapper) wrapper.style.opacity = '1';
         });
 
         btnGrid.addEventListener('click', () => {
@@ -68,40 +70,40 @@ function initEventInteractions() {
     const posterWrapper = document.getElementById('poster-wrapper');
     const posterImg = document.getElementById('poster-img');
 
-    // These are the overlays inside the main poster wrapper
+    // Overlays
     const statusSoon = document.getElementById('status-soon');
     const statusSold = document.getElementById('status-sold');
 
     if (rows.length > 0 && posterWrapper && posterImg) {
         rows.forEach(row => {
             row.addEventListener('mouseenter', () => {
+                // Only on desktop & list mode
                 if (window.innerWidth > 768 && !pageContainer.classList.contains('mode-grid')) {
                     const imgUrl = row.getAttribute('data-img');
-                    const status = row.getAttribute('data-status'); // Get status
+                    const status = row.getAttribute('data-status');
 
-                    // 1. Set Main Poster Source
+                    // 1. Set Image
                     if(imgUrl) {
                         posterImg.src = imgUrl;
                         posterWrapper.classList.add('active');
                     }
 
-                    // 2. Reset Status Images (Hide all initially)
+                    // 2. Reset Statuses
                     if(statusSoon) statusSoon.style.opacity = '0';
                     if(statusSold) statusSold.style.opacity = '0';
-                    
-                    // Default: Show the poster image
                     posterImg.style.opacity = '1';
 
-                    // 3. Handle Status Logic
+                    // 3. Handle Status
                     if (status === 'coming-soon') {
-                        // Show "Coming Soon" spinner, Hide poster image if desired (or keep it dim)
                         if(statusSoon) statusSoon.style.opacity = '1';
-                         posterImg.style.opacity = '0'; // Optional: Hide poster if it's just a placeholder
+                        // Keep poster visible but maybe behind? Or hide it?
+                        // Usually for Coming Soon, we might not have a poster yet.
+                        // posterImg.style.opacity = '0.5'; 
                     } 
                     else if (status === 'sold-out') {
-                        // Show "Sold Out" sticker over the poster
                         if(statusSold) {
                             statusSold.style.opacity = '1';
+                            // Randomize sticker position relative to this container
                             randomizeSticker(statusSold);
                         }
                     }
@@ -113,16 +115,17 @@ function initEventInteractions() {
                     posterWrapper.classList.remove('active');
                 }
             });
-             row.addEventListener('click', () => {
+
+            row.addEventListener('click', (e) => {
                 if(window.innerWidth > 768) {
-                    window.location.href = 'event-detail.html';
+                    // Navigate
+                    window.location.href = row.getAttribute('href');
                 }
             });
         });
     }
 
     // --- GRID LOGIC ---
-    // Trigger randomization for grid items on load
     randomizeGridStickers();
 }
 
@@ -134,39 +137,26 @@ function randomizeGridStickers() {
     });
 }
 
-// Helper: Calculates random position along the edge
+// Helper: Calculates random position
 function randomizeSticker(element) {
     // Pick a side: 0=Top, 1=Right, 2=Bottom, 3=Left
     const side = Math.floor(Math.random() * 4);
     
-    // Random position between 10% and 85% (to keep it visible)
+    // Random position between 10% and 85%
     const offset = Math.random() * 75 + 10; 
     
     let top, left;
 
     switch(side) {
-        case 0: // Top Edge
-            top = 5; 
-            left = offset;
-            break;
-        case 1: // Right Edge
-            top = offset;
-            left = 85; 
-            break;
-        case 2: // Bottom Edge
-            top = 85;
-            left = offset;
-            break;
-        case 3: // Left Edge
-            top = offset;
-            left = 5; 
-            break;
+        case 0: top = 10; left = offset; break;
+        case 1: top = offset; left = 80; break;
+        case 2: top = 80; left = offset; break;
+        case 3: top = offset; left = 10; break;
     }
 
     element.style.top = `${top}%`;
     element.style.left = `${left}%`;
     
-    // Add a random rotation variation between -30 and 30 deg
     const rotation = Math.floor(Math.random() * 60) - 30;
     element.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
 }
