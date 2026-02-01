@@ -3,7 +3,7 @@
    ========================================= */
 
 (() => { 
-    const { wait, waitForTransition, lockTime } = window.AnimationUtils;
+    const { wait, waitForTransition, lockTime, staggerTime } = window.AnimationUtils;
 
     document.addEventListener('DOMContentLoaded', () => {
         const aboutSection = document.querySelector('.about');
@@ -110,7 +110,7 @@
                     toggleSlideText(index, true);
 
                     // 3. STAGGER
-                    await wait(300);
+                    await wait(staggerTime);
 
                     // 4. IMAGES FLY IN
                     moveSlideImages(index, 'state-center');
@@ -135,7 +135,7 @@
                         exitState = 'state-exploded';
                     }
 
-                    await wait(300); 
+                    await wait(staggerTime); 
 
                     // 3. MOVE IMAGES OUT (This will now play fully!)
                     moveSlideImages(index, exitState);
@@ -170,7 +170,7 @@
                 const dx = mouseX - imgX;
                 const dy = mouseY - imgY;
                 const dist = Math.sqrt(dx*dx + dy*dy);
-                const radius = 750;
+                const radius = 240;
                 if (dist < radius) {
                     const force = (radius - dist) / radius;
                     img.style.setProperty('--avoid-x', `${(-dx * force * 0.15).toFixed(2)}px`);

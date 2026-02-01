@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="css/nav.css?v=4">
     <link rel="stylesheet" href="css/section-hero.css?v=4">
     <link rel="stylesheet" href="css/section-about.css?v=4">
-    <link rel="stylesheet" href="css/section-events.css?v=4">
+    <link rel="stylesheet" href="css/section-events.css?v=6">
     <link rel="stylesheet" href="css/section-socials.css?v=4">
     <link rel="stylesheet" href="css/footer.css?v=4">
 </head>
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <script src="scripts/global.js?v=4" defer></script>
+    <script src="scripts/global.js?v=6" defer></script>
     <script src="scripts/background-gradient.js?v=4" defer></script>
     <script src="scripts/scroll.js?v=4" defer></script>
 
@@ -131,9 +131,17 @@
             <div class="events-section-header">
                 <h2 class="type-h2 animate-cascade" id="event-title">Spring 2025 Calendar</h2>
                 
-                <a href="#" class="cta-btn ui-roll roll-hover type-sub2 manual-control" id="event-btn">
-                    <span class="ui-roll-layer ui-roll-visible">All Events <span>&rarr;</span></span>
-                    <span class="ui-roll-layer ui-roll-hidden">All Events <span>&rarr;</span></span>
+                <a href="events.html" class="cta-btn manual-control">
+                    <div class="ui-roll roll-hover ">
+                        <span class="type-sub2 ui-roll-layer ui-roll-visible">
+                            All Events
+                            <img src="images/arrow-right.png" class="cta-arrow" alt="->">
+                        </span>
+                        <span class="type-sub2 ui-roll-layer ui-roll-hidden">
+                            All Events
+                            <img src="images/arrow-right.png" class="cta-arrow" alt="->">
+                        </span>
+                    </div>
                 </a>
             </div>
 
@@ -145,7 +153,7 @@
             </div>
         </div>
     </section>
-    <script src="scripts/section-events.js?v=4" defer></script>
+    <script src="scripts/section-events.js?v=5" defer></script>
 
     <section class="socials-section" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #32CD32">
         <div class="socials-header">

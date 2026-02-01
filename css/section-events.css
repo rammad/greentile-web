@@ -24,12 +24,15 @@
 /* --- HEADER --- */
 .events-section-header {
     position: relative;
+    display: flex;
     width: 100%;
     /* Keep header area fixed height or padded so content flows below */
-    padding-top: 140px; 
-    text-align: center;
+    padding: 140px 20px 0 20px; 
+    justify-content: space-between;
+    align-items: center;
     z-index: 10;
     pointer-events: none;
+    overflow: hidden;
 }
 
 /* REMOVED: #event-title styling. 
@@ -39,7 +42,7 @@
 /* --- BUTTON --- */
 #event-btn {
     position: absolute;
-    top: 140px; /* Aligned roughly with title */
+    top: 140px;
     right: 20px;
     pointer-events: auto; 
     z-index: 12;
@@ -48,7 +51,7 @@
 /* --- GRID --- */
 .events-grid {
     position: absolute;
-    top: 250px; /* Push down below the header */
+    top: 250px;
     left: 20px;
     right: 20px;
     width: auto;
@@ -93,7 +96,7 @@
         padding-top: 100px;
     }
     #event-btn {
-        top: 20px; /* Move button up or hide on mobile if needed */
+        top: 20px;
         right: 20px;
     }
     .events-grid {
