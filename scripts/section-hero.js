@@ -1,81 +1,80 @@
 /* =========================================
-   STEP 1: HERO (Fixed Re-Entry & Class Names)
+   HERO SECTION (Scoped & Safe)
    ========================================= */
 
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. GET ELEMENTS
-    const heroSection = document.querySelector('.hero') || document.querySelector('section');
-    const heroTitle = document.querySelector('.type-display-hero');
+(() => { // <--- 1. OPEN SANDBOX (Prevents "wait is already declared" error)
 
-    if(!heroSection || !heroTitle) {
-        console.error("Hero: Section or Title not found.");
-        return;
-    }
+    const { wait, animate } = window.AnimationUtils;
 
-    // 2. IMMEDIATE LAUNCH
-    // Show immediately so it doesn't flash
-    heroSection.classList.add('is-active');
-    heroTitle.classList.remove('hero-hidden'); 
-    
-    if (!heroTitle.classList.contains('is-visible')) {
-        window.playCascade(heroTitle);
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // 1. GET ELEMENTS
+        const heroSection = document.querySelector('.hero') || document.querySelector('section');
+        const heroTitle = document.querySelector('.type-display-hero');
 
-    // 3. REGISTER STEP
-    if (window.ScrollManager) {
-        ScrollManager.addSteps([{
-            id: 'hero',
-            
-            onEnter: (direction) => {
-                heroSection.classList.add('is-active');
+        if(!heroSection || !heroTitle) {
+            console.warn("Hero: Section or Title not found.");
+            return;
+        }
 
-                // RE-ENTRY FROM BOTTOM
-                if (direction === 'up') {
-                    // 1. Un-fade the parent container
-                    heroTitle.classList.remove('hero-hidden');
-                    
-                    // 2. RESET CHILDREN (The Fix)
-                    const chars = heroTitle.querySelectorAll('.char-reveal');
-                    
-                    chars.forEach(c => {
-                        // Kill transition so it snaps to hidden instantly
-                        c.style.transition = 'none'; 
-                        // Remove the visible class (CSS will handle hiding)
-                        c.classList.remove('is-visible'); 
-                    });
-
-                    // 3. FORCE REFLOW (Flush the 'hidden' state)
-                    void heroTitle.offsetWidth;
-
-                    // 4. RESTORE & PLAY (Next Frame)
-                    // We restore the transition property, then trigger the cascade
-                    requestAnimationFrame(() => {
-                        chars.forEach((c, i) => {
-                            c.style.transition = ''; // Remove inline override
-                            c.style.transitionDelay = `${i * 30}ms`; // Restore staggered delay
-                        });
-                        window.playCascade(heroTitle);
-                    });
-                }
+        // 2. REGISTER STEP WITH SCROLL MANAGER
+        if (window.ScrollManager) {
+            ScrollManager.addSteps([{
+                id: 'hero',
                 
-                return 1000;
-            },
-
-            onExit: (direction) => {
-                if (direction === 'down') {
-                    // Fade out parent
-                    heroTitle.classList.add('hero-hidden');
+                // --- ENTER SCENE ---
+                onEnter: async (direction) => {
                     
-                    // Hide section layer after fade completes
-                    setTimeout(() => {
+                    // A. Activate Section (Fade In Background)
+                    // This fixes the "No Gradient" issue
+                    heroSection.classList.add('is-active');
+                    heroTitle.classList.remove('hero-hidden');
+
+                    // B. Handle Re-Entry (If scrolling UP back to hero)
+                    if (direction === 'up') {
+                        // Reset Text instantly for replay
+                        const chars = heroTitle.querySelectorAll('.char-reveal');
+                        chars.forEach(c => {
+                            c.style.transition = 'none'; 
+                            c.classList.remove('is-visible'); 
+                        });
+
+                        // Force Reflow
+                        void heroTitle.offsetWidth; 
+
+                        // Restore transition
+                        chars.forEach((c, i) => {
+                            c.style.transition = ''; 
+                            c.style.transitionDelay = `${i * 30}ms`; 
+                        });
+                    }
+
+                    // C. Play Animation (Async)
+                    if (window.playCascade) {
+                        // Safety: Wait for text to be split by global.js
+                        while (!heroTitle.classList.contains('is-initialized')) {
+                            await wait(50);
+                        }
+                        
+                        // Trigger the cascade with 0ms overlap (wait for full sequence)
+                        await window.playCascade(heroTitle, 0);
+                    }
+                },
+
+                // --- EXIT SCENE ---
+                onExit: async (direction) => {
+                    if (direction === 'down') {
+                        await animate(heroTitle, 'hero-hidden');                        
                         heroSection.classList.remove('is-active');
-                    }, 800); 
+                    }
                 }
-                return 800; 
-            }
-        }]);
-    } else {
-        console.error("Hero: ScrollManager not found!");
-    }
-});
+            }]);
+        } else {
+            // Fallback if ScrollManager isn't running (just show it)
+            heroSection.classList.add('is-active');
+            heroTitle.classList.remove('hero-hidden');
+            if(window.playCascade) window.playCascade(heroTitle);
+        }
+    });
+
+})();

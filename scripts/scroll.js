@@ -1,6 +1,5 @@
 /* =========================================
-   SCROLL MANAGER (Hybrid Mode)
-   Handles both "Director" steps AND internal scrolling.
+   SCROLL MANAGER (Async / Await Edition)
    ========================================= */
 
 window.ScrollManager = {
@@ -9,23 +8,21 @@ window.ScrollManager = {
     steps: [],      
 
     init() {
-        console.log("ScrollManager: Starting Hybrid Mode...");
+        console.log("ScrollManager: Starting...");
 
-        // 1. LISTEN FOR INPUT
         window.addEventListener('wheel', this.handleInput.bind(this), { passive: false });
         
-        // Touch Logic
         let touchStartY = 0;
         window.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY, { passive: false });
         window.addEventListener('touchend', e => {
-            const touchEndY = e.changedTouches[0].clientY;
-            const delta = touchStartY - touchEndY;
+            const delta = touchStartY - e.changedTouches[0].clientY;
             if (Math.abs(delta) > 30) this.handleTouch(delta);
         }, { passive: false });
 
-        // 2. INITIALIZE FIRST STEP
+        // Init First Step
         setTimeout(() => {
             if(this.steps.length > 0) {
+                // We treat the first load as a "down" entry
                 this.steps[0].onEnter('down');
             } else {
                 document.body.style.overflow = "auto"; 
@@ -37,7 +34,6 @@ window.ScrollManager = {
         this.steps = this.steps.concat(newSteps);
     },
 
-    /* --- THE GATEKEEPER --- */
     handleInput(e) {
         if (this.isLocked) {
             e.preventDefault();
@@ -46,8 +42,6 @@ window.ScrollManager = {
 
         const delta = e.deltaY;
         const target = e.target;
-
-        // 1. CHECK FOR INTERNAL SCROLL ZONES
         const scrollContainer = target.closest('.scrollable-content');
 
         if (scrollContainer) {
@@ -55,70 +49,46 @@ window.ScrollManager = {
             const isAtTop = scrollTop <= 0;
             const isAtBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
 
-            // SCROLLING DOWN
-            if (delta > 0) {
-                if (!isAtBottom) {
-                    // Allow native scroll (don't preventDefault)
-                    // The user is scrolling CONTENT, not SECTIONS
-                    return; 
-                }
-            } 
-            // SCROLLING UP
-            else if (delta < 0) {
-                if (!isAtTop) {
-                    // Allow native scroll
-                    return; 
-                }
-            }
+            if (delta > 0 && !isAtBottom) return; 
+            if (delta < 0 && !isAtTop) return; 
         }
 
-        // 2. DIRECTOR MODE (If we passed the checks above)
-        e.preventDefault(); // Stop browser from scrolling
-
-        // Threshold check to avoid jitter
+        e.preventDefault();
         if (delta > 5) this.trigger(1);
         else if (delta < -5) this.trigger(-1);
     },
 
-    /* --- TOUCH HANDLER (Same Logic) --- */
     handleTouch(delta) {
         if (this.isLocked) return;
-
-        // Note: Touch events target the element you started on.
-        // We can check the active element, but for simplicity, 
-        // we usually rely on the 'wheel' logic or just trigger 
-        // if the user swipes hard enough on the body.
-        
-        // Simple Direction Trigger for now:
         this.trigger(delta > 0 ? 1 : -1);
     },
 
-    trigger(direction) {
+    /* --- THE ASYNC TRIGGER --- */
+    async trigger(direction) {
         const nextIndex = this.currentStep + direction;
-
-        // Bounds Check
         if (nextIndex < 0 || nextIndex >= this.steps.length) return;
 
-        this.isLocked = true;
+        this.isLocked = true; // Lock immediately
+        
         const currentScene = this.steps[this.currentStep];
         const nextScene = this.steps[nextIndex];
+        const dirStr = direction > 0 ? 'down' : 'up';
 
-        // 1. EXIT
-        const exitDuration = currentScene.onExit(direction > 0 ? 'down' : 'up');
+        // 1. EXIT CURRENT (Async)
+        // If onExit is async, we wait. If not, it resolves instantly.
+        await currentScene.onExit(dirStr);
 
-        // 2. ENTER
-        setTimeout(() => {
-            document.querySelectorAll('section').forEach(s => s.classList.remove('is-active'));
-            const enterDuration = nextScene.onEnter(direction > 0 ? 'down' : 'up');
-            
-            // 3. UNLOCK
-            const totalLockTime = Math.max(exitDuration, enterDuration, 600); 
-            setTimeout(() => {
-                this.currentStep = nextIndex;
-                this.isLocked = false;
-            }, totalLockTime);
+        // 2. CLEAR ACTIVE CLASSES
+        document.querySelectorAll('section').forEach(s => s.classList.remove('is-active'));
+        
+        // 3. ENTER NEXT (Async)
+        // This is where we wait for your animation sequence!
+        await nextScene.onEnter(dirStr);
 
-        }, 50); 
+        // 4. UNLOCK
+        // Once the sequence is done, we unlock.
+        this.currentStep = nextIndex;
+        this.isLocked = false;
     }
 };
 

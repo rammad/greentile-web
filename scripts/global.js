@@ -2,118 +2,171 @@
    GLOBAL UTILITIES (The Toolbelt)
    ========================================= */
 
+/* --- 1. ANIMATION ENGINE --- */
+
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * WAIT FOR TRANSITION (Smart Wait)
+ * @param {HTMLElement} element - The element animating
+ * @param {number} overlap - (Optional) Time in ms to finish EARLY.
+ */
+const waitForTransition = (element, overlap = 0) => {
+    return new Promise(resolve => {
+        if (!element) { resolve(); return; }
+        
+        const style = getComputedStyle(element);
+        const duration = style.transitionDuration;
+        const delay = style.transitionDelay;
+        
+        const toMs = (str) => {
+            if (!str) return 0;
+            return parseFloat(str) * (str.indexOf('ms') > -1 ? 1 : 1000);
+        };
+
+        const totalTime = toMs(duration) + toMs(delay);
+        let waitTime = Math.max(0, totalTime - overlap);
+
+        if (!totalTime || totalTime === 0) {
+            resolve();
+        } else {
+            const buffer = overlap > 0 ? 0 : 10;
+            setTimeout(resolve, waitTime + buffer);
+        }
+    });
+};
+
+const animate = async (element, className = 'is-visible', overlap = 0) => {
+    if (!element) return;
+    element.classList.add(className);
+    await waitForTransition(element, overlap);
+};
+
+window.AnimationUtils = { wait, waitForTransition, animate };
+
+
+/* --- 2. INITIALIZATION --- */
+
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
     initCTA();
-    
-    // 1. Initialize Text Animations (Structure-Aware)
-    // This is global because any section might use .animate-cascade
     initCascadeReveal();
 
-    // 2. Trigger Nav Load
     setTimeout(() => {
         const nav = document.querySelector('nav');
         if(nav) nav.classList.add('nav-loaded');
     }, 100);
 });
 
+
 /* =========================================
-   TOOLS (Available to all sections)
+   TEXT TOOLS (Promisified)
    ========================================= */
 
-/**
- * TEXT REVEAL (Structure-Aware Splitter)
- */
 function initCascadeReveal() {
     const targets = document.querySelectorAll('.animate-cascade');
-    
     targets.forEach(el => {
         if(el.classList.contains('is-initialized')) return;
-
+        
         const splitTextInNode = (node) => {
-            // 1. Get text and clear it
             const text = node.innerText;
             node.innerHTML = ''; 
-            
-            // 2. Split by Words first
             const words = text.split(' ');
-            
             words.forEach((wordText, wordIndex) => {
-                // Create a container for the word (prevents breaking)
                 const wordSpan = document.createElement('span');
                 wordSpan.classList.add('word-wrapper');
-                
-                // Split word into characters
                 wordText.split('').forEach(char => {
                     const charSpan = document.createElement('span');
                     charSpan.classList.add('char-reveal');
                     charSpan.innerText = char;
                     wordSpan.appendChild(charSpan);
                 });
-
-                // Append Word
                 node.appendChild(wordSpan);
-
-                // Append Space (unless it's the last word)
                 if (wordIndex < words.length - 1) {
                     node.appendChild(document.createTextNode(' '));
                 }
             });
         };
 
-        if (el.children.length > 0) {
-            Array.from(el.children).forEach(child => splitTextInNode(child));
-        } else {
-            splitTextInNode(el);
-        }
+        if (el.children.length > 0) Array.from(el.children).forEach(child => splitTextInNode(child));
+        else splitTextInNode(el);
+        
         el.classList.add('is-initialized');
     });
 }
 
-window.playCascade = (element) => {
-    if (!element) return;
-    const chars = element.querySelectorAll('.char-reveal');
-    chars.forEach((char, index) => {
-        char.style.transitionDelay = `${index * 30}ms`;
-        char.classList.add('is-visible');
-    });
-};
+/**
+ * PLAY CASCADE (Enter: Left -> Right)
+ * Returns Promise (resolves when last char is visible)
+ */
+window.playCascade = (element, overlap = 0) => {
+    return new Promise(resolve => {
+        if (!element) { resolve(); return; }
+        
+        const chars = element.querySelectorAll('.char-reveal');
+        if (chars.length === 0) { resolve(); return; }
 
-window.reverseCascade = (element) => {
-    if (!element) return;
-    const chars = element.querySelectorAll('.char-reveal');
-    const total = chars.length;
-    chars.forEach((char, index) => {
-        const delay = (total - index) * 20; 
-        char.style.transitionDelay = `${delay}ms`;
-        char.classList.remove('is-visible');
+        const staggerTime = 30; // ms per char
+        
+        chars.forEach((char, index) => {
+            char.style.transitionDelay = `${index * staggerTime}ms`;
+            char.classList.add('is-visible');
+        });
+
+        // Resolve when the LAST character finishes
+        const lastChar = chars[chars.length - 1];
+        waitForTransition(lastChar, overlap).then(resolve);
     });
 };
 
 /**
- * MARQUEE MANAGER
+ * REVERSE CASCADE (Exit: Right -> Left)
+ * Returns Promise (resolves when first char is hidden)
  */
+window.reverseCascade = (element, overlap = 0) => {
+    return new Promise(resolve => {
+        if (!element) { resolve(); return; }
+
+        const chars = element.querySelectorAll('.char-reveal');
+        if (chars.length === 0) { resolve(); return; }
+
+        const total = chars.length;
+        const staggerTime = 20; // Faster exit
+
+        chars.forEach((char, index) => {
+            // Reverse delay: First char waits longest, Last char leaves immediately
+            const delay = (total - index) * staggerTime; 
+            char.style.transitionDelay = `${delay}ms`;
+            char.classList.remove('is-visible');
+        });
+
+        // Resolve when the FIRST character (index 0) finishes hiding
+        // (Since it has the longest delay, it finishes last)
+        const firstChar = chars[0];
+        waitForTransition(firstChar, overlap).then(resolve);
+    });
+};
+
+
+/* =========================================
+   MARQUEE & UI LOGIC
+   ========================================= */
+
 class MarqueeManager {
     constructor(selector, speed = 50, autoStagger = false) {
         this.selector = selector;
         this.speed = speed; 
         this.autoStagger = autoStagger;
-        
-        document.fonts.ready.then(() => {
-            this.init();
-        });
+        document.fonts.ready.then(() => { this.init(); });
     }
 
     init() {
         const tracks = document.querySelectorAll(this.selector);
-        
         tracks.forEach(track => {
             if(track.classList.contains('is-initialized')) return;
-
             let originalContent = Array.from(track.children);
             if (originalContent.length === 0) return;
 
-            // Parity Check
             if (originalContent.length % 2 !== 0) {
                 const fragment = document.createDocumentFragment();
                 originalContent.forEach(child => fragment.appendChild(child.cloneNode(true)));
@@ -121,7 +174,6 @@ class MarqueeManager {
                 originalContent = Array.from(track.children);
             }
 
-            // Auto-Stagger
             if (this.autoStagger) {
                 originalContent.forEach((child, index) => {
                     if (index % 2 !== 0) child.classList.add('push-down');
@@ -129,41 +181,35 @@ class MarqueeManager {
                 });
             }
 
-            // Measure
             const measureDiv = document.createElement('div');
             const trackStyle = window.getComputedStyle(track);
-            measureDiv.style.display = 'flex';
-            measureDiv.style.width = 'max-content';
-            measureDiv.style.visibility = 'hidden';
-            measureDiv.style.position = 'absolute';
-            measureDiv.style.gap = trackStyle.gap || trackStyle.columnGap;
-            measureDiv.style.fontFamily = trackStyle.fontFamily;
-            measureDiv.style.fontSize = trackStyle.fontSize;
-            measureDiv.style.fontWeight = trackStyle.fontWeight;
-            measureDiv.style.letterSpacing = trackStyle.letterSpacing;
-            measureDiv.style.textTransform = trackStyle.textTransform;
+            measureDiv.style.cssText = `
+                display: flex; width: max-content; visibility: hidden; position: absolute;
+                gap: ${trackStyle.gap || trackStyle.columnGap};
+                font-family: ${trackStyle.fontFamily};
+                font-size: ${trackStyle.fontSize};
+                font-weight: ${trackStyle.fontWeight};
+                letter-spacing: ${trackStyle.letterSpacing};
+                text-transform: ${trackStyle.textTransform};
+            `;
             
             originalContent.forEach(child => measureDiv.appendChild(child.cloneNode(true)));
             document.body.appendChild(measureDiv);
+            
             const singleSetWidth = measureDiv.getBoundingClientRect().width;
             const gap = parseFloat(trackStyle.gap || trackStyle.columnGap) || 0;
             document.body.removeChild(measureDiv);
 
-            // Clone
             const screenWidth = window.innerWidth;
             const setsNeeded = Math.ceil(screenWidth / (singleSetWidth + gap)) + 1;
 
             track.innerHTML = '';
             const fragment = document.createDocumentFragment();
             for (let i = 0; i <= setsNeeded; i++) {
-                originalContent.forEach(child => {
-                    const clone = child.cloneNode(true);
-                    fragment.appendChild(clone);
-                });
+                originalContent.forEach(child => fragment.appendChild(child.cloneNode(true)));
             }
             track.appendChild(fragment);
 
-            // Animate
             const moveDistance = singleSetWidth + gap;
             track.style.setProperty('--marquee-end', `-${moveDistance}px`);
             const duration = moveDistance / this.speed; 
@@ -174,9 +220,6 @@ class MarqueeManager {
     }
 }
 
-/**
- * NAVBAR LOGIC
- */
 function initNavbar() {
     const nav = document.querySelector('.sticky-nav');
     if (!nav) return;
@@ -196,9 +239,6 @@ function initNavbar() {
     }, { passive: true });
 }
 
-/**
- * CTA BUTTON LOGIC
- */
 function initCTA() {
     const btns = document.querySelectorAll('.cta-btn');
     const observer = new IntersectionObserver((entries) => {
