@@ -1,101 +1,69 @@
 /* =========================================
-   STEP 3: EVENTS (Director Mode - Fixed CTA)
+   STEP 3: EVENTS (Universal Header Mode)
    ========================================= */
 
-document.addEventListener('DOMContentLoaded', () => {
-    if(!document.querySelector('.events-section')) return;
-    initEventsDirector();
-});
+(() => {
+    const { wait, transitionHeader, lockTime } = window.AnimationUtils;
 
-function initEventsDirector() {
-    const section = document.querySelector('.events-section');
-    const title = document.getElementById('event-title');
-    const cards = document.querySelectorAll('.event-card');
-    const btn = document.getElementById('event-btn');
+    document.addEventListener('DOMContentLoaded', () => {
+        const section = document.querySelector('.events-section');
+        if(!section) return;
 
-    // SETUP CHARS
-    if(title && !title.classList.contains('is-built')) {
-        const text = title.innerText;
-        title.innerHTML = '';
-        text.split('').forEach((char, index) => {
-            const span = document.createElement('span');
-            span.classList.add('char-reveal');
-            span.textContent = char;
-            span.style.transitionDelay = `${index * 30}ms`;
-            title.appendChild(span);
-        });
-        title.classList.add('is-built');
-    }
+        const title = document.getElementById('event-title');
+        const cards = document.querySelectorAll('.event-card');
+        const btn = document.getElementById('event-btn');
 
-    let activeTimers = [];
-    const addTimer = (fn, delay) => {
-        const id = setTimeout(fn, delay);
-        activeTimers.push(id);
-    };
-    const killAllTimers = () => {
-        activeTimers.forEach(id => clearTimeout(id));
-        activeTimers = [];
-    };
-
-    if(window.ScrollManager) {
-        ScrollManager.addSteps([{
-            id: 'events-enter',
-            
-            onEnter: (direction) => {
-                section.classList.add('is-active');
-                killAllTimers();
-
-                // 1. Cascade IN
-                if (title) window.playCascade(title);
-
-                // 2. Shrink Title (1s)
-                addTimer(() => title.classList.add('state-shrunk'), 750);
-
-                // 3. Show Content (1.8s)
-                addTimer(() => {
-                    // Show Cards
-                    cards.forEach((card, i) => {
-                        addTimer(() => card.classList.add('is-visible'), i * 100);
-                    });
-                    
-                    // Show Button (Explicitly)
-                    if(btn) {
-                        // Force a reflow just in case
-                        void btn.offsetWidth; 
-                        btn.classList.remove('not-active');
-                    }
-                }, 1800);
-
-                return 2000; 
-            },
-
-            onExit: (direction) => {
-                killAllTimers();
-
-                if (title) window.reverseCascade(title);
-
-                // Reverse Stagger
-                const total = cards.length;
-                cards.forEach((card, i) => {
-                    const delay = (total - 1 - i) * 100;
-                    addTimer(() => card.classList.remove('is-visible'), delay);
-                });
+        if(window.ScrollManager) {
+            ScrollManager.addSteps([{
+                id: 'events-enter',
                 
-                // Hide Button
-                if(btn) btn.classList.add('not-active');
+                // --- ENTER ---
+                onEnter: async (direction) => {
+                    section.classList.add('is-active');
 
-                // Cascade OUT
-                addTimer(() => window.reverseCascade(title), 600);
+                    // 1. UNIVERSAL HEADER ENTRANCE
+                    transitionHeader(title, 'enter');
 
-                // Reset Position
-                addTimer(() => title.classList.remove('state-shrunk'), 1400);
+                    // 2. WAIT FOR TITLE (500ms lead time)
+                    await wait(500);
 
-                if(direction === 'up') {
-                    setTimeout(() => section.classList.remove('is-active'), 1400);
+                    // 3. STAGGER CARDS IN
+                    for (let i = 0; i < cards.length; i++) {
+                        cards[i].classList.add('is-visible');
+                        await wait(100); 
+                    }
+
+                    // 4. SHOW BUTTON
+                    if(btn) {
+                        void btn.offsetWidth;
+                        // Add the class that triggers the Circle -> Expand -> Text sequence
+                        btn.classList.add('is-visible');
+                    }
+
+                    // 5. GLOBAL LOCK
+                    await wait(lockTime);
+                },
+
+                // --- EXIT ---
+                onExit: async (direction) => {
+                    
+                    // 1. UNIVERSAL HEADER EXIT
+                    await transitionHeader(title, 'exit');
+
+                    // 2. HIDE CARDS (Fast)
+                    const reversedCards = Array.from(cards).reverse();
+                    for (const card of reversedCards) {
+                        card.classList.remove('is-visible');
+                    }
+                    
+                    if(btn) btn.classList.remove('is-visible');
+
+                    // 3. GLOBAL LOCK
+                    await wait(lockTime);
+
+                    section.classList.remove('is-active');
                 }
-
-                return 1400; 
-            }
-        }]);
-    }
-}
+            }]);
+        }
+    });
+})();

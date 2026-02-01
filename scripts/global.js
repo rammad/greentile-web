@@ -5,7 +5,6 @@
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 /* --- CONFIGURATION --- */
-// CHANGE THIS NUMBER to speed up or slow down the whole site's interaction feel.
 const INTERACTION_LOCK_MS = 500; 
 
 const waitForTransition = (element, overlap = 0) => {
@@ -32,15 +31,51 @@ const animate = async (element, className = 'is-visible', overlap = 0) => {
     await waitForTransition(element, overlap);
 };
 
-// EXPORT
+/* --- UNIVERSAL HEADER MANAGER --- */
+const transitionHeader = async (element, direction = 'enter') => {
+    if (!element) return;
+
+    if (direction === 'enter') {
+        element.classList.remove('header-hidden');
+        
+        // Reset
+        const chars = element.querySelectorAll('.char-reveal');
+        chars.forEach(c => { 
+            c.style.transition = 'none'; 
+            c.classList.remove('is-visible'); 
+        });
+        
+        void element.offsetWidth; 
+        
+        // Restore
+        chars.forEach((c, i) => { 
+            c.style.transition = ''; 
+            c.style.transitionDelay = `${i * 30}ms`; 
+        });
+
+        // Play
+        if (window.playCascade) {
+            window.playCascade(element);
+        }
+    } 
+    else {
+        // Exit
+        await animate(element, 'header-hidden');
+    }
+};
+
+/* --- EXPORT --- */
 window.AnimationUtils = { 
     wait, 
     waitForTransition, 
     animate,
-    lockTime: INTERACTION_LOCK_MS // <--- EXPOSED HERE
+    transitionHeader,
+    playCascade: (el, ov) => window.playCascade(el, ov),
+    reverseCascade: (el, ov) => window.reverseCascade(el, ov),
+    lockTime: INTERACTION_LOCK_MS 
 };
 
-/* ... (Keep initCascadeReveal, playCascade, reverseCascade, Marquee, Navbar, CTA as they were) ... */
+/* --- INITIALIZATION --- */
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
     initCTA();
@@ -176,17 +211,39 @@ function initNavbar() {
     }, { passive: true });
 }
 
+/* =========================================
+   GLOBAL UTILITIES (Updated CTA Logic)
+   ========================================= */
+
+/* ... (Keep AnimationUtils, Wait, etc.) ... */
+
 function initCTA() {
     const btns = document.querySelectorAll('.cta-btn');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const btn = entry.target;
+            
+            // Skip manual control buttons (handled by section scripts)
             if (btn.classList.contains('manual-control')) return;
-            entry.isIntersecting ? btn.classList.remove('not-active') : btn.classList.add('not-active');
+            
+            if (entry.isIntersecting) {
+                // Add class to trigger animation sequence
+                btn.classList.add('is-visible');
+            } else {
+                // Remove to reset (allows re-animation)
+                btn.classList.remove('is-visible');
+            }
         });
     }, { threshold: 0.5 });
+
     btns.forEach(btn => {
-        btn.classList.add('not-active');
-        if (!btn.classList.contains('about-persistent-cta')) { observer.observe(btn); }
+        // Ensure clean slate
+        btn.classList.remove('is-visible');
+        
+        if (!btn.classList.contains('about-persistent-cta')) { 
+            observer.observe(btn); 
+        }
     });
 }
+
+/* ... (Rest of file unchanged) ... */

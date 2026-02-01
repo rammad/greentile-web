@@ -1,18 +1,22 @@
 /* =========================================
-   STEP 2: ABOUT / MENU (Fixed Skipping & Popping)
+   STEP 2: ABOUT (Conditional Menu Support)
    ========================================= */
 
 (() => { 
-
-    const { wait, waitForTransition } = window.AnimationUtils;
+    const { wait, waitForTransition, lockTime } = window.AnimationUtils;
 
     document.addEventListener('DOMContentLoaded', () => {
         const aboutSection = document.querySelector('.about');
         if(!aboutSection) return;
 
         const slides = document.querySelectorAll('.about-slide');
-        const menuItems = document.querySelectorAll('.menu-list-overlay .menu-item');
+        const persistentCTA = document.querySelector('.about-persistent-cta');
         
+        // --- OPTIONAL MENU SELECTORS ---
+        const menuOverlay = document.querySelector('.menu-list-overlay');
+        // If overlay exists, get items. If not, empty array (safe).
+        const menuItems = menuOverlay ? menuOverlay.querySelectorAll('.menu-item') : [];
+
         let currentSlideIndex = -1;
 
         setupAboutImages(); 
@@ -23,7 +27,6 @@
         const forceResetSlides = (activeIdx) => {
             slides.forEach((s, i) => {
                 if (i === activeIdx) return; 
-
                 const anchors = s.querySelectorAll('.scatter-anchor');
                 s.classList.remove('slide-visible');
                 
@@ -38,14 +41,11 @@
             });
         };
 
-
-        /* --- HELPER: TRANSITION SLIDE --- */
+        /* --- HELPER: SLIDE TRANSITION --- */
         const transitionSlide = (index, stateClass, snap = false) => {
             const s = slides[index];
             if(!s) return;
-            
             const anchors = s.querySelectorAll('.scatter-anchor');
-            
             anchors.forEach(anchor => {
                 anchor.classList.remove('state-center', 'state-exploded', 'state-up', 'state-down');
                 if (snap) {
@@ -57,14 +57,15 @@
                     anchor.classList.add(stateClass);
                 }
             });
-
             if (stateClass === 'state-center') s.classList.add('slide-visible');
             else s.classList.remove('slide-visible');
         };
 
-
-        /* --- HELPER: ASYNC MENU REVEAL --- */
+        /* --- HELPER: ASYNC MENU REVEAL (Safe) --- */
         const revealMenu = async () => {
+            // SAFEGUARD: Exit if no menu items exist
+            if (menuItems.length === 0) return;
+
             menuItems.forEach(item => {
                 item.style.transition = 'none';
                 item.style.opacity = '0';
@@ -75,63 +76,57 @@
 
             for (let i = 0; i < menuItems.length; i++) {
                 if (currentSlideIndex !== 0) return; 
-
                 const item = menuItems[i];
                 item.style.transition = 'opacity 0.6s ease, filter 0.6s ease, transform 0.6s cubic-bezier(0.19, 1, 0.22, 1)';
                 item.style.opacity = '1';
                 item.style.filter = 'blur(0px)';
                 item.style.transform = 'translateY(0)';
-                
                 await wait(100); 
             }
-
             await wait(600);
             if (currentSlideIndex === 0) {
                 menuItems.forEach(item => item.style.transition = '');
             }
         };
 
+        /* --- HELPER: MENU HIGHLIGHT (Safe) --- */
         const updateMenuHighlight = (activeIndex) => {
+            // SAFEGUARD: Exit if no menu items exist
+            if (menuItems.length === 0) return;
+
             menuItems.forEach((item, i) => {
                 if (i === activeIndex) item.classList.add('active');
                 else item.classList.remove('active');
             });
         };
 
-
         /* --- STEP DEFINITIONS --- */
         const aboutSteps = Array.from(slides).map((slide, index) => {
-            const localCTA = slide.querySelector('.cta-btn');
-
             return {
                 id: `about-${index}`,
                 
-                // --- ENTER SCENE ---
                 onEnter: async (direction) => {
                     aboutSection.classList.add('is-active');
                     currentSlideIndex = index; 
-
                     forceResetSlides(index); 
-
-                    if(localCTA) setTimeout(() => localCTA.classList.remove('not-active'), 50);
+                    
+                    if(persistentCTA) {
+                        // Small delay to let slide settle
+                        setTimeout(() => persistentCTA.classList.add('is-visible'), 100);
+                    }
 
                     // --- SLIDE 0 LOGIC ---
                     if (index === 0) {
                         if (direction === 'down') {
-                            // ENTERING FROM TOP (Normal)
+                            // Try to animate menu (will skip if empty)
                             updateMenuHighlight(-1);
                             revealMenu(); 
                             
                             transitionSlide(0, 'state-exploded', true);
                             await wait(50); 
                             transitionSlide(0, 'state-center'); 
-
                         } else {
-                            // ENTERING FROM BOTTOM (Backwards)
-                            // FIX: Animate smoothly instead of popping
-                            transitionSlide(0, 'state-up', true); // Snap to top
-                            void slide.offsetWidth; 
-                            transitionSlide(0, 'state-center'); // Animate down
+                            transitionSlide(0, 'state-center', true); 
                         }
                     } 
                     // --- OTHER SLIDES ---
@@ -142,31 +137,26 @@
                         transitionSlide(index, 'state-center'); 
                     }
 
+                    // Try to highlight menu item (will skip if empty)
                     updateMenuHighlight(index);
                     
-                    // CRITICAL FIX: ENTER SAFETY LOCK
-                    // We wait 400ms here. This keeps the scroll locked while the
-                    // new slide is animating in. This prevents the "Skip" bug
-                    // where fast scrolling jumps over a slide before it appears.
-                    await wait(400);
+                    await wait(lockTime);
                 },
                 
-                // --- EXIT SCENE ---
                 onExit: async (direction) => {
-                    if(localCTA) localCTA.classList.add('not-active');
+                    if ((index === 0 && direction === 'up') || 
+                        (index === slides.length - 1 && direction === 'down')) {
+                        if(persistentCTA) persistentCTA.classList.remove('is-visible');
+                    }
 
                     let exitState = (direction === 'down') ? 'state-up' : 'state-down';
-                    
                     if ((index === 0 && direction === 'up') || 
                         (index === slides.length - 1 && direction === 'down')) {
                         exitState = 'state-exploded';
                     }
 
                     transitionSlide(index, exitState);
-
-                    // EXIT SAFETY LOCK
-                    // reduced to 300ms to feel responsive, since we added the 400ms lock on enter.
-                    await wait(300); 
+                    await wait(lockTime);
 
                     if (exitState === 'state-exploded') {
                         aboutSection.classList.remove('is-active');
@@ -180,7 +170,7 @@
         }
     });
 
-    /* --- PHYSICS FUNCTIONS --- */
+    /* ... (Physics Functions Unchanged) ... */
     function initSmoothMotion() {
         const images = document.querySelectorAll('.scatter-img');
         if(images.length === 0) return; 
@@ -249,5 +239,4 @@
             });
         });
     }
-
 })();

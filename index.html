@@ -4,19 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Green Tile Social Club</title>
-    <link rel="stylesheet" href="css/style.css">
+    
+    <link rel="stylesheet" href="css/base.css?v=4">
+    <link rel="stylesheet" href="css/nav.css?v=4">
+    <link rel="stylesheet" href="css/section-hero.css?v=4">
+    <link rel="stylesheet" href="css/section-about.css?v=4">
+    <link rel="stylesheet" href="css/section-events.css?v=4">
+    <link rel="stylesheet" href="css/section-socials.css?v=4">
+    <link rel="stylesheet" href="css/footer.css?v=4">
 </head>
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <script src="scripts/global.js?v=2" defer></script>
-    <script src="scripts/background-gradient.js" defer></script>
-    <script src="scripts/scroll.js" defer></script>
+    <script src="scripts/global.js?v=4" defer></script>
+    <script src="scripts/background-gradient.js?v=4" defer></script>
+    <script src="scripts/scroll.js?v=4" defer></script>
 
     <canvas id="gradient-canvas"></canvas>
 
     <nav class="sticky-nav standard-margins">
-        <div class="nav-left"><img src="images/logo-edit.png" class="nav-logo"></img></div>
+        <div class="nav-left">
+            <a href="index.html" class="logo-link">
+                <img src="images/logo-edit.png" class="nav-logo" alt="Home">
+            </a>
+        </div>
         <div class="nav-center">
             <a href="events.html" class="type-sub2 ui-roll roll-hover">
                 <span class="ui-roll-layer ui-roll-visible">Events</span>
@@ -43,7 +54,7 @@
             <span>Social Club</span>
         </h1>
     </section>
-    <script src="scripts/section-hero.js" defer></script>
+    <script src="scripts/section-hero.js?v=4" defer></script>
 
     <section class="about" data-colors="#f0f4f0, #f0f4f0, #32CD32, #32CD32">
         
@@ -120,11 +131,10 @@
 
         </div>
     </section>
-    <script src="scripts/section-about.js" defer></script>
+    <script src="scripts/section-about.js?v=4" defer></script>
 
     <section class="events-section sticky-track" data-colors="#f0f4f0, #f0f4f0, #FABA2F, #32CD32">
         <div class="events-sticky-wrapper">
-
             <div class="events-section-header">
                 <h2 class="type-h2 animate-cascade" id="event-title">Spring 2025 Calendar</h2>
                 
@@ -135,44 +145,30 @@
             </div>
 
             <div class="events-grid">
-                <div class="event-card">
-                    <img src="images/poster1.png" class="event-poster" alt="Event 1">
-                </div>
-                <div class="event-card">
-                    <img src="images/poster2.png" class="event-poster" alt="Event 2">
-                </div>
-                <div class="event-card">
-                    <img src="images/poster3.png" class="event-poster" alt="Event 3">
-                </div>
-                <div class="event-card">
-                    <img src="images/poster1.png" class="event-poster" alt="Event 4">
-                </div>
+                <div class="event-card"><img src="images/poster1.png" class="event-poster" alt="Event 1"></div>
+                <div class="event-card"><img src="images/poster2.png" class="event-poster" alt="Event 2"></div>
+                <div class="event-card"><img src="images/poster3.png" class="event-poster" alt="Event 3"></div>
+                <div class="event-card"><img src="images/poster1.png" class="event-poster" alt="Event 4"></div>
             </div>
-
         </div>
     </section>
-    <script src="scripts/section-events.js" defer></script>
+    <script src="scripts/section-events.js?v=4" defer></script>
 
     <section class="socials-section" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #32CD32">
         <div class="socials-header">
-            
             <div class="text-mask">
                 <span class="type-sub1 text-reveal-inner">Follow Our</span>
             </div>
-
             <div class="type-h1 animate-cascade">Socials</div>
-
             <p class="type-body1 delay-1">
                 To stay up to date on all our<br>events & activities
             </p>
-
             <div class="socials-icons">
                 <a class="icon-circle" href="https://instagram.com/greentilesocialclub"></a>
                 <a class="icon-circle" href="https://tiktok.com/@greentilesocialclub"></a>
                 <a class="icon-circle" href="https://discord.gg/mwgd9P3cb4"></a>
             </div>
         </div>
-
         <div class="socials-marquee-wrapper">
             <div class="socials-track">
                 <img src="images/social1.png" class="social-img" alt="Social Post 1">
@@ -181,18 +177,16 @@
             </div>
         </div>
     </section>
-    <script src="scripts/section-socials.js" defer></script>
+    <script src="scripts/section-socials.js?v=4" defer></script>
 
     <footer class="footer-section">        
         <div class="marquee-wrapper">
-            
             <div class="marquee-bar">
                 <div class="marquee-content">
                     <span class="marquee-item">Our Podcast Greenroom Now on Spotify</span>
                     <span class="marquee-item">&rarr;</span>
                 </div>
             </div>
-
             <div class="marquee-bar">
                 <div class="marquee-content">
                     <span class="marquee-item">Vibe to Music at Parlor</span>
@@ -205,7 +199,6 @@
             <div id="footer-gradient-container" data-colors="#32CD32, #f0f4f0, #FABA2F, #32CD32">
                 <canvas id="footer-canvas"></canvas>
             </div>
-
             <div class="footer-links">
                 <a href="#" class="type-body1 footer-link">Privacy Policy</a>
                 <a href="#" class="type-body1 footer-link">Go Fund Me</a>
@@ -213,16 +206,11 @@
                 <a href="#" class="type-body1 footer-link">Contact Us</a>
                 <a href="#" class="type-body1 footer-link">Follow Us</a>
             </div>
-
             <div class="type-display-hero animate-cascade">
                 <span>Green Tile Social Club</span>
             </div>
         </div>
-
     </footer>
-    <script src="scripts/footer.js" defer></script>
-
-    
-    
+    <script src="scripts/footer.js?v=4" defer></script>
 </body>
 </html>

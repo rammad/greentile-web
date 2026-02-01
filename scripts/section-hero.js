@@ -1,10 +1,9 @@
 /* =========================================
-   HERO SECTION (Global Timing)
+   HERO SECTION (Global & Universal)
    ========================================= */
 
 (() => { 
-    // Destructure lockTime here
-    const { wait, animate, lockTime } = window.AnimationUtils;
+    const { wait, transitionHeader, lockTime } = window.AnimationUtils;
 
     document.addEventListener('DOMContentLoaded', () => {
         const heroSection = document.querySelector('.hero') || document.querySelector('section');
@@ -15,37 +14,33 @@
         if (window.ScrollManager) {
             ScrollManager.addSteps([{
                 id: 'hero',
+                
+                // --- ENTER ---
                 onEnter: async (direction) => {
                     heroSection.classList.add('is-active');
-                    heroTitle.classList.remove('hero-hidden');
 
-                    if (direction === 'up') {
-                        const chars = heroTitle.querySelectorAll('.char-reveal');
-                        chars.forEach(c => { c.style.transition = 'none'; c.classList.remove('is-visible'); });
-                        void heroTitle.offsetWidth; 
-                        chars.forEach((c, i) => { c.style.transition = ''; c.style.transitionDelay = `${i * 30}ms`; });
-                    }
+                    // 1. Universal Header Animation
+                    transitionHeader(heroTitle, 'enter');
 
-                    if (window.playCascade) {
-                        while (!heroTitle.classList.contains('is-initialized')) await wait(50);
-                        
-                        // Start animation (Fire & Forget)
-                        window.playCascade(heroTitle, 0);
-                        
-                        // GLOBAL LOCK
-                        await wait(lockTime);
-                    }
+                    // 2. Global Safety Lock
+                    await wait(lockTime);
                 },
+
+                // --- EXIT ---
                 onExit: async (direction) => {
                     if (direction === 'down') {
-                        await animate(heroTitle, 'hero-hidden');
+                        // 1. Universal Exit (Blur Out)
+                        await transitionHeader(heroTitle, 'exit');
+                        
+                        // 2. Hide Section
                         heroSection.classList.remove('is-active');
                     }
                 }
             }]);
         } else {
+            // Fallback
             heroSection.classList.add('is-active');
-            heroTitle.classList.remove('hero-hidden');
+            heroTitle.classList.remove('header-hidden');
             if(window.playCascade) window.playCascade(heroTitle);
         }
     });
