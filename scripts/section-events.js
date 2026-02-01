@@ -15,7 +15,7 @@
 
         if(window.ScrollManager) {
             ScrollManager.addSteps([{
-                id: 'events-enter',
+                id: 'events',
                 
                 // --- ENTER ---
                 onEnter: async (direction) => {
