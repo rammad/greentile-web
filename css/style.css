@@ -3,7 +3,7 @@
    ========================================= */
 
 /* universal variables */
-@import 'base.css';
+@import 'base.css?v=2';
 
 /* universal sections */
 @import 'nav.css';

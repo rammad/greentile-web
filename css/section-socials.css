@@ -18,7 +18,6 @@
     pointer-events: none;
     /* UPDATE: Use Standard Variables */
     transition: opacity var(--time-fade-in) ease;
-    background-color: var(--color-bg); 
 }
 
 .socials-section.is-active,
@@ -28,7 +27,7 @@
 }
 
 .socials-header {
-    padding: 20% 20px;
+    padding: 20vh 20px;
     display: flex;
     flex-direction: column;
     align-items: center;

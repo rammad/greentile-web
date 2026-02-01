@@ -20,48 +20,66 @@
 }
 
 /* =========================================
-   NEW: PERSISTENT MENU OVERLAY
+   PERSISTENT MENU (Replaces Static Menu)
    ========================================= */
-.menu-list-overlay {
+.about-menu-persistent {
     position: absolute;
-    top: 20%; /* Adjust to match design verticality */
-    left: 0;
+    top: 15%; /* Adjust vertical position here */
+    left: 0; 
     width: 100%;
+    
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 10; /* Above slides, below content */
-    pointer-events: none; /* Let clicks pass through to images if needed */
+    z-index: 50; /* Sits above fading slides */
+    pointer-events: auto; /* Allow clicking if you add links later */
 }
 
-.menu-list-overlay .menu-label {
-    margin-bottom: 32px;
-    overflow: hidden;
-}
-
-.menu-list-overlay ul {
+.about-menu-persistent ul {
     list-style: none;
     padding: 0;
     margin: 0;
     text-align: center;
 }
 
-.menu-list-overlay .menu-item {
-    font-family: var(--font-header);
-    color: var(--c-light-grey);
-    
-    transition: color 0.5s ease, opacity 0.5s ease;
+.about-menu-persistent .menu-label {
+    margin-bottom: 20px;
+    display: block;
 }
 
-/* ACTIVE STATE (Green/Dark) */
-.menu-list-overlay .menu-item.active {
+.about-menu-persistent .menu-item {
+    color: var(--color-placeholder);
+    transition: color 0.3s ease;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.about-menu-persistent .menu-item.is-active {
     color: var(--color-text-main);
 }
 
+/* =========================================
+   CONTENT SPACING (The Modifier)
+   ========================================= */
+/* 1. Default Behavior (Home Page) */
+.about-content {
+    position: relative;
+    z-index: 20; 
+    text-align: center;
+    width: 100%;
+    padding-top: 0; /* No extra space by default */
+}
+
+/* 2. Modified Behavior (About Us Page Only) */
+.about.has-persistent-menu .about-content {
+    padding-top: 350px; /* Pushes text down to clear the menu */
+}
+
 @media (max-width: 768px) {
-    .menu-list-overlay { top: 15%; }
-    .menu-list-overlay .menu-item { font-size: 40px; line-height: 1.1; margin-bottom: 10px; }
+    .about-menu-persistent { top: 12%; }
+    .about-menu-persistent .menu-item { font-size: 40px; margin-bottom: 4px; }
+    .about.has-persistent-menu .about-content { padding-top: 280px; }
 }
 
 
@@ -85,19 +103,15 @@
     position: relative;
     z-index: 20; 
     text-align: center;
-    max-width: 600px;    
-    /* opacity: 0;
-    filter: blur(10px);
-    transition: opacity var(--time-fade-in) ease, filter var(--time-fade-in) ease; */
+    width: 100%;
 }
 
-/* Reveal State
-.about-slide.slide-visible .about-content {
-    opacity: 1;
-    filter: blur(0px);
-} */
+.about-content .type-body1, .about-content .type-body2 {
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--color-text-main);
+}
 
-/* CTA in slide */
 .about-content .cta-btn {
     margin-top: 32px;
     pointer-events: auto; /* Enable clicking */

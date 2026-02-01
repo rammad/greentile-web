@@ -1,9 +1,9 @@
 /* =========================================
-   STEP 2: ABOUT (Fixing the Exit Pop)
+   SECTION: ABOUT (Persistent Menu Edition)
    ========================================= */
 
 (() => { 
-    const { wait, waitForTransition, lockTime, staggerTime } = window.AnimationUtils;
+    const { wait, staggerTime } = window.AnimationUtils;
 
     document.addEventListener('DOMContentLoaded', () => {
         const aboutSection = document.querySelector('.about');
@@ -11,50 +11,29 @@
 
         const slides = document.querySelectorAll('.about-slide');
         
-        let currentSlideIndex = -1;
-
         setupAboutImages(); 
         initSmoothMotion();
 
-        /* --- HELPER 1: JUST THE TEXT --- */
-        // const toggleSlideText = (index, isVisible) => {
-        //     const s = slides[index];
-        //     if (!s) return;
-        //     if (isVisible) s.classList.add('slide-visible');
-        //     else s.classList.remove('slide-visible');
-        // };
+        /* --- HELPER 1: UPDATE GLOBAL MENU --- */
+        const updateGlobalMenu = (activeIndex) => {
+            const items = document.querySelectorAll('.about-menu-persistent .menu-item');
+            if (items.length === 0) return; // Safety for Home Page
 
-        /* --- HELPER 2: JUST THE IMAGES --- */
-        const moveSlideImages = (index, stateClass, snap = false) => {
-            const s = slides[index];
-            if(!s) return;
-            const anchors = s.querySelectorAll('.scatter-anchor');
-            
-            anchors.forEach(anchor => {
-                anchor.classList.remove('state-center', 'state-exploded', 'state-up', 'state-down');
-                
-                if (snap) {
-                    anchor.style.transition = 'none';
-                    anchor.classList.add(stateClass);
-                    void anchor.offsetWidth; 
-                    anchor.style.transition = ''; 
-                } else {
-                    anchor.classList.add(stateClass);
-                }
+            items.forEach((item, index) => {
+                // Use data-index if available, fallback to DOM index
+                const itemIndex = parseInt(item.getAttribute('data-index') || index);
+                if (itemIndex === activeIndex) item.classList.add('is-active');
+                else item.classList.remove('is-active');
             });
         };
 
-        /* --- HELPER 3: RESET OTHERS (Updated) --- */
-        // Now accepts 'ignoreIndex' to prevent killing the exiting slide's animation
+        /* --- HELPER 2: RESET OTHERS --- */
         const forceResetSlides = (activeIdx, ignoreIdx = -1) => {
             slides.forEach((s, i) => {
-                // Skip the active slide AND the one currently animating out
                 if (i === activeIdx || i === ignoreIdx) return; 
                 
-                // 1. Hide Text
                 s.classList.remove('slide-visible');
 
-                // 2. Hide Nested CTA
                 const localCTA = s.querySelector('.cta-btn');
                 if (localCTA) {
                     localCTA.classList.remove('is-visible');
@@ -63,7 +42,6 @@
                     localCTA.style.transition = '';
                 }
                 
-                // 3. Reset Images (Snap Up)
                 const anchors = s.querySelectorAll('.scatter-anchor');
                 anchors.forEach(anchor => {
                     anchor.style.transition = 'none';
@@ -75,63 +53,78 @@
             });
         };
 
-        /* --- STEPS --- */
+        /* --- HELPER 3: MOVE IMAGES --- */
+        const moveSlideImages = (index, stateClass, snap = false) => {
+            const s = slides[index];
+            if(!s) return;
+            const anchors = s.querySelectorAll('.scatter-anchor');
+            
+            anchors.forEach(anchor => {
+                anchor.classList.remove('state-center', 'state-exploded', 'state-up', 'state-down');
+                if (snap) {
+                    anchor.style.transition = 'none';
+                    anchor.classList.add(stateClass);
+                    void anchor.offsetWidth; 
+                    anchor.style.transition = ''; 
+                } else {
+                    anchor.classList.add(stateClass);
+                }
+            });
+        };
+
+        /* --- STEPS REGISTRATION --- */
         const aboutSteps = Array.from(slides).map((slide, index) => {
             const localCTA = slide.querySelector('.cta-btn');
-            const localBody = slide.querySelector('.type-body2');
+            const localBody = slide.querySelector('.type-body1, .type-body2');
 
             return {
                 id: `about-${index}`,
                 
                 onEnter: async (direction) => {
                     aboutSection.classList.add('is-active');
-                    // currentSlideIndex = index; 
                     slide.classList.add('slide-visible');
-                    
-                    // CALCULATE PREVIOUS SLIDE (To protect it from reset)
+
+                    // 1. UPDATE MENU (Global)
+                    updateGlobalMenu(index);
+
+                    // 2. RESET OTHERS
                     let prevIndex = -1;
                     if (direction === 'down') prevIndex = index - 1;
                     else if (direction === 'up') prevIndex = index + 1;
-
-                    // Reset everything EXCEPT the one we just left
                     forceResetSlides(index, prevIndex); 
 
-                    // 1. SETUP START POSITIONS (Hidden)
+                    // 3. SETUP START POSITIONS
                     if (index === 0) {
-                        if (direction === 'down') {
-                            moveSlideImages(0, 'state-exploded', true);
-                        } else {
-                            moveSlideImages(0, 'state-up', true);
-                        }
+                        if (direction === 'down') moveSlideImages(0, 'state-exploded', true);
+                        else moveSlideImages(0, 'state-up', true);
                     } else {
                         const startState = (direction === 'down') ? 'state-down' : 'state-up';
                         moveSlideImages(index, startState, true);
                     }
 
-                    // 2. TEXT FADE IN
-                    localBody.classList.add('is-visible');
-
-                    // 3. STAGGER
+                    // 4. FADE IN TEXT
+                    if(localBody) localBody.classList.add('is-visible');
+                    
                     await wait(staggerTime);
 
-                    // 4. IMAGES FLY IN
+                    // 5. ANIMATE IMAGES & CTA
                     moveSlideImages(index, 'state-center');
-
-                    // 5. CTA FADE IN
-                    if (localCTA) {
-                        localCTA.classList.add('is-visible');
-                    }
-
-                    //await wait(lockTime);
+                    if (localCTA) localCTA.classList.add('is-visible');
                 },
                 
                 onExit: async (direction) => {
-                    // 1. HIDE CTA & TEXT
+                    // 1. HIDE CONTENT
                     if (localCTA) localCTA.classList.remove('is-visible');
-                    localBody.classList.remove('is-visible');
+                    if(localBody) localBody.classList.remove('is-visible');
                     slide.classList.remove('slide-visible');
 
-                    // 2. CALCULATE EXIT
+                    // 2. CHECK EXIT SECTION
+                    if ((index === 0 && direction === 'up') || 
+                        (index === slides.length - 1 && direction === 'down')) {
+                        aboutSection.classList.remove('is-active');
+                    }
+
+                    // 3. ANIMATE OUT
                     let exitState = (direction === 'down') ? 'state-up' : 'state-down';
                     if ((index === 0 && direction === 'up') || 
                         (index === slides.length - 1 && direction === 'down')) {
@@ -139,15 +132,7 @@
                     }
 
                     await wait(staggerTime); 
-
-                    // 3. MOVE IMAGES OUT (This will now play fully!)
                     moveSlideImages(index, exitState);
-                    
-                    //await wait(lockTime);
-
-                    if (exitState === 'state-exploded') {
-                        aboutSection.classList.remove('is-active');
-                    }
                 }
             };
         });
@@ -157,7 +142,7 @@
         }
     });
 
-    /* ... (Physics Functions Unchanged) ... */
+    /* ... (KEEP PHYSICS FUNCTIONS EXACTLY AS THEY WERE) ... */
     function initSmoothMotion() {
         const images = document.querySelectorAll('.scatter-img');
         if(images.length === 0) return; 
