@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Green Tile Social Club</title>
     
-    <link rel="stylesheet" href="css/base.css?v=4">
+    <link rel="stylesheet" href="css/base.css?v=6">
     <link rel="stylesheet" href="css/nav.css?v=4">
     <link rel="stylesheet" href="css/section-hero.css?v=4">
     <link rel="stylesheet" href="css/section-about.css?v=4">
@@ -152,78 +152,82 @@
     </section>
     <script src="scripts/section-events.js?v=5" defer></script>
 
-    <section id="socials" class="socials-section" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #32CD32">
-        <div class="socials-header">
-            <div class="text-mask">
-                <span class="type-sub1 text-reveal-inner">Follow Our</span>
+    <section id="scroll-zone-0" class="natural-scroll-section scrollable-content">
+        <div id="socials" class="socials-section" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #32CD32">
+            <div class="socials-header">
+                <div class="text-mask">
+                    <span class="type-sub1 text-reveal-inner">Follow Our</span>
+                </div>
+                <div class="type-h1 animate-cascade">Socials</div>
+                <p class="type-body1 delay-1">
+                    To stay up to date on all our<br>events & activities
+                </p>
+                <div class="socials-icons">
+                    <a class="icon-circle" href="https://instagram.com/greentilesocialclub"></a>
+                    <a class="icon-circle" href="https://tiktok.com/@greentilesocialclub"></a>
+                    <a class="icon-circle" href="https://discord.gg/mwgd9P3cb4"></a>
+                </div>
             </div>
-            <div class="type-h1 animate-cascade">Socials</div>
-            <p class="type-body1 delay-1">
-                To stay up to date on all our<br>events & activities
-            </p>
-            <div class="socials-icons">
-                <a class="icon-circle" href="https://instagram.com/greentilesocialclub"></a>
-                <a class="icon-circle" href="https://tiktok.com/@greentilesocialclub"></a>
-                <a class="icon-circle" href="https://discord.gg/mwgd9P3cb4"></a>
+            <div class="socials-marquee-wrapper">
+                <div class="socials-track">
+                    <img src="images/social1.png" class="social-img" alt="Social Post 1">
+                    <img src="images/social2.png" class="social-img" alt="Social Post 2">
+                    <img src="images/social3.png" class="social-img" alt="Social Post 3">
+                </div>
             </div>
         </div>
-        <div class="socials-marquee-wrapper">
-            <div class="socials-track">
-                <img src="images/social1.png" class="social-img" alt="Social Post 1">
-                <img src="images/social2.png" class="social-img" alt="Social Post 2">
-                <img src="images/social3.png" class="social-img" alt="Social Post 3">
+        <script src="scripts/section-socials.js?v=4" defer></script>
+
+        <footer id="footer" class="footer-section">        
+            <div class="marquee-wrapper">
+                <div class="marquee-bar">
+                    <div class="marquee-content">
+                        <span class="marquee-item">Our Podcast Greenroom Now on Spotify</span>
+                        <span class="marquee-item">&rarr;</span>
+                    </div>
+                </div>
+                <div class="marquee-bar">
+                    <div class="marquee-content">
+                        <span class="marquee-item">Vibe to Music at Parlor</span>
+                        <span class="marquee-item">&rarr;</span>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <div class="footer-main">
+                <div id="footer-gradient-container" data-colors="#32CD32, #f0f4f0, #FABA2F, #32CD32">
+                    <canvas id="footer-canvas"></canvas>
+                </div>
+                <div class="footer-links">
+                    <a href="#" class="type-sub2 ui-roll roll-hover">
+                        <span class="ui-roll-layer ui-roll-visible">Privacy Policy</span>
+                        <span class="ui-roll-layer ui-roll-hidden">Privacy Policy</span>
+                    </a>
+                    <a href="#" class="type-sub2 ui-roll roll-hover">
+                        <span class="ui-roll-layer ui-roll-visible">Go Fund Me</span>
+                        <span class="ui-roll-layer ui-roll-hidden">Go Fund Me</span>
+                    </a>
+                    <a href="#" class="type-sub2 ui-roll roll-hover">
+                        <span class="ui-roll-layer ui-roll-visible">FAQ</span>
+                        <span class="ui-roll-layer ui-roll-hidden">FAQ</span>
+                    </a>
+                    <a href="#" class="type-sub2 ui-roll roll-hover">
+                        <span class="ui-roll-layer ui-roll-visible">Contact Us</span>
+                        <span class="ui-roll-layer ui-roll-hidden">Contact Us</span>
+                    </a>
+                    <a href="#" class="type-sub2 ui-roll roll-hover">
+                        <span class="ui-roll-layer ui-roll-visible">Follow Us</span>
+                        <span class="ui-roll-layer ui-roll-hidden">Follow Us</span>
+                    </a>
+                </div>
+                <div class="type-display-hero animate-cascade">
+                    <span>Green Tile Social Club</span>
+                </div>
+            </div>
+        </footer>
+        <script src="scripts/footer.js?v=6" defer></script>
     </section>
-    <script src="scripts/section-socials.js?v=4" defer></script>
+    <script src="scripts/section-scroll.js" defer></script>
 
-    <footer id="footer" class="footer-section">        
-        <div class="marquee-wrapper">
-            <div class="marquee-bar">
-                <div class="marquee-content">
-                    <span class="marquee-item">Our Podcast Greenroom Now on Spotify</span>
-                    <span class="marquee-item">&rarr;</span>
-                </div>
-            </div>
-            <div class="marquee-bar">
-                <div class="marquee-content">
-                    <span class="marquee-item">Vibe to Music at Parlor</span>
-                    <span class="marquee-item">&rarr;</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-main">
-            <div id="footer-gradient-container" data-colors="#32CD32, #f0f4f0, #FABA2F, #32CD32">
-                <canvas id="footer-canvas"></canvas>
-            </div>
-            <div class="footer-links">
-                <a href="#" class="type-sub2 ui-roll roll-hover">
-                    <span class="ui-roll-layer ui-roll-visible">Privacy Policy</span>
-                    <span class="ui-roll-layer ui-roll-hidden">Privacy Policy</span>
-                </a>
-                <a href="#" class="type-sub2 ui-roll roll-hover">
-                    <span class="ui-roll-layer ui-roll-visible">Go Fund Me</span>
-                    <span class="ui-roll-layer ui-roll-hidden">Go Fund Me</span>
-                </a>
-                <a href="#" class="type-sub2 ui-roll roll-hover">
-                    <span class="ui-roll-layer ui-roll-visible">FAQ</span>
-                    <span class="ui-roll-layer ui-roll-hidden">FAQ</span>
-                </a>
-                <a href="#" class="type-sub2 ui-roll roll-hover">
-                    <span class="ui-roll-layer ui-roll-visible">Contact Us</span>
-                    <span class="ui-roll-layer ui-roll-hidden">Contact Us</span>
-                </a>
-                <a href="#" class="type-sub2 ui-roll roll-hover">
-                    <span class="ui-roll-layer ui-roll-visible">Follow Us</span>
-                    <span class="ui-roll-layer ui-roll-hidden">Follow Us</span>
-                </a>
-            </div>
-            <div class="type-display-hero animate-cascade">
-                <span>Green Tile Social Club</span>
-            </div>
-        </div>
-    </footer>
-    <script src="scripts/footer.js?v=6" defer></script>
 </body>
 </html>

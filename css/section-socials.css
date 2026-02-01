@@ -16,11 +16,15 @@
     
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.6s ease;
+    /* UPDATE: Use Standard Variables */
+    transition: opacity var(--time-fade-in) ease;
     background-color: var(--color-bg); 
 }
 
-.socials-section.is-active {
+/* If using relative-mode, base.css handles the position/opacity override,
+   but we handle the inner animations here. */
+.socials-section.is-active,
+.socials-section.relative-mode {
     opacity: 1;
     pointer-events: auto;
 }
@@ -34,12 +38,13 @@
     align-items: center;
 }
 
+/* Standard Delays */
 .delay-1 { transition-delay: 0.1s; }
 .delay-2 { transition-delay: 0.2s; }
 .delay-3 { transition-delay: 0.3s; }
 
 /* =========================================
-   ICONS //replace later with images
+   ICONS
    ========================================= */
 .socials-icons {
     display: flex;
@@ -49,11 +54,18 @@
     
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-    transition-delay: 0.4s;
+    
+    /* UPDATE: Standard Timing */
+    transition: 
+        opacity var(--time-fade-in) ease, 
+        transform var(--time-fade-in) var(--ease-standard);
+    
+    transition-delay: 0.2s; 
 }
 
-.socials-section.is-active .socials-icons {
+/* Triggered by JS adding .in-view or .is-active */
+.socials-section.is-active .socials-icons,
+.socials-section.in-view .socials-icons {
     opacity: 1;
     transform: translateY(0);
 }
@@ -79,10 +91,13 @@
     overflow-anchor: none;
 
     opacity: 0;
-    transition: opacity 1s ease 0.5s;
+    /* UPDATE: Standard Timing */
+    transition: opacity var(--time-fade-in) ease;
+    transition-delay: 0.4s;
 }
 
-.socials-section.is-active .socials-marquee-wrapper {
+.socials-section.is-active .socials-marquee-wrapper,
+.socials-section.in-view .socials-marquee-wrapper {
     opacity: 1;
 }
 

@@ -27,6 +27,11 @@
     z-index: 20;
 }
 
+.footer-section.relative-mode {
+    height: 90vh !important; /* Slightly shorter than full screen if desired */
+    justify-content: flex-end;
+}
+
 /* Backgrounds */
 #footer-gradient-container {
     position: absolute;

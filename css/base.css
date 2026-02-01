@@ -209,6 +209,59 @@ section.is-active {
 .section-spacer { margin-top: var(--section-spacing); margin-bottom: var(--section-spacing); }
 
 /* =========================================
+   NATURAL SCROLL SYSTEM
+   ========================================= */
+
+/* The Wrapper (Holds the mixed content) */
+.natural-scroll-section {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    
+    /* Enables Native Scroll */
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    
+    background-color: var(--color-bg);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity 0.8s ease;
+}
+
+.natural-scroll-section.is-active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 20;
+}
+
+/* Hide Scrollbar */
+.natural-scroll-section::-webkit-scrollbar { display: none; }
+.natural-scroll-section { -ms-overflow-style: none; scrollbar-width: none; }
+
+
+/* The Adapter Class (Makes sections stackable) */
+/* Add this class to any section you put INSIDE the wrapper */
+.relative-mode {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    height: auto !important;
+    min-height: 100vh; /* Ensure they still take up space */
+    
+    opacity: 1 !important; /* Visible by default (managed by observer) */
+    pointer-events: auto !important;
+    
+    display: flex;
+    flex-direction: column;
+    
+    /* Ensure no margins break the flow */
+    margin: 0;
+    /* padding-top: 100px; Give them some breathing room */
+    /* padding-bottom: 100px; */
+}
+
+/* =========================================
    UI & CTA (Updated)
    ========================================= */
 

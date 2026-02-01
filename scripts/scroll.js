@@ -1,5 +1,5 @@
 /* =========================================
-   SCROLL MANAGER (Hybrid System)
+   SCROLL MANAGER (Ghost Fix Edition)
    ========================================= */
 
 window.ScrollManager = {
@@ -7,13 +7,13 @@ window.ScrollManager = {
     isLocked: false, 
     steps: [],      
     
-    // Observer for "Natural" sections (nested inside a scroll wrapper)
+    // Trackers for the "Natural" sections
     nestedObserver: null,
+    nestedEls: [], // <--- NEW: Keep track of nested elements
 
     init() {
         console.log("ScrollManager: Starting Hybrid System...");
 
-        // 1. Setup Standard Inputs (Wheel/Touch)
         window.addEventListener('wheel', this.handleInput.bind(this), { passive: false });
         let touchStartY = 0;
         window.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY, { passive: false });
@@ -22,10 +22,7 @@ window.ScrollManager = {
             if (Math.abs(delta) > 30) this.handleTouch(delta);
         }, { passive: false });
 
-        // 2. Setup Nested Observer (For sections inside a Natural Scroll Wrapper)
-        this.initNestedObserver();
-
-        // 3. Init First Step (if exists)
+        // Init First Step
         setTimeout(() => {
             if(this.steps.length > 0) {
                 this.steps[0].onEnter('down');
@@ -35,25 +32,21 @@ window.ScrollManager = {
         }, 100);
     },
 
-    /* --- THE HYBRID REGISTRAR --- */
     addSteps(newSteps) {
         newSteps.forEach(step => {
             const el = document.getElementById(step.id);
-            
-            // ERROR CHECK
             if (!el) {
-                console.warn(`ScrollManager: Element with id '${step.id}' not found. Skipping.`);
+                console.warn(`ScrollManager: Element with id '${step.id}' not found.`);
                 return;
             }
 
-            // CHECK CONTEXT: Is this element inside a Natural Scroll Wrapper?
-            const wrapper = el.closest('.natural-scroll-section');
+            // Check PARENT to prevent self-detection
+            const wrapper = el.parentElement ? el.parentElement.closest('.natural-scroll-section') : null;
 
             if (wrapper) {
-                // CASE A: NESTED (Plug-and-Play Mode)
-                // We attach the logic to the element, but DO NOT add to main 'steps' array.
-                // The IntersectionObserver will trigger these instead.
+                // CASE A: NESTED
                 console.log(`ScrollManager: Registered nested section '${step.id}'`);
+                el.classList.add('relative-mode');
                 
                 el._scrollLogic = {
                     onEnter: step.onEnter,
@@ -61,18 +54,20 @@ window.ScrollManager = {
                     isActive: false
                 };
                 
-                // Start watching it
+                // Track it so we can wake it up later
+                this.nestedEls.push(el);
+
+                if(!this.nestedObserver) this.initNestedObserver();
                 this.nestedObserver.observe(el);
 
             } else {
-                // CASE B: STANDALONE (Director Mode)
-                // This is a top-level page step (like Hero or About).
+                // CASE B: MAIN STEP
                 console.log(`ScrollManager: Registered main step '${step.id}'`);
                 this.steps.push(step);
             }
         });
 
-        // Re-sort main steps by DOM order to ensure flow matches HTML
+        // Sort main steps
         this.steps.sort((a, b) => {
             const elA = document.getElementById(a.id);
             const elB = document.getElementById(b.id);
@@ -81,24 +76,24 @@ window.ScrollManager = {
         });
     },
 
-    /* --- NESTED OBSERVER LOGIC --- */
     initNestedObserver() {
-        const options = { threshold: 0.25 }; // Trigger when 25% visible
+        const options = { threshold: 0.75 };
         
         this.nestedObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 const el = entry.target;
                 if (!el._scrollLogic) return;
 
+                // --- FIX PART 1: THE GUARD CLAUSE ---
+                // If the parent wrapper is not active (invisible), IGNORE this intersection.
+                const wrapper = el.closest('.natural-scroll-section');
+                if (wrapper && !wrapper.classList.contains('is-active')) return;
+
                 if (entry.isIntersecting && !el._scrollLogic.isActive) {
-                    // ENTER
                     el._scrollLogic.isActive = true;
-                    // We pass 'down' as default direction for natural scrolling
                     el._scrollLogic.onEnter('down'); 
                 } 
                 else if (!entry.isIntersecting && el._scrollLogic.isActive) {
-                    // EXIT (Optional: Reset if you want them to play again when scrolling back up)
-                    // You can comment this out if you want animations to only play once.
                     el._scrollLogic.isActive = false;
                     el._scrollLogic.onExit('up');
                 }
@@ -106,29 +101,32 @@ window.ScrollManager = {
         }, options);
     },
 
-    /* --- INPUT HANDLING (Main Steps) --- */
     handleInput(e) {
-        if (this.isLocked) { e.preventDefault(); return; }
+        if (this.isLocked) {
+            e.preventDefault();
+            return;
+        }
 
         const delta = e.deltaY;
         const target = e.target;
-        
-        // CHECK: Are we scrolling INSIDE a natural wrapper?
         const scrollContainer = target.closest('.scrollable-content');
-        
-        if (scrollContainer) {
-            // Allow native scroll until we hit the edge
+
+        // --- THE FIX ---
+        // Only allow native scrolling if the container is actually ACTIVE.
+        // If it's hidden (opacity: 0), we should ignore it and trigger the main step transition instead.
+        const isActiveContainer = scrollContainer && scrollContainer.classList.contains('is-active');
+
+        if (isActiveContainer) {
             const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
             const isAtTop = scrollTop <= 0;
             const isAtBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
 
-            if ((delta > 0 && !isAtBottom) || (delta < 0 && !isAtTop)) {
-                // Allow default scroll, don't trigger step change
-                return; 
-            }
+            // If we can scroll natively in this active container, let it happen
+            if (delta > 0 && !isAtBottom) return; 
+            if (delta < 0 && !isAtTop) return; 
         }
 
-        // If we are at the edge, OR not in a container, trigger Main Step Change
+        // Otherwise, trigger the page transition
         e.preventDefault();
         if (delta > 5) this.trigger(1);
         else if (delta < -5) this.trigger(-1);
@@ -149,11 +147,40 @@ window.ScrollManager = {
         const dirStr = direction > 0 ? 'down' : 'up';
 
         await currentScene.onExit(dirStr);
-        
-        // Deactivate all sections generically
+
+        // --- CLEANUP NESTED CHILDREN ---
+        const currentEl = document.getElementById(currentScene.id);
+        if (currentEl && currentEl.classList.contains('natural-scroll-section')) {
+            this.nestedEls.forEach(nested => {
+                // Check if this child belongs to the wrapper we just left
+                if (nested.closest('.natural-scroll-section') === currentEl) {
+                    if (nested._scrollLogic && nested._scrollLogic.isActive) {
+                        // Manually trigger exit and reset state
+                        nested._scrollLogic.onExit(dirStr);
+                        nested._scrollLogic.isActive = false; 
+                    }
+                }
+            });
+        }
+
         document.querySelectorAll('section').forEach(s => s.classList.remove('is-active'));
         
         await nextScene.onEnter(dirStr);
+
+        // --- FIX PART 2: THE WAKE UP CALL ---
+        // We just made a section active. Check if it's a Wrapper.
+        // If it is, we must restart the observers for its children so they realize they are visible.
+        const activeEl = document.getElementById(nextScene.id);
+        if (activeEl) {
+            this.nestedEls.forEach(el => {
+                // If this child belongs to the newly active wrapper...
+                if (el.closest('.natural-scroll-section') === activeEl) {
+                    // ...Toggle the observer to force an update immediately
+                    this.nestedObserver.unobserve(el);
+                    this.nestedObserver.observe(el);
+                }
+            });
+        }
 
         this.currentStep = nextIndex;
         this.isLocked = false;
