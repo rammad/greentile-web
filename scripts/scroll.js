@@ -77,7 +77,7 @@ window.ScrollManager = {
     },
 
     initNestedObserver() {
-        const options = { threshold: 0.75 };
+        const options = { threshold: 0.5 };
         
         this.nestedObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {

@@ -17,12 +17,12 @@
         initSmoothMotion();
 
         /* --- HELPER 1: JUST THE TEXT --- */
-        const toggleSlideText = (index, isVisible) => {
-            const s = slides[index];
-            if (!s) return;
-            if (isVisible) s.classList.add('slide-visible');
-            else s.classList.remove('slide-visible');
-        };
+        // const toggleSlideText = (index, isVisible) => {
+        //     const s = slides[index];
+        //     if (!s) return;
+        //     if (isVisible) s.classList.add('slide-visible');
+        //     else s.classList.remove('slide-visible');
+        // };
 
         /* --- HELPER 2: JUST THE IMAGES --- */
         const moveSlideImages = (index, stateClass, snap = false) => {
@@ -78,13 +78,15 @@
         /* --- STEPS --- */
         const aboutSteps = Array.from(slides).map((slide, index) => {
             const localCTA = slide.querySelector('.cta-btn');
+            const localBody = slide.querySelector('.type-body2');
 
             return {
                 id: `about-${index}`,
                 
                 onEnter: async (direction) => {
                     aboutSection.classList.add('is-active');
-                    currentSlideIndex = index; 
+                    // currentSlideIndex = index; 
+                    slide.classList.add('slide-visible');
                     
                     // CALCULATE PREVIOUS SLIDE (To protect it from reset)
                     let prevIndex = -1;
@@ -107,7 +109,7 @@
                     }
 
                     // 2. TEXT FADE IN
-                    toggleSlideText(index, true);
+                    localBody.classList.add('is-visible');
 
                     // 3. STAGGER
                     await wait(staggerTime);
@@ -126,7 +128,8 @@
                 onExit: async (direction) => {
                     // 1. HIDE CTA & TEXT
                     if (localCTA) localCTA.classList.remove('is-visible');
-                    toggleSlideText(index, false);
+                    localBody.classList.remove('is-visible');
+                    slide.classList.remove('slide-visible');
 
                     // 2. CALCULATE EXIT
                     let exitState = (direction === 'down') ? 'state-up' : 'state-down';
