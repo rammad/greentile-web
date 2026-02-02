@@ -28,13 +28,10 @@
     width: 100%;
 }
 
-/* --- BACK LINK --- */
-.back-link {
-    margin-bottom: 32px;
-    display: inline-block;
-    text-decoration: none;
-    text-align: left;
-    transform-origin: left center;
+.pdp-section .back-arrow {
+    position: relative;
+    align-self: flex-start;
+    margin-bottom: var(--standard-margin);
 }
 
 /* --- SUBTITLES --- */
@@ -70,6 +67,7 @@
     display: flex;
     flex-direction: column;
     height: auto;
+    align-self: stretch;
     overflow: visible;
 }
 
@@ -108,10 +106,12 @@
 
 .ticket-actions {
     display: flex;
-    align-items: flex-end; /* Aligns bottom so the label can float up */
-    gap: 16px;
+    align-items: flex-end;
+    object-position: bottom;
+    gap: var(--standard-gap);
     width: 100%;
-    margin-top: 40px;
+    margin-top: auto;
+    padding-top: 40px;
 }
 
 /* --- QTY WRAPPER --- */

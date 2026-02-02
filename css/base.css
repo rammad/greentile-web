@@ -440,6 +440,18 @@ section.is-active {
 .text-reveal-inner { display: block; transform: translateY(110%); transition: transform 1.0s cubic-bezier(0.19, 1, 0.22, 1); will-change: transform; }
 .is-visible .text-reveal-inner { transform: translateY(0%); }
 
+
+/* Back Button */
+.back-arrow {
+    position: absolute;
+    display: flex;
+    top: 0;
+    left: 0;
+    height: 7px; /* hate this but it matches the cta arrows */
+    width: auto;
+    transform: scale(-100%);
+}
+
 /* Mobile */
 @media (max-width: 768px) {
     .type-display-hero span { display: block; }
