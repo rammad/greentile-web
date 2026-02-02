@@ -1,6 +1,7 @@
 /* =========================================
-   PAGE: ARCHIVES (Row Packer Algorithm)
+   PAGE: ARCHIVES (Standardized Packer)
    ========================================= */
+
 document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.style.overflow = 'auto';
     document.body.style.overflow = 'auto';
@@ -8,20 +9,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const page = document.querySelector('.archives-page');
     if (page) setTimeout(() => page.classList.add('is-active'), 100);
 
-    // --- RESTORED: ANIMATE TITLE ---
+    // ANIMATE TITLE
     const title = document.querySelector('.animate-cascade');
     if (title) {
-        // We set an interval to wait for global.js to finish splitting the text
         const checkInit = setInterval(() => {
             if (title.classList.contains('is-initialized') && window.playCascade) {
                 clearInterval(checkInit);
-                // Slight delay so it doesn't happen instant the page loads
                 setTimeout(() => window.playCascade(title), 100); 
             }
         }, 50);
     }
 
-    // Initialize Layout
     initRowPacker();
 });
 
@@ -30,10 +28,12 @@ function initRowPacker() {
     if (!container) return;
 
     // 1. EXTRACT DATA
-    // Pull all cells out of DOM and group them by month
     const allCells = Array.from(document.querySelectorAll('.archive-cell'));
-    container.innerHTML = ''; // Clear for rebuilding
-    container.classList.add('packed-grid-container');
+    container.innerHTML = ''; 
+    // Add the class that section-calendar.css expects
+    container.classList.add('calendar-grid-packed'); 
+    // Override display:none from calendar css
+    container.style.display = 'flex'; 
 
     const monthGroups = [];
     let currentMonthName = null;
@@ -41,36 +41,46 @@ function initRowPacker() {
 
     allCells.forEach(cell => {
         const m = cell.getAttribute('data-month');
+        // Get image source from the old .archive-poster
+        const img = cell.querySelector('img');
+        const imgSrc = img ? img.getAttribute('src') : '';
+        const href = cell.getAttribute('href');
+
         if (m !== currentMonthName) {
             currentGroup = { name: m, items: [] };
             monthGroups.push(currentGroup);
             currentMonthName = m;
         }
-        currentGroup.items.push(cell);
+
+        // CREATE NEW CARD (Standardized Structure)
+        // We convert the .archive-cell data into a .grid-card
+        const card = document.createElement('a');
+        card.href = href;
+        card.className = 'grid-card';
+        
+        // Use grid-card-poster class to inherit standard styles
+        card.innerHTML = `<img src="${imgSrc}" class="grid-card-poster">`;
+
+        currentGroup.items.push(card);
     });
 
-    // 2. THE PACKING ALGORITHM
+    // 2. PACKING ALGORITHM (Standard)
     const ROWS = [];
-    let currentRow = { capacity: 6, chunks: [] }; // A row has 6 slots
+    let currentRow = { capacity: 6, chunks: [] }; 
 
     monthGroups.forEach(group => {
         let itemsToPlace = [...group.items];
-        let isContinuation = false; // Is this a split part of a month?
+        let isContinuation = false; 
 
         while (itemsToPlace.length > 0) {
-            // Check if current row is full
             if (currentRow.capacity === 0) {
                 ROWS.push(currentRow);
                 currentRow = { capacity: 6, chunks: [] };
             }
 
-            // How many can we fit?
             const count = Math.min(itemsToPlace.length, currentRow.capacity);
-            
-            // Slice the items for this chunk
             const chunkItems = itemsToPlace.splice(0, count);
 
-            // Create Data Object for this chunk
             currentRow.chunks.push({
                 monthName: group.name,
                 items: chunkItems,
@@ -78,34 +88,26 @@ function initRowPacker() {
                 isContinuation: isContinuation
             });
 
-            // Update Math
             currentRow.capacity -= count;
-            
-            // Next loop iteration is definitely a continuation
             isContinuation = true;
         }
     });
-    // Push final row
     if (currentRow.chunks.length > 0) ROWS.push(currentRow);
 
-    // 3. RENDER TO DOM
-    const flatItemList = []; // Keep track for pagination
+    // 3. RENDER
+    const flatItemList = []; 
 
     ROWS.forEach(rowData => {
-        // Create Row Element
         const rowEl = document.createElement('div');
         rowEl.className = 'packed-row';
         
         rowData.chunks.forEach(chunk => {
-            // Create Chunk Wrapper (The Month Block)
             const chunkEl = document.createElement('div');
             chunkEl.className = `packed-chunk span-${chunk.span}`;
             
-            // Header (Text + Line)
             const header = document.createElement('div');
             header.className = 'month-header';
             
-            // Only show text if it's NOT a continuation line
             if (chunk.isContinuation) {
                 header.innerHTML = '<span class="spacer-line"></span>';
                 header.classList.add('continuation-header');
@@ -114,13 +116,12 @@ function initRowPacker() {
             }
             chunkEl.appendChild(header);
 
-            // Grid for Items
             const gridEl = document.createElement('div');
             gridEl.className = `chunk-grid cols-${chunk.span}`;
             
             chunk.items.forEach(item => {
                 gridEl.appendChild(item);
-                flatItemList.push(item); // Add to flat list for load more
+                flatItemList.push(item); 
             });
 
             chunkEl.appendChild(gridEl);
@@ -130,7 +131,7 @@ function initRowPacker() {
         container.appendChild(rowEl);
     });
 
-    // 4. PAGINATION
+    // 4. PAGINATION (Logic preserved, classes updated)
     initPagination(flatItemList);
 }
 
@@ -139,18 +140,13 @@ function initPagination(items) {
     const BATCH_SIZE = 12;
     let visibleCount = 0;
 
-    // Helper to check if a row is empty of visible items
     const updateLayoutVisibility = () => {
-        document.querySelectorAll('.packed-row').forEach(row => {
-            const hasVisible = Array.from(row.querySelectorAll('.archive-cell'))
-                .some(el => el.style.display !== 'none');
+        // We need to hide empty rows to prevent whitespace gaps
+        const rows = document.querySelectorAll('.packed-row');
+        rows.forEach(row => {
+            const cards = row.querySelectorAll('.grid-card');
+            const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
             row.style.display = hasVisible ? 'grid' : 'none';
-        });
-
-        document.querySelectorAll('.packed-chunk').forEach(chunk => {
-             const hasVisible = Array.from(chunk.querySelectorAll('.archive-cell'))
-                .some(el => el.style.display !== 'none');
-             chunk.style.visibility = hasVisible ? 'visible' : 'hidden';
         });
     };
 
@@ -158,7 +154,10 @@ function initPagination(items) {
     items.forEach((item, index) => {
         if (index >= BATCH_SIZE) {
             item.style.display = 'none';
-            item.classList.add('hidden');
+            // We use standard animation classes if needed, or simple display toggle
+            item.style.opacity = '0';
+        } else {
+            item.style.opacity = '1';
         }
     });
 
@@ -173,17 +172,24 @@ function initPagination(items) {
     if (loadBtn) {
         loadBtn.addEventListener('click', () => {
             const nextLimit = visibleCount + BATCH_SIZE;
+            let newlyVisible = [];
+            
             for (let i = visibleCount; i < nextLimit && i < items.length; i++) {
                 const item = items[i];
                 item.style.display = 'block';
-                // Small delay for fade in
-                setTimeout(() => {
-                    item.classList.remove('hidden');
-                    item.classList.add('is-appearing');
-                }, 10);
+                newlyVisible.push(item);
             }
+            
             visibleCount = nextLimit;
             updateLayoutVisibility();
+
+            // Animate them in
+            setTimeout(() => {
+                newlyVisible.forEach(item => {
+                    item.style.transition = 'opacity 0.6s ease';
+                    item.style.opacity = '1';
+                });
+            }, 50);
 
             if (visibleCount >= items.length) {
                 loadBtn.style.opacity = '0';
