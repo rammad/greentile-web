@@ -6,7 +6,7 @@
     <title>Events - Green Tile Social Club</title>
     <link rel="stylesheet" href="css/base.css?v=8">
     <link rel="stylesheet" href="css/nav.css?v=4">
-    <link rel="stylesheet" href="css/section-calendar.css?v=5">
+    <link rel="stylesheet" href="css/section-calendar.css?v=7">
 </head>
 <body>
 
@@ -44,6 +44,12 @@
             <h1 class="type-display-hero animate-cascade">
                 Spring Calendar 2025
             </h1>
+
+            <div class="calendar-controls">
+                    <div class="text-mask">
+                        <span class="type-sub2 text-reveal-inner">Filters</span>
+                    </div>
+                </div>
 
             <div class="calendar-controls">
                 <div class="filters-list">
@@ -125,19 +131,7 @@
 
             </div>
 
-            <div class="calendar-grid">
-                <a href="product.html" class="grid-item"><img src="images/poster1.png" class="grid-poster"></a>
-                <a href="product.html" class="grid-item">
-                    <div class="status-badge badge-soon"></div>
-                </a>
-                <a href="product.html" class="grid-item">
-                    <img src="images/poster3.png" class="grid-poster">
-                    <div class="status-badge badge-sold"></div>
-                </a>
-                <a href="product.html" class="grid-item"><img src="images/poster1.png" class="grid-poster"></a>
-                <a href="product.html" class="grid-item"><img src="images/poster2.png" class="grid-poster"></a>
-                <a href="product.html" class="grid-item"><img src="images/poster3.png" class="grid-poster"></a>
-            </div>
+            <div id="dynamic-grid-container" class="calendar-grid-packed"></div>
         </div>
 
         <div class="mobile-event-display" id="mobile-display">
@@ -148,7 +142,7 @@
     </div>
 
     <script src="scripts/global.js"></script>
-    <script src="scripts/section-calendar.js"></script>
+    <script src="scripts/section-calendar.js?v=3"></script>
 
 </body>
 </html>
