@@ -1,51 +1,64 @@
 /* =========================================
-   PAGE: PRODUCT DETAIL
+   PAGE: PRODUCT DETAIL (Async Animation)
    ========================================= */
+(() => {
+    const { wait, staggerTime } = window.AnimationUtils;
 
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. ACTIVATE SECTION
-    const section = document.querySelector('.pdp-section');
-    if (section) {
-        setTimeout(() => {
-            section.classList.add('is-active');
-        }, 100);
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        initProductPage();
+    });
 
-    // 2. ANIMATE TITLE (Cascade)
-    const title = document.querySelector('.animate-cascade');
-    if (title && window.playCascade) {
-        setTimeout(() => {
-             window.playCascade(title);
-        }, 200);
-    }
+    async function initProductPage() {
+        
 
-    // 3. ANIMATE BODY TEXT
-    const blurElements = document.querySelectorAll('.blur-fade-text');
-    if (blurElements.length > 0) {
-        blurElements.forEach((el, index) => {
-            setTimeout(() => {
+        // 1. ACTIVATE SECTION (Background Fade)
+        const section = document.querySelector('.pdp-section');
+        if (section) section.classList.add('is-active');
+
+        // 2. ANIMATE TITLE (Wait for Global JS Init)
+        const title = document.querySelector('.animate-cascade');
+        if (title) {
+            // Simple polling to ensure global.js has split the text
+            const checkInit = setInterval(async () => {
+                if (title.classList.contains('is-initialized') && window.playCascade) {
+                    clearInterval(checkInit);
+                    await window.playCascade(title);
+                }
+            }, 50);
+        }
+
+        await wait(staggerTime)
+
+        const subtTitles = section.querySelectorAll('.pdp-tag');
+        if (subtTitles.length > 0) {
+            for (const subt of subtTitles) {
+                subt.classList.add('is-visible');
+            }
+        }
+
+        await wait(staggerTime);
+        
+        const poster = document.querySelector('.pdp-poster');
+        if (poster) poster.classList.add('is-visible');
+
+        // 4. TEXT & DETAILS (Staggered)
+        await wait(200);
+        const textElements = document.querySelectorAll('.type-body1, .type-body2');
+        if (textElements.length > 0) {
+            for (const el of textElements) {
                 el.classList.add('is-visible');
-            }, 600 + (index * 100)); 
-        });
+            }
+        }
     }
 
-    // 4. REVEAL IMAGE
-    const poster = document.querySelector('.pdp-poster');
-    if (poster) {
-        setTimeout(() => {
-            poster.classList.add('is-visible');
-        }, 400);
+    /* --- INTERACTION LOGIC (Ticket Qty) --- */
+    let qty = 1;
+    window.updateQty = function(change) {
+        const qtyDisplay = document.getElementById('ticket-qty');
+        if (!qtyDisplay) return;
+        qty += change;
+        if (qty < 1) qty = 1;
+        if (qty > 4) qty = 4; 
+        qtyDisplay.innerText = qty;
     }
-});
-
-/* INTERACTION LOGIC */
-let qty = 1;
-window.updateQty = function(change) {
-    const qtyDisplay = document.getElementById('ticket-qty');
-    if (!qtyDisplay) return;
-    qty += change;
-    if (qty < 1) qty = 1;
-    if (qty > 10) qty = 10; 
-    qtyDisplay.innerText = qty;
-}
+})();

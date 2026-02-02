@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mahjong After Hours - Green Tile Social Club</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/section-product.css">
+    
+    <link rel="stylesheet" href="css/base.css?v=10">
+    <link rel="stylesheet" href="css/nav.css?v=4">
+    <link rel="stylesheet" href="css/section-product.css?v=5">
 
     <style>
+        /* Allow native scroll for this page */
         html, body {
             overflow: auto !important;
             height: auto !important;
@@ -15,11 +18,16 @@
         }
     </style>
 </head>
+<body>
 
     <nav class="sticky-nav standard-margins">
-        <div class="nav-left"><img src="images/logo-edit.png" class="nav-logo"></div>
+        <div class="nav-left">
+            <a href="index.html" class="logo-link">
+                <img src="images/logo-edit.png" class="nav-logo" alt="Home">
+            </a>
+        </div>
         <div class="nav-center">
-            <a href="events.html" class="type-sub2 ui-roll roll-hover" style="border-bottom: 2px solid currentColor;">
+            <a href="events.html" class="type-sub2 ui-roll roll-hover" style="border-bottom: 1px solid currentColor;">
                 <span class="ui-roll-layer ui-roll-visible">Events</span>
                 <span class="ui-roll-layer ui-roll-hidden">Events</span>
             </a>
@@ -50,45 +58,44 @@
                 </a>
                 
                 <div class="pdp-meta-row">
-                    <span class="pdp-date type-sub1 ui-roll">
-                        <span class="ui-roll-layer ui-roll-visible">Thursday, July 11 &bull; 7PM - 10PM</span>
-                        <span class="ui-roll-layer ui-roll-hidden">Thursday, July 11 &bull; 7PM - 10PM</span>
+                    <span class="pdp-date type-sub1 text-reveal-inner">
+                        Thursday, July 11 &bull; 7PM - 10PM
                     </span>
                 </div>
                 
-                <h1 class="type-h1 animate-cascade pdp-hero-title" style="overflow: hidden; display: block; margin-bottom: 16px;">
+                <h1 class="type-h2 animate-cascade pdp-hero-title">
                     Mahjong After Hours
                 </h1>
                 
                 <div class="pdp-meta-row">
-                    <div class="pdp-location type-sub1 ui-roll">
-                        <span class="ui-roll-layer ui-roll-visible">301 Ten Eyck St</span>
-                        <span class="ui-roll-layer ui-roll-hidden">301 Ten Eyck St</span>
+                    <div class="pdp-location type-sub1 text-reveal-inner">
+                        301 Ten Eyck St
                     </div>
                 </div>
                 
                 <div class="pdp-meta-row">
-                    <span class="pdp-tag blur-fade-text">3 Point Hong Kong Style</span>
+                    <span class="pdp-tag type-sub2 text-reveal-inner">3 Point Hong Kong Style</span>
+                    <span class="pdp-tag type-sub2 text-reveal-inner">Medium Difficulty</span>
+                    <span class="pdp-tag type-sub2 text-reveal-inner">3 Point Hong Kong Style</span>
+                    <span class="pdp-tag type-sub2 text-reveal-inner">Medium Difficulty</span>
+                    <span class="pdp-tag type-sub2 text-reveal-inner">3 Point Hong Kong Style</span>
+                    <span class="pdp-tag type-sub2 text-reveal-inner">Medium Difficulty</span>
+                    <span class="pdp-tag type-sub2 text-reveal-inner">3 Point Hong Kong Style</span>
+                    <span class="pdp-tag type-sub2 text-reveal-inner">Medium Difficulty</span>
                 </div>
 
                 <div class="pdp-desc type-body1">
-                    <p class="blur-fade-text">
+                    <p class=""type-body1>
                         Join us for our second all-day, seven-hour, play-till-you-drop mahjong extravaganza!!! Set against the vibey 2-in-1 backdrop of @trans.pecos + @nha_minh.
                     </p>
                     <br>
-                    <div class="blur-fade-text">
-                        <p>Seven hours of what again???</p>
-                        <p>🀄 Played the classic GTSC way. Like pickup style, swap in and out of tables by simply asking to sub in next game!</p>
-                        <p>🎧 Seven hours of of live DJs featuring @erniechanders @gammavibes @ailee.n</p>
-                        <p>🍖 Viet BBQ, Banh Mis, cocktails and more for purchase!!</p>
-                    </div>
+                    <p class="type-body1">Seven hours of what again???
+                    🀄 Played the classic GTSC way. Like pickup style, swap in and out of tables by simply asking to sub in next game!
+                    🎧 Seven hours of of live DJs featuring @erniechanders @gammavibes @ailee.n
+                    🍖 Viet BBQ, Banh Mis, cocktails and more for purchase!!</p>
                 </div>
 
-                <div class="ticket-actions blur-fade-text">
-                    <div class="pdp-tag" style="margin: 0; background: none; padding: 0;">Max Quantity of Tickets: 4</div>
-                </div>
-                
-                <div class="ticket-actions blur-fade-text" style="margin-top: 16px;">
+                <div class="ticket-actions blur-fade-text" style="margin-top: 40px;">
                     <div class="qty-selector">
                         <button class="qty-btn" onclick="updateQty(-1)">&minus;</button>
                         <span class="qty-val" id="ticket-qty">1</span>
@@ -98,6 +105,10 @@
                         <span>$25 - Buy Now</span>
                         <span>&rarr;</span>
                     </button>
+                </div>
+                
+                <div class="ticket-actions blur-fade-text">
+                    <span class="type-sub2" style="opacity: 0.6; margin-top: 8px;">Max Quantity: 4</span>
                 </div>
             </div>
 
@@ -109,8 +120,7 @@
     </section>
 
     <script src="scripts/global.js?v=2"></script>
-    <!-- <script src="scripts/scroll.js"></script> -->
-    <script src="scripts/section-product.js"></script>
+    <script src="scripts/section-product.js?v=4"></script>
 
 </body>
 </html>
