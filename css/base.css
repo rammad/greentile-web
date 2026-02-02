@@ -75,7 +75,7 @@
     --size-h2: 64px;
     --size-sub1: 24px;
     --size-sub2: 14px;
-    --size-body1: 20px; 
+    --size-body1: 18px; 
     --size-body2: 36px; 
 
     /* Mobile Sizes */
@@ -438,7 +438,7 @@ section.is-active {
 
 .text-mask { display: block; overflow: hidden; line-height: 1.2; }
 .text-reveal-inner { display: block; transform: translateY(110%); transition: transform 1.0s cubic-bezier(0.19, 1, 0.22, 1); will-change: transform; }
-.is-active .text-reveal-inner, .is-visible .text-reveal-inner { transform: translateY(0%); }
+.is-visible .text-reveal-inner { transform: translateY(0%); }
 
 /* Mobile */
 @media (max-width: 768px) {
