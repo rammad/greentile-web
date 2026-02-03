@@ -40,13 +40,13 @@
 */
 
 /* --- BUTTON --- */
-#event-btn {
+/* #event-btn {
     position: absolute;
     top: 140px;
     right: 20px;
     pointer-events: auto; 
     z-index: 12;
-}
+} */
 
 /* --- GRID --- */
 .events-grid {

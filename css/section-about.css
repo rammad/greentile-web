@@ -128,9 +128,7 @@
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    margin-top: var(--standard-margin); 
-    
-    pointer-events: auto;
+    margin-top: var(--standard-margin);
     white-space: nowrap;
 }
 

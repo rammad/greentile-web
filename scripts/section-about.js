@@ -3,7 +3,7 @@
    ========================================= */
 
 (() => { 
-    const { wait, staggerTime } = window.AnimationUtils;
+    const { wait, transitionCta, staggerTime } = window.AnimationUtils;
 
     document.addEventListener('DOMContentLoaded', () => {
         const aboutSection = document.querySelector('.about');
@@ -34,14 +34,22 @@
             if(enable && items[0].classList.contains('is-visible')) return;
             else if (!enable && !items[0].classList.contains('is-visible')) return;
 
+            const subTitle = document.querySelector('.about-menu-persistent .menu-label');
+            if (subTitle){
+                if(enable){
+                    subTitle.classList.add('is-visible');
+                    await wait(staggerTime);
+                }
+                else subTitle.classList.remove('is-visible');
+                
+            }
+
             for (let i = 0; i < items.length; i++) {
                 if(enable) {
                     items[i].classList.add('is-visible');
                     await wait(staggerTime);
                 }
-                else {
-                    items[i].classList.remove('is-visible');
-                }
+                else items[i].classList.remove('is-visible');
             }
         };
 
@@ -130,12 +138,12 @@
 
                     // 5. ANIMATE IMAGES & CTA
                     moveSlideImages(index, 'state-center');
-                    if (localCTA) localCTA.classList.add('is-visible');
+                    if (localCTA) transitionCta(localCTA, 'enter');
                 },
                 
                 onExit: async (direction) => {
                     // 1. HIDE CONTENT
-                    if (localCTA) localCTA.classList.remove('is-visible');
+                    if (localCTA) transitionCta(localCTA, 'exit');
                     if(localBody) localBody.classList.remove('is-visible');
                     slide.classList.remove('slide-visible');
 

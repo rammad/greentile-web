@@ -66,12 +66,29 @@ const transitionHeader = async (element, direction = 'enter') => {
     }
 };
 
+const transitionCta = async (element, direction = 'enter') =>{
+    if (!element) return;
+    const text = element.querySelector('.ui-roll');
+
+    if (direction === 'enter'){
+        void element.offsetWidth
+        await animate(element, 'is-visible')
+        if (text) text.classList.add('is-visible')
+    }
+    else{
+        element.classList.remove('is-visible');
+        if(text) text.classList.remove('is-visible');
+    }
+    
+}
+
 /* --- EXPORT --- */
 window.AnimationUtils = { 
     wait, 
     waitForTransition, 
     animate,
     transitionHeader,
+    transitionCta,
     playCascade: (el, ov) => window.playCascade(el, ov),
     reverseCascade: (el, ov) => window.reverseCascade(el, ov),
     lockTime: INTERACTION_LOCK_MS,
@@ -82,7 +99,7 @@ window.AnimationUtils = {
 /* --- INITIALIZATION --- */
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
-    initCTA();
+    // initCTA();
     initCascadeReveal();
     setTimeout(() => {
         const nav = document.querySelector('nav');
@@ -221,33 +238,31 @@ function initNavbar() {
 
 /* ... (Keep AnimationUtils, Wait, etc.) ... */
 
-function initCTA() {
-    const btns = document.querySelectorAll('.cta-btn');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            const btn = entry.target;
+// function initCTA() {
+//     const btns = document.querySelectorAll('.cta-btn');
+//     const observer = new IntersectionObserver((entries) => {
+//         entries.forEach(entry => {
+//             const btn = entry.target;
             
-            // Skip manual control buttons (handled by section scripts)
-            if (btn.classList.contains('manual-control')) return;
+//             // Skip manual control buttons (handled by section scripts)
+//             if (btn.classList.contains('manual-control')) return;
             
-            if (entry.isIntersecting) {
-                // Add class to trigger animation sequence
-                btn.classList.add('is-visible');
-            } else {
-                // Remove to reset (allows re-animation)
-                btn.classList.remove('is-visible');
-            }
-        });
-    }, { threshold: 0.5 });
+//             if (entry.isIntersecting) {
+//                 // Add class to trigger animation sequence
+//                 btn.classList.add('is-visible');
+//             } else {
+//                 // Remove to reset (allows re-animation)
+//                 btn.classList.remove('is-visible');
+//             }
+//         });
+//     }, { threshold: 0.5 });
 
-    btns.forEach(btn => {
-        // Ensure clean slate
-        btn.classList.remove('is-visible');
+//     btns.forEach(btn => {
+//         // Ensure clean slate
+//         btn.classList.remove('is-visible');
         
-        if (!btn.classList.contains('about-persistent-cta')) { 
-            observer.observe(btn); 
-        }
-    });
-}
-
-/* ... (Rest of file unchanged) ... */
+//         if (!btn.classList.contains('about-persistent-cta')) { 
+//             observer.observe(btn); 
+//         }
+//     });
+// }
