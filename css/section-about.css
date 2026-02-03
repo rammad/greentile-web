@@ -1,5 +1,5 @@
 /* =========================================
-   ABOUT (Fixed Positioning & Scroll Flow)
+   about section (multi-slide)
    ========================================= */
 
 .about {
@@ -20,11 +20,11 @@
 }
 
 /* =========================================
-   PERSISTENT MENU (Replaces Static Menu)
+   persistent menu (optional)
    ========================================= */
 .about-menu-persistent {
     position: absolute;
-    top: 15%; /* Adjust vertical position here */
+    top: 15%; /* dont love this for positioning might change */
     left: 0; 
     width: 100%;
     
@@ -32,8 +32,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 50; /* Sits above fading slides */
-    pointer-events: auto; /* Allow clicking if you add links later */
+    z-index: 50;
+    pointer-events: auto; /* might want clicking later? leaving for now just in case */
 }
 
 .about-menu-persistent ul {
@@ -55,33 +55,35 @@
     margin-bottom: var(--standard-gap);
     cursor: pointer;
 
-    transition: all var(--time-fade-in) ease;
+    transition: all var(--time-fade-out) ease;
 }
 
 .about-menu-persistent .menu-item.is-active {
     color: var(--color-text-main);
+
+    transition: all var(--time-fade-in) ease;
 }
 
 .about-menu-persistent .menu-item.is-visible{
     opacity: 1;
     filter: blur(0);
+
+    transition: all var(--time-fade-in) ease;
 }
 
 /* =========================================
-   CONTENT SPACING (The Modifier)
+   content
    ========================================= */
-/* 1. Default Behavior (Home Page) */
 .about-content {
     position: relative;
     z-index: 20; 
     text-align: center;
     width: 100%;
-    padding-top: 0; /* No extra space by default */
+    padding-top: 0;
 }
 
-/* 2. Modified Behavior (About Us Page Only) */
-.about.has-persistent-menu .about-content {
-    padding-top: 350px; /* Pushes text down to clear the menu */
+.about.has-persistent-menu .about-content { /* kinda dont like this solution come back later */
+    padding-top: 350px;
 }
 
 @media (max-width: 768px) {
@@ -92,7 +94,7 @@
 
 
 /* =========================================
-   SLIDE CONTENT (Body Text & CTA)
+   slides
    ========================================= */
 .about-slide {
     position: absolute;
@@ -121,7 +123,6 @@
     color: var(--color-text-main);
 }
 
-/* THE GHOST CTA */
 .about-content .cta-btn {
     position: absolute;
     top: 100%;
@@ -135,7 +136,7 @@
 
 
 /* =========================================
-   SCATTER IMAGES (Physics Preserved)
+   scattered images
    ========================================= */
 .scatter-anchor {
     position: absolute;
@@ -149,16 +150,15 @@
         translate(var(--offset-x, 0px), var(--offset-y, 0px)) 
         scale(var(--extra-scale, 1));
     transition: 
-        transform 0.6s cubic-bezier(0.19, 1, 0.22, 1),
-        opacity 0.6s ease,
-        filter 0.6s ease;
+        transform var(--time-fade-in) ease,
+        opacity var(--time-fade-in) ease,
+        filter var(--time-fade-in) ease;
     will-change: transform, opacity;
     z-index: 1;
     opacity: 0;
     filter: blur(8px);
 }
 
-/* STATES */
 .scatter-anchor.state-center {
     opacity: 1;
     filter: blur(0px);
@@ -195,10 +195,9 @@
     max-width: 250px; 
     height: auto;
     transform: scale(var(--base-scale, 0.6)) translate(var(--avoid-x, 0px), var(--avoid-y, 0px));
-    transition: transform 0.1s linear; 
+    transition: transform 0.1s linear; /* not sure if this is legacy or for the mouse avoidance check later */
 }
 
-/* POSITIONS */
 .pos-1 { top: 15%; left: 10%; }       
 .pos-2 { top: 10%; right: -15%; }      
 .pos-3 { bottom: -15%; left: 10%; }   
