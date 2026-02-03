@@ -50,13 +50,21 @@
 
 .about-menu-persistent .menu-item {
     color: var(--color-placeholder);
-    transition: color 0.3s ease;
-    margin-bottom: 8px;
+    opacity: 0;
+    filter: blur(var(--standard-blur));
+    margin-bottom: var(--standard-gap);
     cursor: pointer;
+
+    transition: all var(--time-fade-in) ease;
 }
 
 .about-menu-persistent .menu-item.is-active {
     color: var(--color-text-main);
+}
+
+.about-menu-persistent .menu-item.is-visible{
+    opacity: 1;
+    filter: blur(0);
 }
 
 /* =========================================

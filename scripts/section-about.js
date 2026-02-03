@@ -27,6 +27,24 @@
             });
         };
 
+        const animateMenuIn = async (enable) => {
+            const items = document.querySelectorAll('.about-menu-persistent .menu-item');
+            if (items.length === 0) return;
+
+            if(enable && items[0].classList.contains('is-visible')) return;
+            else if (!enable && !items[0].classList.contains('is-visible')) return;
+
+            for (let i = 0; i < items.length; i++) {
+                if(enable) {
+                    items[i].classList.add('is-visible');
+                    await wait(staggerTime);
+                }
+                else {
+                    items[i].classList.remove('is-visible');
+                }
+            }
+        };
+
         /* --- HELPER 2: RESET OTHERS --- */
         const forceResetSlides = (activeIdx, ignoreIdx = -1) => {
             slides.forEach((s, i) => {
@@ -81,8 +99,11 @@
                 id: `about-${index}`,
                 
                 onEnter: async (direction) => {
+                    updateGlobalMenu(-1);
                     aboutSection.classList.add('is-active');
                     slide.classList.add('slide-visible');
+
+                    await animateMenuIn(true);
 
                     // 1. UPDATE MENU (Global)
                     updateGlobalMenu(index);
@@ -122,6 +143,7 @@
                     if ((index === 0 && direction === 'up') || 
                         (index === slides.length - 1 && direction === 'down')) {
                         aboutSection.classList.remove('is-active');
+                        animateMenuIn(false);
                     }
 
                     // 3. ANIMATE OUT
