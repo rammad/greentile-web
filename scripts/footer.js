@@ -29,16 +29,31 @@
         if (window.ScrollManager) {
             ScrollManager.addSteps([{
                 id: 'footer',
+
+                
                 onEnter: async (direction) => {
                     footerSection.classList.add('is-active');
                     const title = footerSection.querySelector('.animate-cascade');
+                    const links = footerSection.querySelectorAll('.ui-roll');
+
                     resetAndPlay(title);
+
+                    await wait(staggerTime);
+
+                    for ( let i = 0; i < links.length; i++){
+                        links[i].classList.add('is-visible');
+                        await wait(staggerTime);
+                    }
+
                     await wait(lockTime);
                 },
                 onExit: async (direction) => {
                     footerSection.classList.remove('is-active');
                     const title = footerSection.querySelector('.animate-cascade');
+                    const links = footerSection.querySelectorAll('.ui-roll');
+                    
                     if (title) window.reverseCascade(title);
+                    for ( let i = 0; i < links.length; i++) links[i].classList.add('is-visible');
                     await wait(lockTime)
                 }
             }]);

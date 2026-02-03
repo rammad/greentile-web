@@ -28,7 +28,7 @@
 }
 
 .footer-section.relative-mode {
-    height: 90vh !important; /* Slightly shorter than full screen if desired */
+    height: 100vh !important;
     justify-content: flex-end;
 }
 
@@ -72,36 +72,40 @@
 
 .marquee-content { 
     display: flex;
+    align-items: center;
     flex-shrink: 0;
     gap: 0px; 
     transform: translateX(0);
     will-change: transform;
 }
 
-/* ACTIVATED BY JS */
 .marquee-content.has-seamless-animation {
-    animation: seamless-scroll var(--marquee-duration, 20s) linear infinite;
+    animation: seamless-scroll var(--marquee-duration) linear infinite;
 }
 
-/* Pause the scrolling when hovering over the marquee content */
-.marquee-content.has-seamless-animation:hover {
-    animation-play-state: paused;
-}
+/* vvv come back to this, not working how i want >:( */
+/* .marquee-content.has-seamless-animation:hover {
+    animation: seamless-scroll calc(var(--marquee-duration) * 2) linear infinite;
+} */
 
 @keyframes seamless-scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(var(--marquee-end)); }
+    0% { transform: translateX(var(--marquee-end)); }
+    100% { transform: translateX(0); }
 }
 
 .marquee-item {
-    font-family: var(--font-subheader);
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 1;
-    text-transform: uppercase;
+    /* font-family: var(--font-subheader); */
+    /* font-size: 24px; */
+    /* font-weight: 700; */
+    /* line-height: 1; */
+    /* text-transform: uppercase; */
     padding: 0 48px;
-    color: var(--color-text-main);
-    font-variation-settings: 'SRFF' 0; 
+    /* color: var(--color-text-main); */
+    /* font-variation-settings: 'SRFF' 0;  */
+}
+
+.marquee-item.arrow{
+    height: 7px;
 }
 
 /* =========================================
@@ -126,7 +130,6 @@
     bottom: auto;
     left: auto;
     transform: none;
-    margin-top: 32px;
     overflow: visible;     /* Important for char animations */
 }
 
@@ -135,9 +138,9 @@
     justify-content: space-between;
     width: auto;
     align-items: flex-end;
-    margin-bottom: 20px;
-    margin-right: 20px;
-    margin-left: 20px;
+    margin-bottom: var(--standard-margin);
+    margin-right: var(--standard-margin);
+    margin-left: var(--standard-margin);
 }
 
 .footer-link a {

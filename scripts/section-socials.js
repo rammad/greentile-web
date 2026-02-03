@@ -22,17 +22,17 @@
                 onEnter: async (direction) => {
                     section.classList.add('is-active');
                     const title = section.querySelector('.type-h1');
-                    const subtitle = section.querySelector('.type-sub1');
+                    const subtitle = section.querySelector('.text-mask');
                     const body = section.querySelector('.type-body1');
                     const icons = section.querySelector('.socials-icons');
 
                     if (subtitle) subtitle.classList.add('is-visible');
-                    await wait(staggerTime);
-
                     if (window.playCascade && title) window.playCascade(title);
+
                     await wait(staggerTime);
 
                     if (body) body.classList.add('is-visible');
+
                     await wait(staggerTime);
 
                     if (icons) icons.classList.add('is-visible');
@@ -40,7 +40,7 @@
                 onExit: async (direction) => {
                     section.classList.remove('is-active');
                     const title = section.querySelector('.type-h1');
-                    const subtitle = section.querySelector('.type-sub1');
+                    const subtitle = section.querySelector('.text-mask');
                     const body = section.querySelector('.type-body1');
                     const icons = section.querySelector('.socials-icons');
 

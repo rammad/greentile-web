@@ -33,6 +33,7 @@
     /* --- COLORS --- */
     --c-off-white: #f0f4f0;
     --c-bright-green: #32CD32;
+    --c-lighter-green: #88cd88;
     --c-dark-green: #1a3c1a;
     --c-black: #000000;
     --c-light-grey: #e0e0e0; 
@@ -278,7 +279,6 @@ section.is-active {
     overflow-x: hidden;
     overscroll-behavior: contain;
     
-    background-color: var(--color-bg);
     opacity: 0;
     pointer-events: none;
     z-index: 1;
@@ -456,9 +456,19 @@ section.is-active {
 .scrollable-content { height: 100%; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; overscroll-behavior: contain; }
 .scrollable-content::-webkit-scrollbar { display: none; }
 
-.text-mask { display: block; overflow: hidden; line-height: 1.2; }
-.text-reveal-inner { display: block; transform: translateY(110%); transition: transform 1.0s cubic-bezier(0.19, 1, 0.22, 1); will-change: transform; }
-.is-visible .text-reveal-inner { transform: translateY(0%); }
+.text-mask { 
+    display: block; 
+    overflow: hidden; 
+    line-height: 1.2; }
+.text-reveal-inner { 
+    display: block; 
+    transform: translateY(110%); 
+    transition: transform 1.0s cubic-bezier(0.19, 1, 0.22, 1); 
+    will-change: transform; 
+}
+.is-visible .text-reveal-inner { 
+    transform: translateY(0%); 
+}
 
 
 /* Back Button */
