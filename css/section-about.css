@@ -24,7 +24,7 @@
    ========================================= */
 .about-menu-persistent {
     position: absolute;
-    top: 15%; /* dont love this for positioning might change */
+    top: 25%; /* dont love this for positioning might change */
     left: 0; 
     width: 100%;
     
@@ -130,6 +130,10 @@
     transform: translateX(-50%);
     margin-top: var(--standard-margin);
     white-space: nowrap;
+}
+
+.has-persistent-menu .cta-btn {
+    top: 100%;
 }
 
 
