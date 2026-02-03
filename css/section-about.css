@@ -102,6 +102,7 @@
     height: 100%;
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
     pointer-events: none;
     z-index: 1;
@@ -120,9 +121,16 @@
     color: var(--color-text-main);
 }
 
+/* THE GHOST CTA */
 .about-content .cta-btn {
-    margin-top: 32px;
-    pointer-events: auto; /* Enable clicking */
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: var(--standard-margin); 
+    
+    pointer-events: auto;
+    white-space: nowrap;
 }
 
 

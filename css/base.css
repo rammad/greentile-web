@@ -195,9 +195,32 @@ section.is-active {
     text-align: center;
 }
 
-.type-h1 { font-family: var(--font-header); font-size: var(--size-h1); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase; overflow: hidden; }
-.type-h2 { font-family: var(--font-header); font-size: var(--size-h2); font-weight: 800; text-transform: uppercase; line-height: 1; letter-spacing: -0.03em; margin: 0; }
-.type-sub1 { font-family: var(--font-subheader); font-size: var(--size-sub1); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-variation-settings: 'SRFF' 0; }
+.type-h1 { 
+    font-family: var(--font-header); 
+    font-size: var(--size-h1); 
+    font-weight: 800; 
+    line-height: 1.1;
+    text-transform: uppercase; 
+    overflow: hidden; 
+}
+
+.type-h2 { 
+    font-family: var(--font-header); 
+    font-size: var(--size-h2); 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    line-height: 1; 
+    margin: 0; 
+}
+
+.type-sub1 { 
+    font-family: var(--font-subheader); 
+    font-size: var(--size-sub1); 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em; 
+    font-variation-settings: 'SRFF' 0; 
+}
 
 /* Sub2 (Nav/Link) */
 .type-sub2 {

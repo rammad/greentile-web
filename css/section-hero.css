@@ -25,10 +25,6 @@
     z-index: 0;
 }
 
-.hero .type-display-hero span {
-    display: inline-block;
-}
-
 @media (max-width: 768px) {
     .hero .type-display-hero {
         width: 90%; 
