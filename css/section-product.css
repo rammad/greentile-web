@@ -7,15 +7,15 @@
     width: 100%;
     
     /* SCROLL SETUP */
-    height: auto;           
+    height: 100vh;           
     min-height: 100vh;      
     overflow: visible !important;    
     
     /* Use variables for nav spacing */
     padding-top: var(--space-for-nav); 
-    padding-bottom: 40px;
-    padding-left: 40px;
-    padding-right: 40px;
+    padding-bottom: var(--standard-margin);
+    padding-left: var(--standard-margin);
+    padding-right: var(--standard-margin);
     
     display: flex;
     justify-content: center;
@@ -54,49 +54,56 @@
    ========================================= */
 
 .pdp-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    --pdp-target-height: calc(100vh - (var(--space-for-nav) + var(--standard-margin)));
+    --pdp-col-width: calc(var(--pdp-target-height) * 0.8);
+
+    display: flex;
+    justify-content: center;
     gap: 80px;
     width: 100%;
+
     align-items: start !important; 
     overflow: visible !important;
     height: auto !important;
 }
 
 .pdp-info {
+    width: var(--pdp-col-width);
     display: flex;
+    flex: 0 0 auto;
     flex-direction: column;
     height: auto;
+    min-height: 100%;
     align-self: stretch;
     overflow: visible;
 }
 
 /* RIGHT COLUMN (Sticky) */
 .pdp-image-col {
-    display: block;
-    width: 100%;
-    height: auto; ;
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 140px; 
-    z-index: 5;
+    width: var(--pdp-col-width);
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    height: auto;
+    min-height: 100%;
+    align-self: stretch;
+    overflow: visible;
 }
 
 .pdp-poster {
     display: block;
     width: 100%;
-    max-height: 80vh;
-    object-fit: contain;
-    object-position: right top;
+    height: var(--pdp-target-height);
+    object-fit: cover;
+    /* object-position: right top; */
     
     opacity: 0;
-    transition: 
-        opacity 1s ease, 
-        transform 1s var(--ease-standard);
+    transition: opacity var(--time-fade-out) ease,
 }
 
 .pdp-poster.is-visible {
     opacity: 1; 
+    transition: opacity var(--time-fade-in) ease;
 }
 
 

@@ -2,7 +2,7 @@
    PAGE: PRODUCT DETAIL (Async Animation)
    ========================================= */
 (() => {
-    const { wait, staggerTime } = window.AnimationUtils;
+    const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils;
 
     document.addEventListener('DOMContentLoaded', () => {
         initProductPage();
@@ -23,7 +23,7 @@
             const checkInit = setInterval(async () => {
                 if (title.classList.contains('is-initialized') && window.playCascade) {
                     clearInterval(checkInit);
-                    await window.playCascade(title);
+                    transitionHeader(title, 'enter');
                 }
             }, 50);
         }
@@ -62,6 +62,9 @@
                 el.classList.add('is-visible');
             }
         }
+
+        const cta = document.querySelector('.cta-btn');
+        if(cta) transitionCta(cta, 'enter');
     }
 
     /* --- INTERACTION LOGIC (Ticket Qty) --- */
