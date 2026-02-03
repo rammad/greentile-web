@@ -76,39 +76,34 @@
 /* =========================================
    MARQUEE
    ========================================= */
-.socials-marquee-wrapper {
+/* .socials-marquee-wrapper {
     width: 100%;
     position: relative;
     overflow-anchor: none;
+    align-content: center;
 
     opacity: 0;
-    /* UPDATE: Standard Timing */
     transition: opacity var(--time-fade-in) ease;
-    transition-delay: 0.4s;
 }
 
-.socials-section.is-active .socials-marquee-wrapper,
-.socials-section.in-view .socials-marquee-wrapper {
+.socials-marquee-wrapper.is-visible{
     opacity: 1;
-}
+    transition: opacity var(--time-fade-out) ease;
+} */
 
 .socials-track {
     display: flex;
     gap: 8px; 
     width: max-content;
-    align-items: flex-start;
+    align-items: center;
     
-    transform: translateX(0);
-    will-change: transform;
+    opacity: 0;
+    transition: opacity var(--time-fade-in) ease;
 }
 
-.socials-track.has-seamless-animation {
-    animation: seamless-scroll var(--marquee-duration, 20s) linear infinite;
-}
-
-@keyframes seamless-scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(var(--marquee-end)); }
+.socials-track.is-visible{
+    opacity: 1;
+    transition: opacity var(--time-fade-out) ease;
 }
 
 .social-img {

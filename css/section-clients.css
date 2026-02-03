@@ -28,38 +28,43 @@
 
 .clients-header {
     margin-bottom: 64px;
-    color: var(--color-text-main);
+    width: 100%;
     text-align: left;
 }
 
 /* --- LOGO MARQUEE (Uses Global MarqueeManager) --- */
-.logo-marquee {
+/* .logo-marquee {
     width: 100%;
     overflow: hidden;
     position: relative;
-    /* Fade edges */
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
-}
+} */
 
 .logo-track {
     display: flex;
     align-items: center;
     gap: 64px; 
-    width: max-content; 
-    will-change: transform;
-    /* Animation handled by JS MarqueeManager now */
+    width: max-content;
+
+    opacity: 0;
+    transition: opacity var(--time-fade-out);
+}
+
+.logo-track.is-visible {
+    opacity: 1;
+    transition: opacity var(--time-fade-in);
 }
 
 /* JS Adds this class */
-.logo-track.has-seamless-animation {
+/* .logo-track.has-seamless-animation {
     animation: marquee-scroll var(--marquee-duration, 60s) linear infinite;
 }
 
 @keyframes marquee-scroll {
     0% { transform: translateX(0); }
     100% { transform: translateX(var(--marquee-end)); }
-}
+} */
 
 .client-logo {
     height: 80px; /* dont like this hardcoded but might have to leave it like this */

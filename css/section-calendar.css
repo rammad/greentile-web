@@ -252,12 +252,12 @@
 }
 .badge-soon {
     background-color: var(--color-accent);
-    -webkit-mask-image: url('../images/coming-soon.svg'); mask-image: url('../images/coming-soon.svg');
+    -webkit-mask-image: url('../images/graphics/coming-soon.svg'); mask-image: url('../images/graphics/coming-soon.svg');
     animation: spin-slow-centered 8s linear infinite;
 }
 .badge-sold {
     background-color: #FF0000;
-    -webkit-mask-image: url('../images/sold-out.svg'); mask-image: url('../images/sold-out.svg');
+    -webkit-mask-image: url('../images/graphics/sold-out.svg'); mask-image: url('../images/graphics/sold-out.svg');
 }
 @keyframes spin-slow-centered { 
     from { transform: translate(-50%, -50%) rotate(0deg); } 

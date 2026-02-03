@@ -1,26 +1,28 @@
 /* =========================================
    SECTION: CLIENTS
    ========================================= */
-document.addEventListener('DOMContentLoaded', () => {
-    const section = document.querySelector('.clients-section');
-    if(!section) return;
+(() => {
+    const { wait, waitForTransition, lockTime, staggerTime, scrollSpeed } = window.AnimationUtils;
+    document.addEventListener('DOMContentLoaded', () => {
+        const section = document.querySelector('.clients-section');
+        if(!section) return;
 
-    // 1. SELF-INIT MARQUEE
-    if (typeof MarqueeManager !== 'undefined') {
-        new MarqueeManager('.logo-track', 80, false); 
-    }
+        if (window.ScrollManager) {
+            ScrollManager.addSteps([{
+                id: 'clients',
+                onEnter: async (direction) => {
+                    section.classList.add('is-active');
+                    const subtitle = section.querySelector('.text-mask');
+                    const gallery = section.querySelector('.logo-track');
 
-    if (window.ScrollManager) {
-        ScrollManager.addSteps([{
-            id: 'clients',
-            onEnter: (dir) => {
-                section.classList.add('is-active');
-                return 1000;
-            },
-            onExit: (dir) => {
-                section.classList.remove('is-active');
-                return 800;
-            }
-        }]);
-    }
-});
+                    if (subtitle) subtitle.classList.add('is-visible');
+
+                    await wait(staggerTime);
+
+                    if(gallery) gallery.classList.add('is-visible');
+                },
+                onExit: () => {}
+            }])
+        }
+    });
+})();
