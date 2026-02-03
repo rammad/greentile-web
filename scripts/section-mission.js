@@ -1,32 +1,50 @@
 /* =========================================
    SECTION: MISSION
    ========================================= */
-document.addEventListener('DOMContentLoaded', () => {
-    const section = document.querySelector('.mission-section');
-    if(!section) return;
+(() => { 
+    const { wait, transitionCta, staggerTime, lockTime } = window.AnimationUtils;
 
-    if (window.ScrollManager) {
-        ScrollManager.addSteps([{
-            id: 'mission',
-            onEnter: (dir) => {
-                section.classList.add('is-active');
-                
-                const title = section.querySelector('.animate-cascade');
-                if(title) {
-                    // Force a reset frame to ensure animation plays
-                    window.reverseCascade(title); 
-                    void title.offsetWidth; // Trigger Reflow
-                    window.playCascade(title);
+    document.addEventListener('DOMContentLoaded', () => {
+        const section = document.querySelector('.mission-section');
+
+
+        if(!section) return;
+
+        if (window.ScrollManager) {
+            ScrollManager.addSteps([{
+                id: 'mission',
+                onEnter: async (dir) => {
+                    section.classList.add('is-active');
+
+                    const subtitle = section.querySelector('.text-mask');
+                    if(subtitle) subtitle.classList.add('is-visible');
+
+                    await wait(staggerTime);
+                    
+                    const titles = section.querySelectorAll('.animate-cascade');
+                    if(titles.length > 0) {
+                        for (let i = 0; i < titles.length; i++){
+                            transitionHeader(titles[i], 'enter');
+                            await wait(staggerTime);
+                        }
+                    }
+                },
+                onExit: async (dir) => {
+                    section.classList.remove('is-active');
+                    
+                    const subtitle = section.querySelector('.text-mask');
+                    if(subtitle) subtitle.classList.add('is-visible');
+
+                    const titles = section.querySelectorAll('.animate-cascade');
+                    if(titles.length > 0) {
+                        for (let i = 0; i < titles.length; i++){
+                            transitionHeader(titles[i], 'exit');
+                        }
+                    }
+
+                    await wait(lockTime);
                 }
-                
-                return 1000;
-            },
-            onExit: (dir) => {
-                section.classList.remove('is-active');
-                const title = section.querySelector('.animate-cascade');
-                if(title) window.reverseCascade(title);
-                return 800;
-            }
-        }]);
-    }
-});
+            }]);
+        }
+    });
+})();
