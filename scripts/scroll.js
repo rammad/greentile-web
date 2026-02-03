@@ -77,7 +77,7 @@ window.ScrollManager = {
     },
 
     initNestedObserver() {
-        const options = { threshold: 0.5 };
+        const options = { threshold: 0.75 };
         
         this.nestedObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -93,10 +93,10 @@ window.ScrollManager = {
                     el._scrollLogic.isActive = true;
                     el._scrollLogic.onEnter('down'); 
                 } 
-                else if (!entry.isIntersecting && el._scrollLogic.isActive) {
-                    el._scrollLogic.isActive = false;
-                    el._scrollLogic.onExit('up');
-                }
+                // else if (!entry.isIntersecting && el._scrollLogic.isActive) {
+                //     el._scrollLogic.isActive = false;
+                //     el._scrollLogic.onExit('up');
+                // }
             });
         }, options);
     },
