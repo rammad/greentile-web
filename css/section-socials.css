@@ -34,6 +34,10 @@
     align-items: center;
 }
 
+.socials-header .type-body1, .socials-header .type-body2 {
+    max-width: 50%;
+}
+
 /* =========================================
    ICONS
    ========================================= */

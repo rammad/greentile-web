@@ -193,9 +193,12 @@
 .scatter-img {
     display: block;
     position: relative;
-    width: 20vw;      
-    max-width: 250px; 
+    width: 20vw;
     height: auto;
+
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    
     transform: scale(var(--base-scale, 0.6)) translate(var(--avoid-x, 0px), var(--avoid-y, 0px));
     transition: transform 0.1s linear; /* not sure if this is legacy or for the mouse avoidance check later */
 }
