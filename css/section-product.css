@@ -187,6 +187,10 @@
     transition: opacity var(--time-fade-in) ease;
 }
 
+.pdp-tag .type-sub1, .pdp-tag .type-sub2{
+    color: #777777;
+}
+
 .pdp-tag.is-visible{
     opacity: 1;
 }
