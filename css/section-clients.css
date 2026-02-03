@@ -29,7 +29,7 @@
 .clients-header {
     margin-bottom: 64px;
     color: var(--color-text-main);
-    text-align: center;
+    text-align: left;
 }
 
 /* --- LOGO MARQUEE (Uses Global MarqueeManager) --- */
@@ -62,8 +62,9 @@
 }
 
 .client-logo {
-    height: 40px; /* Or whatever height fits your design */
+    height: 80px; /* dont like this hardcoded but might have to leave it like this */
     width: auto;
+    max-width: 120px;
     object-fit: contain;
     opacity: 0.5; 
     filter: grayscale(100%);
