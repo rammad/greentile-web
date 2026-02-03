@@ -3,45 +3,48 @@
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const { staggerTime, wait } = window.AnimationUtils;
+    const { staggerTime, wait, transitionHeader } = window.AnimationUtils;
 
-    // 1. ANIMATE HERO TITLE (Wait for Global JS)
+    const animateEntrance = async () =>{
     const title = document.querySelector('.animate-cascade');
-    if (title) {
-        const checkInit = setInterval(() => {
-            if (title.classList.contains('is-initialized')) {
-                clearInterval(checkInit);
-                if (window.playCascade) window.playCascade(title);
-            }
-        }, 50);
-    }
-
-    // 2. ANIMATE UI CONTROLS
-    const header = document.querySelector('.calendar-header');
-    if (header) {
-        setTimeout(() => {
-            header.classList.add('is-active');
-        }, 200); 
-    }
-
-    // 3. ANIMATE CALENDAR LIST (Cleaned up)
+    const subtitle = document.querySelector('.text-mask');
+    const filters = document.querySelectorAll('.ui-roll');
     const rows = document.querySelectorAll('.calendar-row');
-    
-    // Start after header is mostly visible
-    const initialDelay = 400; 
 
-    if (rows.length > 0) {
-        rows.forEach((row, index) => {
-            setTimeout(() => {
-                row.classList.add('is-visible');
-            }, initialDelay + (index * 100)); // 100ms stagger is cleaner for lists than 300ms
-        });
+    while (!title.classList.contains('is-initialized')){
+        await wait(50);
     }
 
-    // 4. SETUP UI INTERACTIONS
+    if(title) transitionHeader(title);
+
+    await wait(staggerTime);
+
+    if(subtitle) subtitle.classList.add('is-visible');
+
+    await wait(staggerTime);
+
+    if(filters.length > 0) {
+        for (let i = 0; i < filters.length; i++){
+            filters[i].classList.add('is-visible');
+        }
+    }
+
+    await wait(staggerTime);
+
+    if(rows.length > 0) {
+        for (let i = 0; i < rows.length; i++){
+            rows[i].classList.add('is-visible');
+            await wait(staggerTime * 0.5);
+        }
+    }
+}
+
     initEventInteractions();
     initRowPacker();
+    animateEntrance();
 });
+
+
 
 function initEventInteractions() {
     const pageContainer = document.getElementById('cal-page-container');
