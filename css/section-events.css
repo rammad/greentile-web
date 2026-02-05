@@ -21,12 +21,11 @@
     flex-direction: column;
 }
 
-/* --- HEADER --- */
 .events-section-header {
     position: relative;
     display: flex;
     width: 100%;
-    /* Keep header area fixed height or padded so content flows below */
+
     padding: 140px 20px 0 20px; 
     justify-content: space-between;
     align-items: center;
@@ -35,20 +34,6 @@
     overflow: hidden;
 }
 
-/* REMOVED: #event-title styling. 
-   Now it uses .type-h2 properties from base.css automatically.
-*/
-
-/* --- BUTTON --- */
-/* #event-btn {
-    position: absolute;
-    top: 140px;
-    right: 20px;
-    pointer-events: auto; 
-    z-index: 12;
-} */
-
-/* --- GRID --- */
 .events-grid {
     position: absolute;
     top: 250px;
@@ -62,7 +47,6 @@
     z-index: 5;
 }
 
-/* STAGGER EFFECT (Desktop Only) */
 @media (min-width: 769px) {
     .events-grid .event-card:nth-child(even) {
         margin-top: 64px; 
@@ -90,25 +74,19 @@
     display: block;
 }
 
-/* --- MOBILE LAYOUT (Hybrid Scroll) --- */
 @media (max-width: 768px) {
     .events-section {
-        /* 1. LOCK THE WINDOW */
         height: 100vh !important; 
         
-        /* 2. ENABLE INTERNAL SCROLL */
         overflow-y: auto; 
         -webkit-overflow-scrolling: touch;
         
-        /* 3. LAYOUT FLOW */
         display: block; 
-        padding-top: 120px; /* Space for Nav */
+        padding-top: 120px;
         
-        /* Ensure clicks/touches work immediately */
         pointer-events: auto !important; 
     }
 
-    /* Break the "sticky" container so it can grow */
     .events-sticky-wrapper {
         height: auto; 
         min-height: 100%;
@@ -118,28 +96,23 @@
         flex-direction: column;
     }
 
-    /* Reset the Header */
     .events-section-header {
         position: relative;
-        padding: 0 20px 40px 20px; /* Breathing room below title */
+        padding: 0 20px 40px 20px;
         width: 100%;
         flex-shrink: 0;
         height: auto;
         
-        /* Ensure items wrap if needed */
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
     }
 
-    /* Move the button into the flow if you want */
     .events-section-header .cta-btn {
-        align-self: flex-start; /* Left align button on mobile */
+        align-self: flex-start;
     }
 
-    /* Reset the Grid (The most important part) */
     .events-grid {
-        /* Stop floating, start stacking */
         position: relative;
         top: auto; 
         left: auto; 
@@ -150,15 +123,13 @@
         flex-direction: column;
         gap: 40px;
         
-        /* Add padding at bottom so last card clears the screen edge */
         padding: 0 20px 140px 20px; 
     }
 
-    /* Ensure cards are visible */
     .event-card {
         width: 100%;
-        margin: 0; /* Remove desktop stagger margin */
-        opacity: 1; /* Optional: Force visible if JS delays are weird on mobile */
+        margin: 0;
+        opacity: 1;
         transform: none;
     }
 }
