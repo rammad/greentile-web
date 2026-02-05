@@ -208,21 +208,20 @@
 
     .pdp-grid {
         display: flex;
-        flex-direction: column-reverse; 
+        flex-direction: column; 
         gap: 40px;
+        padding-bottom: 100px;
     }
     
-    .pdp-image-col {
-        position: relative; top: 0; width: 100%; margin-bottom: 20px;
-    }
-    
-    .pdp-poster {
-        max-height: none; width: 100%; aspect-ratio: 4/5; object-fit: cover;
+    .pdp-info {
+        width: 100%;
+        height: auto;
     }
 
-    .pdp-hero-title { font-size: 64px; }
-    
-    .ticket-actions { flex-direction: column; align-items: stretch; }
-    .qty-selector, .btn-buy { width: 100%; justify-content: center; }
-    .btn-buy { justify-content: space-between; padding: 0 24px; }
+    /* RIGHT COLUMN (Sticky) */
+    .pdp-image-col {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 5;
+    }
 }
