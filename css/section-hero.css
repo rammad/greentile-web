@@ -24,21 +24,3 @@
     text-align: center;
     z-index: 0;
 }
-
-@media (max-width: 768px) {
-    .hero .type-display-hero {
-        width: 90%; 
-        padding-bottom: 80px; 
-    }
-    
-    /* THE FIX: Use direct child selector (>) */
-    /* This makes "Green Tile" and "Social Club" stack... */
-    .hero .type-display-hero > span {
-        display: block;
-    }
-
-    /* ...But keeps the inner characters (.char-reveal) inline */
-    .hero .type-display-hero > span .char-reveal {
-        display: inline; 
-    }
-}

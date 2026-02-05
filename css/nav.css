@@ -125,8 +125,7 @@
 } */
 
 @media (max-width: 768px) {
-    .sticky-nav { 
-        width: 95%; 
-        padding: 12px 20px;
+    .nav-center{
+        gap: 16px;
     }
 }
