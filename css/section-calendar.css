@@ -276,32 +276,142 @@
 /* =========================================
    MOBILE (Must be LAST)
    ========================================= */
-.mobile-event-display { display: none; }
+/* .mobile-event-display { display: none; } */
+
+/* =========================================
+   MOBILE (The "Frame" Layout)
+   ========================================= */
 
 @media (max-width: 768px) {
-    .calendar-page { height: auto; min-height: 100vh; overflow: visible; }
-    .calendar-interface-wrapper { 
-        display: block; 
-        height: auto; 
+    .calendar-page {
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
-    
-    .calendar-poster-wrapper { display: none; }
-    .calendar-controls { display: none; }
 
-    /* Mobile List */
-    .calendar-list {
-        display: block; height: auto; 
-        padding-bottom: 40px;
+    /* 1. Header & Controls */
+    .calendar-header {
+        padding: 0 20px 20px 20px;
+        flex-shrink: 0;
+        z-index: 20; /* Sit above everything */
+        position: relative;
     }
-    .calendar-row {
-        flex-direction: column; align-items: flex-start;
-        margin-bottom: 20px;
-        opacity: 0.5;
+/*     
+    .calendar-controls, 
+    .mobile-event-display { 
+        display: none !important; 
+    } */
+
+    /* 2. The Stage (Interface Wrapper) */
+    .calendar-interface-wrapper {
+        display: block;
+        position: relative;
+        flex: 1; /* Fill remaining screen */
+        width: 100%;
+        overflow: hidden;
     }
-    .calendar-row.is-visible { opacity: 0.5; }
+
+    /* 3. The Stationary Poster (Background Layer) */
+    .calendar-poster-wrapper {
+        display: flex !important; /* Force Visible */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        
+        width: 70vw; /* Fixed size */
+        aspect-ratio: 4/5;
+        height: auto;
+        
+        z-index: 1; /* Behind the text */
+        opacity: 1 !important;
+        filter: blur(0) !important;
+        pointer-events: none;
+    }
     
-    /* Mobile Grid */
-    .packed-row { display: block; }
-    .packed-chunk { width: 100%; margin-bottom: 40px; }
-    .chunk-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .calendar-poster-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* 4. The Scrolling List (Foreground Layer) */
+    .calendar-list {
+        position: relative;
+        z-index: 10; /* Above the poster */
+        
+        display: flex; /* Horizontal */
+        flex-direction: row;
+        justify-content: flex-start;
+        
+        width: 100%;
+        height: 100%;
+        
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+
+    /* 5. The "Frame" Item */
+    .calendar-row {
+        /* Size: Full Screen Width */
+        min-width: 100vw;
+        height: 100%;
+        
+        /* Layout: Push Date up, Title down */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; 
+        align-items: center;
+        text-align: center;
+        
+        /* Padding creates the "Hole" for the poster */
+        /* Adjust these numbers to frame your poster perfectly */
+        padding-top: 40px; 
+        padding-bottom: 120px; 
+        
+        scroll-snap-align: center;
+        opacity: 1;
+        filter: blur(0);
+        text-decoration: none;
+    }
+
+    .calendar-row .cal-date,
+    .calendar-row .cal-name {
+        /* Add text shadows so they are readable if they overlap image */
+        text-shadow: 0 2px 10px rgba(240, 244, 240, 0.8); 
+    }
+
+        /* 2. "Unpack" the Grid Rows */
+    /* Stop the row from trying to be a 6-column grid. Just let it stack. */
+    .packed-row {
+        display: flex !important;
+        flex-direction: column;
+        gap: 40px;
+        width: 100%;
+    }
+
+    /* 3. Reset the Chunks */
+    /* Force every chunk to take up the full width of the screen */
+    .packed-chunk {
+        width: 100% !important; 
+        grid-column: auto !important; /* Reset desktop spans */
+        margin: 0 !important;
+    }
+
+    /* 4. Force 2 Columns */
+    /* No matter what the desktop class says (cols-3, cols-4), mobile is always 2 */
+    .chunk-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important; /* <--- THE FIX */
+        gap: 15px; /* Tighter gap for mobile screens */
+    }
+
+    /* 5. Adjust Card Size */
+    /* Ensure cards don't get too tall or squished */
+    .grid-card {
+        aspect-ratio: 4/5;
+        width: 100%;
+    }
 }

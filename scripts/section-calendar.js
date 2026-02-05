@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventInteractions();
     initRowPacker();
     animateEntrance();
+    initMobileScrollSpy();
 });
 
 
@@ -158,6 +159,39 @@ function randomizeSticker(element) {
     const rotation = Math.floor(Math.random() * 60) - 30;
     element.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
 }
+
+/* =========================================
+   MOBILE POSTER SYNC
+   ========================================= */
+function initMobileScrollSpy() {
+    if (window.innerWidth > 768) return; // Desktop handled by hover
+
+    const list = document.querySelector('.calendar-list');
+    const items = document.querySelectorAll('.calendar-row');
+    const poster = document.getElementById('poster-img');
+
+    if (!list || !poster) return;
+
+    // Use IntersectionObserver to see which item is centered
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Get image from the data attribute of the centered text item
+                const newSrc = entry.target.getAttribute('data-img');
+                
+                // Update the fixed poster
+                if (newSrc && poster.src !== newSrc) {
+                    poster.src = newSrc;
+                }
+            }
+        });
+    }, {
+        root: list,    // Watch the scrolling list
+        threshold: 0.6 // Trigger when 60% of the item is visible (mostly centered)
+    });
+
+    items.forEach(item => observer.observe(item));
+};
 
 /* =========================================
    THE ROW PACKER (Adapted for Events)

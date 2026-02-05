@@ -63,13 +63,35 @@
 
 /* 5. RESPONSIVE */
 @media (max-width: 768px) {
-    .archives-page { padding-top: 120px; }
-    .archives-title { font-size: 14vw; }
-    .back-arrow-fixed { 
-        position: relative; 
-        display: block; 
-        margin-bottom: 20px; 
-        transform: none; 
-        text-align: center;
+            /* 2. "Unpack" the Grid Rows */
+    /* Stop the row from trying to be a 6-column grid. Just let it stack. */
+    .packed-row {
+        display: flex !important;
+        flex-direction: column;
+        gap: 40px;
+        width: 100%;
+    }
+
+    /* 3. Reset the Chunks */
+    /* Force every chunk to take up the full width of the screen */
+    .packed-chunk {
+        width: 100% !important; 
+        grid-column: auto !important; /* Reset desktop spans */
+        margin: 0 !important;
+    }
+
+    /* 4. Force 2 Columns */
+    /* No matter what the desktop class says (cols-3, cols-4), mobile is always 2 */
+    .chunk-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important; /* <--- THE FIX */
+        gap: 15px; /* Tighter gap for mobile screens */
+    }
+
+    /* 5. Adjust Card Size */
+    /* Ensure cards don't get too tall or squished */
+    .grid-card {
+        aspect-ratio: 4/5;
+        width: 100%;
     }
 }
