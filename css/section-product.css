@@ -23,11 +23,6 @@
     z-index: 10;
 }
 
-/* --- TITLE --- */
-.pdp-hero-title {
-    width: 100%;
-}
-
 .pdp-section .back-arrow {
     position: relative;
     align-self: flex-start;
@@ -35,24 +30,19 @@
 }
 
 /* --- SUBTITLES --- */
-.pdp-meta-row {
+.pdp-meta-row,
+.pdp-desc,
+.pdp-hero-title {
+    flex-shrink: 0;
     margin-bottom: var(--standard-margin);
     width: 100%;
-}
-/* 
-.pdp-date, .pdp-location {
-    display: inline-block;
-} */
-
-.pdp-desc {
-    margin-bottom: var(--standard-margin);
 }
 
 
 /* =========================================
    LAYOUT GRID (Sticky Column)
    ========================================= */
-
+/* 
 .pdp-grid {
     --pdp-target-height: calc(100vh - (var(--space-for-nav) + var(--standard-margin)));
     --pdp-col-width: calc(var(--pdp-target-height) * 0.8);
@@ -78,7 +68,6 @@
     overflow: visible;
 }
 
-/* RIGHT COLUMN (Sticky) */
 .pdp-image-col {
     width: var(--pdp-col-width);
     display: flex;
@@ -95,7 +84,6 @@
     width: 100%;
     height: var(--pdp-target-height);
     object-fit: cover;
-    /* object-position: right top; */
     
     opacity: 0;
     transition: opacity var(--time-fade-out) ease,
@@ -104,6 +92,118 @@
 .pdp-poster.is-visible {
     opacity: 1; 
     transition: opacity var(--time-fade-in) ease;
+} */
+
+/* =========================================
+   LAYOUT GRID (Independent Scroll Windows)
+   ========================================= */
+
+.pdp-grid {
+    --pdp-target-height: calc(100vh - (var(--space-for-nav) + var(--standard-margin)));
+    --pdp-col-width: calc(var(--pdp-target-height) * 0.8);
+
+    height: var(--pdp-target-height); 
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    gap: 4vw; 
+    
+    /* Ensure columns fill the height */
+    align-items: stretch; 
+}
+
+/* SHARED SCROLL COLUMN STYLES */
+.pdp-image-col, 
+.pdp-info {
+    /* 2. Width Logic (40vw each) */
+    width: var(--pdp-col-width);
+    flex: 0 0 auto;
+    
+    /* 3. SCROLL LOGIC */
+    height: 100%; /* Fill the grid height */
+    overflow-y: auto; /* Enable independent scroll */
+    
+    /* Hide Scrollbars for cleaner look */
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE */
+    
+    /* Add padding to bottom of scroll content so it doesn't cut off */
+    /* padding-bottom: 40px;  */
+}
+
+/* Chrome/Safari Scrollbar Hide */
+.pdp-image-col::-webkit-scrollbar, 
+.pdp-info::-webkit-scrollbar {
+    display: none;
+}
+
+/* RIGHT COLUMN (Info specific) */
+.pdp-info {
+    display: flex;
+    flex-direction: column;
+}
+
+/* LEFT COLUMN (Image specific) */
+.pdp-image-col {
+    display: block; 
+    /* Remove sticky positioning - the whole column scrolls now */
+}
+
+.pdp-poster {
+    display: block;
+    width: 100%;
+    /* Allow height to be determined by the image (scrolling feed) */
+    height: auto; 
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    
+    opacity: 0;
+    transition: opacity var(--time-fade-out) ease;
+}
+
+.pdp-poster + .pdp-poster {
+    margin-top: 20px; 
+}
+
+.pdp-poster.is-visible {
+    opacity: 1; 
+    transition: opacity var(--time-fade-in) ease;
+}
+
+
+/* =========================================
+   RESPONSIVE (Mobile Reset)
+   ========================================= */
+
+@media (max-width: 1024px) {
+    .pdp-section {
+        padding: 100px 20px 80px 20px;
+        display: block; 
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .pdp-grid {
+        /* Kill the fixed height on mobile so it flows naturally */
+        height: auto; 
+        display: flex;
+        flex-direction: column-reverse; /* Image on top */
+        gap: 40px;
+        overflow: visible;
+    }
+    
+    .pdp-image-col, 
+    .pdp-info {
+        width: 100%; 
+        height: auto;
+        overflow-y: visible; /* Stop internal scrolling */
+    }
+    
+    .pdp-poster {
+        width: 100%; 
+        aspect-ratio: 4/5; 
+    }
 }
 
 

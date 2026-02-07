@@ -51,9 +51,10 @@
 
         await wait(staggerTime);
 
-        const poster = document.querySelector('.pdp-poster');
-        if (poster) poster.classList.add('is-visible');
-
+        const posters = document.querySelectorAll('.pdp-poster');
+        if (posters.length > 0) posters.forEach( poster => {
+            poster.classList.add('is-visible');
+        })
         // 4. TEXT & DETAILS (Staggered)
         await wait(200);
         const textElements = document.querySelectorAll('.type-body1, .type-body2');
