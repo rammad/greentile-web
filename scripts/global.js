@@ -6,7 +6,7 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 /* --- CONFIGURATION --- */
 const INTERACTION_LOCK_MS = 500; 
-const SEQUENTIAL_ELEMENT_STAGGER_MS = 300;
+const SEQUENTIAL_ELEMENT_STAGGER_MS = 200;
 const SCROLL_SPEED = 40;
 
 const waitForTransition = (element, overlap = 0) => {

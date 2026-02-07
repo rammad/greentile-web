@@ -57,11 +57,12 @@
     --font-subheader: 'ABC Arizona Plus Variable', normal;
 
     /* --- TIMING (Global Dials) --- */
-    --time-fade-in: 0.8s;
-    --time-fade-out: 0.6s;
+    --time-fade-in: 0.6s;
+    --time-fade-out: 0.2s;
     --time-cascade: 1.2s;
     --time-roll: 1.0s;
     --ease-standard: cubic-bezier(0.19, 1, 0.22, 1);
+    --ease-out-long: cubic-bezier(0, 0, .2, 1);
 
     --blur-standard: 10px;
 
