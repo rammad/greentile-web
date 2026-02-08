@@ -1,7 +1,7 @@
-/* footer section – observer-driven + marquee init */
+/* footer section – one-time entrance + marquee init */
 
 (function () {
-    const { staggerTime, scrollSpeed } = window.AnimationUtils || {};
+    const { observeElementInOut, staggerTime, scrollSpeed } = window.AnimationUtils || {};
 
     document.addEventListener('DOMContentLoaded', () => {
         const footerSection = document.querySelector('.footer-section');
@@ -28,21 +28,21 @@
             });
         };
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) return;
-                    footerSection.classList.add('is-visible');
-                    const title = footerSection.querySelector('.animate-cascade');
-                    const links = footerSection.querySelectorAll('.ui-roll');
-                    resetAndPlay(title);
-                    links.forEach((link, i) => {
-                        setTimeout(() => link.classList.add('is-visible'), (staggerTime || 200) * (i + 1));
-                    });
-                });
-            },
-            { threshold: 0.2 }
-        );
-        observer.observe(footerSection);
+        const title = footerSection.querySelector('.animate-cascade');
+        const links = footerSection.querySelectorAll('.ui-roll');
+
+        if (title) {
+            observeElementInOut(title, {
+                onEnter() { resetAndPlay(title); }
+            });
+        }
+
+        links.forEach((link, i) => {
+            observeElementInOut(link, {
+                onEnter() {
+                    setTimeout(() => link.classList.add('is-visible'), (staggerTime || 200) * (i + 1));
+                }
+            });
+        });
     });
 })();

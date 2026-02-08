@@ -1,23 +1,23 @@
-/* hero section – observer-driven cascade */
+/* hero section – one-time entrance when visible (new animation system) */
 
 (function () {
+    const { observeElementInOut } = window.AnimationUtils || {};
+
+    function runHeroEnter(heroTitle) {
+        heroTitle.classList.remove('header-hidden');
+        heroTitle.classList.add('is-initialized');
+        if (window.playCascade) window.playCascade(heroTitle);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-        const heroSection = document.querySelector('.hero') || document.querySelector('#hero');
         const heroTitle = document.querySelector('.type-display-hero');
+        if (!heroTitle) return;
 
-        if (!heroSection || !heroTitle) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) return;
-                    heroSection.classList.add('is-visible');
-                    heroTitle.classList.remove('header-hidden');
-                    if (window.playCascade) window.playCascade(heroTitle);
-                });
-            },
-            { threshold: 0.2, rootMargin: '0px' }
-        );
-        observer.observe(heroSection);
+        const viewport = document.getElementById('scroll-viewport');
+        observeElementInOut(heroTitle, {
+            root: viewport || null,
+            enterThreshold: 0.15,
+            onEnter: runHeroEnter
+        });
     });
 })();

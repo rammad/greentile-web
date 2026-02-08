@@ -1,7 +1,7 @@
-/* socials section – observer-driven cascade, body, icons, gallery */
+/* socials section – one-time entrance when visible, then stay */
 
 (function () {
-    const { staggerTime } = window.AnimationUtils || {};
+    const { observeElementInOut, staggerTime } = window.AnimationUtils || {};
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.querySelector('.socials-section');
@@ -13,20 +13,38 @@
         const icons = section.querySelector('.socials-icons');
         const gallery = section.querySelector('.socials-track');
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) return;
-                    section.classList.add('is-visible');
-                    if (subtitle) subtitle.classList.add('is-visible');
-                    if (title && window.playCascade) window.playCascade(title);
-                    if (body) setTimeout(() => body.classList.add('is-visible'), staggerTime || 0);
-                    if (icons) setTimeout(() => icons.classList.add('is-visible'), (staggerTime || 0) * 2);
-                    if (gallery) setTimeout(() => gallery.classList.add('is-visible'), (staggerTime || 0) * 3);
-                });
-            },
-            { threshold: 0.2 }
-        );
-        observer.observe(section);
+        const stagger = staggerTime || 200;
+
+        if (subtitle) {
+            observeElementInOut(subtitle, {
+                onEnter() { subtitle.classList.add('is-visible'); }
+            });
+        }
+
+        if (title) {
+            observeElementInOut(title, {
+                onEnter() {
+                    if (window.playCascade) window.playCascade(title);
+                }
+            });
+        }
+
+        if (body) {
+            observeElementInOut(body, {
+                onEnter() { setTimeout(() => body.classList.add('is-visible'), stagger); }
+            });
+        }
+
+        if (icons) {
+            observeElementInOut(icons, {
+                onEnter() { setTimeout(() => icons.classList.add('is-visible'), stagger * 2); }
+            });
+        }
+
+        if (gallery) {
+            observeElementInOut(gallery, {
+                onEnter() { setTimeout(() => gallery.classList.add('is-visible'), stagger * 3); }
+            });
+        }
     });
 })();

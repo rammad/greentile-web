@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await wait(50);
     }
 
-    if(title) transitionHeader(title);
+    if (title) await transitionHeader(title, 'enter');
 
     await wait(staggerTime);
 

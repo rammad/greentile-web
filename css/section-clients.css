@@ -1,5 +1,10 @@
 /* clients section */
 
+.scroll-content .clients-section {
+    position: relative;
+    margin-top: 0;
+}
+
 .clients-section {
     position: absolute;
     top: 0;

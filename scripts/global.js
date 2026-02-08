@@ -18,6 +18,41 @@ const LENIS_DURATION = 0.4;
 /** Lenis: wheel scroll speed multiplier (> 1 = more movement per tick). */
 const LENIS_WHEEL_MULTIPLIER = 1.2;
 
+/** Element-level entrance only: animate in once when visible, then stay. No exit. Use repeat: true to fire onEnter every time element enters view (e.g. scroll-spy). */
+const ENTER_THRESHOLD = 0.15;
+
+function observeElementInOut(element, options = {}) {
+    if (!element) return () => {};
+    const {
+        onEnter,
+        enterThreshold = ENTER_THRESHOLD,
+        repeat = false,
+        root = document.getElementById('scroll-viewport') || null
+    } = options;
+
+    let didEnter = false;
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                const visible = entry.isIntersecting && entry.intersectionRatio >= enterThreshold;
+                if (visible && onEnter) {
+                    if (!didEnter || repeat) {
+                        didEnter = true;
+                        onEnter(entry.target);
+                    }
+                } else if (!visible && repeat) {
+                    didEnter = false;
+                }
+            });
+        },
+        { root, threshold: [0, enterThreshold], rootMargin: '0px' }
+    );
+
+    observer.observe(element);
+    return () => observer.unobserve(element);
+}
+
 const waitForTransition = (element, overlap = 0) => {
     return new Promise(resolve => {
         if (!element) { resolve(); return; }
@@ -81,14 +116,15 @@ const transitionCta = async (element, direction = 'enter') =>{
     
 }
 
-window.AnimationUtils = { 
-    wait, 
-    waitForTransition, 
+window.AnimationUtils = {
+    wait,
+    waitForTransition,
     animate,
     transitionHeader,
     transitionCta,
     playCascade: (el, ov) => window.playCascade(el, ov),
     reverseCascade: (el, ov) => window.reverseCascade(el, ov),
+    observeElementInOut,
     lockTime: INTERACTION_LOCK_MS,
     staggerTime: SEQUENTIAL_ELEMENT_STAGGER_MS,
     scrollSpeed: SCROLL_SPEED,
@@ -97,7 +133,8 @@ window.AnimationUtils = {
     scrollSensitivity: SCROLL_SENSITIVITY,
     lenisLerp: LENIS_LERP,
     lenisDuration: LENIS_DURATION,
-    lenisWheelMultiplier: LENIS_WHEEL_MULTIPLIER
+    lenisWheelMultiplier: LENIS_WHEEL_MULTIPLIER,
+    enterThreshold: ENTER_THRESHOLD
 };
 
 document.addEventListener('DOMContentLoaded', () => {

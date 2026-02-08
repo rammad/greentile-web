@@ -80,11 +80,14 @@
 .footer-main {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; 
-    flex-grow: 1; 
+    justify-content: flex-end;
+    flex-grow: 1;
     margin-top: 8px;
     position: relative;
     z-index: 1;
+    padding-left: var(--section-padding);
+    padding-right: var(--section-padding);
+    box-sizing: border-box;
 }
 
 .footer-main .type-display-hero {

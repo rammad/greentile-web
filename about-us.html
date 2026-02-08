@@ -15,6 +15,12 @@
     <link rel="stylesheet" href="css/footer.css?v=10">
 </head>
 <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.0.43/dist/lenis.min.js"></script>
+    <script src="scripts/global.js?v=9" defer></script>
+    <script src="scripts/background-gradient.js?v=4" defer></script>
+    <script src="scripts/scroll.js?v=6" defer></script>
+
     <canvas id="gradient-canvas"></canvas>
 
     <nav class="sticky-nav standard-margins">
@@ -44,7 +50,10 @@
             </a>
         </div>
     </nav>
-    
+
+    <div id="scroll-viewport" class="scroll-viewport">
+        <div id="scroll-content" class="scroll-content">
+
     <section id="mission" class="mission-section" data-colors="#32CD32, #f0f4f0, #FABA2F, #32CD32">
 
         <div class="text-mask">
@@ -181,23 +190,7 @@
         </div>
     </section>
 
-    <!-- <section id="events" class="events-section sticky-track" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #88cd88">
-        <div class="events-sticky-wrapper">
-            <div class="events-section-header">
-                <h2 class="type-h2 animate-cascade" id="event-title">MEET THE TEAM</h2>
-            </div>
-
-            <div class="events-grid">
-                <div class="event-card"><img src="images/poster1.png" class="event-poster" alt="Event 1"></div>
-                <div class="event-card"><img src="images/poster2.png" class="event-poster" alt="Event 2"></div>
-                <div class="event-card"><img src="images/poster3.png" class="event-poster" alt="Event 3"></div>
-                <div class="event-card"><img src="images/poster1.png" class="event-poster" alt="Event 4"></div>
-            </div>
-        </div>
-    </section> -->
-
-    <section id="scroll-zone-0" class="natural-scroll-section scrollable-content" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #88cd88">
-        
+    <section id="socials-footer" class="socials-footer" data-colors="#f0f4f0, #f0f4f0, #f0f4f0, #88cd88">
         <div id="socials" class="socials-section">
             <div class="socials-header">
                 <!-- <div class="text-mask">
@@ -291,20 +284,14 @@
         </footer>
     </section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <script src="scripts/global.js?v=2" defer></script>
-    <script src="scripts/scroll.js?v=3" defer></script>
-    <script src="scripts/background-gradient.js?v=2" defer></script>
+        </div>
+    </div>
 
-    <script src="scripts/section-mission.js?v=3" defer></script>
-    <script src="scripts/section-about.js?v=3" defer></script>
-    <script src="scripts/section-menu.js?v=2" defer></script>
-    
-    <script src="scripts/section-socials.js?v=6" defer></script> 
-    <script src="scripts/section-clients.js?v=5" defer></script>
-    <script src="scripts/footer.js?v=2" defer></script> 
-    
-    <script src="scripts/section-scroll.js?v=4" defer></script>
+    <script src="scripts/section-mission.js?v=4" defer></script>
+    <script src="scripts/section-about.js?v=4" defer></script>
+    <script src="scripts/section-about-us.js?v=1" defer></script>
+    <script src="scripts/section-socials.js?v=7" defer></script>
+    <script src="scripts/section-clients.js?v=6" defer></script>
+    <script src="scripts/footer.js?v=7" defer></script>
 </body>
 </html>

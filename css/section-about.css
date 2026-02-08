@@ -1,37 +1,76 @@
-/* about section – sticky text + scrolling image track */
+/* about section – slide stack (equal portions) + sticky body; column-based image animation */
 
 .about {
     position: relative;
     width: 100%;
     min-height: 100vh;
-    overflow: visible;
+    overflow: hidden;
     background-color: transparent;
 }
 
 .about-image-track {
     position: relative;
     width: 100%;
-    overflow: hidden; 
+    overflow: visible;
+    min-height: 100vh;
 }
 
-.about-sticky-content {
+/* Track sits behind slides; height set by JS */
+.about-image-track-positioned {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    z-index: 0;
+}
+
+/* Column sentinels: bind image visibility to full column (left/right half of track) */
+.about-col {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+.about-col-left { left: 0; }
+.about-col-right { left: 50%; }
+
+/* Slide stack: each slide = equal portion of full column; body animates when body is visible */
+.about-slides {
+    position: relative;
+    width: 100%;
+    z-index: 10;
+}
+
+.about-slide {
+    position: relative;
+    width: 100%;
+}
+
+/* about-us: each slide takes full viewport height for continuous scroll */
+.about.has-persistent-menu .about-slide {
+    min-height: 100vh;
+}
+
+.about-slide-sticky {
     position: sticky;
     top: 0;
     height: 100vh;
     width: 100%;
-    
     display: flex;
     justify-content: center;
     align-items: center;
-    
-    z-index: 20; 
-    pointer-events: none; 
+    pointer-events: none;
+}
 
-    margin-bottom: -100vh; 
+.about-slide-sticky .about-text-block {
+    pointer-events: auto;
 }
 
 .about-text-block {
-    position: absolute;
+    position: relative;
     width: 100%;
     max-width: 600px;
     padding: 0 20px;
@@ -121,7 +160,8 @@
     .about.has-persistent-menu .about-content { padding-top: 280px; }
 }
 
-.about-content .cta-btn {
+.about-content .cta-btn,
+.about-text-block .cta-btn {
     position: absolute;
     top: 150%;
     left: 50%;

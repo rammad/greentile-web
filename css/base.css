@@ -100,6 +100,16 @@ html {
     scroll-behavior: smooth;
 }
 
+/* full-page gradient (parallax background) – above body, below scroll content */
+#gradient-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
 /* Lenis: viewport clips, content scrolls */
 .scroll-viewport {
     position: fixed;
@@ -107,7 +117,7 @@ html {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    z-index: 0;
+    z-index: 1;
 }
 .scroll-content {
     position: relative;

@@ -1,7 +1,7 @@
-/* events section – observer-driven header, CTA, cards */
+/* events section – one-time entrance when visible, then stay */
 
 (function () {
-    const { transitionHeader, transitionCta, staggerTime } = window.AnimationUtils || {};
+    const { transitionHeader, transitionCta, observeElementInOut, staggerTime } = window.AnimationUtils || {};
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.querySelector('.events-section');
@@ -11,20 +11,29 @@
         const cards = section.querySelectorAll('.event-card');
         const btn = section.querySelector('.cta-btn');
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) return;
-                    section.classList.add('is-visible');
-                    if (title && transitionHeader) transitionHeader(title, 'enter');
-                    if (btn && transitionCta) setTimeout(() => transitionCta(btn, 'enter'), (staggerTime || 200));
-                    cards.forEach((card, i) => {
-                        setTimeout(() => card.classList.add('is-visible'), (staggerTime || 200) + 100 * i);
-                    });
-                });
-            },
-            { threshold: 0.2 }
-        );
-        observer.observe(section);
+        if (title) {
+            observeElementInOut(title, {
+                onEnter() {
+                    if (transitionHeader) transitionHeader(title, 'enter');
+                }
+            });
+        }
+
+        if (btn) {
+            observeElementInOut(btn, {
+                onEnter() {
+                    if (transitionCta) transitionCta(btn, 'enter');
+                }
+            });
+        }
+
+        cards.forEach((card, i) => {
+            observeElementInOut(card, {
+                onEnter() {
+                    const delay = (staggerTime || 200) + i * 100;
+                    setTimeout(() => card.classList.add('is-visible'), delay);
+                }
+            });
+        });
     });
 })();

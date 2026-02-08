@@ -23,24 +23,24 @@
     position: relative;
     display: flex;
     width: 100%;
-
-    padding: 140px 20px 0 20px; 
+    padding: 140px 20px 0 20px;
     justify-content: space-between;
     align-items: center;
     z-index: 10;
     pointer-events: none;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .events-grid {
-    position: absolute;
-    top: 250px;
-    left: 20px;
-    right: 20px;
-    width: auto;
-    
+    position: relative;
+    margin-top: 0;
+    padding: 0 20px 140px 20px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     display: grid;
-    grid-template-columns: repeat(4, 1fr); 
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
     z-index: 5;
 }

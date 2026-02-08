@@ -1,11 +1,17 @@
 /* mission section */
 
+/* In continuous scroll (e.g. about-us): stay in flow so content below scrolls */
+.scroll-content .mission-section {
+    position: relative;
+}
+
 .mission-section {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
+    min-height: 100vh;
     padding: var(--space-for-nav) 20px 0px 20px;
     
     display: flex;
