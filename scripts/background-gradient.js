@@ -351,33 +351,33 @@ document.addEventListener('DOMContentLoaded', () => {
         parallax: true,
         contentSelector: '#scroll-content',
         // speed: animation speed of the noise (higher = faster morphing)
-        speed: 0.01,
+        speed: 0.03,
         // colors: [color1, color2, color3] – valleys, mid, peaks (overridden by section data-colors when observer is on)
         colors: ['#ff7a33', '#33a0ff', '#ffc53d'],
         // uNoiseDensity: scale of noise input (higher = finer, more ripples; lower = broader blobs)
-        uNoiseDensity: 2,
+        uNoiseDensity: 1.5,
         // uNoiseStrength: how much the noise displaces vertices (higher = more bumpy; lower = smoother sphere)
-        uNoiseStrength: 1,
+        uNoiseStrength: 0.5,
         // uAmplitude: overall displacement scale (higher = bigger bumps; lower = subtler)
-        uAmplitude: .8,
+        uAmplitude: 0.5,
         // colorFalloff: >1 = sharper bands (more raw color), <1 = softer blend (more mix), 1 = linear
         colorFalloff: 3,
         // color3Start: where color3 starts (0–1); lower = more area with third color (e.g. 0.2)
         color3Start: 0.25,
         // color3End: where color3 is full (0–1); default 1.0
-        color3End: 1.0,
+        color3End: 1,
         // color3Amount: boost third color (>1 = more visible, e.g. 1.2–1.5)
-        color3Amount: 1.2,
+        color3Amount: 1,
         // noiseBandScale: [x, y, z] – lateral bands (low x,z, high y); (1,1,1) = round bumps
-        noiseBandScale: [0.3, 1.0, 0.5],
+        noiseBandScale: [0.4, 1.0, 0.7],
         // sphereRadius: size of the sphere in world units (higher = bigger on screen)
         sphereRadius: 3,
         // sphereSegments: resolution of the mesh (higher = smoother; lower = more angular, faster)
         sphereSegments: 512,
         // cameraZ: camera distance from center (higher = smaller/further; lower = larger/closer) – close, looking at top
-        cameraZ: 4,
+        cameraZ: 3.6,
         // cameraLookAtY: camera looks at this Y (positive = tilted up toward top of sphere)
-        cameraLookAtY: 1,
+        cameraLookAtY: 1.6,
         // fov: vertical field of view in degrees (higher = wider view; lower = more zoomed)
         fov: 45,
         // parallax: when true, sphere rotation.x (pitch) is driven by scroll (reversed: down scroll = tilt up)
@@ -385,7 +385,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // parallaxRotationX: total X rotation in radians over full scroll (up/down tilt to match page scroll)
         parallaxRotationX: Math.PI * 0.1,
         // rotateSpeedY: per-frame Y rotation when parallax is off (Z rotation removed so bands stay lateral)
-        rotateSpeedY: 0.001
+        rotateSpeedY: 0.002,
+        rotateSpeedZ: 0.001
     });
 
     new GradientEngine('footer-canvas', {
