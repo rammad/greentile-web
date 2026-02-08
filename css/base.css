@@ -1,8 +1,4 @@
-/* =========================================
-   FONTS (RESTORED)
-   ========================================= */
-
-/* 1. Jubilee Golden */
+/* fonts */
 @font-face {
     font-family: 'OT Jubilee Golden';
     src: url('../fonts/OTJubilee-GoldenExtrabold.otf') format('opentype');
@@ -10,7 +6,6 @@
     font-style: normal;
 }
 
-/* 2. Jubilee Ruby */
 @font-face {
     font-family: 'OT Jubilee Ruby';
     src: url('../fonts/OTJubilee-RubyExtrabold.otf') format('opentype');
@@ -18,7 +13,6 @@
     font-style: normal;
 }
 
-/* 3. ABC Arizona Variable */
 @font-face {
     font-family: 'ABC Arizona Plus Variable';
     src: url('../fonts/ABCArizonaPlusVariable-Trial.woff2') format('woff2');
@@ -26,11 +20,8 @@
     font-style: normal;
 }
 
-/* =========================================
-   UNIVERSAL VARIABLES
-   ========================================= */
+/* variables */
 :root {
-    /* --- COLORS --- */
     --c-off-white: #f0f4f0;
     --c-bright-green: #32CD32;
     --c-lighter-green: #88cd88;
@@ -50,13 +41,11 @@
     
     --color-bg-gradient: url('../images/temp-grad.png');
 
-    /* --- FONTS --- */
     --font-display: 'OT Jubilee Ruby', serif; 
     --font-header: 'OT Jubilee Golden', serif; 
     --font-body: 'ABC Arizona Plus Variable', normal;
     --font-subheader: 'ABC Arizona Plus Variable', normal;
 
-    /* --- TIMING (Global Dials) --- */
     --time-fade-in: 0.6s;
     --time-fade-out: 0.2s;
     --time-cascade: 1.2s;
@@ -70,7 +59,6 @@
     --standard-margin: 20px;
     --standard-gap: 8px;
 
-    /* --- SIZING --- */
     --size-display-hero: 8.6vw; 
     --size-display-xl: 160px;
     --size-h1: 96px;
@@ -80,7 +68,6 @@
     --size-body1: 18px; 
     --size-body2: 36px; 
 
-    /* Mobile Sizes */
     --size-display-hero-mobile: 15vw; 
     --size-display-xl-mobile: 100px;
     --size-h1-mobile: 96px;
@@ -90,7 +77,6 @@
     --size-body1-mobile: 14px; 
     --size-body2-mobile: 24px;
 
-    /* Spacing */
     --section-spacing: 200px;
     --section-padding: 20px;
     --section-nav-padding: 100px;
@@ -100,7 +86,7 @@
     --section-nav-padding-mobile: 60px;
 }
 
-/* --- RESET & SCROLL LAYERS --- */
+/* reset */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
@@ -133,52 +119,7 @@ section.is-active {
     display: flex; flex-direction: column;
 }
 
-/* =========================================
-   ANIMATIONS & UTILITIES
-   ========================================= */
-
-/* Header Blur Out */
-.header-hidden {
-    opacity: 0 !important;
-    filter: blur(var(--blur-standard)); 
-    transform: translateY(-15px);
-    transition: 
-        opacity var(--time-fade-out) ease,
-        filter var(--time-fade-out) ease,
-        transform var(--time-fade-out) var(--ease-standard);
-    pointer-events: none;
-}
-
-/* Cascade Text */
-.word-wrapper { 
-    display: inline-block; 
-    white-space: nowrap; 
-    overflow: hidden;
-
-    vertical-align: bottom;
-}
-
-.char-reveal {
-    display: inline-block !important;
-    opacity: 1;
-    transform: translateY(110%) rotateX(-20deg); 
-    transform-origin: bottom center;
-    white-space: pre-wrap;
-    transition: transform var(--time-cascade) var(--ease-standard);
-    will-change: transform;
-}
-.char-reveal.is-visible { transform: translateY(0) rotateX(0deg); }
-
-/* Basic Fade */
-.hero-faded {
-    opacity: 0 !important;
-    pointer-events: none;
-    transition: opacity var(--time-fade-out) ease;
-}
-
-/* =========================================
-   TYPOGRAPHY
-   ========================================= */
+/* type */
 .type-display-hero {
     font-family: var(--font-display);
     text-transform: uppercase;
@@ -226,7 +167,6 @@ section.is-active {
     font-variation-settings: 'SRFF' 0; 
 }
 
-/* Sub2 (Nav/Link) */
 .type-sub2 {
     font-family: var(--font-subheader);
     font-size: var(--size-sub2);
@@ -268,63 +208,75 @@ section.is-active {
 .standard-margins { padding: var(--section-nav-padding) var(--section-padding) var(--section-padding) var(--section-padding); }
 .section-spacer { margin-top: var(--section-spacing); margin-bottom: var(--section-spacing); }
 
-/* =========================================
-   NATURAL SCROLL SYSTEM
-   ========================================= */
+/* utils */
+.header-hidden {
+    opacity: 0 !important;
+    filter: blur(var(--blur-standard)); 
+    transform: translateY(-15px);
+    transition: 
+        opacity var(--time-fade-out) ease,
+        filter var(--time-fade-out) ease,
+        transform var(--time-fade-out) var(--ease-standard);
+    pointer-events: none;
+}
 
-/* The Wrapper (Holds the mixed content) */
+.word-wrapper { 
+    display: inline-block; 
+    white-space: nowrap; 
+    overflow: hidden;
+    vertical-align: bottom;
+}
+
+.char-reveal {
+    display: inline-block !important;
+    opacity: 1;
+    transform: translateY(110%) rotateX(-20deg); 
+    transform-origin: bottom center;
+    white-space: pre-wrap;
+    transition: transform var(--time-cascade) var(--ease-standard);
+    will-change: transform;
+}
+.char-reveal.is-visible { transform: translateY(0) rotateX(0deg); }
+
+.hero-faded {
+    opacity: 0 !important;
+    pointer-events: none;
+    transition: opacity var(--time-fade-out) ease;
+}
+
+/* scroll sections */
 .natural-scroll-section {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    
-    /* Enables Native Scroll */
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
-    
     opacity: 0;
     pointer-events: none;
     z-index: 1;
     transition: opacity 0.8s ease;
+    -ms-overflow-style: none; scrollbar-width: none;
 }
-
 .natural-scroll-section.is-active {
     opacity: 1;
     pointer-events: auto;
     z-index: 20;
 }
-
-/* Hide Scrollbar */
 .natural-scroll-section::-webkit-scrollbar { display: none; }
-.natural-scroll-section { -ms-overflow-style: none; scrollbar-width: none; }
 
-
-/* The Adapter Class (Makes sections stackable) */
-/* Add this class to any section you put INSIDE the wrapper */
 .relative-mode {
     position: relative !important;
     top: auto !important;
     left: auto !important;
     height: auto !important;
-    /* min-height: 100vh; Ensure they still take up space */
-    
-    opacity: 1 !important; /* Visible by default (managed by observer) */
+    opacity: 1 !important; 
     pointer-events: auto !important;
-    
     display: flex;
     flex-direction: column;
-    
-    /* Ensure no margins break the flow */
     margin: 0;
-    /* padding-top: 100px; Give them some breathing room */
-    /* padding-bottom: 100px; */
 }
 
-/* =========================================
-   UI & CTA (Updated)
-   ========================================= */
-
-/* Roll Link Hover */
+/* ui */
 .ui-roll { position: relative; overflow: hidden; display: inline-block; cursor: pointer; }
 .ui-roll-layer { display: block; transition: transform var(--time-roll) var(--ease-standard); }
 .ui-roll-visible { transform: translateY(110%); }
@@ -334,37 +286,24 @@ section.is-active {
 .ui-roll.roll-hover:hover .ui-roll-visible { transform: translateY(-150%); }
 .ui-roll.roll-hover:hover .ui-roll-hidden { transform: translateY(0%); }
 
-
-/* =========================================
-   UNIVERSAL CTA (Nested Wrapper Fix)
-   ========================================= */
-
 .cta-btn {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    
-    /* 1. SHAPE & SIZE */
     padding: 12px; 
     min-width: calc(1em + 24px); 
     max-width: calc(1em + 24px); 
     border-radius: 100px;
     background-color: var(--color-accent);
-    
-    /* 2. TEXT VISIBILITY DEFAULTS */
     color: transparent; 
     text-decoration: none;
     border: none;
     white-space: nowrap; 
-
     pointer-events: auto;
     cursor: pointer;
-    
-    /* 3. ANIMATION SETTINGS */
     opacity: 0;
     overflow: hidden; 
-    
     transition: 
         opacity 0.4s ease,
         max-width 0.8s ease, 
@@ -379,15 +318,12 @@ section.is-active {
     color: var(--color-btn-text);
 }
 
-/* --- THE NEW WRAPPER (.ui-roll) --- */
-/* This restricts the text movement to just the text area, ignoring padding */
+/* cta roll: text area only (ignores padding) */
 .cta-btn .ui-roll {
     display: block;
     position: relative;
     overflow: hidden;
-    line-height: 1; /* Critical for perfect roll math */
-    
-    /* Start pushed down for the entrance animation */
+    line-height: 1; /* roll math */
     transform: translateY(150%);
     opacity: 0;
     
@@ -401,61 +337,47 @@ section.is-active {
     opacity: 1;
 }
 
-/* --- THE LAYERS --- */
 .cta-btn .ui-roll-layer {
     display: flex;
     align-items: center;
-    gap: 40px; /* The gap between text and arrow */
+    gap: 40px;
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-/* VISIBLE LAYER */
 .cta-btn .ui-roll-visible {
     position: relative;
     transform: translateY(0%);
 }
 
-/* HIDDEN LAYER (Absolute to the .ui-roll wrapper) */
 .cta-btn .ui-roll-hidden {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    transform: translateY(100%); /* Sit just below */
+    transform: translateY(100%);
 }
 
-/* --- HOVER EFFECT (The Roll) --- */
-/* Only triggers when button is fully visible */
+/* roll only when btn visible */
 .cta-btn.is-visible:hover .ui-roll-visible {
-    transform: translateY(-100%); /* Move Up */
+    transform: translateY(-100%);
     transition-delay: 0s;
 }
 
 .cta-btn.is-visible:hover .ui-roll-hidden {
-    transform: translateY(0%); /* Move In */
+    transform: translateY(0%);
     transition-delay: 0s;
 }
 
 .cta-arrow {
-    /* Scale relative to the font-size (18px) */
     height: 0.5em; 
     width: auto; 
-    
-    /* Ensure it behaves nicely in flexbox */
     display: block; 
-    
-    /* Optional: If the arrow needs to be white to match text */
-    /* filter: brightness(0) invert(1); */ 
 }
 
-/* Default state for hidden layer */
 .ui-roll-hidden { transform: translateY(150%); opacity: 1; }
 
-
-/* =========================================
-   SCROLL & MASKING
-   ========================================= */
+/* scroll & masking */
 .scrollable-content { height: 100%; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; overscroll-behavior: contain; }
 .scrollable-content::-webkit-scrollbar { display: none; }
 
@@ -474,18 +396,17 @@ section.is-active {
 }
 
 
-/* Back Button */
+/* back btn */
 .back-arrow {
     position: absolute;
     display: flex;
     top: 0;
     left: 0;
-    height: 7px; /* hate this but it matches the cta arrows */
+    height: 7px; 
     width: auto;
     transform: scale(-100%);
 }
 
-/* Mobile */
 @media (max-width: 768px) {
     .type-display-hero { font-size: var(--size-display-hero-mobile); }
     .type-display-xl { font-size: var(--size-display-xl-mobile); }

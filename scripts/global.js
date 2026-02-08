@@ -1,10 +1,7 @@
-/* =========================================
-   GLOBAL UTILITIES (The Toolbelt)
-   ========================================= */
+/* global utils */
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-/* --- CONFIGURATION --- */
 const INTERACTION_LOCK_MS = 500; 
 const SEQUENTIAL_ELEMENT_STAGGER_MS = 200;
 const SCROLL_SPEED = 40;
@@ -33,35 +30,25 @@ const animate = async (element, className = 'is-visible', overlap = 0) => {
     await waitForTransition(element, overlap);
 };
 
-/* --- UNIVERSAL HEADER MANAGER --- */
 const transitionHeader = async (element, direction = 'enter') => {
     if (!element) return;
 
     if (direction === 'enter') {
         element.classList.remove('header-hidden');
-        
-        // Reset
         const chars = element.querySelectorAll('.char-reveal');
         chars.forEach(c => { 
             c.style.transition = 'none'; 
             c.classList.remove('is-visible'); 
         });
-        
         void element.offsetWidth; 
-        
-        // Restore
         chars.forEach((c, i) => { 
             c.style.transition = ''; 
             c.style.transitionDelay = `${i * 30}ms`; 
         });
-
-        // Play
         if (window.playCascade) {
             window.playCascade(element);
         }
-    } 
-    else {
-        // Exit
+    } else {
         await animate(element, 'header-hidden');
     }
 };
@@ -82,7 +69,6 @@ const transitionCta = async (element, direction = 'enter') =>{
     
 }
 
-/* --- EXPORT --- */
 window.AnimationUtils = { 
     wait, 
     waitForTransition, 
@@ -96,10 +82,9 @@ window.AnimationUtils = {
     scrollSpeed: SCROLL_SPEED
 };
 
-/* --- INITIALIZATION --- */
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
-    // initCTA();
+    // initCTA(); /* section scripts handle ctas */
     initCascadeReveal();
     setTimeout(() => {
         const nav = document.querySelector('nav');
@@ -232,37 +217,4 @@ function initNavbar() {
     }, { passive: true });
 }
 
-/* =========================================
-   GLOBAL UTILITIES (Updated CTA Logic)
-   ========================================= */
-
-/* ... (Keep AnimationUtils, Wait, etc.) ... */
-
-// function initCTA() {
-//     const btns = document.querySelectorAll('.cta-btn');
-//     const observer = new IntersectionObserver((entries) => {
-//         entries.forEach(entry => {
-//             const btn = entry.target;
-            
-//             // Skip manual control buttons (handled by section scripts)
-//             if (btn.classList.contains('manual-control')) return;
-            
-//             if (entry.isIntersecting) {
-//                 // Add class to trigger animation sequence
-//                 btn.classList.add('is-visible');
-//             } else {
-//                 // Remove to reset (allows re-animation)
-//                 btn.classList.remove('is-visible');
-//             }
-//         });
-//     }, { threshold: 0.5 });
-
-//     btns.forEach(btn => {
-//         // Ensure clean slate
-//         btn.classList.remove('is-visible');
-        
-//         if (!btn.classList.contains('about-persistent-cta')) { 
-//             observer.observe(btn); 
-//         }
-//     });
-// }
+/* initCTA() disabled - section scripts handle ctas */

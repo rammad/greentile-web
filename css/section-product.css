@@ -1,17 +1,11 @@
-/* =========================================
-   PDP STYLES (Standardized)
-   ========================================= */
+/* pdp / product page */
 
 .pdp-section {
     position: relative; 
     width: 100%;
-    
-    /* SCROLL SETUP */
     height: 100vh;           
     min-height: 100vh;      
     overflow: visible !important;    
-    
-    /* Use variables for nav spacing */
     padding-top: var(--space-for-nav); 
     padding-bottom: var(--standard-margin);
     padding-left: var(--standard-margin);
@@ -29,7 +23,6 @@
     margin-bottom: var(--standard-margin);
 }
 
-/* --- SUBTITLES --- */
 .pdp-meta-row,
 .pdp-desc,
 .pdp-hero-title {
@@ -39,10 +32,7 @@
 }
 
 
-/* =========================================
-   LAYOUT GRID (Sticky Column)
-   ========================================= */
-/* 
+/* old sticky layout (kept for reference)
 .pdp-grid {
     --pdp-target-height: calc(100vh - (var(--space-for-nav) + var(--standard-margin)));
     --pdp-col-width: calc(var(--pdp-target-height) * 0.8);
@@ -94,10 +84,6 @@
     transition: opacity var(--time-fade-in) ease;
 } */
 
-/* =========================================
-   LAYOUT GRID (Independent Scroll Windows)
-   ========================================= */
-
 .pdp-grid {
     --pdp-target-height: calc(100vh - (var(--space-for-nav) + var(--standard-margin)));
     --pdp-col-width: calc(var(--pdp-target-height) * 0.8);
@@ -108,52 +94,36 @@
     display: flex;
     justify-content: center;
     gap: 4vw; 
-    
-    /* Ensure columns fill the height */
     align-items: stretch; 
 }
 
-/* SHARED SCROLL COLUMN STYLES */
 .pdp-image-col, 
 .pdp-info {
-    /* 2. Width Logic (40vw each) */
     width: var(--pdp-col-width);
     flex: 0 0 auto;
-    
-    /* 3. SCROLL LOGIC */
-    height: 100%; /* Fill the grid height */
-    overflow-y: auto; /* Enable independent scroll */
-    
-    /* Hide Scrollbars for cleaner look */
-    scrollbar-width: none;  /* Firefox */
-    -ms-overflow-style: none;  /* IE */
-    
-    /* Add padding to bottom of scroll content so it doesn't cut off */
-    /* padding-bottom: 40px;  */
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-/* Chrome/Safari Scrollbar Hide */
 .pdp-image-col::-webkit-scrollbar, 
 .pdp-info::-webkit-scrollbar {
     display: none;
 }
 
-/* RIGHT COLUMN (Info specific) */
 .pdp-info {
     display: flex;
     flex-direction: column;
 }
 
-/* LEFT COLUMN (Image specific) */
 .pdp-image-col {
     display: block; 
-    /* Remove sticky positioning - the whole column scrolls now */
 }
 
 .pdp-poster {
     display: block;
     width: 100%;
-    /* Allow height to be determined by the image (scrolling feed) */
     height: auto; 
     aspect-ratio: 4 / 5;
     object-fit: cover;
@@ -172,10 +142,7 @@
 }
 
 
-/* =========================================
-   RESPONSIVE (Mobile Reset)
-   ========================================= */
-
+/* mobile */
 @media (max-width: 1024px) {
     .pdp-section {
         padding: 100px 20px 80px 20px;
@@ -185,10 +152,9 @@
     }
 
     .pdp-grid {
-        /* Kill the fixed height on mobile so it flows naturally */
         height: auto; 
         display: flex;
-        flex-direction: column-reverse; /* Image on top */
+        flex-direction: column-reverse;
         gap: 40px;
         overflow: visible;
     }
@@ -197,7 +163,7 @@
     .pdp-info {
         width: 100%; 
         height: auto;
-        overflow-y: visible; /* Stop internal scrolling */
+        overflow-y: visible;
     }
     
     .pdp-poster {
@@ -206,10 +172,6 @@
     }
 }
 
-
-/* =========================================
-   UI COMPONENTS (Updated)
-   ========================================= */
 
 .ticket-actions {
     display: flex;
@@ -221,7 +183,6 @@
     padding-top: 40px;
 }
 
-/* --- QTY WRAPPER --- */
 .qty-wrapper {
     position: relative;
     display: flex;
@@ -230,16 +191,12 @@
     height: auto;
 }
 
-/* --- MAX QTY LABEL --- */
-/* Reuse .pdp-tag styles, but position absolutely above */
 .max-qty-label {
     position: absolute;
-    bottom: 100%; /* Sits directly on top */
+    bottom: 100%;
     left: 0;
-    margin-bottom: var(--standard-gap); /* Tiny gap */
+    margin-bottom: var(--standard-gap);
     white-space: nowrap;
-    
-    /* Animation State */
     opacity: 0;
     transition: opacity var(--time-fade-in) ease;
     pointer-events: none;
@@ -249,16 +206,15 @@
     opacity: 1;
 }
 
-/* --- QTY SELECTOR --- */
 .qty-selector {
     display: flex;
     align-items: center;
     justify-content: space-between;
     background-color: var(--color-placeholder);
-    border-radius: 100px; /* Pill shape */
-    padding: 12px 20px;   /* Match CTA padding */
+    border-radius: 100px;
+    padding: 12px 20px;
     min-width: 140px;
-    height: auto;         /* Let padding define height */
+    height: auto;
 }
 
 .qty-btn {
@@ -271,8 +227,6 @@
     min-width: 24px; text-align: center;
 }
 
-/* --- BUY BUTTON OVERRIDE --- */
-/* The base .cta-btn handles most styles, we just tweak width */
 .buy-btn-override {
     align-self: flex-end;
 }
@@ -296,10 +250,6 @@
 }
 
 
-/* =========================================
-   RESPONSIVE
-   ========================================= */
-
 @media (max-width: 1024px) {
     .pdp-section {
         padding: 100px 20px 80px 20px;
@@ -318,7 +268,6 @@
         height: auto;
     }
 
-    /* RIGHT COLUMN (Sticky) */
     .pdp-image-col {
         width: 100%;
         height: auto;

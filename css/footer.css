@@ -1,7 +1,5 @@
-/* =========================================
-   FOOTER (Director Mode)
-   ========================================= */
-   
+/* footer */
+
 .footer-section {
     position: absolute;
     top: 0;
@@ -32,7 +30,6 @@
     justify-content: flex-end;
 }
 
-/* Backgrounds */
 #footer-gradient-container {
     position: absolute;
     top: 0;
@@ -49,9 +46,6 @@
     height: 100%;
 }
 
-/* =========================================
-   MARQUEE (Seamless)
-   ========================================= */
 .marquee-wrapper {
     width: 100%;
     position: relative;
@@ -94,23 +88,13 @@
 }
 
 .marquee-item {
-    /* font-family: var(--font-subheader); */
-    /* font-size: 24px; */
-    /* font-weight: 700; */
-    /* line-height: 1; */
-    /* text-transform: uppercase; */
     padding: 0 48px;
-    /* color: var(--color-text-main); */
-    /* font-variation-settings: 'SRFF' 0;  */
 }
 
 .marquee-item.arrow{
     height: 7px;
 }
 
-/* =========================================
-   MAIN FOOTER CONTENT
-   ========================================= */
 .footer-main {
     display: flex;
     flex-direction: column;
@@ -121,16 +105,14 @@
     z-index: 1;
 }
 
-/* FOOTER TITLE STYLES */
-/* We target it specifically here to override any Hero collisions */
 .footer-main .type-display-hero {
     display: block;        
     width: 100%;
-    position: relative;    /* Ensures it sits in flow */
+    position: relative;
     bottom: auto;
     left: auto;
     transform: none;
-    overflow: visible;     /* Important for char animations */
+    overflow: visible;
 }
 
 .footer-links {
@@ -149,14 +131,10 @@
     line-height: 1; 
 }
 
-
-/* MOBILE FIX (Baseline for later) */
 @media (max-width: 768px) {
-    /* Stack the lines */
     .footer-main .type-display-hero > span {
         display: block;
     }
-    /* Keep letters inline */
     .footer-main .type-display-hero > span .char-reveal {
         display: inline-block;
     }

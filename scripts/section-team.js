@@ -1,15 +1,8 @@
-/* =========================================
-   SECTION: TEAM (Reusing Events Structure)
-   ========================================= */
-document.addEventListener('DOMContentLoaded', () => {
-    // Specifically target the section labeled "The Team" or just the events-section on this page
-    const section = document.querySelector('.events-section');
-    if(!section) return;
+/* team section (reuses events structure) */
 
-    // Check if this is actually the Team section to avoid conflict with Home Page
-    // (Optional safety check if you load both scripts)
-    // const title = section.querySelector('#event-title');
-    // if(title && title.innerText !== 'The Team') return; 
+document.addEventListener('DOMContentLoaded', () => {
+    const section = document.querySelector('.events-section');
+    if(!section) return; 
 
     if (window.ScrollManager) {
         ScrollManager.addSteps([{

@@ -1,6 +1,4 @@
-/* =========================================
-   NAV (Permanent Pill + Rolling Text)
-   ========================================= */
+/* nav */
 
 .sticky-nav {
     position: fixed;
@@ -29,10 +27,7 @@
                 background 0.3s ease;
 }
 
-/* HIDDEN STATE */
 .sticky-nav.nav-hidden {
-    /* Only move vertically now. 
-       We translate Y by -200% (or -100px) to move it off the top edge. */
     transform: translate3d(0, -150%, 0);
 }
 
@@ -69,24 +64,21 @@
     align-items: center;
     justify-content: center;
     
-    height: 1.25em; /* Lock height to font size */
+    height: 1.25em;
     line-height: 1.25;
-    
     color: var(--color-text-main);
     text-decoration: none;
 }
 
-/* The Visible Text */
 .sticky-nav a span {
     display: inline-block;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* The Duplicate Text (from data-text attr) */
 .sticky-nav a::after {
     content: attr(data-text);
     position: absolute;
-    top: 100%; /* Start just below visibility */
+    top: 100%;
     left: 0;
     width: 100%;
     height: 100%;
@@ -96,15 +88,14 @@
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* HOVER EFFECT */
 .sticky-nav a:hover span {
-    transform: translateY(-100%); /* Move original UP and out */
+    transform: translateY(-100%);
 }
 .sticky-nav a:hover::after {
-    transform: translateY(-100%); /* Move duplicate UP and in */
+    transform: translateY(-100%);
 }
 
-/* UNDERLINE EFFECT
+/* underline (disabled)
 .sticky-nav a::before {
     content: '';
     position: absolute;

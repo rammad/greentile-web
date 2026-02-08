@@ -1,6 +1,4 @@
-/* =========================================
-   PAGE: EVENTS (Calendar Logic)
-   ========================================= */
+/* events / calendar */
 
 document.addEventListener('DOMContentLoaded', () => {
     const { staggerTime, wait, transitionHeader } = window.AnimationUtils;
@@ -52,7 +50,6 @@ function initEventInteractions() {
     const btnList = document.getElementById('btn-list');
     const btnGrid = document.getElementById('btn-grid');
     
-    // --- VIEW TOGGLE ---
     if(btnList && btnGrid && pageContainer) {
         btnList.addEventListener('click', () => {
             pageContainer.classList.remove('mode-grid');
@@ -67,35 +64,28 @@ function initEventInteractions() {
         });
     }
 
-    // --- HOVER LOGIC (LIST VIEW) ---
     const rows = document.querySelectorAll('.calendar-row');
     const posterWrapper = document.getElementById('poster-wrapper');
     const posterImg = document.getElementById('poster-img');
-
-    // Overlays
     const statusSoon = document.getElementById('status-soon');
     const statusSold = document.getElementById('status-sold');
 
     if (rows.length > 0 && posterWrapper && posterImg) {
         rows.forEach(row => {
             row.addEventListener('mouseenter', () => {
-                // Only on desktop & list mode
                 if (window.innerWidth > 768 && !pageContainer.classList.contains('mode-grid')) {
                     const imgUrl = row.getAttribute('data-img');
                     const status = row.getAttribute('data-status');
 
-                    // 1. Set Image
                     if(imgUrl) {
                         posterImg.src = imgUrl;
                         posterWrapper.classList.add('active');
                     }
 
-                    // 2. Reset Statuses
                     if(statusSoon) statusSoon.style.opacity = '0';
                     if(statusSold) statusSold.style.opacity = '0';
                     posterImg.style.opacity = '1';
 
-                    // 3. Handle Status
                     if (status === 'coming-soon') {
                         if(statusSoon) statusSoon.style.opacity = '1';
                         posterImg.style.opacity = '0'; 
@@ -117,18 +107,15 @@ function initEventInteractions() {
 
             row.addEventListener('click', (e) => {
                 if(window.innerWidth > 768) {
-                    // Navigate
                     window.location.href = row.getAttribute('href');
                 }
             });
         });
     }
 
-    // --- GRID LOGIC ---
     randomizeGridStickers();
 }
 
-// Scrambles the position of "Sold Out" stickers in the grid
 function randomizeGridStickers() {
     const gridStickers = document.querySelectorAll('.grid-item .badge-sold');
     gridStickers.forEach(el => {
@@ -136,12 +123,8 @@ function randomizeGridStickers() {
     });
 }
 
-// Helper: Calculates random position
 function randomizeSticker(element) {
-    // Pick a side: 0=Top, 1=Right, 2=Bottom, 3=Left
     const side = Math.floor(Math.random() * 4);
-    
-    // Random position between 10% and 85%
     const offset = Math.random() * 75 + 10; 
     
     let top, left;
@@ -160,11 +143,9 @@ function randomizeSticker(element) {
     element.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
 }
 
-/* =========================================
-   MOBILE POSTER SYNC
-   ========================================= */
+/* mobile: sync poster to centered list item */
 function initMobileScrollSpy() {
-    if (window.innerWidth > 768) return; // Desktop handled by hover
+    if (window.innerWidth > 768) return;
 
     const list = document.querySelector('.calendar-list');
     const items = document.querySelectorAll('.calendar-row');
@@ -172,44 +153,36 @@ function initMobileScrollSpy() {
 
     if (!list || !poster) return;
 
-    // Use IntersectionObserver to see which item is centered
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                // Get image from the data attribute of the centered text item
                 const newSrc = entry.target.getAttribute('data-img');
-                
-                // Update the fixed poster
                 if (newSrc && poster.src !== newSrc) {
                     poster.src = newSrc;
                 }
             }
         });
     }, {
-        root: list,    // Watch the scrolling list
-        threshold: 0.6 // Trigger when 60% of the item is visible (mostly centered)
+        root: list,
+        threshold: 0.6
     });
 
     items.forEach(item => observer.observe(item));
 };
 
-/* =========================================
-   THE ROW PACKER (Adapted for Events)
-   ========================================= */
+/* pack list rows into grid by month */
 function initRowPacker() {
     const container = document.getElementById('dynamic-grid-container');
     const listRows = document.querySelectorAll('.calendar-row');
     
     if (!container || listRows.length === 0) return;
 
-    container.innerHTML = ''; // Clear
+    container.innerHTML = '';
 
-    // 1. PARSE DATA
     const monthGroups = [];
     let currentMonthName = null;
     let currentGroup = null;
 
-    // Helper: Convert "03.07" -> "March"
     const getMonthName = (dateStr) => {
         const monthNum = dateStr.split('.')[0];
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -217,10 +190,8 @@ function initRowPacker() {
     };
 
     listRows.forEach(row => {
-        const dateText = row.querySelector('.cal-date').innerText.trim(); // "03.07"
+        const dateText = row.querySelector('.cal-date').innerText.trim();
         const monthName = getMonthName(dateText);
-        
-        // Extract Data for the Card
         const imgUrl = row.getAttribute('data-img');
         const href = row.getAttribute('href');
         const status = row.getAttribute('data-status');
@@ -231,7 +202,6 @@ function initRowPacker() {
             currentMonthName = monthName;
         }
 
-        // Create the Grid Card DOM Element
         const card = document.createElement('a');
         card.href = href;
         card.className = 'grid-card';
@@ -244,7 +214,6 @@ function initRowPacker() {
         currentGroup.items.push(card);
     });
 
-    // 2. PACKING ALGORITHM (Same as Archives)
     const ROWS = [];
     let currentRow = { capacity: 6, chunks: [] };
 
@@ -274,7 +243,6 @@ function initRowPacker() {
     });
     if (currentRow.chunks.length > 0) ROWS.push(currentRow);
 
-    // 3. RENDER
     ROWS.forEach(rowData => {
         const rowEl = document.createElement('div');
         rowEl.className = 'packed-row';

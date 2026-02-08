@@ -1,25 +1,18 @@
-/* =========================================
-   PAGE: PRODUCT DETAIL (Async Animation)
-   ========================================= */
+/* product page */
 (() => {
     const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils;
 
     document.addEventListener('DOMContentLoaded', () => {
         initProductPage();
-        updateQty(0); // Initialize Qty Display
+        updateQty(0);
     });
 
     async function initProductPage() {
-        
-
-        // 1. ACTIVATE SECTION (Background Fade)
         const section = document.querySelector('.pdp-section');
         if (section) section.classList.add('is-active');
 
-        // 2. ANIMATE TITLE (Wait for Global JS Init)
         const title = document.querySelector('.animate-cascade');
         if (title) {
-            // Simple polling to ensure global.js has split the text
             const checkInit = setInterval(async () => {
                 if (title.classList.contains('is-initialized') && window.playCascade) {
                     clearInterval(checkInit);
@@ -28,7 +21,7 @@
             }, 50);
         }
 
-        await(staggerTime);
+        await wait(staggerTime);
 
         const subtitles = document.querySelectorAll('.text-mask');
         if (subtitles.length > 0) {
@@ -55,7 +48,6 @@
         if (posters.length > 0) posters.forEach( poster => {
             poster.classList.add('is-visible');
         })
-        // 4. TEXT & DETAILS (Staggered)
         await wait(200);
         const textElements = document.querySelectorAll('.type-body1, .type-body2');
         if (textElements.length > 0) {
@@ -68,7 +60,6 @@
         if(cta) transitionCta(cta, 'enter');
     }
 
-    /* --- INTERACTION LOGIC (Ticket Qty) --- */
     let qty = 1;
     const MAX_QTY = 4;
 
@@ -79,15 +70,11 @@
         if (!qtyDisplay) return;
         
         qty += change;
-        
-        // Clamp values
         if (qty < 1) qty = 1;
         if (qty > MAX_QTY) qty = MAX_QTY; 
         
-        // Update Text
         qtyDisplay.innerText = qty;
 
-        // Toggle Max Label
         if (qty === MAX_QTY) {
             if(maxMsg) maxMsg.classList.add('is-visible');
         } else {

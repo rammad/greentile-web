@@ -1,6 +1,4 @@
-/* =========================================
-   SOCIALS SECTION
-   ========================================= */
+/* socials section */
 
 .socials-section {
     text-align: center;
@@ -8,16 +6,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    
     height: 100vh; 
     width: 100%;
     position: absolute;
     z-index: 10;
     margin-bottom: 120px;
-    
     opacity: 0;
     pointer-events: none;
-    /* UPDATE: Use Standard Variables */
     transition: opacity var(--time-fade-in) ease;
 }
 
@@ -38,19 +33,13 @@
     max-width: 50%;
 }
 
-/* =========================================
-   ICONS
-   ========================================= */
 .socials-icons {
     display: flex;
     gap: 16px;
     justify-content: center;
     margin-top: 32px;
-    
     opacity: 0;
     transform: translateY(20px);
-    
-    /* UPDATE: Standard Timing */
     transition: 
         opacity var(--time-fade-in) var(--ease-standard), 
         transform var(--time-fade-in) var(--ease-standard);

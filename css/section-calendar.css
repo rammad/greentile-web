@@ -1,6 +1,4 @@
-/* =========================================
-   EVENTS CALENDAR (Cleaned & Fixed)
-   ========================================= */
+/* events / calendar */
 
 .calendar-page {
     position: absolute;
@@ -14,7 +12,6 @@
     padding-top: var(--space-for-nav);
 }
 
-/* --- HEADER --- */
 .calendar-header {
     padding: 0 0 24px 0;
     flex-shrink: 0;
@@ -29,7 +26,6 @@
     overflow: hidden;
 }
 
-/* --- CONTROLS --- */
 .calendar-controls {
     display: flex;
     justify-content: space-between;
@@ -50,11 +46,6 @@
 
 .divider { color: var(--color-placeholder); margin: 0 8px; display: inline-block; line-height: 1; }
 
-
-/* =========================================
-   BODY & VIEW TOGGLING
-   ========================================= */
-
 .calendar-body {
     position: relative;
     flex: 1;
@@ -65,7 +56,6 @@
     overflow: hidden;
 }
 
-/* LIST VIEW WRAPPER */
 .calendar-interface-wrapper {
     position: relative;
     width: 100%;
@@ -76,31 +66,19 @@
     align-items: center;
 }
 
-/* GRID VIEW WRAPPER */
 .calendar-grid-packed {
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    /* padding: 0 20px 80px 20px; */
     scrollbar-width: none;
     flex-direction: column;
     gap: 60px;
-    
-    /* Default Hidden */
     display: none; 
 }
 .calendar-grid-packed::-webkit-scrollbar { display: none; }
 
-
-/* --- TOGGLE LOGIC --- */
-/* When 'mode-grid' is active on parent: */
 .calendar-page.mode-grid .calendar-interface-wrapper { display: none !important; }
 .calendar-page.mode-grid .calendar-grid-packed { display: flex !important; }
-
-
-/* =========================================
-   LIST VIEW STYLES
-   ========================================= */
 
 .calendar-list {
     position: relative;
@@ -135,17 +113,14 @@
     color: var(--color-text-main);
 }
 
-/* --- POSTER OVERLAY (Ghost Fix) --- */
 .calendar-poster-wrapper {
     position: absolute; 
     z-index: 1;
     top: 0; left: 10%; 
     height: 100%;
-    
     display: flex;
     align-items: center;
-    pointer-events: none; /* Crucial: clicks go through */
-    
+    pointer-events: none;
     opacity: 0;
     filter: blur(10px);
     transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease; 
@@ -154,7 +129,6 @@
 .calendar-poster-wrapper.active { 
     opacity: 1; 
     filter: blur(0px);
-    /* Slower entrance for smoothness */
     transition: opacity var(--time-fade-in) ease, filter var(--time-fade-in) ease;
 }
 
@@ -162,16 +136,9 @@
     height: auto; max-height: 100%;
     width: 100%;
     object-fit: contain;
-    /* Remove opacity here to prevent double-fading issues */
     opacity: 1; 
 }
 
-
-/* =========================================
-   PACKED GRID STYLES (New Logic)
-   ========================================= */
-
-/* The Row */
 .packed-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -181,10 +148,8 @@
     animation: fadeIn var(--time-fade-in) ease forwards;
 }
 
-/* The Chunk */
 .packed-chunk { display: flex; flex-direction: column; }
 
-/* Spans */
 .span-1 { grid-column: span 1; }
 .span-2 { grid-column: span 2; }
 .span-3 { grid-column: span 3; }
@@ -192,7 +157,6 @@
 .span-5 { grid-column: span 5; }
 .span-6 { grid-column: span 6; }
 
-/* Header */
 .month-header {
     color: var(--color-placeholder);
     display: flex;
@@ -207,7 +171,6 @@
 .month-header:not(.continuation-header)::after { margin-left: 16px; }
 .continuation-header { width: 100%; display: flex; }
 
-/* Inner Grid */
 .chunk-grid { display: grid; gap: 20px; row-gap: 20px; }
 .cols-1 { grid-template-columns: repeat(1, 1fr); }
 .cols-2 { grid-template-columns: repeat(2, 1fr); }
@@ -216,21 +179,19 @@
 .cols-5 { grid-template-columns: repeat(5, 1fr); }
 .cols-6 { grid-template-columns: repeat(6, 1fr); }
 
-/* --- GRID CARD (The Fix for Sizes) --- */
 .grid-card {
     display: block;
     position: relative;
     width: 100%;
-    /* Enforce Aspect Ratio */
     aspect-ratio: 4/5; 
     text-decoration: none;
-    background: #f0f0f0; /* Placeholder color */
+    background: #f0f0f0;
 }
 
 .grid-card-poster {
     width: 100%; 
     height: 100%;
-    object-fit: cover; /* Forces image to fill the card */
+    object-fit: cover;
     display: block;
     transition: all var(--time-fade-in) ease;
 }
@@ -240,10 +201,6 @@
     z-index: 2;
 }
 
-
-/* =========================================
-   BADGES (Universal)
-   ========================================= */
 .status-badge {
     position: absolute; z-index: 10; pointer-events: none;
     -webkit-mask-size: contain; mask-size: contain;
@@ -264,24 +221,13 @@
     to   { transform: translate(-50%, -50%) rotate(360deg); } 
 }
 
-/* Context: List */
 #status-soon { top: 50%; left: 50%; width: 100%; height: 100%; opacity: 0; transition: opacity 0.3s ease; }
 #status-sold { top: 50%; left: 50%; width: 140px; height: 140px; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease; }
 
-/* Context: Grid */
 .grid-card .badge-soon { top: 50%; left: 50%; width: 70%; height: 70%; transform: translate(-50%, -50%); }
 .grid-card .badge-sold { top: 10%; right: 10%; width: 60px; height: 60px; transform: rotate(-15deg); }
 
-
-/* =========================================
-   MOBILE (Must be LAST)
-   ========================================= */
-/* .mobile-event-display { display: none; } */
-
-/* =========================================
-   MOBILE (The "Frame" Layout)
-   ========================================= */
-
+/* mobile */
 @media (max-width: 768px) {
     .calendar-page {
         height: 100vh;
@@ -290,41 +236,31 @@
         flex-direction: column;
     }
 
-    /* 1. Header & Controls */
     .calendar-header {
         padding: 0 20px 20px 20px;
         flex-shrink: 0;
-        z-index: 20; /* Sit above everything */
+        z-index: 20;
         position: relative;
     }
-/*     
-    .calendar-controls, 
-    .mobile-event-display { 
-        display: none !important; 
-    } */
 
-    /* 2. The Stage (Interface Wrapper) */
     .calendar-interface-wrapper {
         display: block;
         position: relative;
-        flex: 1; /* Fill remaining screen */
+        flex: 1;
         width: 100%;
         overflow: hidden;
     }
 
-    /* 3. The Stationary Poster (Background Layer) */
     .calendar-poster-wrapper {
-        display: flex !important; /* Force Visible */
+        display: flex !important;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        
-        width: 70vw; /* Fixed size */
+        width: 70vw;
         aspect-ratio: 4/5;
         height: auto;
-        
-        z-index: 1; /* Behind the text */
+        z-index: 1;
         opacity: 1 !important;
         filter: blur(0) !important;
         pointer-events: none;
@@ -336,12 +272,10 @@
         object-fit: cover;
     }
 
-    /* 4. The Scrolling List (Foreground Layer) */
     .calendar-list {
         position: relative;
-        z-index: 10; /* Above the poster */
-        
-        display: flex; /* Horizontal */
+        z-index: 10;
+        display: flex;
         flex-direction: row;
         justify-content: flex-start;
         
@@ -353,24 +287,16 @@
         scrollbar-width: none;
     }
 
-    /* 5. The "Frame" Item */
     .calendar-row {
-        /* Size: Full Screen Width */
         min-width: 100vw;
         height: 100%;
-        
-        /* Layout: Push Date up, Title down */
         display: flex;
         flex-direction: column;
         justify-content: space-between; 
         align-items: center;
         text-align: center;
-        
-        /* Padding creates the "Hole" for the poster */
-        /* Adjust these numbers to frame your poster perfectly */
         padding-top: 40px; 
         padding-bottom: 120px; 
-        
         scroll-snap-align: center;
         opacity: 1;
         filter: blur(0);
@@ -379,12 +305,9 @@
 
     .calendar-row .cal-date,
     .calendar-row .cal-name {
-        /* Add text shadows so they are readable if they overlap image */
         text-shadow: 0 2px 10px rgba(240, 244, 240, 0.8); 
     }
 
-        /* 2. "Unpack" the Grid Rows */
-    /* Stop the row from trying to be a 6-column grid. Just let it stack. */
     .packed-row {
         display: flex !important;
         flex-direction: column;
@@ -392,24 +315,18 @@
         width: 100%;
     }
 
-    /* 3. Reset the Chunks */
-    /* Force every chunk to take up the full width of the screen */
     .packed-chunk {
         width: 100% !important; 
-        grid-column: auto !important; /* Reset desktop spans */
+        grid-column: auto !important;
         margin: 0 !important;
     }
 
-    /* 4. Force 2 Columns */
-    /* No matter what the desktop class says (cols-3, cols-4), mobile is always 2 */
     .chunk-grid {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important; /* <--- THE FIX */
-        gap: 15px; /* Tighter gap for mobile screens */
+        grid-template-columns: 1fr 1fr !important;
+        gap: 15px;
     }
 
-    /* 5. Adjust Card Size */
-    /* Ensure cards don't get too tall or squished */
     .grid-card {
         aspect-ratio: 4/5;
         width: 100%;

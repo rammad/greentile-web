@@ -1,6 +1,4 @@
-/* =========================================
-   MISSION SECTION (Director Mode)
-   ========================================= */
+/* mission section */
 
 .mission-section {
     position: absolute;
@@ -27,7 +25,6 @@
     pointer-events: auto;
 }
 
-/* Ensure text doesn't span too wide */
 .mission-section .type-display-hero {
     font-size: 7vw;
     width: 100%;

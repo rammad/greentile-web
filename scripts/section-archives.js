@@ -1,6 +1,4 @@
-/* =========================================
-   PAGE: ARCHIVES (Standardized Packer)
-   ========================================= */
+/* archives page */
 
 (() => {
     const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils;
@@ -12,7 +10,6 @@
         const page = document.querySelector('.archives-page');
         if (page) setTimeout(() => page.classList.add('is-active'), 100);
 
-        // ANIMATE TITLE
         const title = document.querySelector('.animate-cascade');
         if (title) {
             const checkInit = setInterval(() => {
@@ -33,12 +30,9 @@
         const container = document.getElementById('dynamic-archive-container');
         if (!container) return;
 
-        // 1. EXTRACT DATA
         const allCells = Array.from(document.querySelectorAll('.archive-cell'));
         container.innerHTML = ''; 
-        // Add the class that section-calendar.css expects
         container.classList.add('calendar-grid-packed'); 
-        // Override display:none from calendar css
         container.style.display = 'flex'; 
 
         const monthGroups = [];
@@ -47,7 +41,6 @@
 
         allCells.forEach(cell => {
             const m = cell.getAttribute('data-month');
-            // Get image source from the old .archive-poster
             const img = cell.querySelector('img');
             const imgSrc = img ? img.getAttribute('src') : '';
             const href = cell.getAttribute('href');
@@ -58,19 +51,14 @@
                 currentMonthName = m;
             }
 
-            // CREATE NEW CARD (Standardized Structure)
-            // We convert the .archive-cell data into a .grid-card
             const card = document.createElement('a');
             card.href = href;
             card.className = 'grid-card';
-            
-            // Use grid-card-poster class to inherit standard styles
             card.innerHTML = `<img src="${imgSrc}" class="grid-card-poster">`;
 
             currentGroup.items.push(card);
         });
 
-        // 2. PACKING ALGORITHM (Standard)
         const ROWS = [];
         let currentRow = { capacity: 6, chunks: [] }; 
 
@@ -100,7 +88,6 @@
         });
         if (currentRow.chunks.length > 0) ROWS.push(currentRow);
 
-        // 3. RENDER
         const flatItemList = []; 
 
         ROWS.forEach(rowData => {
@@ -137,7 +124,6 @@
             container.appendChild(rowEl);
         });
 
-        // 4. PAGINATION (Logic preserved, classes updated)
         initPagination(flatItemList);
     }
 
@@ -147,7 +133,6 @@
         let visibleCount = 0;
 
         const updateLayoutVisibility = () => {
-            // We need to hide empty rows to prevent whitespace gaps
             const rows = document.querySelectorAll('.packed-row');
             rows.forEach(row => {
                 const cards = row.querySelectorAll('.grid-card');
@@ -156,11 +141,9 @@
             });
         };
 
-        // Initial Hide
         items.forEach((item, index) => {
             if (index >= BATCH_SIZE) {
                 item.style.display = 'none';
-                // We use standard animation classes if needed, or simple display toggle
                 item.style.opacity = '0';
             } else {
                 item.style.opacity = '1';
@@ -189,7 +172,6 @@
                 visibleCount = nextLimit;
                 updateLayoutVisibility();
 
-                // Animate them in
                 setTimeout(() => {
                     newlyVisible.forEach(item => {
                         item.style.transition = 'opacity 0.6s ease';

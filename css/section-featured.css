@@ -1,20 +1,14 @@
-/* =========================================
-   FEATURED SECTION (Layout Update)
-   ========================================= */
+/* featured section */
 
 .featured-section {
     position: absolute;
     top: 0; left: 0;
     width: 100%;
     height: 100vh;
-    
-    /* Animation states */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.8s ease;
     z-index: 1;
-    
-    /* Ensure sizing includes borders/padding */
     box-sizing: border-box; 
 }
 
@@ -27,13 +21,9 @@
 .featured-grid {
     width: 100%;
     height: 100%;
-    
-    /* 1. LAYOUT: Flex (Image Left, Content Right) */
     display: flex;
-    align-items: center; /* Vertically center items in the row */
+    align-items: center;
     gap: 80px;
-    
-    /* 2. MARGINS (Applied as Padding) */
     padding-top: var(--space-for-nav);
     padding-bottom: var(--standard-margin);
     padding-left: var(--standard-margin);
@@ -42,28 +32,19 @@
     box-sizing: border-box;
 }
 
-/* --- LEFT: POSTER --- */
 .featured-image-container {
     display: block;
-    
-    /* Force height to fill the available space (Screen minus Margins) */
     height: 100%; 
-    
-    /* Force Width based on ratio */
     aspect-ratio: 4 / 5;
-    
-    /* Prevent Flex from squishing it */
     flex-shrink: 0; 
 }
 
 .featured-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Crop if necessary */
+    object-fit: cover;
     object-position: center;
     display: block;
-    
-    /* Animation */
     opacity: 0;
     transform: scale(1.05);
     transition: opacity 1s ease, transform 1s ease-out;
@@ -74,26 +55,21 @@
     transform: scale(1);
 }
 
-/* --- RIGHT: CONTENT --- */
 .featured-content {
-    /* Fill all remaining space to the right */
     flex-grow: 1;
-    
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Center horizontally in the remaining space */
-    align-items: center;     /* Center vertically */
+    justify-content: center;
+    align-items: center;
     height: 100%;
 }
 
 .featured-text-wrapper {
-    /* Max Width Constraint */
     width: 100%;
     max-width: 500px;
-    
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Left align text block */
+    align-items: flex-start;
 }
 /* 
 .featured-content .type-body1 {

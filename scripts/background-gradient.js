@@ -173,11 +173,8 @@ class GradientEngine {
         const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ uniforms: this.uniforms, vertexShader, fragmentShader }));
         this.scene.add(mesh);
 
-        // 5. OBSERVERS
         window.addEventListener('resize', () => this.onResize());
 
-        // --- THE MAGIC FIX: MUTATION OBSERVER ---
-        // Watches for sections becoming "is-active"
         if (cfg.updateMode === 'observer') {
             this.setupMutationObserver();
         }
@@ -185,13 +182,11 @@ class GradientEngine {
         this.animate();
     }
 
-    // New Logic: Watch DOM for class changes
     setupMutationObserver() {
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                     const target = mutation.target;
-                    // If a section becomes active...
                     if (target.classList.contains('is-active') && target.hasAttribute('data-colors')) {
                         this.updateColorsFromElement(target);
                     }
@@ -199,11 +194,8 @@ class GradientEngine {
             });
         });
 
-        // Watch all sections
         const sections = document.querySelectorAll('section');
         sections.forEach(s => observer.observe(s, { attributes: true }));
-        
-        // Check initially
         const activeSection = document.querySelector('section.is-active');
         if (activeSection) this.updateColorsFromElement(activeSection);
     }
@@ -215,7 +207,6 @@ class GradientEngine {
             if (rawList.length > 0) {
                 for (let i = 0; i < this.config.numPoints; i++) {
                     const role = this.pointRoles[i];
-                    // Map distribution to new colors
                     if (role < rawList.length) {
                         this.targetColors[i].set(rawList[role]);
                     } else {
@@ -244,25 +235,22 @@ class GradientEngine {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. MAIN BACKGROUND (Watch Mode)
     new GradientEngine('gradient-canvas', {
         isFullScreen: true,  
         numPoints: 20, 
         distribution: [6, 3, 1, 1], 
         radius: 0.6, 
         speed: 0.1, 
-        colors: ["#f0f4f0", "#f0f4f0", "#f0f4f0", "#f0f4f0"], // Starts White
+        colors: ["#f0f4f0", "#f0f4f0", "#f0f4f0", "#f0f4f0"],
         updateMode: 'observer' 
     });
 
-    // 2. FOOTER INTERNAL GRADIENT (Static)
     new GradientEngine('footer-canvas', {
-        isFullScreen: false, // <--- CHANGED: Fits inside the footer div
+        isFullScreen: false,
         numPoints: 20,       
         distribution: [6, 3, 1, 1], 
         radius: 0.8,        
         speed: 0.1, 
-        // CHANGED: Use the vibrant colors (Dark Green, Light Green, Yellow, etc)
         colors: ["#32CD32", "#f0f4f0", "#FABA2F", "#32CD32"], 
         updateMode: 'none' 
     });

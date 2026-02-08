@@ -1,6 +1,5 @@
-/* =========================================
-   SECTION: MENU (Complex)
-   ========================================= */
+/* menu section */
+
 document.addEventListener('DOMContentLoaded', () => {
     const menuSection = document.querySelector('.menu-section');
     if(!menuSection) return;
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     if (window.ScrollManager) {
-        // Create 4 discrete steps for the 4 menu items
         const menuSteps = [0, 1, 2, 3].map(index => ({
             id: `menu-${index}`,
             onEnter: (dir) => {
@@ -36,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return 800;
             },
             onExit: (dir) => {
-                // Hide section ONLY if we leave the menu entirely
                 if ((index === 3 && dir === 'down') || (index === 0 && dir === 'up')) {
                     menuSection.classList.remove('is-active');
                 }
