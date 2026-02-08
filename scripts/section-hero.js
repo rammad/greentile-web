@@ -1,33 +1,23 @@
-/* hero section */
+/* hero section – observer-driven cascade */
 
-(() => { 
-    const { wait, transitionHeader, lockTime } = window.AnimationUtils;
-
+(function () {
     document.addEventListener('DOMContentLoaded', () => {
-        const heroSection = document.querySelector('.hero') || document.querySelector('section');
+        const heroSection = document.querySelector('.hero') || document.querySelector('#hero');
         const heroTitle = document.querySelector('.type-display-hero');
 
-        if(!heroSection || !heroTitle) return;
+        if (!heroSection || !heroTitle) return;
 
-        if (window.ScrollManager) {
-            ScrollManager.addSteps([{
-                id: 'hero',
-                onEnter: async (direction) => {
-                    heroSection.classList.add('is-active');
-                    transitionHeader(heroTitle, 'enter');
-                    await wait(lockTime);
-                },
-                onExit: async (direction) => {
-                    if (direction === 'down') {
-                        await transitionHeader(heroTitle, 'exit');
-                        heroSection.classList.remove('is-active');
-                    }
-                }
-            }]);
-        } else {
-            heroSection.classList.add('is-active');
-            heroTitle.classList.remove('header-hidden');
-            if(window.playCascade) window.playCascade(heroTitle);
-        }
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    heroSection.classList.add('is-visible');
+                    heroTitle.classList.remove('header-hidden');
+                    if (window.playCascade) window.playCascade(heroTitle);
+                });
+            },
+            { threshold: 0.2, rootMargin: '0px' }
+        );
+        observer.observe(heroSection);
     });
 })();

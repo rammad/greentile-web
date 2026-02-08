@@ -96,27 +96,40 @@ html, body {
     color: var(--color-text-main);
     font-family: var(--font-body);
 }
+html {
+    scroll-behavior: smooth;
+}
+
+/* Lenis: viewport clips, content scrolls */
+.scroll-viewport {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+}
+.scroll-content {
+    position: relative;
+    width: 100%;
+    min-height: 100%;
+}
 
 main { position: relative; width: 100%; height: 100%; }
 
 section {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    opacity: 0; 
-    pointer-events: none; 
-    transition: opacity var(--time-fade-in) ease;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: block;
     z-index: 1;
 }
 
-section.is-active {
-    opacity: 1;
-    pointer-events: auto;
-    z-index: 10;
-}
-
 .sticky-wrapper, .about-sticky-wrapper, .events-sticky-wrapper {
-    position: relative; height: 100%; width: 100%;
-    display: flex; flex-direction: column;
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 /* type */
@@ -244,38 +257,6 @@ section.is-active {
     transition: opacity var(--time-fade-out) ease;
 }
 
-/* scroll sections */
-.natural-scroll-section {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 1;
-    transition: opacity 0.8s ease;
-    -ms-overflow-style: none; scrollbar-width: none;
-}
-.natural-scroll-section.is-active {
-    opacity: 1;
-    pointer-events: auto;
-    z-index: 20;
-}
-.natural-scroll-section::-webkit-scrollbar { display: none; }
-
-.relative-mode {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    height: auto !important;
-    opacity: 1 !important; 
-    pointer-events: auto !important;
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-}
-
 /* ui */
 .ui-roll { position: relative; overflow: hidden; display: inline-block; cursor: pointer; }
 .ui-roll-layer { display: block; transition: transform var(--time-roll) var(--ease-standard); }
@@ -377,10 +358,7 @@ section.is-active {
 
 .ui-roll-hidden { transform: translateY(150%); opacity: 1; }
 
-/* scroll & masking */
-.scrollable-content { height: 100%; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; overscroll-behavior: contain; }
-.scrollable-content::-webkit-scrollbar { display: none; }
-
+/* masking */
 .text-mask { 
     display: block; 
     overflow: hidden; 

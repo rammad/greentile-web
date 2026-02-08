@@ -1,62 +1,48 @@
-/* =========================================
-   SECTION: FOOTER
-   ========================================= */
+/* footer section – observer-driven + marquee init */
 
-(() => {
-    const { wait, staggerTime, scrollSpeed, lockTime } = window.AnimationUtils;
-        
+(function () {
+    const { staggerTime, scrollSpeed } = window.AnimationUtils || {};
+
     document.addEventListener('DOMContentLoaded', () => {
         const footerSection = document.querySelector('.footer-section');
-        if(!footerSection) return;
+        if (!footerSection) return;
 
-        // 1. SELF-INIT MARQUEE
         if (typeof MarqueeManager !== 'undefined') {
-            new MarqueeManager('.marquee-content', scrollSpeed, false);
+            new MarqueeManager('.marquee-content', scrollSpeed || 40, false);
         }
 
-        // 2. HELPER: The "Hard Reset" & Play
         const resetAndPlay = (element) => {
+            if (!element) return;
             const chars = element.querySelectorAll('.char-reveal');
-            chars.forEach(c => { c.style.transition = 'none'; c.classList.remove('is-visible'); });
-            void element.offsetWidth; 
+            chars.forEach((c) => {
+                c.style.transition = 'none';
+                c.classList.remove('is-visible');
+            });
+            void element.offsetWidth;
             requestAnimationFrame(() => {
-                chars.forEach((c, i) => { c.style.transition = ''; c.style.transitionDelay = `${i * 30}ms`; });
-                window.playCascade(element);
+                chars.forEach((c, i) => {
+                    c.style.transition = '';
+                    c.style.transitionDelay = `${i * 30}ms`;
+                });
+                if (window.playCascade) window.playCascade(element);
             });
         };
 
-        // 3. REGISTER STEP
-        if (window.ScrollManager) {
-            ScrollManager.addSteps([{
-                id: 'footer',
-
-                
-                onEnter: async (direction) => {
-                    footerSection.classList.add('is-active');
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    footerSection.classList.add('is-visible');
                     const title = footerSection.querySelector('.animate-cascade');
                     const links = footerSection.querySelectorAll('.ui-roll');
-
                     resetAndPlay(title);
-
-                    await wait(staggerTime);
-
-                    for ( let i = 0; i < links.length; i++){
-                        links[i].classList.add('is-visible');
-                        await wait(staggerTime);
-                    }
-
-                    await wait(lockTime);
-                },
-                onExit: async (direction) => {
-                    footerSection.classList.remove('is-active');
-                    const title = footerSection.querySelector('.animate-cascade');
-                    const links = footerSection.querySelectorAll('.ui-roll');
-                    
-                    if (title) window.reverseCascade(title);
-                    for ( let i = 0; i < links.length; i++) links[i].classList.add('is-visible');
-                    await wait(lockTime)
-                }
-            }]);
-        }
+                    links.forEach((link, i) => {
+                        setTimeout(() => link.classList.add('is-visible'), (staggerTime || 200) * (i + 1));
+                    });
+                });
+            },
+            { threshold: 0.2 }
+        );
+        observer.observe(footerSection);
     });
 })();

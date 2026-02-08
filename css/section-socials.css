@@ -6,20 +6,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh; 
+    min-height: 100vh;
     width: 100%;
-    position: absolute;
-    z-index: 10;
+    position: relative;
     margin-bottom: 120px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--time-fade-in) ease;
-}
-
-.socials-section.is-active,
-.socials-section.relative-mode {
-    opacity: 1;
-    pointer-events: auto;
 }
 
 .socials-header {

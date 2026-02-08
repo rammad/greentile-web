@@ -5,6 +5,18 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const INTERACTION_LOCK_MS = 500; 
 const SEQUENTIAL_ELEMENT_STAGGER_MS = 200;
 const SCROLL_SPEED = 40;
+/** Accumulated wheel delta must exceed this before triggering a section change (smoother scroll feel). */
+const SCROLL_WHEEL_THRESHOLD = 80;
+/** Eased scroll: how quickly current position catches target (0.05 = slow/velvety, 0.15 = snappier). */
+const SCROLL_EASE_FACTOR = 0.08;
+/** Eased scroll: wheel delta to step delta (e.g. 0.002 means 500px wheel = 1 section). */
+const SCROLL_SENSITIVITY = 0.002;
+/** Lenis: how fast scroll catches up (0.1 = default, 0.15–0.2 = responsive). */
+const LENIS_LERP = 0.18;
+/** Lenis: max animation duration in seconds (lower = snappier). */
+const LENIS_DURATION = 0.4;
+/** Lenis: wheel scroll speed multiplier (> 1 = more movement per tick). */
+const LENIS_WHEEL_MULTIPLIER = 1.2;
 
 const waitForTransition = (element, overlap = 0) => {
     return new Promise(resolve => {
@@ -79,7 +91,13 @@ window.AnimationUtils = {
     reverseCascade: (el, ov) => window.reverseCascade(el, ov),
     lockTime: INTERACTION_LOCK_MS,
     staggerTime: SEQUENTIAL_ELEMENT_STAGGER_MS,
-    scrollSpeed: SCROLL_SPEED
+    scrollSpeed: SCROLL_SPEED,
+    scrollWheelThreshold: SCROLL_WHEEL_THRESHOLD,
+    scrollEaseFactor: SCROLL_EASE_FACTOR,
+    scrollSensitivity: SCROLL_SENSITIVITY,
+    lenisLerp: LENIS_LERP,
+    lenisDuration: LENIS_DURATION,
+    lenisWheelMultiplier: LENIS_WHEEL_MULTIPLIER
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -210,7 +228,7 @@ function initNavbar() {
     const links = nav.querySelectorAll('a');
     let scrollTimer;
     links.forEach(link => { if (link.children.length === 0) link.innerText = link.innerText; });
-    window.addEventListener('scroll', () => {
+    window.addEventListener('lenis-scroll', () => {
         nav.classList.add('nav-hidden');
         clearTimeout(scrollTimer);
         scrollTimer = setTimeout(() => { nav.classList.remove('nav-hidden'); }, 500);
