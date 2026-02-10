@@ -14,11 +14,25 @@
 }
 
 @font-face {
+    font-family: 'Arizona Flare Light';
+    src: url('../fonts/ABCArizonaFlare-Light-Trial.otf') format('opentype');
+    font-weight: 100 900; 
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Arizona Sans Bold';
+    src: url('../fonts/ABCArizonaSans-Bold-Trial.otf') format('opentype');
+    font-weight: 100 900; 
+    font-style: normal;
+}
+
+/* @font-face {
     font-family: 'ABC Arizona Plus Variable';
     src: url('../fonts/ABCArizonaPlusVariable-Trial.woff2') format('woff2');
     font-weight: 100 900; 
     font-style: normal;
-}
+} */
 
 /* variables */
 :root {
@@ -43,8 +57,8 @@
 
     --font-display: 'OT Jubilee Ruby', serif; 
     --font-header: 'OT Jubilee Golden', serif; 
-    --font-body: 'ABC Arizona Plus Variable', normal;
-    --font-subheader: 'ABC Arizona Plus Variable', normal;
+    --font-body: 'Arizona Flare Light', normal;
+    --font-subheader: 'Arizona Sans Bold', normal;
 
     --time-fade-in: 0.6s;
     --time-fade-out: 0.2s;
@@ -105,7 +119,7 @@ html {
     position: fixed;
     inset: 0;
     width: 100%;
-    height: 100%;
+    height: 100%;font-weight: 100 900; 
     z-index: 0;
     pointer-events: none;
 }
@@ -187,19 +201,19 @@ section {
     font-weight: 700; 
     text-transform: uppercase; 
     letter-spacing: 0.05em; 
-    font-variation-settings: 'SRFF' 0; 
+    /* font-variation-settings: 'SRFF' 0;  */
 }
 
 .type-sub2 {
     font-family: var(--font-subheader);
     font-size: var(--size-sub2);
-    font-weight: 370; 
+    font-weight: 100; 
     font-style: normal;
     color: var(--color-text-subheader);
     line-height: 100%; 
     text-transform: uppercase;
     text-decoration: none;
-    font-variation-settings: 'SRFF' 0; 
+    /* font-variation-settings: 'SRFF' 0;  */
 }
 
 .type-body1 { 
@@ -207,7 +221,7 @@ section {
     font-size: var(--size-body1); 
     font-weight: 300; 
     line-height: 1.2; 
-    font-variation-settings: 'SRFF' 25; 
+    /* font-variation-settings: 'SRFF' 25;  */
 
     opacity: 0;
     filter: blur(var(--blur-standard));
@@ -220,7 +234,7 @@ section {
     font-size: var(--size-body2); 
     font-weight: 300; 
     line-height: 1; 
-    font-variation-settings: 'SRFF' 25; 
+    /* font-variation-settings: 'SRFF' 25;  */
 
     opacity: 0;
     filter: blur(var(--blur-standard));
