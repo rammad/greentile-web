@@ -1,8 +1,8 @@
 /**
- * GRADIENT ENGINE – Dual Channel Control
- * * NEW VARIABLES:
- * - heightDensity/Speed: Controls the physical waves.
- * - colorDensity/Speed: Controls the liquid gradient flow.
+ * GRADIENT ENGINE – Dual Channel Sphere
+ * * CHANGES:
+ * - Switch to SphereGeometry.
+ * - Vertex Shader now uses 3D position (x,y,z) for noise so it wraps correctly.
  */
 class GradientEngine {
     constructor(canvasId, config) {
@@ -10,29 +10,33 @@ class GradientEngine {
         if (!this.canvas) return;
 
         this.config = Object.assign({
-            type: 'plane',       
-            colors: ['#47ff54', '#f1ffe8', '#f0fd7c'], // Green -> White -> Yellow
+            type: 'sphere',       
+            colors: ['#47ff54', '#f1ffe8', '#f0fd7c'], 
             
-            // --- CHANNEL 1: HEIGHT (The Waves) ---
-            heightDensity: 1.8,   // How many waves? (Higher = more ripples)
-            heightStrength: 3.0,  // How tall are they?
-            heightSpeed: 0.2,     // How fast do waves move?
+            // --- CHANNEL 1: HEIGHT (The Blob Shape) ---
+            heightDensity: 1.5,   
+            heightStrength: 0.8,  
+            heightSpeed: 0.2,     
             
-            // --- CHANNEL 2: COLOR (The Liquid) ---
-            colorDensity: 0.4,    // How large are the color patches? (Lower = bigger blobs)
-            colorSpeed: 0.1,      // How fast do colors morph?
+            // --- CHANNEL 2: COLOR (The Liquid Surface) ---
+            colorDensity: 0.6,    
+            colorSpeed: 0.1,      
+            
+            // --- PHYSICS: ROTATION ---
+            // x, y, z values determine speed per frame (lower = slower)
+            rotationSpeed: { x: 0.001, y: 0.002, z: 0.0 }, 
             
             // Geometry
-            planeSize: [20, 20], 
+            sphereRadius: 2.0,
             segments: 128,       
             
             // Positioning
-            positionY: -2.1,     
-            rotationZ: 225 * (Math.PI / 180),
+            positionY: 0,        
+            rotationZ: 0,
             
             // Camera
-            cameraPosition: { x: 0, y: 0.5, z: 2.4 }, 
-            cameraRotation: { x: -0.4, y: 0, z: 0 },   
+            cameraPosition: { x: 0, y: 0, z: 6.0 }, 
+            cameraRotation: { x: 0, y: 0, z: 0 },   
             fov: 45,
             
             updateMode: 'observer',
@@ -55,17 +59,16 @@ class GradientEngine {
     buildVertexShader() {
         return `
             varying vec2 vUv;
-            varying float vDistort;     // Height Noise
-            varying float vColorNoise;  // Color Noise
+            varying float vDistort;     
+            varying float vColorNoise;  
+            varying vec3 vNormal;       // Pass normal for basic lighting
             
             uniform float uTime;
             
-            // Channel 1: Height
             uniform float uHeightDensity;
             uniform float uHeightStrength;
             uniform float uHeightSpeed;
             
-            // Channel 2: Color
             uniform float uColorDensity;
             uniform float uColorSpeed;
 
@@ -120,25 +123,25 @@ class GradientEngine {
 
             void main() {
                 vUv = uv;
+                vNormal = normal;
 
-                // 1. CALCULATE HEIGHT NOISE
-                // Uses heightSpeed and heightDensity
+                // 1. HEIGHT NOISE (3D)
+                // We use the full 'position' (x,y,z) + time to animate the field through the sphere
                 float tHeight = uTime * uHeightSpeed;
-                vec3 heightPos = vec3(position.x * uHeightDensity, position.y * uHeightDensity, tHeight);
+                vec3 heightPos = position * uHeightDensity + tHeight; 
                 float heightNoise = snoise(heightPos);
                 
-                // 2. CALCULATE COLOR NOISE
-                // Uses colorSpeed and colorDensity (independent from height!)
+                // 2. COLOR NOISE (3D)
+                // Different scale/speed, same 3D logic
                 float tColor = uTime * uColorSpeed;
-                vec3 colorPos = vec3((position.x + 10.0) * uColorDensity, (position.y + 10.0) * uColorDensity, tColor);
+                vec3 colorPos = (position + 10.0) * uColorDensity + tColor;
                 float colorNoise = snoise(colorPos);
                 
                 // 3. DISPLACEMENT
-                // Only the Height Noise moves the vertices
+                // Move vertex OUTWARD along its normal (radially)
                 float distortion = heightNoise * uHeightStrength;
                 vec3 newPos = position + (normal * distortion);
                 
-                // Pass values to Fragment Shader
                 vDistort = heightNoise; 
                 vColorNoise = colorNoise; 
                 
@@ -150,28 +153,31 @@ class GradientEngine {
     buildFragmentShader() {
         return `
             varying vec2 vUv;
-            varying float vDistort;     // Height Map (-1 to 1)
-            varying float vColorNoise;  // Color Map (-1 to 1)
-            
+            varying float vDistort;     
+            varying float vColorNoise;  
+            varying vec3 vNormal;
+
             uniform vec3 uColor1;
             uniform vec3 uColor2;
             uniform vec3 uColor3;
 
             void main() {
-                // Map noises to 0-1
                 float height = (vDistort * 0.5) + 0.5;
                 float colorMix = (vColorNoise * 0.5) + 0.5;
 
-                // 1. BASE COLOR LAYER
-                // Driven by 'colorDensity' and 'colorSpeed'
-                // This creates the liquid blobs flowing on the surface
+                // 1. BASE COLOR LAYER (Liquid Flow)
                 vec3 baseColor = mix(uColor1, uColor2, colorMix);
 
-                // 2. HIGHLIGHT LAYER
-                // Driven by 'heightDensity' and 'heightSpeed'
-                // This ensures the tips of the waves always get Color 3
+                // 2. HIGHLIGHT LAYER (Peaks)
+                // Sharp transition for the tips
                 float highlight = smoothstep(0.6, 1.0, height);
                 
+                // 3. SHADING (Optional Fake Lighting)
+                // Adds a bit of depth so it doesn't look like a flat circle
+                // We use the normal relative to camera (approx)
+                // float light = dot(vNormal, vec3(0.5, 0.5, 1.0)) * 0.5 + 0.5;
+                // baseColor *= light;
+
                 vec3 finalColor = mix(baseColor, uColor3, highlight);
 
                 gl_FragColor = vec4(finalColor, 1.0);
@@ -194,16 +200,11 @@ class GradientEngine {
 
         this.uniforms = {
             uTime: { value: 0 },
-            
-            // Height Channel
             uHeightDensity: { value: cfg.heightDensity },
             uHeightStrength: { value: cfg.heightStrength },
             uHeightSpeed: { value: cfg.heightSpeed },
-            
-            // Color Channel
             uColorDensity: { value: cfg.colorDensity },
             uColorSpeed: { value: cfg.colorSpeed },
-            
             uColor1: { value: this.currentColors[0] },
             uColor2: { value: this.currentColors[1] },
             uColor3: { value: this.currentColors[2] }
@@ -216,10 +217,11 @@ class GradientEngine {
             side: THREE.DoubleSide
         });
 
-        const geometry = new THREE.PlaneGeometry(cfg.planeSize[0], cfg.planeSize[1], cfg.segments, cfg.segments);
+        // GEOMETRY SWITCH: Use SphereGeometry
+        const geometry = new THREE.SphereGeometry(cfg.sphereRadius, cfg.segments, cfg.segments);
         this.mesh = new THREE.Mesh(geometry, material);
 
-        this.mesh.rotation.x = -Math.PI / 2;
+        // Rotation & Position
         if (cfg.rotationZ) this.mesh.rotation.z = cfg.rotationZ;
         if (cfg.positionY) this.mesh.position.y = cfg.positionY;
 
@@ -280,6 +282,12 @@ class GradientEngine {
         requestAnimationFrame(() => this.animate());
         const delta = this.clock.getDelta();
         this.uniforms.uTime.value += delta;
+        
+        // --- APPLIED ROTATION VECTOR ---
+        this.mesh.rotation.x += this.config.rotationSpeed.x;
+        this.mesh.rotation.y += this.config.rotationSpeed.y;
+        this.mesh.rotation.z += this.config.rotationSpeed.z;
+
         this.uniforms.uColor1.value.lerp(this.targetColors[0], 0.05);
         this.uniforms.uColor2.value.lerp(this.targetColors[1], 0.05);
         this.uniforms.uColor3.value.lerp(this.targetColors[2], 0.05);
@@ -292,22 +300,26 @@ document.addEventListener('DOMContentLoaded', () => {
     new GradientEngine('gradient-canvas', {
         colors: ['#47ff54', '#f1ffe8', '#f0fd7c'], 
         
-        // --- CHANNEL 1: WAVES ---
-        heightDensity: 0.2,   // High = lots of small ripples
-        heightStrength: 1,  // High = tall spikes
-        heightSpeed: 0.1,     // Speed of the ripples
+        // SPHERE PHYSICS
+        heightDensity: 1,   // Density of the blobs
+        heightStrength: 0.3,  // How much it deforms (keep low < 1.0 to avoid self-intersection)
+        heightSpeed: 0.01,     
         
-        // --- CHANNEL 2: LIQUID FLOW ---
-        colorDensity: 0.3,    // Low = big, broad patches of color
-        colorSpeed: 0.1,      // Slow = lazy morphing color
+        // LIQUID COLOR
+        colorDensity: 2,    
+        colorSpeed: 0.01,      
+
+        rotationSpeed: { x: 0.001, y: 0.001, z: 0.0 },
         
-        positionY: -2.1,
-        rotationZ: 225 * (Math.PI / 180),
+        sphereRadius: 2.0,
         
-        cameraPosition: { x: 0, y: 0.0, z: 2.4 }, 
-        cameraRotation: { x: -1, y: 0, z: 0 },
+        // Center the sphere
+        positionY: 0,
         
-        planeSize: [20, 20],
-        segments: 128
+        // Pull camera back to see the whole sphere
+        cameraPosition: { x: 0, y: 0, z: 2.5 }, 
+        cameraRotation: { x: 0, y: 0, z: 0 },
+        
+        segments: 512
     });
 });
