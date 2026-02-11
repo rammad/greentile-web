@@ -20,11 +20,11 @@
             images.forEach((img, index) => {
                 const isLeft = index % 2 === 0;
                 /* left column: 2–22%; right column: 78–98% (viewport %) so both sides appear on screen */
-                const minX = isLeft ? 2 : 78;
-                const maxX = isLeft ? 22 : 98;
+                const minX = isLeft ? -5 : 65;
+                const maxX = isLeft ? 25 : 95;
                 const randomX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
-                const minW = isMobile ? 40 : 12;
-                const maxW = isMobile ? 55 : 20;
+                const minW = isMobile ? 40 : 7;
+                const maxW = isMobile ? 55 : 12;
                 const randomW = Math.floor(Math.random() * (maxW - minW + 1)) + minW;
                 const jitter = Math.floor(Math.random() * 120) - 60;
                 const finalY = currentY + jitter;
@@ -115,6 +115,41 @@
 
         /* Track: absolute so slides define section height; track sits behind */
         track.classList.add('about-image-track-positioned');
+
+        /* Pin body text when its slide is in view (observe .about-slide so pin state doesn’t affect observed rect).
+         * Hysteresis: pin when slide ratio >= 0.4, unpin when < 0.15. */
+        const slides = section.querySelectorAll('.about-slide');
+        const slideRatios = new Map();
+        let pinnedSticky = null;
+        const PIN_ENTER = 0.4;
+        const PIN_LEAVE = 0.15;
+        const pinObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((e) => slideRatios.set(e.target, e.intersectionRatio));
+                const currentSlide = pinnedSticky ? pinnedSticky.closest('.about-slide') : null;
+                const currentRatio = currentSlide ? (slideRatios.get(currentSlide) ?? 0) : 0;
+                if (pinnedSticky && currentRatio < PIN_LEAVE) {
+                    pinnedSticky.classList.remove('is-pinned');
+                    pinnedSticky = null;
+                }
+                let maxRatio = 0;
+                let candidateSticky = null;
+                slides.forEach((slide) => {
+                    const r = slideRatios.get(slide) ?? 0;
+                    if (r >= PIN_ENTER && r > maxRatio) {
+                        maxRatio = r;
+                        candidateSticky = slide.querySelector('.about-slide-sticky');
+                    }
+                });
+                if (candidateSticky && candidateSticky !== pinnedSticky) {
+                    if (pinnedSticky) pinnedSticky.classList.remove('is-pinned');
+                    candidateSticky.classList.add('is-pinned');
+                    pinnedSticky = candidateSticky;
+                }
+            },
+            { root: viewport, threshold: [0, PIN_LEAVE, 0.25, PIN_ENTER, 0.5, 0.75, 1] }
+        );
+        slides.forEach((s) => pinObserver.observe(s));
 
         let timer;
         window.addEventListener('resize', () => {

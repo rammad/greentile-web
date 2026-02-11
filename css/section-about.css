@@ -49,14 +49,13 @@
     width: 100%;
 }
 
-/* about-us: each slide takes full viewport height for continuous scroll */
-.about.has-persistent-menu .about-slide {
-    min-height: 100vh;
-}
-
+/* Sticky wrapper: keeps body text centered in viewport after it fades in */
 .about-slide-sticky {
     position: sticky;
     top: 0;
+    left: 0;
+    right: 0;
+    min-height: 100vh;
     height: 100vh;
     width: 100%;
     display: flex;
@@ -86,26 +85,58 @@
     aspect-ratio: 4 / 5;
     object-fit: cover;
     opacity: 0;
-    transform: translateX(var(--slide-start, 0px)); 
-    transition: 
+    transform: translateX(var(--slide-start, 0px));
+    transition:
         opacity var(--time-fade-out) linear,
-        transform var(--time-fade-out)  ease-in;
-        
+        transform var(--time-fade-out) ease-in;
     will-change: transform, opacity;
 }
 
 .scatter-img.is-visible {
     opacity: 1;
     transform: translateX(0px);
-    transition: 
+    transition:
         opacity var(--time-fade-in) ease,
-        transform var(--time-fade-in) var(--ease-out-long); 
+        transform var(--time-fade-in) var(--ease-out-long);
+}
+
+.about-text-block .cta-btn {
+    position: absolute;
+    top: 150%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: var(--standard-margin);
+    white-space: nowrap;
+}
+
+/* Pin when in view (Lenis doesn’t support CSS sticky) – JS adds .is-pinned */
+.about-slide-sticky.is-pinned {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100vh;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    pointer-events: none;
+}
+.about-slide-sticky.is-pinned .about-text-block {
+    pointer-events: auto;
+}
+
+/* ----- about-us page: persistent "What We Do" menu + full-height slides ----- */
+.about.has-persistent-menu .about-slide {
+    min-height: 100vh;
 }
 
 .about-menu-persistent {
     position: absolute;
     top: 25%;
-    left: 0; 
+    left: 0;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -133,20 +164,17 @@
     filter: blur(var(--standard-blur));
     margin-bottom: var(--standard-gap);
     cursor: pointer;
-
     transition: all var(--time-fade-out) ease;
 }
 
 .about-menu-persistent .menu-item.is-active {
     color: var(--color-text-main);
-
     transition: all var(--time-fade-in) ease;
 }
 
-.about-menu-persistent .menu-item.is-visible{
+.about-menu-persistent .menu-item.is-visible {
     opacity: 1;
     filter: blur(0);
-
     transition: all var(--time-fade-in) ease;
 }
 
@@ -160,8 +188,7 @@
     .about.has-persistent-menu .about-content { padding-top: 280px; }
 }
 
-.about-content .cta-btn,
-.about-text-block .cta-btn {
+.about-content .cta-btn {
     position: absolute;
     top: 150%;
     left: 50%;
