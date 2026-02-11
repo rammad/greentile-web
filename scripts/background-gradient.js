@@ -21,6 +21,8 @@ class GradientEngine {
             // --- CHANNEL 2: COLOR (The Liquid Surface) ---
             colorDensity: 0.6,    
             colorSpeed: 0.1,      
+            colorGradientFalloff: 1.0,  // 1 = linear; >1 = sharper bands; <1 = softer transition
+            colorGradientBalance: 0.5,  // 0 = more color1, 1 = more color2, 0.5 = even
             
             // --- PHYSICS: ROTATION ---
             // x, y, z values determine speed per frame (lower = slower)
@@ -125,16 +127,21 @@ class GradientEngine {
                 vUv = uv;
                 vNormal = normal;
 
+                // Small offset to avoid sampling on simplex lattice boundaries (reduces center stutter)
+                vec3 eps = vec3(0.001, 0.002, 0.003);
+
                 // 1. HEIGHT NOISE (3D)
-                // We use the full 'position' (x,y,z) + time to animate the field through the sphere
-                float tHeight = uTime * uHeightSpeed;
-                vec3 heightPos = position * uHeightDensity + tHeight; 
+                // Time as vec3 with different phases so motion has no single direction (no downward drift)
+                float t = uTime * uHeightSpeed;
+                vec3 heightTimeOff = vec3(sin(t), cos(t * 0.83), sin(t * 1.17)) * 0.5;
+                vec3 heightPos = position * uHeightDensity + heightTimeOff + eps;
                 float heightNoise = snoise(heightPos);
                 
                 // 2. COLOR NOISE (3D)
-                // Different scale/speed, same 3D logic
-                float tColor = uTime * uColorSpeed;
-                vec3 colorPos = (position + 10.0) * uColorDensity + tColor;
+                // Different phases so color and height don't move in lockstep
+                float tc = uTime * uColorSpeed;
+                vec3 colorTimeOff = vec3(cos(tc * 1.1), sin(tc * 0.91), cos(tc * 1.23)) * 0.5;
+                vec3 colorPos = (position + 10.0) * uColorDensity + colorTimeOff + eps;
                 float colorNoise = snoise(colorPos);
                 
                 // 3. DISPLACEMENT
@@ -160,10 +167,19 @@ class GradientEngine {
             uniform vec3 uColor1;
             uniform vec3 uColor2;
             uniform vec3 uColor3;
+            uniform float uColorGradientFalloff;
+            uniform float uColorGradientBalance;
 
             void main() {
                 float height = (vDistort * 0.5) + 0.5;
                 float colorMix = (vColorNoise * 0.5) + 0.5;
+                colorMix = pow(colorMix, uColorGradientFalloff);
+                // Remap so 0.5 in noise space maps to balance (0 = color1 dominant, 1 = color2, 0.5 = even)
+                float b = uColorGradientBalance;
+                if (colorMix < 0.5)
+                    colorMix = b * 2.0 * colorMix;
+                else
+                    colorMix = b + (1.0 - b) * 2.0 * (colorMix - 0.5);
 
                 // 1. BASE COLOR LAYER (Liquid Flow)
                 vec3 baseColor = mix(uColor1, uColor2, colorMix);
@@ -205,6 +221,8 @@ class GradientEngine {
             uHeightSpeed: { value: cfg.heightSpeed },
             uColorDensity: { value: cfg.colorDensity },
             uColorSpeed: { value: cfg.colorSpeed },
+            uColorGradientFalloff: { value: cfg.colorGradientFalloff },
+            uColorGradientBalance: { value: cfg.colorGradientBalance },
             uColor1: { value: this.currentColors[0] },
             uColor2: { value: this.currentColors[1] },
             uColor3: { value: this.currentColors[2] }
@@ -283,7 +301,6 @@ class GradientEngine {
         const delta = this.clock.getDelta();
         this.uniforms.uTime.value += delta;
         
-        // --- APPLIED ROTATION VECTOR ---
         this.mesh.rotation.x += this.config.rotationSpeed.x;
         this.mesh.rotation.y += this.config.rotationSpeed.y;
         this.mesh.rotation.z += this.config.rotationSpeed.z;
@@ -295,29 +312,26 @@ class GradientEngine {
     }
 }
 
-// INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
     new GradientEngine('gradient-canvas', {
         colors: ['#47ff54', '#f1ffe8', '#f0fd7c'], 
         
-        // SPHERE PHYSICS
-        heightDensity: 1,   // Density of the blobs
-        heightStrength: 0.3,  // How much it deforms (keep low < 1.0 to avoid self-intersection)
-        heightSpeed: 0.01,     
+        heightDensity: 0.9, 
+        heightStrength: 0.14,
+        heightSpeed: 0.2,     
         
-        // LIQUID COLOR
-        colorDensity: 2,    
-        colorSpeed: 0.01,      
+        colorDensity: 1.2,    
+        colorSpeed: 0.2,      
+        colorGradientFalloff: 1.4,
+        colorGradientBalance: 0.7,
 
-        rotationSpeed: { x: 0.001, y: 0.001, z: 0.0 },
+        rotationSpeed: { x: 0.0, y: 0.0, z: 0.0 },
         
         sphereRadius: 2.0,
         
-        // Center the sphere
         positionY: 0,
         
-        // Pull camera back to see the whole sphere
-        cameraPosition: { x: 0, y: 0, z: 2.5 }, 
+        cameraPosition: { x: 0, y: 0, z: 2.6 }, 
         cameraRotation: { x: 0, y: 0, z: 0 },
         
         segments: 512
