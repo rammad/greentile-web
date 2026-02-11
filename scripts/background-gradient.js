@@ -24,9 +24,9 @@ class GradientEngine {
             colorGradientFalloff: 1.0,  // 1 = linear; >1 = sharper bands; <1 = softer transition
             colorGradientBalance: 0.5,  // 0 = more color1, 1 = more color2, 0.5 = even
             
-            // --- PHYSICS: ROTATION ---
-            // x, y, z values determine speed per frame (lower = slower)
-            rotationSpeed: { x: 0.001, y: 0.002, z: 0.0 }, 
+            // --- PHYSICS: ROTATION (parallax from scroll) ---
+            // Rotation per pixel of scroll (scroll down = +rotation; scroll up = -rotation)
+            scrollRotationSpeed: { x: 0, y: 0, z: 0 },
             
             // Geometry
             sphereRadius: 2.0,
@@ -43,6 +43,7 @@ class GradientEngine {
             
             updateMode: 'observer',
             contentSelector: '#scroll-content',
+            useSectionObserver: true,  // false = use container data-colors (e.g. footer), true = follow active section
         }, config);
 
         this.init();
@@ -256,7 +257,10 @@ class GradientEngine {
         this.clock = new THREE.Clock();
         window.addEventListener('resize', () => this.onResize());
         
-        if (cfg.updateMode === 'observer') this.setupObserver();
+        if (cfg.useSectionObserver && cfg.updateMode === 'observer') this.setupObserver();
+        else if (this.canvas.parentElement && this.canvas.parentElement.hasAttribute('data-colors')) {
+            this.updateColors(this.canvas.parentElement.getAttribute('data-colors'));
+        }
 
         this.animate();
     }
@@ -289,6 +293,16 @@ class GradientEngine {
         return { width: window.innerWidth, height: window.innerHeight };
     }
 
+    getScrollPosition() {
+        // Lenis drives scroll via transform, so use its scroll value when available
+        if (typeof window !== 'undefined' && window.lenis != null && typeof window.lenis.scroll === 'number') {
+            return window.lenis.scroll;
+        }
+        const el = this.config.contentSelector ? document.querySelector(this.config.contentSelector) : null;
+        if (el) return el.scrollTop;
+        return typeof window !== 'undefined' ? (window.scrollY ?? document.documentElement.scrollTop) : 0;
+    }
+
     onResize() {
         const { width, height } = this.getDimensions();
         this.renderer.setSize(width, height);
@@ -300,10 +314,12 @@ class GradientEngine {
         requestAnimationFrame(() => this.animate());
         const delta = this.clock.getDelta();
         this.uniforms.uTime.value += delta;
-        
-        this.mesh.rotation.x += this.config.rotationSpeed.x;
-        this.mesh.rotation.y += this.config.rotationSpeed.y;
-        this.mesh.rotation.z += this.config.rotationSpeed.z;
+
+        const scrollPos = this.getScrollPosition();
+        const sr = this.config.scrollRotationSpeed;
+        this.mesh.rotation.x = scrollPos * sr.x;
+        this.mesh.rotation.y = scrollPos * sr.y;
+        this.mesh.rotation.z = scrollPos * sr.z;
 
         this.uniforms.uColor1.value.lerp(this.targetColors[0], 0.05);
         this.uniforms.uColor2.value.lerp(this.targetColors[1], 0.05);
@@ -325,8 +341,8 @@ document.addEventListener('DOMContentLoaded', () => {
         colorGradientFalloff: 1.4,
         colorGradientBalance: 0.7,
 
-        rotationSpeed: { x: 0.0, y: 0.0, z: 0.0 },
-        
+        scrollRotationSpeed: { x: -0.0004, y: 0.0, z: 0.0 },
+
         sphereRadius: 2.0,
         
         positionY: 0,
@@ -335,5 +351,30 @@ document.addEventListener('DOMContentLoaded', () => {
         cameraRotation: { x: 0, y: 0, z: 0 },
         
         segments: 512
+    });
+
+    new GradientEngine('footer-canvas', {
+        colors: ['#32CD32', '#f0f4f0', '#FABA2F'], 
+        
+        heightDensity: 0.9, 
+        heightStrength: 0.14,
+        heightSpeed: 0.2,     
+        
+        colorDensity: 1.2,    
+        colorSpeed: 0.2,      
+        colorGradientFalloff: 1.4,
+        colorGradientBalance: 0.7,
+
+        scrollRotationSpeed: { x: -0.0004, y: 0.0, z: 0.0 },
+
+        sphereRadius: 2.0,
+        
+        positionY: 0,
+        
+        cameraPosition: { x: 0, y: 0, z: 2.6 }, 
+        cameraRotation: { x: 0, y: 0, z: 0 },
+        
+        segments: 512,
+        useSectionObserver: false  // use #footer-gradient-container data-colors, not active section
     });
 });
