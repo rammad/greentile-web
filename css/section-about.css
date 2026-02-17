@@ -42,6 +42,8 @@
     position: relative;
     width: 100%;
     z-index: 10;
+    padding-top: 20vh;
+    padding-bottom: 20vh;
 }
 
 .about-slide {
@@ -128,6 +130,20 @@
     pointer-events: auto;
 }
 
+/* Pin flow: hide whole block (no transition) while position:fixed is applied; JS adds is-visible when removing is-pinning so base.css .type-body2.is-visible runs the fade in the right place */
+.about-slide-sticky.is-pinning .about-text-block {
+    opacity: 0;
+    filter: blur(var(--blur-standard));
+    transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease;
+}
+
+/* Unpin flow: fade whole block out (transition) before removing pin so no pop when returning to in-flow */
+.about-slide-sticky.is-unpinning .about-text-block {
+    opacity: 0;
+    filter: blur(var(--blur-standard));
+    transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease;
+}
+
 /* ----- about-us page: persistent "What We Do" menu + full-height slides ----- */
 .about.has-persistent-menu .about-slide {
     min-height: 100vh;
@@ -161,7 +177,7 @@
 .about-menu-persistent .menu-item {
     color: var(--color-placeholder);
     opacity: 0;
-    filter: blur(var(--standard-blur));
+    filter: blur(var(--blur-standard));
     margin-bottom: var(--standard-gap);
     cursor: pointer;
     transition: all var(--time-fade-out) ease;

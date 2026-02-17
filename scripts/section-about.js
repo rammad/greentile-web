@@ -1,7 +1,34 @@
 /* about section – column-based image animation; slide stack with body visibility */
 
 (function () {
-    const { transitionCta, observeElementInOut } = window.AnimationUtils || {};
+    const {
+        animate,
+        transitionCta,
+        observeElementInOut,
+        wait,
+        waitForTransition,
+        staggerTime
+    } = window.AnimationUtils || {};
+
+    const MOBILE_BREAKPOINT = 768;
+    const STEP_Y_MOBILE = 140;
+    const STEP_Y_DESKTOP = 160;
+    const COL_LEFT_X_MIN = -5;
+    const COL_LEFT_X_MAX = 25;
+    const COL_RIGHT_X_MIN = 65;
+    const COL_RIGHT_X_MAX = 95;
+    const IMG_WIDTH_MOBILE_MIN = 40;
+    const IMG_WIDTH_MOBILE_MAX = 55;
+    const IMG_WIDTH_DESKTOP_MIN = 7;
+    const IMG_WIDTH_DESKTOP_MAX = 12;
+    const IMG_JITTER_RANGE = 120;
+    const IMG_Z_INDEX_MAX = 20;
+    const SLIDE_START_OFFSET_VW = 20;
+    const ABOUT_BLOCK_ENTER_THRESHOLD = 0.3;
+    const ABOUT_COL_ENTER_THRESHOLD = 0.25;
+    const PIN_ENTER_RATIO = 0.4;
+    const PIN_LEAVE_RATIO = 0.3;
+    const PIN_OBSERVER_THRESHOLDS = [PIN_LEAVE_RATIO, 0.25, PIN_ENTER_RATIO, 0.5, 0.75, 1];
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('about');
@@ -13,27 +40,26 @@
         let trackHeight = 0;
 
         const initLayout = () => {
-            const isMobile = window.innerWidth < 768;
-            const stepY = isMobile ? 140 : 160;
+            const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+            const stepY = isMobile ? STEP_Y_MOBILE : STEP_Y_DESKTOP;
             let currentY = 0;
 
             images.forEach((img, index) => {
                 const isLeft = index % 2 === 0;
-                /* left column: 2–22%; right column: 78–98% (viewport %) so both sides appear on screen */
-                const minX = isLeft ? -5 : 65;
-                const maxX = isLeft ? 25 : 95;
+                const minX = isLeft ? COL_LEFT_X_MIN : COL_RIGHT_X_MIN;
+                const maxX = isLeft ? COL_LEFT_X_MAX : COL_RIGHT_X_MAX;
                 const randomX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
-                const minW = isMobile ? 40 : 7;
-                const maxW = isMobile ? 55 : 12;
+                const minW = isMobile ? IMG_WIDTH_MOBILE_MIN : IMG_WIDTH_DESKTOP_MIN;
+                const maxW = isMobile ? IMG_WIDTH_MOBILE_MAX : IMG_WIDTH_DESKTOP_MAX;
                 const randomW = Math.floor(Math.random() * (maxW - minW + 1)) + minW;
-                const jitter = Math.floor(Math.random() * 120) - 60;
+                const jitter = Math.floor(Math.random() * IMG_JITTER_RANGE) - IMG_JITTER_RANGE / 2;
                 const finalY = currentY + jitter;
 
                 img.style.width = `${randomW}vw`;
                 img.style.left = `${randomX}%`;
                 img.style.top = `${finalY}px`;
-                img.style.zIndex = Math.floor(Math.random() * 20);
-                const startX = isLeft ? '-20vw' : '20vw';
+                img.style.zIndex = Math.floor(Math.random() * IMG_Z_INDEX_MAX);
+                const startX = isLeft ? `-${SLIDE_START_OFFSET_VW}vw` : `${SLIDE_START_OFFSET_VW}vw`;
                 img.style.setProperty('--slide-start', startX);
                 currentY += stepY;
             });
@@ -48,7 +74,7 @@
             const textBlocks = section.querySelectorAll('.about-text-block');
             if (!stickyContent || textBlocks.length === 0 || trackHeight <= 0) return;
 
-            const slideHeight = trackHeight / 3;
+            const slideHeight = trackHeight / textBlocks.length;
             const slidesWrap = document.createElement('div');
             slidesWrap.className = 'about-slides';
 
@@ -67,19 +93,21 @@
             section.appendChild(slidesWrap);
             stickyContent.remove();
 
-            /* Observe each body block – animate in when the body is visible, not the parent */
-            section.querySelectorAll('.about-text-block').forEach((block, i) => {
+            /* Observe each body block – pin logic handles enter (animate + transitionCta); here only reset on leave */
+            section.querySelectorAll('.about-text-block').forEach((block) => {
+                const cta = block.querySelector('.cta-btn');
+                const bodyText = block.querySelectorAll('.type-body2, .type-body1');
                 observeElementInOut(block, {
                     root: viewport,
-                    enterThreshold: 0.2,
+                    enterThreshold: ABOUT_BLOCK_ENTER_THRESHOLD,
+                    repeat: true,
                     onEnter() {
                         block.style.pointerEvents = 'auto';
-                        Array.from(block.children).forEach((child, j) => {
-                            setTimeout(() => {
-                                if (child.classList.contains('cta-btn') && transitionCta) transitionCta(child, 'enter');
-                                else child.classList.add('is-visible');
-                            }, j * 100);
-                        });
+                    },
+                    onLeave() {
+                        block.style.pointerEvents = 'none';
+                        bodyText.forEach((el) => el.classList.remove('is-visible'));
+                        if (cta && transitionCta) transitionCta(cta, 'exit');
                     }
                 });
             });
@@ -99,12 +127,12 @@
 
             observeElementInOut(colLeft, {
                 root: viewport,
-                enterThreshold: 0.1,
+                enterThreshold: ABOUT_COL_ENTER_THRESHOLD,
                 onEnter() { leftImages.forEach((img) => img.classList.add('is-visible')); }
             });
             observeElementInOut(colRight, {
                 root: viewport,
-                enterThreshold: 0.1,
+                enterThreshold: ABOUT_COL_ENTER_THRESHOLD,
                 onEnter() { rightImages.forEach((img) => img.classList.add('is-visible')); }
             });
         }
@@ -116,50 +144,109 @@
         /* Track: absolute so slides define section height; track sits behind */
         track.classList.add('about-image-track-positioned');
 
-        /* Pin body text when its slide is in view (observe .about-slide so pin state doesn’t affect observed rect).
-         * Hysteresis: pin when slide ratio >= 0.4, unpin when < 0.15. */
+        /* Pin/unpin by slide visibility; use animate() for fade-in, waitForTransition for fade-out. */
         const slides = section.querySelectorAll('.about-slide');
         const slideRatios = new Map();
         let pinnedSticky = null;
-        const PIN_ENTER = 0.4;
-        const PIN_LEAVE = 0.15;
+        let unpinningInProgress = false;
+        const pinDelayMs = typeof staggerTime === 'number' ? staggerTime : 200;
+
+        function clearPin(sticky) {
+            if (!sticky) return;
+            sticky.classList.remove('is-pinned', 'is-pinning', 'is-unpinning');
+            sticky.querySelectorAll('.type-body2, .type-body1').forEach((el) => el.classList.remove('is-visible'));
+            const cta = sticky.querySelector('.cta-btn');
+            if (cta && transitionCta) transitionCta(cta, 'exit');
+        }
+
+        async function applyPin(candidateSticky) {
+            // 1. Let the previous pin fade out gracefully instead of instantly ripping it off
+            if (pinnedSticky && pinnedSticky !== candidateSticky) {
+                startUnpin(pinnedSticky);
+            }
+            
+            pinnedSticky = candidateSticky;
+            candidateSticky.classList.add('is-pinned', 'is-pinning');
+            candidateSticky.classList.remove('is-unpinning');
+
+            await wait(pinDelayMs);
+            if (pinnedSticky !== candidateSticky) return;
+
+            candidateSticky.classList.remove('is-pinning');
+            const bodyText = candidateSticky.querySelectorAll('.type-body2, .type-body1');
+            for (const el of bodyText) {
+                if (animate) await animate(el, 'is-visible');
+                else el.classList.add('is-visible');
+            }
+            const cta = candidateSticky.querySelector('.cta-btn');
+            if (cta && transitionCta) await transitionCta(cta, 'enter');
+        }
+
+        async function startUnpin(sticky) {
+            if (!sticky || sticky.classList.contains('is-unpinning') || unpinningInProgress) return;
+            unpinningInProgress = true;
+            sticky.classList.add('is-unpinning');
+
+            // 1. Trigger the fade out on the text/cta FIRST while still pinned
+            sticky.querySelectorAll('.type-body2, .type-body1').forEach((el) => el.classList.remove('is-visible'));
+            const cta = sticky.querySelector('.cta-btn');
+            if (cta && transitionCta) transitionCta(cta, 'exit');
+
+            // 2. Wait for the CSS fade-out transition to finish
+            const textElements = sticky.querySelectorAll('.type-body2, .type-body1');
+            if (textElements.length > 0 && waitForTransition) {
+                await waitForTransition(textElements[0]);
+            } else if (wait) {
+                await wait(pinDelayMs); // Use pinDelayMs instead of hardcoded 200
+            }
+
+            // 3. NOW remove the pin classes, returning it to standard document flow invisibly
+            clearPin(sticky);
+            if (pinnedSticky === sticky) pinnedSticky = null;
+            unpinningInProgress = false;
+        }
+
         const pinObserver = new IntersectionObserver(
             (entries) => {
+                if (unpinningInProgress) return; // Don't process while unpinning
+
                 entries.forEach((e) => slideRatios.set(e.target, e.intersectionRatio));
                 const currentSlide = pinnedSticky ? pinnedSticky.closest('.about-slide') : null;
                 const currentRatio = currentSlide ? (slideRatios.get(currentSlide) ?? 0) : 0;
-                if (pinnedSticky && currentRatio < PIN_LEAVE) {
-                    pinnedSticky.classList.remove('is-pinned');
-                    pinnedSticky = null;
+
+                if (pinnedSticky && currentRatio <= PIN_LEAVE_RATIO) {
+                    startUnpin(pinnedSticky);
+                    return; // Don't continue to applyPin in same tick
                 }
+
                 let maxRatio = 0;
                 let candidateSticky = null;
                 slides.forEach((slide) => {
                     const r = slideRatios.get(slide) ?? 0;
-                    if (r >= PIN_ENTER && r > maxRatio) {
+                    if (r >= PIN_ENTER_RATIO && r > maxRatio) {
                         maxRatio = r;
                         candidateSticky = slide.querySelector('.about-slide-sticky');
                     }
                 });
+
                 if (candidateSticky && candidateSticky !== pinnedSticky) {
-                    if (pinnedSticky) pinnedSticky.classList.remove('is-pinned');
-                    candidateSticky.classList.add('is-pinned');
-                    pinnedSticky = candidateSticky;
+                    applyPin(candidateSticky);
                 }
             },
-            { root: viewport, threshold: [0, PIN_LEAVE, 0.25, PIN_ENTER, 0.5, 0.75, 1] }
+            { root: viewport, threshold: PIN_OBSERVER_THRESHOLDS }
         );
         slides.forEach((s) => pinObserver.observe(s));
 
-        let timer;
+        let resizeTimer;
+        const resizeDebounceMs = typeof staggerTime === 'number' ? staggerTime : 200;
         window.addEventListener('resize', () => {
-            clearTimeout(timer);
-            timer = setTimeout(() => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
                 initLayout();
-                const slides = section.querySelectorAll('.about-slide');
-                const slideHeight = trackHeight / 3;
-                slides.forEach((s) => { s.style.height = `${slideHeight}px`; });
-            }, 200);
+                const slidesAfterResize = section.querySelectorAll('.about-slide');
+                const slideHeight = trackHeight / slidesAfterResize.length;
+                slidesAfterResize.forEach((s) => { s.style.height = `${slideHeight}px`; });
+            }, resizeDebounceMs);
         });
     });
 })();
