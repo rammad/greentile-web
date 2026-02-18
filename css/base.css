@@ -67,6 +67,9 @@
     --ease-standard: cubic-bezier(0.19, 1, 0.22, 1);
     --ease-out-long: cubic-bezier(0, 0, .2, 1);
 
+    /** Cascade title animation: vertical travel distance (small = subtle). */
+    --cascade-travel: 15%;
+
     --blur-standard: 10px;
 
     --space-for-nav: 90px;
@@ -266,14 +269,19 @@ section {
 
 .char-reveal {
     display: inline-block !important;
-    opacity: 1;
-    transform: translateY(110%) rotateX(-20deg); 
+    opacity: 0;
+    transform: translateY(var(--cascade-travel)) rotateX(-5deg);
     transform-origin: bottom center;
     white-space: pre-wrap;
-    transition: transform var(--time-cascade) var(--ease-standard);
-    will-change: transform;
+    transition:
+        transform var(--time-cascade) var(--ease-standard),
+        opacity var(--time-cascade) var(--ease-standard);
+    will-change: transform, opacity;
 }
-.char-reveal.is-visible { transform: translateY(0) rotateX(0deg); }
+.char-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+}
 
 .hero-faded {
     opacity: 0 !important;

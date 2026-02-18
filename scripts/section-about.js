@@ -20,7 +20,7 @@
     const IMG_WIDTH_MOBILE_MIN = 40;
     const IMG_WIDTH_MOBILE_MAX = 55;
     const IMG_WIDTH_DESKTOP_MIN = 7;
-    const IMG_WIDTH_DESKTOP_MAX = 12;
+    const IMG_WIDTH_DESKTOP_MAX = 15;
     const IMG_JITTER_RANGE = 120;
     const IMG_Z_INDEX_MAX = 20;
     const SLIDE_START_OFFSET_VW = 20;
@@ -31,7 +31,7 @@
     const PIN_OBSERVER_THRESHOLDS = [PIN_LEAVE_RATIO, 0.25, PIN_ENTER_RATIO, 0.5, 0.75, 1];
     
     /* Image randomization: avoid consecutive similar values */
-    const IMG_VARIATION_MIN_DIFF = 0.3; /* Minimum difference (0-1) from previous image (higher = more forced variation) */
+    const IMG_VARIATION_MIN_DIFF = 0.2; /* Minimum difference (0-1) from previous image (higher = more forced variation) */
     
     /* Generate random value that's sufficiently different from previous value */
     function getVariedRandom(min, max, previousValue = null, minDiff = IMG_VARIATION_MIN_DIFF) {
