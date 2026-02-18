@@ -76,6 +76,8 @@
     max-width: 600px;
     padding: 0 20px;
     text-align: center;
+    transform: translateY(var(--pinned-scroll-offset, 0px));
+    transition: transform 0.1s linear;
 }
 
 .scatter-img {
@@ -87,7 +89,7 @@
     aspect-ratio: 4 / 5;
     object-fit: cover;
     opacity: 0;
-    transform: translateX(var(--slide-start, 0px));
+    transform: translateX(var(--slide-start, 0px)) scale(1);
     transition:
         opacity var(--time-fade-out) linear,
         transform var(--time-fade-out) ease-in;
@@ -96,10 +98,9 @@
 
 .scatter-img.is-visible {
     opacity: 1;
-    transform: translateX(0px);
     transition:
         opacity var(--time-fade-in) ease,
-        transform var(--time-fade-in) var(--ease-out-long);
+        transform var(--time-fade-in) ease;
 }
 
 .about-text-block .cta-btn {
@@ -142,6 +143,39 @@
     opacity: 0;
     filter: blur(var(--blur-standard));
     transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease;
+}
+
+/* About body text: slide in/out based on scroll direction with opposite exit */
+/* Entering (not visible yet): slide from direction of scroll */
+.about[data-scroll-direction="down"] .type-body2:not(.is-visible),
+.about[data-scroll-direction="down"] .type-body1:not(.is-visible) {
+    transform: translateY(100px);
+}
+
+.about[data-scroll-direction="up"] .type-body2:not(.is-visible),
+.about[data-scroll-direction="up"] .type-body1:not(.is-visible) {
+    transform: translateY(-100px);
+}
+
+/* Exiting (parent has is-unpinning): slide opposite direction */
+.about[data-scroll-direction="down"] .about-slide-sticky.is-unpinning .type-body2,
+.about[data-scroll-direction="down"] .about-slide-sticky.is-unpinning .type-body1 {
+    transform: translateY(-100px);
+}
+
+.about[data-scroll-direction="up"] .about-slide-sticky.is-unpinning .type-body2,
+.about[data-scroll-direction="up"] .about-slide-sticky.is-unpinning .type-body1 {
+    transform: translateY(100px);
+}
+
+.about .type-body2,
+.about .type-body1 {
+    transition: opacity var(--time-fade-in) ease, filter var(--time-fade-in) ease, transform var(--time-fade-in) ease;
+}
+
+.about .type-body2.is-visible,
+.about .type-body1.is-visible {
+    transform: translateY(0);
 }
 
 /* ----- about-us page: persistent "What We Do" menu + full-height slides ----- */

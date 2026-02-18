@@ -29,6 +29,14 @@
     const PIN_ENTER_RATIO = 0.4;
     const PIN_LEAVE_RATIO = 0.3;
     const PIN_OBSERVER_THRESHOLDS = [PIN_LEAVE_RATIO, 0.25, PIN_ENTER_RATIO, 0.5, 0.75, 1];
+    
+    /* Image scale effect: images grow as they approach vertical center of viewport (curved surface feel) */
+    const IMG_SCALE_MIN = 1.0;     /* Scale when image is at top/bottom edge of viewport */
+    const IMG_SCALE_MAX = 1.0;    /* Scale when image is at vertical center of viewport */
+    
+    /* Pinned text scroll parallax: subtle vertical movement while pinned */
+    const PINNED_TEXT_SCROLL_RANGE = 150; /* Total pixels the text can move up/down during its pin duration */
+    const PINNED_TEXT_PARALLAX_FACTOR = 0.1; /* How much the scroll delta affects position (0.0-1.0, lower = slower) */
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('about');
@@ -38,6 +46,9 @@
         const track = section.querySelector('.about-image-track');
         const images = track ? Array.from(track.querySelectorAll('.scatter-img')) : [];
         let trackHeight = 0;
+        let lastScrollY = 0;
+        let scrollDirection = 'down'; /* 'up' or 'down' */
+        let pinnedScrollStart = 0; /* Scroll position when current slide was pinned */
 
         const initLayout = () => {
             const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
@@ -106,8 +117,14 @@
                     },
                     onLeave() {
                         block.style.pointerEvents = 'none';
+                        const sticky = block.closest('.about-slide-sticky');
+                        if (sticky) sticky.classList.add('is-unpinning');
                         bodyText.forEach((el) => el.classList.remove('is-visible'));
                         if (cta && transitionCta) transitionCta(cta, 'exit');
+                        /* Remove is-unpinning after transition so next enter uses correct starting position */
+                        setTimeout(() => {
+                            if (sticky) sticky.classList.remove('is-unpinning');
+                        }, 600);
                     }
                 });
             });
@@ -144,6 +161,76 @@
         /* Track: absolute so slides define section height; track sits behind */
         track.classList.add('about-image-track-positioned');
 
+        /* Image scale effect: scale images based on distance from viewport center (curved surface) */
+        function updateImageScales() {
+            if (!viewport) return;
+            const viewportRect = viewport.getBoundingClientRect();
+            const viewportCenterY = viewportRect.height / 2;
+
+            images.forEach((img) => {
+                const imgRect = img.getBoundingClientRect();
+                const imgCenterY = imgRect.top + imgRect.height / 2 - viewportRect.top;
+                const distanceFromCenter = Math.abs(imgCenterY - viewportCenterY);
+                const maxDistance = viewportRect.height / 2;
+                const proximity = 1 - Math.min(distanceFromCenter / maxDistance, 1);
+                const scale = IMG_SCALE_MIN + (IMG_SCALE_MAX - IMG_SCALE_MIN) * proximity;
+                img.style.transform = `translateX(${img.classList.contains('is-visible') ? '0px' : img.style.getPropertyValue('--slide-start')}) scale(${scale})`;
+            });
+        }
+
+        /* Track scroll direction for body text slide-in direction */
+        function updateScrollDirection() {
+            if (!window.lenis) return;
+            const currentScrollY = window.lenis.scroll;
+            if (currentScrollY > lastScrollY) scrollDirection = 'down';
+            else if (currentScrollY < lastScrollY) scrollDirection = 'up';
+            lastScrollY = currentScrollY;
+            section.setAttribute('data-scroll-direction', scrollDirection);
+        }
+        
+        /* Apply subtle parallax to pinned text based on scroll delta */
+        function updatePinnedTextParallax(currentScroll) {
+            if (!pinnedSticky) return;
+            
+            const slide = pinnedSticky.closest('.about-slide');
+            if (!slide) return;
+            
+            const viewportHeight = window.innerHeight;
+            const slideRect = slide.getBoundingClientRect();
+            
+            // Calculate where the slide's center is relative to viewport center
+            // When slide center = viewport center, this is 0
+            // Positive = slide is below center, Negative = slide is above center
+            const slideCenterY = slideRect.top + (slideRect.height / 2);
+            const viewportCenterY = viewportHeight / 2;
+            const distanceFromCenter = slideCenterY - viewportCenterY;
+            
+            // Map this distance to our offset range
+            // Scale it down significantly since distanceFromCenter can be hundreds of pixels
+            const offset = -distanceFromCenter * PINNED_TEXT_PARALLAX_FACTOR;
+            const clampedOffset = Math.max(-PINNED_TEXT_SCROLL_RANGE / 2, Math.min(PINNED_TEXT_SCROLL_RANGE / 2, offset));
+            
+            const textBlock = pinnedSticky.querySelector('.about-text-block');
+            if (textBlock) {
+                console.log('Parallax:', { 
+                    slideCenterY: slideCenterY.toFixed(0),
+                    viewportCenterY: viewportCenterY.toFixed(0),
+                    distanceFromCenter: distanceFromCenter.toFixed(0),
+                    offset: offset.toFixed(1), 
+                    clampedOffset: clampedOffset.toFixed(1) 
+                });
+                textBlock.style.setProperty('--pinned-scroll-offset', `${-clampedOffset}px`);
+            }
+        }
+
+        window.addEventListener('lenis-scroll', (e) => {
+            const currentScroll = e.detail?.scroll ?? 0;
+            updateScrollDirection();
+            updateImageScales();
+            updatePinnedTextParallax(currentScroll);
+        });
+        updateImageScales();
+
         /* Pin/unpin by slide visibility; use animate() for fade-in, waitForTransition for fade-out. */
         const slides = section.querySelectorAll('.about-slide');
         const slideRatios = new Map();
@@ -157,6 +244,10 @@
             sticky.querySelectorAll('.type-body2, .type-body1').forEach((el) => el.classList.remove('is-visible'));
             const cta = sticky.querySelector('.cta-btn');
             if (cta && transitionCta) transitionCta(cta, 'exit');
+            
+            // Reset parallax offset
+            const textBlock = sticky.querySelector('.about-text-block');
+            if (textBlock) textBlock.style.removeProperty('--pinned-scroll-offset');
         }
 
         async function applyPin(candidateSticky) {
@@ -166,6 +257,7 @@
             }
             
             pinnedSticky = candidateSticky;
+            pinnedScrollStart = window.lenis ? window.lenis.scroll : 0;
             candidateSticky.classList.add('is-pinned', 'is-pinning');
             candidateSticky.classList.remove('is-unpinning');
 

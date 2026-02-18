@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
         colorGradientFalloff: 1.4,
         colorGradientBalance: 0.7,
 
-        scrollRotationSpeed: { x: -0.0004, y: 0.0, z: 0.0 },
+        scrollRotationSpeed: { x: -0.0002, y: 0.0, z: 0.0 },
 
         sphereRadius: 2.0,
         
