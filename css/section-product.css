@@ -1,26 +1,27 @@
 /* pdp / product page */
 
 .pdp-section {
-    position: relative; 
+    position: relative;
     width: 100%;
-    height: 100vh;           
-    min-height: 100vh;      
-    overflow: visible !important;    
-    padding-top: var(--space-for-nav); 
-    padding-bottom: var(--standard-margin);
-    padding-left: var(--standard-margin);
-    padding-right: var(--standard-margin);
-    
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; 
+    min-height: 100vh; /* JS sets explicit height for the scroll track */
+    overflow: visible !important;
     z-index: 10;
 }
 
-.pdp-section .back-arrow {
-    position: relative;
-    align-self: flex-start;
-    margin-bottom: var(--standard-margin);
+.pdp-sticky-wrapper .back-arrow {
+    left: var(--standard-margin);
+}
+
+.pdp-sticky-wrapper {
+    /* back-arrow is position:absolute so grid fills the full padded area */
+    --pdp-target-height: calc(100vh - var(--space-for-nav) - 2 * var(--standard-margin));
+
+    position: sticky;
+    top: var(--space-for-nav);
+    width: 100%;
+    height: calc(100vh - var(--space-for-nav));
+    padding: var(--standard-margin);
+    box-sizing: border-box;
 }
 
 .pdp-meta-row,
@@ -34,6 +35,7 @@
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
+    overscroll-behavior-y: contain; /* don't bubble scroll to the page */
     scrollbar-width: none;
     -ms-overflow-style: none;
     margin-bottom: var(--standard-margin);
@@ -98,101 +100,117 @@
 } */
 
 .pdp-grid {
-    --pdp-target-height: calc(100vh - (var(--space-for-nav) + var(--standard-margin)));
     --pdp-col-width: calc(var(--pdp-target-height) * 0.8);
 
-    height: var(--pdp-target-height); 
+    /* explicit height so columns' height:100% always resolves correctly */
+    height: var(--pdp-target-height);
     width: 100%;
 
     display: flex;
     justify-content: center;
-    gap: 4vw; 
-    align-items: stretch; 
+    gap: 4vw;
+    align-items: stretch;
 }
 
-.pdp-image-col, 
+.pdp-image-col,
 .pdp-info {
     width: var(--pdp-col-width);
     flex: 0 0 auto;
     height: 100%;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.pdp-image-col::-webkit-scrollbar, 
-.pdp-info::-webkit-scrollbar {
-    display: none;
-}
-
-.pdp-image-col {
-    overflow-y: auto;
 }
 
 .pdp-info {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
+.pdp-info::-webkit-scrollbar {
+    display: none;
+}
+
+/* image column: relative + overflow visible so thumbnails can extend left */
 .pdp-image-col {
-    display: block; 
+    position: relative;
+    overflow: visible;
 }
 
+/* thumbnails are clickable */
 .pdp-poster {
-    display: block;
+    cursor: pointer;
+}
+
+/* all posters absolutely stacked; JS drives width/height/left per scroll */
+.pdp-poster {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto; 
-    aspect-ratio: 4 / 5;
+    height: 100%;
     object-fit: cover;
-    
     opacity: 0;
-    transition: opacity var(--time-fade-out) ease;
-}
-
-.pdp-poster + .pdp-poster {
-    margin-top: 20px; 
-}
-
-.pdp-poster.is-visible {
-    opacity: 1; 
     transition: opacity var(--time-fade-in) ease;
 }
 
+.pdp-poster.is-visible {
+    opacity: 1;
+}
 
-/* mobile */
+
+/* mobile: native stacking layout, no scroll animation */
 @media (max-width: 1024px) {
     .pdp-section {
-        padding: 100px 20px 80px 20px;
-        display: block; 
-        height: auto;
+        height: auto !important;
         min-height: 100vh;
     }
 
+    .pdp-sticky-wrapper {
+        position: relative;
+        top: unset;
+        height: auto;
+        padding: 100px 20px 80px;
+        box-sizing: border-box;
+    }
+
     .pdp-grid {
-        height: auto; 
+        height: auto;
         display: flex;
         flex-direction: column-reverse;
         gap: 40px;
         overflow: visible;
     }
-    
-    .pdp-image-col, 
+
+    .pdp-image-col,
     .pdp-info {
-        width: 100%; 
+        width: 100%;
         height: auto;
-        overflow-y: visible;
         overflow: visible;
+    }
+
+    .pdp-image-col {
+        position: relative;
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
+    }
+
+    .pdp-poster {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* hide all but first poster on mobile */
+    .pdp-poster:not(:first-child) {
+        display: none;
     }
 
     .pdp-desc {
         flex: none;
         min-height: unset;
         overflow-y: visible;
-    }
-    
-    .pdp-poster {
-        width: 100%; 
-        aspect-ratio: 4/5; 
     }
 }
 
@@ -272,28 +290,3 @@
     opacity: 1;
 }
 
-
-@media (max-width: 1024px) {
-    .pdp-section {
-        padding: 100px 20px 80px 20px;
-        display: block; 
-    }
-
-    .pdp-grid {
-        display: flex;
-        flex-direction: column; 
-        gap: 40px;
-        padding-bottom: 100px;
-    }
-    
-    .pdp-info {
-        width: 100%;
-        height: auto;
-    }
-
-    .pdp-image-col {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 4 / 5;
-    }
-}
