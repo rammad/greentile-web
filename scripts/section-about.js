@@ -30,6 +30,29 @@
     const PIN_LEAVE_RATIO = 0.3;
     const PIN_OBSERVER_THRESHOLDS = [PIN_LEAVE_RATIO, 0.25, PIN_ENTER_RATIO, 0.5, 0.75, 1];
     
+    /* Image randomization: avoid consecutive similar values */
+    const IMG_VARIATION_MIN_DIFF = 0.3; /* Minimum difference (0-1) from previous image (higher = more forced variation) */
+    
+    /* Generate random value that's sufficiently different from previous value */
+    function getVariedRandom(min, max, previousValue = null, minDiff = IMG_VARIATION_MIN_DIFF) {
+        if (previousValue === null) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        const range = max - min;
+        const minDistance = range * minDiff;
+        let attempts = 0;
+        let value;
+        
+        // Try to find a value that's far enough from previous
+        do {
+            value = Math.floor(Math.random() * (max - min + 1)) + min;
+            attempts++;
+        } while (Math.abs(value - previousValue) < minDistance && attempts < 10);
+        
+        return value;
+    }
+    
     /* Image scale effect: images grow as they approach vertical center of viewport (curved surface feel) */
     const IMG_SCALE_MIN = 1.0;     /* Scale when image is at top/bottom edge of viewport */
     const IMG_SCALE_MAX = 1.0;    /* Scale when image is at vertical center of viewport */
@@ -54,15 +77,23 @@
             const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
             const stepY = isMobile ? STEP_Y_MOBILE : STEP_Y_DESKTOP;
             let currentY = 0;
+            
+            // Track previous values for each column to ensure variation
+            const prevLeft = { x: null, w: null };
+            const prevRight = { x: null, w: null };
 
             images.forEach((img, index) => {
                 const isLeft = index % 2 === 0;
+                const prev = isLeft ? prevLeft : prevRight;
+                
                 const minX = isLeft ? COL_LEFT_X_MIN : COL_RIGHT_X_MIN;
                 const maxX = isLeft ? COL_LEFT_X_MAX : COL_RIGHT_X_MAX;
-                const randomX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+                const randomX = getVariedRandom(minX, maxX, prev.x);
+                
                 const minW = isMobile ? IMG_WIDTH_MOBILE_MIN : IMG_WIDTH_DESKTOP_MIN;
                 const maxW = isMobile ? IMG_WIDTH_MOBILE_MAX : IMG_WIDTH_DESKTOP_MAX;
-                const randomW = Math.floor(Math.random() * (maxW - minW + 1)) + minW;
+                const randomW = getVariedRandom(minW, maxW, prev.w);
+                
                 const jitter = Math.floor(Math.random() * IMG_JITTER_RANGE) - IMG_JITTER_RANGE / 2;
                 const finalY = currentY + jitter;
 
@@ -72,6 +103,11 @@
                 img.style.zIndex = Math.floor(Math.random() * IMG_Z_INDEX_MAX);
                 const startX = isLeft ? `-${SLIDE_START_OFFSET_VW}vw` : `${SLIDE_START_OFFSET_VW}vw`;
                 img.style.setProperty('--slide-start', startX);
+                
+                // Update previous values for this column
+                prev.x = randomX;
+                prev.w = randomW;
+                
                 currentY += stepY;
             });
 
