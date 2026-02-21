@@ -58,7 +58,7 @@
     const IMG_SCALE_MAX = 1.0;    /* Scale when image is at vertical center of viewport */
     
     /* Pinned text scroll parallax: subtle vertical movement while pinned */
-    const PINNED_TEXT_SCROLL_RANGE = 150; /* Total pixels the text can move up/down during its pin duration */
+    const PINNED_TEXT_SCROLL_RANGE = 50; /* Total pixels the text can move up/down during its pin duration */
     const PINNED_TEXT_PARALLAX_FACTOR = 0.1; /* How much the scroll delta affects position (0.0-1.0, lower = slower) */
 
     document.addEventListener('DOMContentLoaded', () => {

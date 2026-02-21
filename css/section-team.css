@@ -1,0 +1,200 @@
+/* =========================================
+   TEAM SECTION
+   Three-column layout:
+     ├ sticky title (left)
+     ├ naturally-scrolling poster images (middle)
+     └ proportionally-scrolling member bios (right)
+
+   Expected HTML skeleton:
+   ───────────────────────────────────────────
+   <section id="team" class="team-section" data-colors="...">
+     <div class="team-layout">
+
+       <div class="team-title-col">
+         <span class="type-sub1">...</span>
+         <div class="type-h1">TEAM</div>
+       </div>
+
+       <div class="team-images-col">
+         <div class="team-poster-wrap">
+           <img class="team-poster" src="..." alt="...">
+         </div>
+         <!-- repeat .team-poster-wrap for each member -->
+       </div>
+
+       <div class="team-text-col">
+         <div class="team-text-inner">
+           <div class="team-member">
+             <span class="team-member-name type-sub1">Name</span>
+             <span class="team-member-role type-sub2">Role</span>
+             <p class="type-body1">Bio…</p>
+           </div>
+           <!-- repeat .team-member for each member -->
+         </div>
+       </div>
+
+     </div>
+   </section>
+   ========================================= */
+
+/* ── Section shell ───────────────────────── */
+
+.team-section {
+    position: relative;
+    width: 100%;
+    /* Clears the sticky nav; images + title begin just below it */
+    padding-top: calc(var(--space-for-nav, 90px) + var(--standard-margin, 20px));
+    padding-bottom: calc(var(--standard-margin, 20px) * 3);
+}
+
+/* ── Three-column grid ───────────────────── */
+
+/*
+ * Four-column grid:
+ *   col 1 – title: narrow sticky label on the far left
+ *   col 2 – spacer (1fr): pushes images + text to the right edge
+ *   col 3 – images: sized so each 4∕5 poster fills ~80vh
+ *   col 4 – text: fixed-ish width for readable bios
+ *
+ * Children are explicitly placed via grid-column so the auto-placement
+ * algorithm doesn't fill the spacer column.
+ */
+.team-layout {
+    display: grid;
+    grid-template-columns:
+        minmax(80px, 15%)                                               /* title  */
+        1fr                                                             /* spacer */
+        calc((100vh - var(--space-for-nav, 90px) - 60px) * 4 / 5)     /* images */
+        clamp(220px, 25vw, 380px);                                     /* text   */
+    column-gap: calc(var(--standard-margin, 20px) * 2);
+    align-items: start;
+    padding: 0 var(--standard-margin);
+    box-sizing: border-box;
+}
+
+.team-title-col  { grid-column: 1; }
+.team-images-col { grid-column: 3; }
+.team-text-col   { grid-column: 4; }
+
+/* ── Left: sticky title ─────────────────── */
+
+.team-title-col {
+    position: sticky;
+    top: var(--space-for-nav, 90px);
+    align-self: start;
+}
+
+/* ── Middle: naturally scrolling images ──── */
+
+.team-images-col {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--standard-margin, 20px) * 2);
+}
+
+.team-poster-wrap {
+    width: 100%;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+        opacity 0.8s ease,
+        transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.team-poster-wrap.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.team-poster {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    display: block;
+}
+
+/* ── Right: proportionally scrolling text ── */
+
+/*
+ * The column itself is sticky and clips the overflowing text.
+ * JS drives a translateY on .team-text-inner so the content
+ * scrolls proportionally to the section's scroll progress,
+ * finishing exactly when the last poster reaches the bottom.
+ */
+.team-text-col {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    align-self: start;
+    box-sizing: border-box;
+}
+
+.team-text-inner {
+    /* Padding pushes content below the sticky nav */
+    padding-top: calc(var(--space-for-nav, 90px) + var(--standard-margin, 20px));
+    will-change: transform;
+}
+
+.team-member-name {
+    display: block;
+    margin-bottom: calc(var(--standard-margin, 20px) * 1.5);
+}
+
+.team-member-name:last-child {
+    margin-bottom: 0;
+}
+
+/* ── Reduced motion ─────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+    .team-poster-wrap {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+    .team-text-inner {
+        transition: none;
+    }
+}
+
+/* ── Mobile ─────────────────────────────── */
+
+@media (max-width: 768px) {
+    .team-section {
+        padding-bottom: var(--standard-margin, 20px);
+    }
+
+    .team-layout {
+        grid-template-columns: 1fr;
+        row-gap: calc(var(--standard-margin, 20px) * 2);
+    }
+
+    .team-title-col,
+    .team-images-col,
+    .team-text-col { grid-column: 1; }
+
+    .team-title-col {
+        position: relative;
+        top: 0;
+    }
+
+    /* Images fill natural width on mobile */
+    .team-poster-wrap {
+        opacity: 1;
+        transform: none;
+    }
+
+    /* Text column reverts to normal flow; JS translateY is cleared */
+    .team-text-col {
+        position: relative;
+        height: auto;
+        overflow: visible;
+    }
+
+    .team-text-inner {
+        padding-top: 0;
+        transform: none !important;
+    }
+}

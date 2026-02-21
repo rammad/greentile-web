@@ -250,3 +250,63 @@
 .has-persistent-menu .cta-btn {
     top: 100%;
 }
+
+/* ── about-us: menu pinned (position:fixed) while section is in view ── */
+.about.has-persistent-menu .about-menu-persistent.is-pinned {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding-top: 80px; /* sit below sticky nav */
+    pointer-events: auto;
+    z-index: 50;
+}
+
+/* ── about-us: slide content anchored to lower half of viewport so it
+      sits below the pinned menu ── */
+.about.has-persistent-menu .about-slide-sticky.is-pinned {
+    align-items: flex-end;
+    padding-bottom: 10vh;
+}
+
+/* Strip the layout-only padding-top when content is inside the fixed sticky */
+.about.has-persistent-menu .about-slide-sticky.is-pinned .about-content {
+    padding-top: 0;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+/* about-content needs position:relative so its absolute-child .cta-btn works */
+.about.has-persistent-menu .about-content {
+    position: relative;
+}
+
+/* Hide body text during pin/unpin transitions (same pattern as .about-text-block) */
+.about.has-persistent-menu .about-slide-sticky.is-pinning .about-content,
+.about.has-persistent-menu .about-slide-sticky.is-unpinning .about-content {
+    opacity: 0;
+    filter: blur(var(--blur-standard));
+    transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease;
+}
+
+/* Body text in about-us starts hidden until JS adds is-visible */
+.about.has-persistent-menu .about-content .type-body1 {
+    opacity: 0;
+    filter: blur(var(--blur-standard));
+}
+
+.about.has-persistent-menu .about-content .type-body1.is-visible {
+    opacity: 1;
+    filter: blur(0);
+}
+
+@media (max-width: 768px) {
+    .about.has-persistent-menu .about-menu-persistent.is-pinned {
+        padding-top: 60px;
+    }
+    .about.has-persistent-menu .about-slide-sticky.is-pinned {
+        padding-bottom: 6vh;
+    }
+}
