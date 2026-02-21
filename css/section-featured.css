@@ -3,32 +3,90 @@
 .featured-section {
     position: relative;
     width: 100%;
-    height: 100vh;
-    min-height: 100vh;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
+    height: 150vh;
 }
 
-.featured-grid {
-    width: 100%;
-    height: 100%;
-    max-height: 100vh;
+/* blurred background — scrolls naturally with the section */
+.featured-bg-img {
+    position: absolute;
+    inset: -60px;
+    width: calc(100% + 120px);
+    height: calc(100% + 120px);
+    object-fit: cover;
+    object-position: center;
+    filter: blur(48px);
+    transform: scale(1.05);
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* dark scrim sits over the scrolling bg */
+.featured-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+/* sticky viewport frame — marquee + poster stick here */
+.featured-frame {
+    position: sticky;
+    top: 0;
+    height: 100vh;
     display: flex;
     align-items: center;
-    gap: 80px;
+    justify-content: center;
     padding-top: var(--space-for-nav);
     padding-bottom: var(--standard-margin);
-    padding-left: var(--section-padding);
-    padding-right: var(--section-padding);
     box-sizing: border-box;
+    z-index: 2;
 }
 
-.featured-image-container {
-    display: block;
-    height: 100%; 
+/* marquee behind poster */
+.featured-marquee-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+}
+
+.featured-marquee-track {
+    display: flex;
+    gap: clamp(40px, 5vw, 80px);
+    white-space: nowrap;
+    animation: featured-scroll 90s linear infinite;
+    will-change: transform;
+}
+
+.featured-marquee-item {
+    font-family: var(--font-header);
+    font-size: clamp(80px, 13vw, 200px);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 1);
+    flex-shrink: 0;
+}
+
+@keyframes featured-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+/* centered poster */
+.featured-poster-wrap {
+    position: relative;
+    z-index: 3;
+    height: 100%;
+    /* max-height: 520px; */
     aspect-ratio: 4 / 5;
-    flex-shrink: 0; 
+    flex-shrink: 0;
 }
 
 .featured-img {
@@ -38,75 +96,27 @@
     object-position: center;
     display: block;
     opacity: 0;
-    transform: scale(1.05);
-    transition: opacity 1s ease, transform 1s ease-out;
+    transform: translateY(24px) scale(1.04);
+    transition: opacity 0.9s ease, transform 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .featured-img.is-visible {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0) scale(1);
 }
 
-.featured-content {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
-
-.featured-text-wrapper {
-    width: 100%;
-    max-width: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-/* 
-.featured-content .type-body1 {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.featured-content .type-body1.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-} */
-
-
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
     .featured-section {
-        height: 100vh !important; 
-        
-        overflow-y: auto; 
-        -webkit-overflow-scrolling: touch;
-        display: block; 
-        padding-top: 120px;
-        padding-bottom: 0;
+        height: 140vh;
     }
 
-    .featured-grid {
-        height: auto; 
-        min-height: 100%;
-        
-        flex-direction: column; 
-        justify-content: flex-start;
-        gap: 40px;
-
-        padding-bottom: 120px; 
-    }
-
-    .featured-image-container {
-        width: 100%;
+    .featured-poster-wrap {
         height: auto;
-        aspect-ratio: 4/5;
+        width: min(72vw, 300px);
+        max-height: none;
     }
-    
-    .featured-content {
-        width: 100%;
-        height: auto;
-        flex-grow: 0;
+
+    .featured-marquee-item {
+        font-size: clamp(64px, 18vw, 100px);
     }
 }

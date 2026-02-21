@@ -1,52 +1,20 @@
-/* featured section – one-time entrance when visible, then stay */
+/* featured section – fade poster in on scroll enter */
 
 (function () {
-    const { transitionHeader, transitionCta, observeElementInOut, staggerTime } = window.AnimationUtils || {};
+    const { observeElementInOut } = window.AnimationUtils || {};
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.querySelector('.featured-section');
         if (!section) return;
 
-        const subtitle = section.querySelector('.text-mask');
-        const title = section.querySelector('.animate-cascade');
-        const body = section.querySelector('.type-body1');
-        const btn = section.querySelector('.cta-btn');
         const image = section.querySelector('.featured-img');
 
-        const stagger = staggerTime || 200;
-
-        if (subtitle) {
-            observeElementInOut(subtitle, {
-                onEnter() { subtitle.classList.add('is-visible'); }
-            });
-        }
-
-        if (title) {
-            observeElementInOut(title, {
-                onEnter() {
-                    setTimeout(() => transitionHeader && transitionHeader(title, 'enter'), stagger);
-                }
-            });
-        }
-
-        if (body) {
-            observeElementInOut(body, {
-                onEnter() { setTimeout(() => body.classList.add('is-visible'), stagger * 2); }
-            });
-        }
-
-        if (image) {
+        if (image && observeElementInOut) {
             observeElementInOut(image, {
-                onEnter() { setTimeout(() => image.classList.add('is-visible'), stagger * 2); }
+                onEnter() { image.classList.add('is-visible'); }
             });
-        }
-
-        if (btn) {
-            observeElementInOut(btn, {
-                onEnter() {
-                    setTimeout(() => transitionCta && transitionCta(btn, 'enter'), stagger * 3);
-                }
-            });
+        } else if (image) {
+            image.classList.add('is-visible');
         }
     });
 })();

@@ -171,6 +171,22 @@ section {
 .type-display-hero.is-initialized { opacity: 1; }
 .type-display-hero span { display: inline; }
 
+/**
+ * .fit-text — font-size is calculated by fitTextToWidth() in global.js.
+ * Formula: fontSize = (containerWidth / renderedWidth@100px) × 100px
+ * The JS reads the number of rendered characters at a reference size and
+ * scales to fill the container, so the title stays full-width regardless
+ * of how many characters it contains or what the viewport width is.
+ * Element stays invisible (opacity: 0) until JS calls .is-initialized.
+ */
+.fit-text {
+    display: block;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity var(--time-fade-in) ease;
+}
+.fit-text.is-initialized { opacity: 1; }
+
 .type-display-xl {
     font-family: var(--font-display);
     font-size: var(--size-display-xl);

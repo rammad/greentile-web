@@ -1,132 +1,114 @@
 /* =========================================
-   EVENTS SECTION (Clean Universal Mode)
+   EVENTS SECTION
+   One sticky 100vh viewport. Title and
+   posters are both vertically centered.
+   Cards animate in automatically on entry.
    ========================================= */
 
 .events-section {
     position: relative;
     width: 100%;
-    min-height: 100vh;
-    background: transparent;
-}
-
-.events-sticky-wrapper {
-    position: relative;
-    min-height: 100vh;
-    width: 100%;
-    overflow: hidden;
     padding: 0;
-    display: flex;
-    flex-direction: column;
+    min-height: 160vh; /* sticky lingers for ~60vh of scroll after section enters */
 }
 
-.events-section-header {
-    position: relative;
-    display: flex;
+/* ── Single sticky viewport ─────────────── */
+
+.events-sticky {
+    position: sticky;
+    top: 0;
     width: 100%;
-    padding: 140px 20px 0 20px;
-    justify-content: space-between;
+    height: 100vh;
+    overflow: hidden;
+    /* Vertically center the in-flow content (.events-content).
+       The title-wrap is absolute and centers itself independently. */
+    display: flex;
     align-items: center;
-    z-index: 10;
+    justify-content: center;
+}
+
+/* ── Title: absolute-centered behind the posters ── */
+
+.events-title-wrap {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 1;
     pointer-events: none;
     overflow: hidden;
-    flex-shrink: 0;
+    padding: 0 var(--standard-margin, 20px);
 }
+
+.events-title-wrap #event-title {
+    display: block;
+    width: 100%;
+    text-align: center;
+    /* font-size is set at runtime by fitTextToWidth() in global.js */
+}
+
+/* ── Posters: in-flow, vertically centered by flex parent ── */
+
+.events-content {
+    position: relative;
+    width: 100%;
+    z-index: 2;
+}
+
+/* ── Poster Grid ────────────────────────── */
 
 .events-grid {
-    position: relative;
-    margin-top: 0;
-    padding: 0 20px 140px 20px;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    z-index: 5;
+    grid-template-columns: repeat(var(--poster-count, 4), 1fr);
+    gap: calc(var(--standard-margin, 20px) * 2);
+    padding: 0 var(--standard-margin, 20px);
+    width: 100%;
+    box-sizing: border-box;
 }
 
-@media (min-width: 769px) {
-    .events-grid .event-card:nth-child(even) {
-        margin-top: 64px; 
-    }
-}
-
+/*
+ * Cards start one full card-height below their grid slot (clipped by the
+ * sticky's overflow:hidden). --card-extra adds a random 0–80 px on top so
+ * each card travels a slightly different distance before landing at Y = 0.
+ */
 .event-card {
     opacity: 0;
-    transform: translateX(100px); 
-    transition: 
-        opacity 0.8s ease, 
-        transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+    transform: translateY(calc(100% + var(--card-extra, 0px)));
+    transition:
+        opacity var(--time-fade-in, 0.6s) ease,
+        transform 1.8s var(--ease-out-long, cubic-bezier(0, 0, .2, 1));
 }
 
 .event-card.is-visible {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
 }
 
 .event-poster {
     width: 100%;
-    aspect-ratio: 4/5;
+    aspect-ratio: 4 / 5;
     object-fit: cover;
-    background-color: var(--color-placeholder);
     display: block;
 }
 
+/* ── CTA ────────────────────────────────── */
+
+.events-content-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--standard-margin, 20px);
+}
+
+/* ── Mobile ─────────────────────────────── */
+
 @media (max-width: 768px) {
-    .events-section {
-        height: 100vh !important; 
-        
-        overflow-y: auto; 
-        -webkit-overflow-scrolling: touch;
-        
-        display: block; 
-        padding-top: 120px;
-        
-        pointer-events: auto !important; 
-    }
-
-    .events-sticky-wrapper {
-        height: auto; 
-        min-height: 100%;
-        width: 100%;
-        overflow: visible;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .events-section-header {
-        position: relative;
-        padding: 0 20px 40px 20px;
-        width: 100%;
-        flex-shrink: 0;
-        height: auto;
-        
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-    }
-
-    .events-section-header .cta-btn {
-        align-self: flex-start;
-    }
-
     .events-grid {
-        position: relative;
-        top: auto; 
-        left: auto; 
-        right: auto;
-        
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 40px;
-        
-        padding: 0 20px 140px 20px; 
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .event-card {
-        width: 100%;
-        margin: 0;
         opacity: 1;
         transform: none;
     }

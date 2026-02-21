@@ -2,6 +2,85 @@
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+/**
+ * Returns the current season based on calendar month.
+ * Spring: Mar–May  |  Summer: Jun–Aug  |  Fall: Sep–Nov  |  Winter: Dec–Feb
+ */
+function getCurrentSeason() {
+    const month = new Date().getMonth() + 1; // 1=Jan … 12=Dec
+    if (month >= 3 && month <= 5)  return { name: 'spring', label: 'Spring' };
+    if (month >= 6 && month <= 8)  return { name: 'summer', label: 'Summer' };
+    if (month >= 9 && month <= 11) return { name: 'fall',   label: 'Fall'   };
+    return { name: 'winter', label: 'Winter' };
+}
+
+/**
+ * Scales an element's font-size so its text spans the full width of its
+ * parent container. Uses a single render-measure-scale pass (fast).
+ * Call after fonts are loaded and text content is set.
+ * @param {HTMLElement} element
+ * @param {{ padding?: number }} [options]
+ */
+function fitTextToWidth(element, options = {}) {
+    if (!element) return;
+    const { padding = 0 } = options;
+    const container   = element.parentElement || document.body;
+    const cs          = getComputedStyle(container);
+    const containerPadding = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    const targetWidth = container.clientWidth - containerPadding - padding * 2;
+    if (targetWidth <= 0) return;
+
+    // Save and override styles needed for an accurate text-width measurement.
+    // Setting width to max-content prevents the element's own 100% width
+    // from clamping scrollWidth to the container width instead of the text.
+    const savedWhiteSpace = element.style.whiteSpace;
+    const savedWidth      = element.style.width;
+    element.style.whiteSpace = 'nowrap';
+    element.style.width      = 'max-content';
+    element.style.fontSize   = '100px';
+
+    // getBoundingClientRect gives sub-pixel precision (scrollWidth rounds).
+    const textWidth = element.getBoundingClientRect().width;
+    if (textWidth === 0) {
+        element.style.whiteSpace = savedWhiteSpace;
+        element.style.width      = savedWidth;
+        return;
+    }
+
+    element.style.fontSize   = `${(targetWidth / textWidth) * 100}px`;
+    element.style.whiteSpace = savedWhiteSpace;
+    element.style.width      = savedWidth; // restore (typically '' or '100%')
+}
+
+/**
+ * Initialise all .fit-text elements and re-run on window resize.
+ *
+ * Elements with data-fit-managed="true" receive only the font-size
+ * calculation; their visibility reveal is handled by their own section
+ * script (which also owns cascade setup and entrance animation timing).
+ */
+function initFitText() {
+    const elements = document.querySelectorAll('.fit-text');
+    if (!elements.length) return;
+
+    document.fonts.ready.then(() => {
+        elements.forEach(el => {
+            fitTextToWidth(el);
+            if (!el.dataset.fitManaged && !el.classList.contains('is-initialized')) {
+                el.classList.add('is-initialized');
+            }
+        });
+    });
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            elements.forEach(el => fitTextToWidth(el));
+        }, 50);
+    });
+}
+
 const INTERACTION_LOCK_MS = 500; 
 const SEQUENTIAL_ELEMENT_STAGGER_MS = 200;
 const SCROLL_SPEED = 40;
@@ -137,10 +216,20 @@ window.AnimationUtils = {
     enterThreshold: ENTER_THRESHOLD
 };
 
+/** Universal app utilities (non-animation): season detection, text fitting, etc. */
+window.AppUtils = {
+    getCurrentSeason,
+    fitTextToWidth,
+};
+
+/* Expose so section scripts can re-run cascade split after setting dynamic text. */
+window.initCascadeReveal = initCascadeReveal;
+
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
     // initCTA(); /* section scripts handle ctas */
     initCascadeReveal();
+    initFitText();
     setTimeout(() => {
         const nav = document.querySelector('nav');
         if(nav) nav.classList.add('nav-loaded');
