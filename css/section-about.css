@@ -1,4 +1,4 @@
-/* about section – slide stack (equal portions) + sticky body; column-based image animation */
+/* about section – slide stack + sticky body text + column-based image scatter */
 
 .about {
     position: relative;
@@ -15,7 +15,7 @@
     min-height: 100vh;
 }
 
-/* Track sits behind slides; height set by JS */
+/* track sits behind slides; height set by js */
 .about-image-track-positioned {
     position: absolute;
     top: 0;
@@ -25,7 +25,7 @@
     z-index: 0;
 }
 
-/* Column sentinels: bind image visibility to full column (left/right half of track) */
+/* invisible sentinels that span left/right halves — used to trigger column image visibility */
 .about-col {
     position: absolute;
     top: 0;
@@ -37,7 +37,6 @@
 .about-col-left { left: 0; }
 .about-col-right { left: 50%; }
 
-/* Slide stack: each slide = equal portion of full column; body animates when body is visible */
 .about-slides {
     position: relative;
     width: 100%;
@@ -51,7 +50,7 @@
     width: 100%;
 }
 
-/* Sticky wrapper: keeps body text centered in viewport after it fades in */
+/* keeps body text centered in viewport while pinned */
 .about-slide-sticky {
     position: sticky;
     top: 0;
@@ -112,7 +111,7 @@
     white-space: nowrap;
 }
 
-/* Pin when in view (Lenis doesn’t support CSS sticky) – JS adds .is-pinned */
+/* lenis doesn't support css sticky — js adds .is-pinned to switch to position:fixed */
 .about-slide-sticky.is-pinned {
     position: fixed;
     top: 0;
@@ -131,22 +130,21 @@
     pointer-events: auto;
 }
 
-/* Pin flow: hide whole block (no transition) while position:fixed is applied; JS adds is-visible when removing is-pinning so base.css .type-body2.is-visible runs the fade in the right place */
+/* hide instantly while position:fixed is being applied, then fade in after .is-pinning is removed */
 .about-slide-sticky.is-pinning .about-text-block {
     opacity: 0;
     filter: blur(var(--blur-standard));
     transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease;
 }
 
-/* Unpin flow: fade whole block out (transition) before removing pin so no pop when returning to in-flow */
+/* fade out before removing pin so there's no pop when returning to document flow */
 .about-slide-sticky.is-unpinning .about-text-block {
     opacity: 0;
     filter: blur(var(--blur-standard));
     transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease;
 }
 
-/* About body text: slide in/out based on scroll direction with opposite exit */
-/* Entering (not visible yet): slide from direction of scroll */
+/* body text slides in from scroll direction on enter, exits in opposite direction */
 .about[data-scroll-direction="down"] .type-body2:not(.is-visible),
 .about[data-scroll-direction="down"] .type-body1:not(.is-visible) {
     transform: translateY(100px);
@@ -157,7 +155,6 @@
     transform: translateY(-100px);
 }
 
-/* Exiting (parent has is-unpinning): slide opposite direction */
 .about[data-scroll-direction="down"] .about-slide-sticky.is-unpinning .type-body2,
 .about[data-scroll-direction="down"] .about-slide-sticky.is-unpinning .type-body1 {
     transform: translateY(-100px);
@@ -178,7 +175,8 @@
     transform: translateY(0);
 }
 
-/* ----- about-us page: persistent "What We Do" menu + full-height slides ----- */
+/* about-us page: persistent menu + full-height slides */
+
 .about.has-persistent-menu .about-slide {
     min-height: 100vh;
 }
@@ -251,26 +249,25 @@
     top: 100%;
 }
 
-/* ── about-us: menu pinned (position:fixed) while section is in view ── */
+/* menu switches to position:fixed while section is in view */
 .about.has-persistent-menu .about-menu-persistent.is-pinned {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     width: 100%;
-    /* Push the menu down so it and the body read as a centered pair */
-    padding-top: 20vh;
+    padding-top: 20vh; /* pushes menu down so menu + body read as a centered pair */
     pointer-events: auto;
     z-index: 50;
 }
 
-/* ── about-us: slide content pulled up symmetrically toward the menu ── */
+/* slide content pulled up symmetrically toward the pinned menu */
 .about.has-persistent-menu .about-slide-sticky.is-pinned {
     align-items: flex-end;
     padding-bottom: 20vh;
 }
 
-/* Strip the layout-only padding-top when content is inside the fixed sticky */
+/* strip layout padding when content is inside the fixed sticky */
 .about.has-persistent-menu .about-slide-sticky.is-pinned .about-content {
     padding-top: 0;
     width: 100%;
@@ -278,12 +275,12 @@
     text-align: center;
 }
 
-/* about-content needs position:relative so its absolute-child .cta-btn works */
+/* needs position:relative so absolute-child .cta-btn resolves correctly */
 .about.has-persistent-menu .about-content {
     position: relative;
 }
 
-/* Hide body text during pin/unpin transitions (same pattern as .about-text-block) */
+/* hide body text during pin/unpin transitions (same pattern as .about-text-block) */
 .about.has-persistent-menu .about-slide-sticky.is-pinning .about-content,
 .about.has-persistent-menu .about-slide-sticky.is-unpinning .about-content {
     opacity: 0;
@@ -291,7 +288,6 @@
     transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease;
 }
 
-/* Body text in about-us starts hidden until JS adds is-visible */
 .about.has-persistent-menu .about-content .type-body1 {
     opacity: 0;
     filter: blur(var(--blur-standard));

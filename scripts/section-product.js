@@ -1,12 +1,13 @@
 /* product page */
+
 (() => {
     const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils;
 
-    /* ── image swipe constants ────────────────────────────────────────────── */
-    const THUMB_W_PCT       = 30;    /* thumbnail width as % of image column */
-    const THUMB_GAP_PCT     = 5;     /* gap between thumbnails as % of image column */
-    const THUMB_STEP_PCT    = THUMB_W_PCT + THUMB_GAP_PCT; /* 35% — slot size */
-    const TAB_OFFSET_PX     = 20;    /* px each past image steps right to show as a clickable tab */
+    // tweak these to adjust the image swipe layout
+    const THUMB_W_PCT       = 30;    // thumbnail width as % of image column
+    const THUMB_GAP_PCT     = 5;     // gap between thumbnails as %
+    const THUMB_STEP_PCT    = THUMB_W_PCT + THUMB_GAP_PCT; // slot size = 35%
+    const TAB_OFFSET_PX     = 20;    // px each past image steps right to peek as a tab
     const MOBILE_BREAKPOINT = 1024;
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -18,7 +19,6 @@
         }
     });
 
-    /* ── page entrance animation ─────────────────────────────────────────── */
     async function initProductPage() {
         const section = document.querySelector('.pdp-section');
         if (section) section.classList.add('is-active');
@@ -59,7 +59,6 @@
         if (cta) transitionCta(cta, 'enter');
     }
 
-    /* ── swipe-to-next image animation ──────────────────────────────────────── */
     function setupImageScrollTrack() {
         const imageCol = document.querySelector('.pdp-image-col');
         const desc     = document.querySelector('.pdp-desc');
@@ -80,12 +79,10 @@
             `top    ${SWIPE_MS}ms ${SWIPE_EASE}`,
         ].join(', ');
 
-        /* z-index fixed by sequence order — never changes.
-           higher index = higher z so forward swipes cover the previous image
-           and backward swipes reveal it underneath with no popping. */
+        // z-index fixed by sequence order: higher index = higher z
+        // so forward swipes cover previous image, backward swipes reveal it underneath
         posters.forEach((poster, i) => { poster.style.zIndex = i + 1; });
 
-        /* place every poster at its resting position for the given active index */
         function applyPositions(active, animate) {
             const colW     = imageCol.clientWidth;
             const colH     = imageCol.clientHeight;
@@ -97,21 +94,20 @@
                 const ahead = i - active;
 
                 if (ahead < 0) {
-                    /* past: full size, staggered right so each peeks out as
-                       a clickable tab to the right of the active image */
+                    /* past: full size, staggered right so each peeks as a tab */
                     const tabOffset = Math.abs(ahead) * TAB_OFFSET_PX;
                     poster.style.top    = '0px';
                     poster.style.left   = `${tabOffset}px`;
                     poster.style.width  = '100%';
                     poster.style.height = `${colH}px`;
                 } else if (ahead === 0) {
-                    /* active: fills column flush to left edge */
+                    /* active: fills column flush to left */
                     poster.style.top    = '0px';
                     poster.style.left   = '0px';
                     poster.style.width  = '100%';
                     poster.style.height = `${colH}px`;
                 } else {
-                    /* upcoming thumbnails to the left */
+                    /* upcoming: thumbnails peeking from the left */
                     const leftPct = -(ahead * THUMB_STEP_PCT);
                     poster.style.top    = `${thumbTop}px`;
                     poster.style.left   = `${leftPct}%`;
@@ -121,8 +117,7 @@
             });
         }
 
-        /* sequential stepping — always moves one image at a time so
-           clicking an image 3 steps away animates through each one */
+        // always steps one image at a time so clicking 3 steps away animates through each
         let sequenceTarget = null;
 
         function stepOnce() {
@@ -141,7 +136,7 @@
 
             setTimeout(() => {
                 posters.forEach(p => { p.style.transition = ''; });
-                stepOnce(); /* re-evaluates sequenceTarget each step */
+                stepOnce(); // re-evaluates sequenceTarget each step
             }, SWIPE_MS);
         }
 
@@ -149,19 +144,16 @@
             if (target < 0 || target >= N || target === activeIdx) return;
             sequenceTarget = target;
             if (!isAnimating) stepOnce();
-            /* if mid-animation, current stepOnce() will pick up the new
-               sequenceTarget when it finishes and continue from there */
+            // if mid-animation, stepOnce() will pick up new sequenceTarget when it finishes
         }
 
-        /* initial layout – no animation */
         applyPositions(0, false);
 
-        /* click any poster → animate to it one step at a time */
         posters.forEach((poster, i) => {
             poster.addEventListener('click', () => goToImage(i));
         });
 
-        /* wheel → single step; skip if already animating */
+        // wheel: single step, skip if already animating
         function onWheel(e) {
             if (desc && desc.contains(e.target)) return;
             e.preventDefault();
@@ -170,7 +162,7 @@
         }
         window.addEventListener('wheel', onWheel, { passive: false });
 
-        /* touch swipe → snap */
+        // touch swipe
         let touchY = 0;
         window.addEventListener('touchstart', e => {
             if (desc && desc.contains(e.target)) return;
@@ -182,7 +174,7 @@
             if (Math.abs(dy) > 40) goToImage(activeIdx + (dy > 0 ? 1 : -1));
         }, { passive: true });
 
-        /* resize → re-measure and snap to current index */
+        // resize: re-measure and snap to current index
         let resizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
@@ -190,7 +182,7 @@
         });
     }
 
-    /* ── qty selector ────────────────────────────────────────────────────── */
+    // qty selector
     let qty = 1;
     const MAX_QTY = 4;
 

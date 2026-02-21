@@ -1,17 +1,6 @@
-/* about-us page: persistent menu + sticky content per slide + image scatter
- *
- * Mirrors the pin/unpin logic of section-about.js but adapted for the
- * has-persistent-menu variant where:
- *   - each .about-slide already exists in HTML with images + .about-content
- *   - .about-menu-persistent floats in the upper viewport while scrolling
- *   - .about-content is wrapped in .about-slide-sticky at runtime (same as
- *     section-about.js's buildSlideStack pattern)
- *   - active menu item tracks the dominant slide
- *
- * Menu visibility is tied entirely to the slide pin-state, NOT a separate
- * section IntersectionObserver.  This prevents the menu from showing up on
- * page load before any slide is actually pinned.
- */
+/* about-us page – persistent menu + sticky content per slide + image scatter
+ * mirrors section-about.js pin/unpin logic but each slide already exists in html
+ * menu visibility is tied to slide pin state (not a separate section observer) */
 
 (function () {
     const {
@@ -23,7 +12,7 @@
         staggerTime
     } = window.AnimationUtils || {};
 
-    /* ── image layout constants (mirrors section-about.js) ── */
+    // image layout constants (mirrors section-about.js)
     const MOBILE_BREAKPOINT = 768;
     const STEP_Y_MOBILE     = 140;
     const STEP_Y_DESKTOP    = 160;
@@ -39,7 +28,7 @@
     const IMG_Z_MAX         = 20;
     const SLIDE_START_VW    = 20;
 
-    /* ── pin logic constants (mirrors section-about.js) ── */
+    // pin logic constants (mirrors section-about.js)
     const PIN_ENTER_RATIO         = 0.4;
     const PIN_LEAVE_RATIO         = 0.3;
     const PIN_OBSERVER_THRESHOLDS = [PIN_LEAVE_RATIO, 0.25, PIN_ENTER_RATIO, 0.5, 0.75, 1];
@@ -58,9 +47,7 @@
         const slides    = Array.from(section.querySelectorAll('.about-slide'));
         if (!slides.length) return;
 
-        /* ── 1. Wrap each slide's .about-content in .about-slide-sticky ──
-         * Identical to the pattern section-about.js's buildSlideStack() uses.
-         * The same CSS pin classes then work for both pages. */
+        // wrap each slide's .about-content in .about-slide-sticky (same pattern as section-about.js)
         slides.forEach(slide => {
             const content = slide.querySelector('.about-content');
             if (!content || content.closest('.about-slide-sticky')) return;
@@ -70,12 +57,7 @@
             sticky.appendChild(content);
         });
 
-        /* ── 2. Position images within each slide + set slide height ──
-         * Uses the same column-scatter algorithm as section-about.js's
-         * initLayout(), scoped to one slide at a time.
-         * Slide height = trackH (the depth reached by the deepest image),
-         * clamped to at least 100vh by the existing CSS min-height rule.
-         * This avoids the large dead-space that a 1.5× multiplier creates. */
+        // scatter images within each slide and set slide min-height
         function initSlideImages(slide) {
             const images   = Array.from(slide.querySelectorAll('.scatter-img'));
             if (!images.length) return window.innerHeight;
@@ -108,13 +90,11 @@
 
         slides.forEach(slide => {
             const trackH = initSlideImages(slide);
-            /* Let CSS handle the 100vh minimum; JS only guarantees images fit.
-             * This removes the 1.5× dead-space from the previous version. */
+            // css handles 100vh minimum; js only guarantees images fit
             slide.style.minHeight = `${trackH}px`;
         });
 
-        /* ── 3. Column observers: batch image visibility per slide ──
-         * Mirrors section-about.js setupColumnObservers() but per-slide. */
+        // batch image visibility per side column, per slide
         slides.forEach(slide => {
             const images    = Array.from(slide.querySelectorAll('.scatter-img'));
             const leftImgs  = images.filter((_, i) => i % 2 === 0);
@@ -137,13 +117,8 @@
             });
         });
 
-        /* ── 4. Menu pin/unpin ──
-         * IMPORTANT: menu visibility is driven by the slide pin state — NOT a
-         * separate section IntersectionObserver.  A section observer with
-         * threshold:0 can fire spuriously on page load (Lenis layout init can
-         * create a brief intersection) and leave the menu visible over other
-         * sections.  Tying it to applyPin / startUnpin is reliable: the menu
-         * appears exactly when slide content is pinned, nothing more. */
+        // menu visibility is driven by slide pin state, not its own observer —
+        // avoids spurious show on page load from lenis layout init
         let menuPinned = false;
 
         function pinMenu() {
@@ -165,8 +140,7 @@
             const label = section.querySelector('.about-menu-persistent .menu-label .text-reveal-inner');
             if (mask)  mask.classList.remove('is-visible');
             if (label) label.classList.remove('is-visible');
-            /* Wait for the CSS fade-out transition, then snap back to position:absolute.
-             * Items are already opacity:0 by that point so the snap is invisible. */
+            // wait for css fade-out, then snap back to position:absolute (invisible at that point)
             const firstItem = menuItems[0];
             const delay = firstItem
                 ? (parseFloat(getComputedStyle(firstItem).transitionDuration) || 0.3) * 1000
@@ -174,7 +148,6 @@
             setTimeout(() => { if (!menuPinned) menuEl.classList.remove('is-pinned'); }, delay);
         }
 
-        /* ── 5. Active menu item ── */
         function setActiveItem(index) {
             menuItems.forEach(item => {
                 const idx = parseInt(item.getAttribute('data-index'), 10);
@@ -182,11 +155,8 @@
             });
         }
 
-        /* ── 6. Content pin/unpin (same state machine as section-about.js) ──
-         * After each unpin, re-evaluate all current slide ratios.  This handles
-         * the transition case: while unpinningInProgress the observer is paused,
-         * so after it finishes we look up which slide (if any) qualifies.  If
-         * none, we also unpin the menu. */
+        // content pin/unpin state machine (same as section-about.js)
+        // after each unpin, re-evaluates all slide ratios to handle the paused-observer gap
         const slideRatios       = new Map();
         let pinnedSticky        = null;
         let unpinningInProgress = false;
@@ -207,7 +177,7 @@
 
             pinnedSticky = candidateSticky;
             setActiveItem(slideIndex);
-            pinMenu(); /* show menu as soon as any slide is pinned */
+            pinMenu();
 
             candidateSticky.classList.add('is-pinned', 'is-pinning');
             candidateSticky.classList.remove('is-unpinning');
@@ -245,9 +215,7 @@
             if (pinnedSticky === sticky) pinnedSticky = null;
             unpinningInProgress = false;
 
-            /* Re-evaluate: the observer was paused during unpinning.
-             * If another slide became dominant, pin it.  If nothing qualifies,
-             * hide the menu. */
+            // observer was paused during unpin — re-evaluate to catch any slide that became dominant
             let maxRatio       = 0;
             let nextSticky     = null;
             let nextIndex      = -1;
@@ -269,7 +237,7 @@
 
         const pinObserver = new IntersectionObserver(
             (entries) => {
-                /* Always update ratios so re-evaluation after unpin is accurate */
+                // always update ratios so re-evaluation after unpin is accurate
                 entries.forEach(e => slideRatios.set(e.target, e.intersectionRatio));
 
                 if (unpinningInProgress) return;
@@ -304,7 +272,7 @@
 
         slides.forEach(slide => pinObserver.observe(slide));
 
-        /* ── 7. Scroll direction (drives text slide-in direction via CSS) ── */
+        // scroll direction drives text slide-in direction via css data attribute
         let lastScrollY = 0;
         window.addEventListener('lenis-scroll', () => {
             const cur = window.lenis?.scroll ?? 0;
@@ -315,7 +283,6 @@
 
         setActiveItem(0);
 
-        /* ── 8. Resize: reposition images and recalculate slide heights ── */
         let resizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);

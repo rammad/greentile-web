@@ -1,15 +1,12 @@
-/* =========================================
-   MASTER STYLESHEET
-   ========================================= */
+/* master stylesheet */
 
-/* universal variables */
 @import 'base.css?v=3';
 
-/* universal sections */
+/* nav + footer */
 @import 'nav.css';
 @import 'footer.css?v=2';
 
-/* home sections */
+/* home */
 @import 'section-hero.css';
 @import 'section-about.css?v=2';
 @import 'section-menu.css';
@@ -17,14 +14,13 @@
 @import 'section-featured.css';
 @import 'section-socials.css';
 
-/* about us sections */
+/* about-us */
 @import 'section-mission.css';
 @import 'section-menu.css';
 @import 'section-clients.css';
 
-/* events page sections */
+/* events page */
 @import 'section-calendar.css?v=2';
-
 
 @import 'section-product.css';
 

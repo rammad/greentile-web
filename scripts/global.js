@@ -1,26 +1,17 @@
-/* global utils */
+/* globals */
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-/**
- * Returns the current season based on calendar month.
- * Spring: Mar–May  |  Summer: Jun–Aug  |  Fall: Sep–Nov  |  Winter: Dec–Feb
- */
+// returns current season based on month: spring/summer/fall/winter
 function getCurrentSeason() {
-    const month = new Date().getMonth() + 1; // 1=Jan … 12=Dec
+    const month = new Date().getMonth() + 1; // 1=jan … 12=dec
     if (month >= 3 && month <= 5)  return { name: 'spring', label: 'Spring' };
     if (month >= 6 && month <= 8)  return { name: 'summer', label: 'Summer' };
     if (month >= 9 && month <= 11) return { name: 'fall',   label: 'Fall'   };
     return { name: 'winter', label: 'Winter' };
 }
 
-/**
- * Scales an element's font-size so its text spans the full width of its
- * parent container. Uses a single render-measure-scale pass (fast).
- * Call after fonts are loaded and text content is set.
- * @param {HTMLElement} element
- * @param {{ padding?: number }} [options]
- */
+// scales element font-size to fill container width — call after fonts load and text is set
 function fitTextToWidth(element, options = {}) {
     if (!element) return;
     const { padding = 0 } = options;
@@ -30,16 +21,14 @@ function fitTextToWidth(element, options = {}) {
     const targetWidth = container.clientWidth - containerPadding - padding * 2;
     if (targetWidth <= 0) return;
 
-    // Save and override styles needed for an accurate text-width measurement.
-    // Setting width to max-content prevents the element's own 100% width
-    // from clamping scrollWidth to the container width instead of the text.
+    // force max-content width so the element doesn't clamp its own scrollWidth
     const savedWhiteSpace = element.style.whiteSpace;
     const savedWidth      = element.style.width;
     element.style.whiteSpace = 'nowrap';
     element.style.width      = 'max-content';
     element.style.fontSize   = '100px';
 
-    // getBoundingClientRect gives sub-pixel precision (scrollWidth rounds).
+    // getBoundingClientRect gives sub-pixel precision (scrollWidth rounds)
     const textWidth = element.getBoundingClientRect().width;
     if (textWidth === 0) {
         element.style.whiteSpace = savedWhiteSpace;
@@ -49,16 +38,11 @@ function fitTextToWidth(element, options = {}) {
 
     element.style.fontSize   = `${(targetWidth / textWidth) * 100}px`;
     element.style.whiteSpace = savedWhiteSpace;
-    element.style.width      = savedWidth; // restore (typically '' or '100%')
+    element.style.width      = savedWidth;
 }
 
-/**
- * Initialise all .fit-text elements and re-run on window resize.
- *
- * Elements with data-fit-managed="true" receive only the font-size
- * calculation; their visibility reveal is handled by their own section
- * script (which also owns cascade setup and entrance animation timing).
- */
+// init fit-text on all .fit-text elements + resize listener
+// elements with data-fit-managed get font-size only; their section script handles visibility
 function initFitText() {
     const elements = document.querySelectorAll('.fit-text');
     if (!elements.length) return;
@@ -81,24 +65,18 @@ function initFitText() {
     });
 }
 
-const INTERACTION_LOCK_MS = 500; 
+// tweak these to adjust feel of scroll-based interactions
+const INTERACTION_LOCK_MS = 500;
 const SEQUENTIAL_ELEMENT_STAGGER_MS = 200;
 const SCROLL_SPEED = 40;
-/** Accumulated wheel delta must exceed this before triggering a section change (smoother scroll feel). */
-const SCROLL_WHEEL_THRESHOLD = 80;
-/** Eased scroll: how quickly current position catches target (0.05 = slow/velvety, 0.15 = snappier). */
-const SCROLL_EASE_FACTOR = 0.08;
-/** Eased scroll: wheel delta to step delta (e.g. 0.002 means 500px wheel = 1 section). */
-const SCROLL_SENSITIVITY = 0.002;
-/** Lenis: how fast scroll catches up (0.1 = default, 0.15–0.2 = responsive). */
-const LENIS_LERP = 0.18;
-/** Lenis: max animation duration in seconds (lower = snappier). */
-const LENIS_DURATION = 0.4;
-/** Lenis: wheel scroll speed multiplier (> 1 = more movement per tick). */
-const LENIS_WHEEL_MULTIPLIER = 1.2;
+const SCROLL_WHEEL_THRESHOLD = 80;       // accumulated wheel delta before triggering section change
+const SCROLL_EASE_FACTOR = 0.08;         // 0.05 = velvety, 0.15 = snappy
+const SCROLL_SENSITIVITY = 0.002;        // 500px wheel ≈ 1 section at 0.002
+const LENIS_LERP = 0.18;                 // how fast scroll catches up, 0.1 = default
+const LENIS_DURATION = 0.4;             // max scroll duration in seconds, lower = snappier
+const LENIS_WHEEL_MULTIPLIER = 1.2;     // wheel speed multiplier
 
-/** Element-level entrance only: animate in once when visible, then stay. No exit. Use repeat: true to fire onEnter every time element enters view (e.g. scroll-spy). */
-const ENTER_THRESHOLD = 0.15;
+const ENTER_THRESHOLD = 0.15; // how much of element must be visible to trigger entrance
 
 function observeElementInOut(element, options = {}) {
     if (!element) return () => {};
@@ -192,7 +170,6 @@ const transitionCta = async (element, direction = 'enter') =>{
         element.classList.remove('is-visible');
         if(text) text.classList.remove('is-visible');
     }
-    
 }
 
 window.AnimationUtils = {
@@ -216,13 +193,12 @@ window.AnimationUtils = {
     enterThreshold: ENTER_THRESHOLD
 };
 
-/** Universal app utilities (non-animation): season detection, text fitting, etc. */
 window.AppUtils = {
     getCurrentSeason,
     fitTextToWidth,
 };
 
-/* Expose so section scripts can re-run cascade split after setting dynamic text. */
+// exposed so section scripts can re-run split after setting text
 window.initCascadeReveal = initCascadeReveal;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -360,5 +336,3 @@ function initNavbar() {
         scrollTimer = setTimeout(() => { nav.classList.remove('nav-hidden'); }, 500);
     }, { passive: true });
 }
-
-/* initCTA() disabled - section scripts handle ctas */

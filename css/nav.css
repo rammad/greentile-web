@@ -56,7 +56,7 @@
     display: block;
 }
 
-/* --- ROLLING TEXT LINKS --- */
+/* rolling text links */
 
 .sticky-nav a {
     position: relative;
@@ -95,7 +95,7 @@
     transform: translateY(-100%);
 }
 
-/* underline (disabled)
+/* underline (disabled — maybe bring back later)
 .sticky-nav a::before {
     content: '';
     position: absolute;

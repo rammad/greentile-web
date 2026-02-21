@@ -1,25 +1,15 @@
-/* =========================================
-   EVENTS SECTION
-   One sticky 100vh viewport. Title and
-   posters are both vertically centered.
-   Cards animate in automatically on entry.
-   ========================================= */
+/* events section */
 
 .events-section {
     position: relative;
     width: 100%;
     padding: 0;
-    /* Phase 1 (100vh): section enters from below, title scrolls to centre.
-                        This is approach scroll — not part of section height.
-       Phase 2  (80vh): dead zone. Title stays centred, posters animate in.
-       Phase 3 (100vh): CSS sticky releases (section bottom constraint).
-                        Title + images scroll up naturally.
-                        Starts at 80vh into the section — not the very end.
-       Total = 180vh. */
+    /* phase 1 (100vh): section enters, title scrolls to centre
+       phase 2 (80vh): dead zone, cards animate in
+       phase 3 (100vh): sticky releases, content scrolls up naturally
+       total = ~240vh */
     min-height: 240vh;
 }
-
-/* ── Single sticky viewport ─────────────── */
 
 .events-sticky {
     position: sticky;
@@ -27,15 +17,12 @@
     width: 100%;
     height: 100vh;
     overflow: hidden;
-    /* Vertically center the in-flow content (.events-content).
-       The title-wrap is absolute and centers itself independently. */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* ── Title: absolute-centered behind the posters ── */
-
+/* title: absolute-centered behind the posters */
 .events-title-wrap {
     position: absolute;
     top: 0;
@@ -53,18 +40,14 @@
     display: block;
     width: 100%;
     text-align: center;
-    /* font-size is set at runtime by fitTextToWidth() in global.js */
+    /* font-size set at runtime by fitTextToWidth() */
 }
-
-/* ── Posters: in-flow, vertically centered by flex parent ── */
 
 .events-content {
     position: relative;
     width: 100%;
     z-index: 2;
 }
-
-/* ── Poster Grid ────────────────────────── */
 
 .events-grid {
     display: grid;
@@ -75,11 +58,8 @@
     box-sizing: border-box;
 }
 
-/*
- * transform and opacity are set as inline styles on every scroll frame by
- * section-events.js — position is a direct function of scroll, not an
- * animation. will-change promotes the layer to the GPU compositor.
- */
+/* transform and opacity are driven by scroll position via inline styles —
+   will-change promotes to gpu compositor */
 .event-card {
     opacity: 0;
     will-change: transform, opacity;
@@ -92,8 +72,6 @@
     display: block;
 }
 
-/* ── CTA ────────────────────────────────── */
-
 .events-content-footer {
     display: flex;
     justify-content: center;
@@ -101,14 +79,12 @@
     padding: var(--standard-margin, 20px);
 }
 
-/* ── Mobile ─────────────────────────────── */
-
 @media (max-width: 768px) {
     .events-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    /* Override inline styles set by scroll JS — show immediately on mobile */
+    /* override inline styles from scroll js — show immediately on mobile */
     .event-card {
         opacity: 1 !important;
         transform: none !important;

@@ -1,41 +1,41 @@
-/* events / calendar */
+/* events / calendar page */
 
 document.addEventListener('DOMContentLoaded', () => {
     const { staggerTime, wait, transitionHeader } = window.AnimationUtils;
 
-    const animateEntrance = async () =>{
-    const title = document.querySelector('.animate-cascade');
-    const subtitle = document.querySelector('.text-mask');
-    const filters = document.querySelectorAll('.ui-roll');
-    const rows = document.querySelectorAll('.calendar-row');
+    const animateEntrance = async () => {
+        const title = document.querySelector('.animate-cascade');
+        const subtitle = document.querySelector('.text-mask');
+        const filters = document.querySelectorAll('.ui-roll');
+        const rows = document.querySelectorAll('.calendar-row');
 
-    while (!title.classList.contains('is-initialized')){
-        await wait(50);
-    }
-
-    if (title) await transitionHeader(title, 'enter');
-
-    await wait(staggerTime);
-
-    if(subtitle) subtitle.classList.add('is-visible');
-
-    await wait(staggerTime);
-
-    if(filters.length > 0) {
-        for (let i = 0; i < filters.length; i++){
-            filters[i].classList.add('is-visible');
+        while (!title.classList.contains('is-initialized')) {
+            await wait(50);
         }
-    }
 
-    await wait(staggerTime);
+        if (title) await transitionHeader(title, 'enter');
 
-    if(rows.length > 0) {
-        for (let i = 0; i < rows.length; i++){
-            rows[i].classList.add('is-visible');
-            await wait(staggerTime * 0.5);
+        await wait(staggerTime);
+
+        if (subtitle) subtitle.classList.add('is-visible');
+
+        await wait(staggerTime);
+
+        if (filters.length > 0) {
+            for (let i = 0; i < filters.length; i++) {
+                filters[i].classList.add('is-visible');
+            }
         }
-    }
-}
+
+        await wait(staggerTime);
+
+        if (rows.length > 0) {
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].classList.add('is-visible');
+                await wait(staggerTime * 0.5);
+            }
+        }
+    };
 
     initEventInteractions();
     initRowPacker();
@@ -43,14 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileScrollSpy();
 });
 
-
-
 function initEventInteractions() {
     const pageContainer = document.getElementById('cal-page-container');
     const btnList = document.getElementById('btn-list');
     const btnGrid = document.getElementById('btn-grid');
-    
-    if(btnList && btnGrid && pageContainer) {
+
+    if (btnList && btnGrid && pageContainer) {
         btnList.addEventListener('click', () => {
             pageContainer.classList.remove('mode-grid');
             btnList.classList.add('active');
@@ -77,21 +75,20 @@ function initEventInteractions() {
                     const imgUrl = row.getAttribute('data-img');
                     const status = row.getAttribute('data-status');
 
-                    if(imgUrl) {
+                    if (imgUrl) {
                         posterImg.src = imgUrl;
                         posterWrapper.classList.add('active');
                     }
 
-                    if(statusSoon) statusSoon.style.opacity = '0';
-                    if(statusSold) statusSold.style.opacity = '0';
+                    if (statusSoon) statusSoon.style.opacity = '0';
+                    if (statusSold) statusSold.style.opacity = '0';
                     posterImg.style.opacity = '1';
 
                     if (status === 'coming-soon') {
-                        if(statusSoon) statusSoon.style.opacity = '1';
-                        posterImg.style.opacity = '0'; 
-                    } 
-                    else if (status === 'sold-out') {
-                        if(statusSold) {
+                        if (statusSoon) statusSoon.style.opacity = '1';
+                        posterImg.style.opacity = '0';
+                    } else if (status === 'sold-out') {
+                        if (statusSold) {
                             statusSold.style.opacity = '1';
                             randomizeSticker(statusSold);
                         }
@@ -106,7 +103,7 @@ function initEventInteractions() {
             });
 
             row.addEventListener('click', (e) => {
-                if(window.innerWidth > 768) {
+                if (window.innerWidth > 768) {
                     window.location.href = row.getAttribute('href');
                 }
             });
@@ -119,17 +116,17 @@ function initEventInteractions() {
 function randomizeGridStickers() {
     const gridStickers = document.querySelectorAll('.grid-item .badge-sold');
     gridStickers.forEach(el => {
-        randomizeSticker(el); 
+        randomizeSticker(el);
     });
 }
 
 function randomizeSticker(element) {
     const side = Math.floor(Math.random() * 4);
-    const offset = Math.random() * 75 + 10; 
-    
+    const offset = Math.random() * 75 + 10;
+
     let top, left;
 
-    switch(side) {
+    switch (side) {
         case 0: top = 10; left = offset; break;
         case 1: top = offset; left = 80; break;
         case 2: top = 80; left = offset; break;
@@ -138,12 +135,12 @@ function randomizeSticker(element) {
 
     element.style.top = `${top}%`;
     element.style.left = `${left}%`;
-    
+
     const rotation = Math.floor(Math.random() * 60) - 30;
     element.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
 }
 
-/* mobile: sync poster to centered list item */
+/* mobile: sync poster image to the centered list item via scroll spy */
 function initMobileScrollSpy() {
     if (window.innerWidth > 768) return;
 
@@ -168,13 +165,13 @@ function initMobileScrollSpy() {
     });
 
     items.forEach(item => observer.observe(item));
-};
+}
 
-/* pack list rows into grid by month */
+/* pack list rows into a grid grouped by month */
 function initRowPacker() {
     const container = document.getElementById('dynamic-grid-container');
     const listRows = document.querySelectorAll('.calendar-row');
-    
+
     if (!container || listRows.length === 0) return;
 
     container.innerHTML = '';
@@ -246,14 +243,14 @@ function initRowPacker() {
     ROWS.forEach(rowData => {
         const rowEl = document.createElement('div');
         rowEl.className = 'packed-row';
-        
+
         rowData.chunks.forEach(chunk => {
             const chunkEl = document.createElement('div');
             chunkEl.className = `packed-chunk span-${chunk.span}`;
-            
+
             const header = document.createElement('div');
             header.className = 'month-header';
-            header.classList.add('type-sub2')
+            header.classList.add('type-sub2');
             if (chunk.isContinuation) {
                 header.innerHTML = '<span class="spacer-line"></span>';
                 header.classList.add('continuation-header');

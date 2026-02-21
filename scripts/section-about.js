@@ -1,4 +1,4 @@
-/* about section – column-based image animation; slide stack with body visibility */
+/* about section – column-based image scatter + slide stack with sticky body text */
 
 (function () {
     const {
@@ -10,6 +10,7 @@
         staggerTime
     } = window.AnimationUtils || {};
 
+    // tweak these to adjust image scatter layout
     const MOBILE_BREAKPOINT = 768;
     const STEP_Y_MOBILE = 140;
     const STEP_Y_DESKTOP = 160;
@@ -29,37 +30,31 @@
     const PIN_ENTER_RATIO = 0.4;
     const PIN_LEAVE_RATIO = 0.3;
     const PIN_OBSERVER_THRESHOLDS = [PIN_LEAVE_RATIO, 0.25, PIN_ENTER_RATIO, 0.5, 0.75, 1];
-    
-    /* Image randomization: avoid consecutive similar values */
-    const IMG_VARIATION_MIN_DIFF = 0.2; /* Minimum difference (0-1) from previous image (higher = more forced variation) */
-    
-    /* Generate random value that's sufficiently different from previous value */
+
+    const IMG_VARIATION_MIN_DIFF = 0.2; // min difference (0-1) from previous image — higher = more forced variation
+
+    // picks a random value that's far enough from the previous one
     function getVariedRandom(min, max, previousValue = null, minDiff = IMG_VARIATION_MIN_DIFF) {
         if (previousValue === null) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
-        
         const range = max - min;
         const minDistance = range * minDiff;
         let attempts = 0;
         let value;
-        
-        // Try to find a value that's far enough from previous
         do {
             value = Math.floor(Math.random() * (max - min + 1)) + min;
             attempts++;
         } while (Math.abs(value - previousValue) < minDistance && attempts < 10);
-        
         return value;
     }
-    
-    /* Image scale effect: images grow as they approach vertical center of viewport (curved surface feel) */
-    const IMG_SCALE_MIN = 1.0;     /* Scale when image is at top/bottom edge of viewport */
-    const IMG_SCALE_MAX = 1.0;    /* Scale when image is at vertical center of viewport */
-    
-    /* Pinned text scroll parallax: subtle vertical movement while pinned */
-    const PINNED_TEXT_SCROLL_RANGE = 50; /* Total pixels the text can move up/down during its pin duration */
-    const PINNED_TEXT_PARALLAX_FACTOR = 0.1; /* How much the scroll delta affects position (0.0-1.0, lower = slower) */
+
+    // both currently 1.0 but leaving these here to tweak the curved-surface scale effect
+    const IMG_SCALE_MIN = 1.0;
+    const IMG_SCALE_MAX = 1.0;
+
+    const PINNED_TEXT_SCROLL_RANGE = 50;      // total px the text can drift up/down while pinned
+    const PINNED_TEXT_PARALLAX_FACTOR = 0.1;  // how much scroll delta affects position (0–1)
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('about');
@@ -70,30 +65,28 @@
         const images = track ? Array.from(track.querySelectorAll('.scatter-img')) : [];
         let trackHeight = 0;
         let lastScrollY = 0;
-        let scrollDirection = 'down'; /* 'up' or 'down' */
-        let pinnedScrollStart = 0; /* Scroll position when current slide was pinned */
+        let scrollDirection = 'down';
+        let pinnedScrollStart = 0;
 
         const initLayout = () => {
             const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
             const stepY = isMobile ? STEP_Y_MOBILE : STEP_Y_DESKTOP;
             let currentY = 0;
-            
-            // Track previous values for each column to ensure variation
             const prevLeft = { x: null, w: null };
             const prevRight = { x: null, w: null };
 
             images.forEach((img, index) => {
                 const isLeft = index % 2 === 0;
                 const prev = isLeft ? prevLeft : prevRight;
-                
+
                 const minX = isLeft ? COL_LEFT_X_MIN : COL_RIGHT_X_MIN;
                 const maxX = isLeft ? COL_LEFT_X_MAX : COL_RIGHT_X_MAX;
                 const randomX = getVariedRandom(minX, maxX, prev.x);
-                
+
                 const minW = isMobile ? IMG_WIDTH_MOBILE_MIN : IMG_WIDTH_DESKTOP_MIN;
                 const maxW = isMobile ? IMG_WIDTH_MOBILE_MAX : IMG_WIDTH_DESKTOP_MAX;
                 const randomW = getVariedRandom(minW, maxW, prev.w);
-                
+
                 const jitter = Math.floor(Math.random() * IMG_JITTER_RANGE) - IMG_JITTER_RANGE / 2;
                 const finalY = currentY + jitter;
 
@@ -103,11 +96,10 @@
                 img.style.zIndex = Math.floor(Math.random() * IMG_Z_INDEX_MAX);
                 const startX = isLeft ? `-${SLIDE_START_OFFSET_VW}vw` : `${SLIDE_START_OFFSET_VW}vw`;
                 img.style.setProperty('--slide-start', startX);
-                
-                // Update previous values for this column
+
                 prev.x = randomX;
                 prev.w = randomW;
-                
+
                 currentY += stepY;
             });
 
@@ -115,7 +107,6 @@
             if (track) track.style.height = `${trackHeight}px`;
         };
 
-        /* Build slide stack: 3 slides, each 1/3 of column height, sticky body in center; body animates when body is visible */
         function buildSlideStack() {
             const stickyContent = section.querySelector('.about-sticky-content');
             const textBlocks = section.querySelectorAll('.about-text-block');
@@ -140,7 +131,6 @@
             section.appendChild(slidesWrap);
             stickyContent.remove();
 
-            /* Observe each body block – pin logic handles enter (animate + transitionCta); here only reset on leave */
             section.querySelectorAll('.about-text-block').forEach((block) => {
                 const cta = block.querySelector('.cta-btn');
                 const bodyText = block.querySelectorAll('.type-body2, .type-body1');
@@ -157,7 +147,6 @@
                         if (sticky) sticky.classList.add('is-unpinning');
                         bodyText.forEach((el) => el.classList.remove('is-visible'));
                         if (cta && transitionCta) transitionCta(cta, 'exit');
-                        /* Remove is-unpinning after transition so next enter uses correct starting position */
                         setTimeout(() => {
                             if (sticky) sticky.classList.remove('is-unpinning');
                         }, 600);
@@ -166,7 +155,6 @@
             });
         }
 
-        /* Column sentinels: bind image visibility to full column, not individual images */
         function setupColumnObservers() {
             const colLeft = document.createElement('div');
             colLeft.className = 'about-col about-col-left';
@@ -194,10 +182,8 @@
         buildSlideStack();
         setupColumnObservers();
 
-        /* Track: absolute so slides define section height; track sits behind */
         track.classList.add('about-image-track-positioned');
 
-        /* Image scale effect: scale images based on distance from viewport center (curved surface) */
         function updateImageScales() {
             if (!viewport) return;
             const viewportRect = viewport.getBoundingClientRect();
@@ -214,7 +200,6 @@
             });
         }
 
-        /* Track scroll direction for body text slide-in direction */
         function updateScrollDirection() {
             if (!window.lenis) return;
             const currentScrollY = window.lenis.scroll;
@@ -223,38 +208,25 @@
             lastScrollY = currentScrollY;
             section.setAttribute('data-scroll-direction', scrollDirection);
         }
-        
-        /* Apply subtle parallax to pinned text based on scroll delta */
+
+        // subtle parallax on pinned text — maps slide center distance to vertical offset
         function updatePinnedTextParallax(currentScroll) {
             if (!pinnedSticky) return;
-            
+
             const slide = pinnedSticky.closest('.about-slide');
             if (!slide) return;
-            
+
             const viewportHeight = window.innerHeight;
             const slideRect = slide.getBoundingClientRect();
-            
-            // Calculate where the slide's center is relative to viewport center
-            // When slide center = viewport center, this is 0
-            // Positive = slide is below center, Negative = slide is above center
             const slideCenterY = slideRect.top + (slideRect.height / 2);
             const viewportCenterY = viewportHeight / 2;
             const distanceFromCenter = slideCenterY - viewportCenterY;
-            
-            // Map this distance to our offset range
-            // Scale it down significantly since distanceFromCenter can be hundreds of pixels
+
             const offset = -distanceFromCenter * PINNED_TEXT_PARALLAX_FACTOR;
             const clampedOffset = Math.max(-PINNED_TEXT_SCROLL_RANGE / 2, Math.min(PINNED_TEXT_SCROLL_RANGE / 2, offset));
-            
+
             const textBlock = pinnedSticky.querySelector('.about-text-block');
             if (textBlock) {
-                console.log('Parallax:', { 
-                    slideCenterY: slideCenterY.toFixed(0),
-                    viewportCenterY: viewportCenterY.toFixed(0),
-                    distanceFromCenter: distanceFromCenter.toFixed(0),
-                    offset: offset.toFixed(1), 
-                    clampedOffset: clampedOffset.toFixed(1) 
-                });
                 textBlock.style.setProperty('--pinned-scroll-offset', `${-clampedOffset}px`);
             }
         }
@@ -267,7 +239,6 @@
         });
         updateImageScales();
 
-        /* Pin/unpin by slide visibility; use animate() for fade-in, waitForTransition for fade-out. */
         const slides = section.querySelectorAll('.about-slide');
         const slideRatios = new Map();
         let pinnedSticky = null;
@@ -280,18 +251,15 @@
             sticky.querySelectorAll('.type-body2, .type-body1').forEach((el) => el.classList.remove('is-visible'));
             const cta = sticky.querySelector('.cta-btn');
             if (cta && transitionCta) transitionCta(cta, 'exit');
-            
-            // Reset parallax offset
             const textBlock = sticky.querySelector('.about-text-block');
             if (textBlock) textBlock.style.removeProperty('--pinned-scroll-offset');
         }
 
         async function applyPin(candidateSticky) {
-            // 1. Let the previous pin fade out gracefully instead of instantly ripping it off
             if (pinnedSticky && pinnedSticky !== candidateSticky) {
                 startUnpin(pinnedSticky);
             }
-            
+
             pinnedSticky = candidateSticky;
             pinnedScrollStart = window.lenis ? window.lenis.scroll : 0;
             candidateSticky.classList.add('is-pinned', 'is-pinning');
@@ -315,20 +283,18 @@
             unpinningInProgress = true;
             sticky.classList.add('is-unpinning');
 
-            // 1. Trigger the fade out on the text/cta FIRST while still pinned
+            // fade out text first, then remove pin — avoids a pop when returning to flow
             sticky.querySelectorAll('.type-body2, .type-body1').forEach((el) => el.classList.remove('is-visible'));
             const cta = sticky.querySelector('.cta-btn');
             if (cta && transitionCta) transitionCta(cta, 'exit');
 
-            // 2. Wait for the CSS fade-out transition to finish
             const textElements = sticky.querySelectorAll('.type-body2, .type-body1');
             if (textElements.length > 0 && waitForTransition) {
                 await waitForTransition(textElements[0]);
             } else if (wait) {
-                await wait(pinDelayMs); // Use pinDelayMs instead of hardcoded 200
+                await wait(pinDelayMs);
             }
 
-            // 3. NOW remove the pin classes, returning it to standard document flow invisibly
             clearPin(sticky);
             if (pinnedSticky === sticky) pinnedSticky = null;
             unpinningInProgress = false;
@@ -336,7 +302,7 @@
 
         const pinObserver = new IntersectionObserver(
             (entries) => {
-                if (unpinningInProgress) return; // Don't process while unpinning
+                if (unpinningInProgress) return;
 
                 entries.forEach((e) => slideRatios.set(e.target, e.intersectionRatio));
                 const currentSlide = pinnedSticky ? pinnedSticky.closest('.about-slide') : null;
@@ -344,7 +310,7 @@
 
                 if (pinnedSticky && currentRatio <= PIN_LEAVE_RATIO) {
                     startUnpin(pinnedSticky);
-                    return; // Don't continue to applyPin in same tick
+                    return;
                 }
 
                 let maxRatio = 0;

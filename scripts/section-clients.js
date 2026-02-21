@@ -1,6 +1,4 @@
-/* =========================================
-   SECTION: CLIENTS
-   ========================================= */
+/* clients section */
 (() => {
     const { wait, staggerTime, observeElementInOut } = window.AnimationUtils || {};
 

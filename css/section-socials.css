@@ -52,9 +52,7 @@
     transform: scale(1.1);
 }
 
-/* =========================================
-   MARQUEE
-   ========================================= */
+/* marquee (disabled for now)
 /* .socials-marquee-wrapper {
     width: 100%;
     position: relative;

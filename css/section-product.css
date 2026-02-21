@@ -3,7 +3,7 @@
 .pdp-section {
     position: relative;
     width: 100%;
-    min-height: 100vh; /* JS sets explicit height for the scroll track */
+    min-height: 100vh; /* js sets explicit height for scroll track */
     overflow: visible !important;
     z-index: 10;
 }
@@ -13,7 +13,7 @@
 }
 
 .pdp-sticky-wrapper {
-    /* back-arrow is position:absolute so grid fills the full padded area */
+    /* back-arrow is absolute so grid fills full padded area */
     --pdp-target-height: calc(100vh - var(--space-for-nav) - 2 * var(--standard-margin));
 
     position: sticky;
@@ -35,7 +35,7 @@
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
-    overscroll-behavior-y: contain; /* don't bubble scroll to the page */
+    overscroll-behavior-y: contain; /* stop scroll from bubbling to the page */
     scrollbar-width: none;
     -ms-overflow-style: none;
     margin-bottom: var(--standard-margin);
@@ -47,7 +47,7 @@
 }
 
 
-/* old sticky layout (kept for reference)
+/* old sticky layout — keeping for reference in case we need to revert
 .pdp-grid {
     --pdp-target-height: calc(100vh - (var(--space-for-nav) + var(--standard-margin)));
     --pdp-col-width: calc(var(--pdp-target-height) * 0.8);
@@ -102,7 +102,7 @@
 .pdp-grid {
     --pdp-col-width: calc(var(--pdp-target-height) * 0.8);
 
-    /* explicit height so columns' height:100% always resolves correctly */
+    /* explicit height so child height:100% always resolves */
     height: var(--pdp-target-height);
     width: 100%;
 
@@ -131,18 +131,13 @@
     display: none;
 }
 
-/* image column: relative + overflow visible so thumbnails can extend left */
+/* overflow visible so thumbnails can extend left outside the column */
 .pdp-image-col {
     position: relative;
     overflow: visible;
 }
 
-/* thumbnails are clickable */
-.pdp-poster {
-    cursor: pointer;
-}
-
-/* all posters absolutely stacked; JS drives width/height/left per scroll */
+/* all posters absolutely stacked; js drives width/height/left per click */
 .pdp-poster {
     position: absolute;
     top: 0;
@@ -151,6 +146,7 @@
     height: 100%;
     object-fit: cover;
     opacity: 0;
+    cursor: pointer;
     transition: opacity var(--time-fade-in) ease;
 }
 
@@ -159,7 +155,7 @@
 }
 
 
-/* mobile: native stacking layout, no scroll animation */
+/* mobile: native stacking layout, no scroll swipe animation */
 @media (max-width: 1024px) {
     .pdp-section {
         height: auto !important;
@@ -202,7 +198,7 @@
         height: 100%;
     }
 
-    /* hide all but first poster on mobile */
+    /* only show first poster on mobile */
     .pdp-poster:not(:first-child) {
         display: none;
     }

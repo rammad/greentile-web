@@ -6,7 +6,7 @@
     height: 150vh;
 }
 
-/* wrapper clips the blurred image to section bounds without affecting sticky children */
+/* clips blurred bg to section bounds without affecting sticky children */
 .featured-bg-wrap {
     position: absolute;
     inset: 0;
@@ -15,7 +15,7 @@
     pointer-events: none;
 }
 
-/* blurred background — scrolls naturally with the section */
+/* blurred bg scrolls naturally with the section */
 .featured-bg-img {
     position: absolute;
     top: 40px;
@@ -32,7 +32,7 @@
     user-select: none;
 }
 
-/* dark scrim sits over the scrolling bg */
+/* dark scrim over scrolling bg */
 .featured-section::before {
     content: '';
     position: absolute;
@@ -40,7 +40,7 @@
     z-index: 1;
 }
 
-/* sticky viewport frame — marquee + poster stick here */
+/* sticky frame — marquee + poster stick here */
 .featured-frame {
     position: sticky;
     top: 0;
@@ -54,7 +54,7 @@
     z-index: 2;
 }
 
-/* marquee behind poster */
+/* marquee sits behind poster */
 .featured-marquee-layer {
     position: absolute;
     inset: 0;
@@ -84,12 +84,12 @@
     to   { transform: translateX(-50%); }
 }
 
-/* centered poster */
+/* centered poster wrap */
 .featured-poster-wrap {
     position: relative;
     z-index: 3;
     height: 100%;
-    /* max-height: 520px; */
+    /* max-height: 520px; — might want this on smaller screens */
     aspect-ratio: 4 / 5;
     flex-shrink: 0;
 }

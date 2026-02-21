@@ -1,6 +1,4 @@
-/* =========================================
-   SECTION: MISSION
-   ========================================= */
+/* mission section */
 (() => {
     const { wait, staggerTime, lockTime, observeElementInOut } = window.AnimationUtils || {};
 
@@ -46,7 +44,7 @@
                 }
             }]);
         } else {
-            /* Continuous scroll (e.g. about-us): play entrance once when section enters view */
+            // continuous scroll (about-us): play entrance once on enter
             observeElementInOut(section, {
                 onEnter: () => playMissionEnter(section)
             });

@@ -15,7 +15,7 @@
             const checkInit = setInterval(() => {
                 if (title.classList.contains('is-initialized') && window.playCascade) {
                     clearInterval(checkInit);
-                    setTimeout(() => window.playCascade(title), 100); 
+                    setTimeout(() => window.playCascade(title), 100);
                 }
             }, 50);
         }
@@ -31,9 +31,9 @@
         if (!container) return;
 
         const allCells = Array.from(document.querySelectorAll('.archive-cell'));
-        container.innerHTML = ''; 
-        container.classList.add('calendar-grid-packed'); 
-        container.style.display = 'flex'; 
+        container.innerHTML = '';
+        container.classList.add('calendar-grid-packed');
+        container.style.display = 'flex';
 
         const monthGroups = [];
         let currentMonthName = null;
@@ -60,7 +60,7 @@
         });
 
         const ROWS = [];
-        let currentRow = { capacity: 6, chunks: [] }; 
+        let currentRow = { capacity: 6, chunks: [] };
 
         monthGroups.forEach(group => {
             let itemsToPlace = [...group.items];
@@ -88,7 +88,7 @@
         });
         if (currentRow.chunks.length > 0) ROWS.push(currentRow);
 
-        const flatItemList = []; 
+        const flatItemList = [];
 
         ROWS.forEach(rowData => {
             const rowEl = document.createElement('div');
@@ -114,7 +114,7 @@
                 
                 chunk.items.forEach(item => {
                     gridEl.appendChild(item);
-                    flatItemList.push(item); 
+                    flatItemList.push(item);
                 });
 
                 chunkEl.appendChild(gridEl);

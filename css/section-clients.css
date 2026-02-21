@@ -34,7 +34,8 @@
     text-align: left;
 }
 
-/* .logo-marquee {
+/* logo marquee with edge fade — disabled for now
+.logo-marquee {
     width: 100%;
     overflow: hidden;
     position: relative;
@@ -57,7 +58,8 @@
     transition: opacity var(--time-fade-in);
 }
 
-/* .logo-track.has-seamless-animation {
+/* logo marquee animation — disabled, logos are static for now
+.logo-track.has-seamless-animation {
     animation: marquee-scroll var(--marquee-duration, 60s) linear infinite;
 }
 

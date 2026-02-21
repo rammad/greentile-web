@@ -1,6 +1,6 @@
 /* mission section */
 
-/* In continuous scroll (e.g. about-us): stay in flow so content below scrolls */
+/* on continuous scroll pages (about-us): stay in flow so content below can scroll */
 .scroll-content .mission-section {
     position: relative;
 }

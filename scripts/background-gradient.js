@@ -1,49 +1,40 @@
-/**
- * GRADIENT ENGINE – Dual Channel Sphere
- * * CHANGES:
- * - Switch to SphereGeometry.
- * - Vertex Shader now uses 3D position (x,y,z) for noise so it wraps correctly.
- */
+/* gradient engine – three.js sphere with dual noise channels */
+
 class GradientEngine {
     constructor(canvasId, config) {
         this.canvas = document.getElementById(canvasId);
         if (!this.canvas) return;
 
         this.config = Object.assign({
-            type: 'sphere',       
-            colors: ['#47ff54', '#f1ffe8', '#f0fd7c'], 
-            
-            // --- CHANNEL 1: HEIGHT (The Blob Shape) ---
-            heightDensity: 1.5,   
-            heightStrength: 0.8,  
-            heightSpeed: 0.2,     
-            
-            // --- CHANNEL 2: COLOR (The Liquid Surface) ---
-            colorDensity: 0.6,    
-            colorSpeed: 0.1,      
-            colorGradientFalloff: 1.0,  // 1 = linear; >1 = sharper bands; <1 = softer transition
+            type: 'sphere',
+            colors: ['#47ff54', '#f1ffe8', '#f0fd7c'],
+
+            // channel 1: height (blob shape)
+            heightDensity: 1.5,
+            heightStrength: 0.8,
+            heightSpeed: 0.2,
+
+            // channel 2: color (liquid surface)
+            colorDensity: 0.6,
+            colorSpeed: 0.1,
+            colorGradientFalloff: 1.0,  // 1 = linear, >1 = sharper bands, <1 = softer
             colorGradientBalance: 0.5,  // 0 = more color1, 1 = more color2, 0.5 = even
-            
-            // --- PHYSICS: ROTATION (parallax from scroll) ---
-            // Rotation per pixel of scroll (scroll down = +rotation; scroll up = -rotation)
+
+            // rotation per pixel of scroll
             scrollRotationSpeed: { x: 0, y: 0, z: 0 },
-            
-            // Geometry
+
             sphereRadius: 2.0,
-            segments: 128,       
-            
-            // Positioning
-            positionY: 0,        
+            segments: 128,
+            positionY: 0,
             rotationZ: 0,
-            
-            // Camera
-            cameraPosition: { x: 0, y: 0, z: 6.0 }, 
-            cameraRotation: { x: 0, y: 0, z: 0 },   
+
+            cameraPosition: { x: 0, y: 0, z: 6.0 },
+            cameraRotation: { x: 0, y: 0, z: 0 },
             fov: 45,
-            
+
             updateMode: 'observer',
             contentSelector: '#scroll-content',
-            useSectionObserver: true,  // false = use container data-colors (e.g. footer), true = follow active section
+            useSectionObserver: true,  // false = use container data-colors, true = follow active section
         }, config);
 
         this.init();
@@ -62,20 +53,18 @@ class GradientEngine {
     buildVertexShader() {
         return `
             varying vec2 vUv;
-            varying float vDistort;     
-            varying float vColorNoise;  
-            varying vec3 vNormal;       // Pass normal for basic lighting
-            
+            varying float vDistort;
+            varying float vColorNoise;
+            varying vec3 vNormal;
+
             uniform float uTime;
-            
             uniform float uHeightDensity;
             uniform float uHeightStrength;
             uniform float uHeightSpeed;
-            
             uniform float uColorDensity;
             uniform float uColorSpeed;
 
-            // --- SIMPLEX NOISE ALGORITHM ---
+            // simplex noise
             vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
             vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
             vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
@@ -128,31 +117,28 @@ class GradientEngine {
                 vUv = uv;
                 vNormal = normal;
 
-                // Small offset to avoid sampling on simplex lattice boundaries (reduces center stutter)
+                // small offset avoids sampling on lattice boundaries (prevents center stutter)
                 vec3 eps = vec3(0.001, 0.002, 0.003);
 
-                // 1. HEIGHT NOISE (3D)
-                // Time as vec3 with different phases so motion has no single direction (no downward drift)
+                // height noise – time with different phases so there's no single drift direction
                 float t = uTime * uHeightSpeed;
                 vec3 heightTimeOff = vec3(sin(t), cos(t * 0.83), sin(t * 1.17)) * 0.5;
                 vec3 heightPos = position * uHeightDensity + heightTimeOff + eps;
                 float heightNoise = snoise(heightPos);
-                
-                // 2. COLOR NOISE (3D)
-                // Different phases so color and height don't move in lockstep
+
+                // color noise – different phases so color and height don't move in lockstep
                 float tc = uTime * uColorSpeed;
                 vec3 colorTimeOff = vec3(cos(tc * 1.1), sin(tc * 0.91), cos(tc * 1.23)) * 0.5;
                 vec3 colorPos = (position + 10.0) * uColorDensity + colorTimeOff + eps;
                 float colorNoise = snoise(colorPos);
-                
-                // 3. DISPLACEMENT
-                // Move vertex OUTWARD along its normal (radially)
+
+                // displace vertex outward along its normal
                 float distortion = heightNoise * uHeightStrength;
                 vec3 newPos = position + (normal * distortion);
-                
-                vDistort = heightNoise; 
-                vColorNoise = colorNoise; 
-                
+
+                vDistort = heightNoise;
+                vColorNoise = colorNoise;
+
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
             }
         `;
@@ -161,8 +147,8 @@ class GradientEngine {
     buildFragmentShader() {
         return `
             varying vec2 vUv;
-            varying float vDistort;     
-            varying float vColorNoise;  
+            varying float vDistort;
+            varying float vColorNoise;
             varying vec3 vNormal;
 
             uniform vec3 uColor1;
@@ -175,26 +161,15 @@ class GradientEngine {
                 float height = (vDistort * 0.5) + 0.5;
                 float colorMix = (vColorNoise * 0.5) + 0.5;
                 colorMix = pow(colorMix, uColorGradientFalloff);
-                // Remap so 0.5 in noise space maps to balance (0 = color1 dominant, 1 = color2, 0.5 = even)
+                // remap so 0.5 noise = balance point (0 = color1 dominant, 1 = color2, 0.5 = even)
                 float b = uColorGradientBalance;
                 if (colorMix < 0.5)
                     colorMix = b * 2.0 * colorMix;
                 else
                     colorMix = b + (1.0 - b) * 2.0 * (colorMix - 0.5);
 
-                // 1. BASE COLOR LAYER (Liquid Flow)
                 vec3 baseColor = mix(uColor1, uColor2, colorMix);
-
-                // 2. HIGHLIGHT LAYER (Peaks)
-                // Sharp transition for the tips
                 float highlight = smoothstep(0.6, 1.0, height);
-                
-                // 3. SHADING (Optional Fake Lighting)
-                // Adds a bit of depth so it doesn't look like a flat circle
-                // We use the normal relative to camera (approx)
-                // float light = dot(vNormal, vec3(0.5, 0.5, 1.0)) * 0.5 + 0.5;
-                // baseColor *= light;
-
                 vec3 finalColor = mix(baseColor, uColor3, highlight);
 
                 gl_FragColor = vec4(finalColor, 1.0);
@@ -236,11 +211,9 @@ class GradientEngine {
             side: THREE.DoubleSide
         });
 
-        // GEOMETRY SWITCH: Use SphereGeometry
         const geometry = new THREE.SphereGeometry(cfg.sphereRadius, cfg.segments, cfg.segments);
         this.mesh = new THREE.Mesh(geometry, material);
 
-        // Rotation & Position
         if (cfg.rotationZ) this.mesh.rotation.z = cfg.rotationZ;
         if (cfg.positionY) this.mesh.position.y = cfg.positionY;
 
@@ -256,7 +229,7 @@ class GradientEngine {
 
         this.clock = new THREE.Clock();
         window.addEventListener('resize', () => this.onResize());
-        
+
         if (cfg.useSectionObserver && cfg.updateMode === 'observer') this.setupObserver();
         else if (this.canvas.parentElement && this.canvas.parentElement.hasAttribute('data-colors')) {
             this.updateColors(this.canvas.parentElement.getAttribute('data-colors'));
@@ -294,7 +267,7 @@ class GradientEngine {
     }
 
     getScrollPosition() {
-        // Lenis drives scroll via transform, so use its scroll value when available
+        // lenis drives scroll via transform, so use its value when available
         if (typeof window !== 'undefined' && window.lenis != null && typeof window.lenis.scroll === 'number') {
             return window.lenis.scroll;
         }
@@ -330,51 +303,49 @@ class GradientEngine {
 
 document.addEventListener('DOMContentLoaded', () => {
     new GradientEngine('gradient-canvas', {
-        colors: ['#47ff54', '#f1ffe8', '#f0fd7c'], 
-        
-        heightDensity: 0.9, 
+        colors: ['#47ff54', '#f1ffe8', '#f0fd7c'],
+
+        heightDensity: 0.9,
         heightStrength: 0.14,
-        heightSpeed: 0.2,     
-        
-        colorDensity: 1.2,    
-        colorSpeed: 0.2,      
+        heightSpeed: 0.2,
+
+        colorDensity: 1.2,
+        colorSpeed: 0.2,
         colorGradientFalloff: 1.4,
         colorGradientBalance: 0.7,
 
         scrollRotationSpeed: { x: -0.0002, y: 0.0, z: 0.0 },
 
         sphereRadius: 2.0,
-        
         positionY: 0,
-        
-        cameraPosition: { x: 0, y: 0, z: 2.6 }, 
+
+        cameraPosition: { x: 0, y: 0, z: 2.6 },
         cameraRotation: { x: 0, y: 0, z: 0 },
-        
+
         segments: 512
     });
 
     new GradientEngine('footer-canvas', {
-        colors: ['#32CD32', '#f0f4f0', '#FABA2F'], 
-        
-        heightDensity: 0.9, 
+        colors: ['#32CD32', '#f0f4f0', '#FABA2F'],
+
+        heightDensity: 0.9,
         heightStrength: 0.14,
-        heightSpeed: 0.2,     
-        
-        colorDensity: 1.2,    
-        colorSpeed: 0.2,      
+        heightSpeed: 0.2,
+
+        colorDensity: 1.2,
+        colorSpeed: 0.2,
         colorGradientFalloff: 1.4,
         colorGradientBalance: 0.7,
 
         scrollRotationSpeed: { x: -0.0004, y: 0.0, z: 0.0 },
 
         sphereRadius: 2.0,
-        
         positionY: 0,
-        
-        cameraPosition: { x: 0, y: 0, z: 2.6 }, 
+
+        cameraPosition: { x: 0, y: 0, z: 2.6 },
         cameraRotation: { x: 0, y: 0, z: 0 },
-        
+
         segments: 512,
-        useSectionObserver: false  // use #footer-gradient-container data-colors, not active section
+        useSectionObserver: false  // uses #footer-gradient-container data-colors, not active section
     });
 });

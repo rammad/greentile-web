@@ -16,21 +16,22 @@
 @font-face {
     font-family: 'Arizona Flare Light';
     src: url('../fonts/ABCArizonaFlare-Light-Trial.otf') format('opentype');
-    font-weight: 100 900; 
+    font-weight: 100 900;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Arizona Sans Bold';
     src: url('../fonts/ABCArizonaSans-Bold-Trial.otf') format('opentype');
-    font-weight: 100 900; 
+    font-weight: 100 900;
     font-style: normal;
 }
 
-/* @font-face {
+/* variable font — not loaded yet, keeping for later
+@font-face {
     font-family: 'ABC Arizona Plus Variable';
     src: url('../fonts/ABCArizonaPlusVariable-Trial.woff2') format('woff2');
-    font-weight: 100 900; 
+    font-weight: 100 900;
     font-style: normal;
 } */
 
@@ -41,7 +42,7 @@
     --c-lighter-green: #88cd88;
     --c-dark-green: #1a3c1a;
     --c-black: #000000;
-    --c-light-grey: #e0e0e0; 
+    --c-light-grey: #e0e0e0;
     --c-yellow: #FABA2F;
     --c-light-yellow: #f8cc6f;
 
@@ -52,11 +53,11 @@
     --color-text-body: var(--c-black);
     --color-text-subheader: var(--c-dark-green);
     --color-placeholder: var(--c-light-grey);
-    
+
     --color-bg-gradient: url('../images/temp-grad.png');
 
-    --font-display: 'OT Jubilee Ruby', serif; 
-    --font-header: 'OT Jubilee Golden', serif; 
+    --font-display: 'OT Jubilee Ruby', serif;
+    --font-header: 'OT Jubilee Golden', serif;
     --font-body: 'Arizona Flare Light', normal;
     --font-subheader: 'Arizona Sans Bold', normal;
 
@@ -67,8 +68,7 @@
     --ease-standard: cubic-bezier(0.19, 1, 0.22, 1);
     --ease-out-long: cubic-bezier(0, 0, .2, 1);
 
-    /** Cascade title animation: vertical travel distance (small = subtle). */
-    --cascade-travel: 15%;
+    --cascade-travel: 15%; /* vertical travel distance for char-reveal animations */
 
     --blur-standard: 10px;
 
@@ -76,28 +76,30 @@
     --standard-margin: 20px;
     --standard-gap: 8px;
 
-    --size-display-hero: 8.6vw; 
+    /* desktop type sizes */
+    --size-display-hero: 8.6vw;
     --size-display-xl: 160px;
     --size-h1: 96px;
     --size-h2: 64px;
     --size-sub1: 24px;
     --size-sub2: 14px;
-    --size-body1: 18px; 
-    --size-body2: 36px; 
+    --size-body1: 18px;
+    --size-body2: 36px;
 
-    --size-display-hero-mobile: 15vw; 
+    /* mobile type sizes */
+    --size-display-hero-mobile: 15vw;
     --size-display-xl-mobile: 100px;
     --size-h1-mobile: 96px;
     --size-h2-mobile: 40px;
     --size-sub1-mobile: 24px;
     --size-sub2-mobile: 14px;
-    --size-body1-mobile: 14px; 
+    --size-body1-mobile: 14px;
     --size-body2-mobile: 24px;
 
     --section-spacing: 200px;
     --section-padding: 20px;
     --section-nav-padding: 100px;
-    
+
     --section-spacing-mobile: 80px;
     --section-padding-mobile: 20px;
     --section-nav-padding-mobile: 60px;
@@ -108,7 +110,7 @@
 
 html, body {
     margin: 0; padding: 0; width: 100%; height: 100%;
-    overflow: hidden; 
+    overflow: hidden; /* lenis handles scrolling */
     background-color: var(--color-bg);
     color: var(--color-text-main);
     font-family: var(--font-body);
@@ -117,17 +119,17 @@ html {
     scroll-behavior: smooth;
 }
 
-/* full-page gradient (parallax background) – above body, below scroll content */
+/* full-page gradient canvas — fixed behind everything */
 #gradient-canvas {
     position: fixed;
     inset: 0;
     width: 100%;
-    height: 100%;font-weight: 100 900; 
+    height: 100%;
     z-index: 0;
     pointer-events: none;
 }
 
-/* Lenis: viewport clips, content scrolls */
+/* lenis: viewport clips, content scrolls */
 .scroll-viewport {
     position: fixed;
     inset: 0;
@@ -165,20 +167,14 @@ section {
     text-transform: uppercase;
     line-height: 1;
     text-align: center;
-    font-size: var(--size-display-hero); 
-    opacity: 0; 
+    font-size: var(--size-display-hero);
+    opacity: 0;
 }
 .type-display-hero.is-initialized { opacity: 1; }
 .type-display-hero span { display: inline; }
 
-/**
- * .fit-text — font-size is calculated by fitTextToWidth() in global.js.
- * Formula: fontSize = (containerWidth / renderedWidth@100px) × 100px
- * The JS reads the number of rendered characters at a reference size and
- * scales to fill the container, so the title stays full-width regardless
- * of how many characters it contains or what the viewport width is.
- * Element stays invisible (opacity: 0) until JS calls .is-initialized.
- */
+/* font-size is set by fitTextToWidth() in global.js
+   element stays opacity:0 until js sets .is-initialized */
 .fit-text {
     display: block;
     white-space: nowrap;
@@ -196,51 +192,51 @@ section {
     text-align: center;
 }
 
-.type-h1 { 
-    font-family: var(--font-header); 
-    font-size: var(--size-h1); 
-    font-weight: 800; 
+.type-h1 {
+    font-family: var(--font-header);
+    font-size: var(--size-h1);
+    font-weight: 800;
     line-height: 1;
-    text-transform: uppercase; 
-    overflow: hidden; 
+    text-transform: uppercase;
+    overflow: hidden;
 }
 
-.type-h2 { 
-    font-family: var(--font-header); 
-    font-size: var(--size-h2); 
-    font-weight: 800; 
-    text-transform: uppercase; 
-    line-height: 1; 
+.type-h2 {
+    font-family: var(--font-header);
+    font-size: var(--size-h2);
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1;
     margin: 0;
 }
 
-.type-sub1 { 
-    font-family: var(--font-subheader); 
-    font-size: var(--size-sub1); 
-    font-weight: 700; 
-    text-transform: uppercase; 
-    letter-spacing: 0.05em; 
-    /* font-variation-settings: 'SRFF' 0;  */
+.type-sub1 {
+    font-family: var(--font-subheader);
+    font-size: var(--size-sub1);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    /* font-variation-settings: 'SRFF' 0; */
 }
 
 .type-sub2 {
     font-family: var(--font-subheader);
     font-size: var(--size-sub2);
-    font-weight: 100; 
+    font-weight: 100;
     font-style: normal;
     color: var(--color-text-subheader);
-    line-height: 100%; 
+    line-height: 100%;
     text-transform: uppercase;
     text-decoration: none;
-    /* font-variation-settings: 'SRFF' 0;  */
+    /* font-variation-settings: 'SRFF' 0; */
 }
 
-.type-body1 { 
-    font-family: var(--font-body); 
-    font-size: var(--size-body1); 
-    font-weight: 300; 
-    line-height: 1.2; 
-    /* font-variation-settings: 'SRFF' 25;  */
+.type-body1 {
+    font-family: var(--font-body);
+    font-size: var(--size-body1);
+    font-weight: 300;
+    line-height: 1.2;
+    /* font-variation-settings: 'SRFF' 25; */
 
     opacity: 0;
     filter: blur(var(--blur-standard));
@@ -248,12 +244,12 @@ section {
 }
 .type-body1.is-visible { opacity: 1; filter: blur(0); }
 
-.type-body2 { 
-    font-family: var(--font-body); 
-    font-size: var(--size-body2); 
-    font-weight: 300; 
-    line-height: 1; 
-    /* font-variation-settings: 'SRFF' 25;  */
+.type-body2 {
+    font-family: var(--font-body);
+    font-size: var(--size-body2);
+    font-weight: 300;
+    line-height: 1;
+    /* font-variation-settings: 'SRFF' 25; */
 
     opacity: 0;
     filter: blur(var(--blur-standard));
@@ -267,18 +263,18 @@ section {
 /* utils */
 .header-hidden {
     opacity: 0 !important;
-    filter: blur(var(--blur-standard)); 
+    filter: blur(var(--blur-standard));
     transform: translateY(-15px);
-    transition: 
+    transition:
         opacity var(--time-fade-out) ease,
         filter var(--time-fade-out) ease,
         transform var(--time-fade-out) var(--ease-standard);
     pointer-events: none;
 }
 
-.word-wrapper { 
-    display: inline-block; 
-    white-space: nowrap; 
+.word-wrapper {
+    display: inline-block;
+    white-space: nowrap;
     overflow: hidden;
     vertical-align: bottom;
 }
@@ -320,24 +316,24 @@ section {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px; 
-    min-width: calc(1em + 24px); 
-    max-width: calc(1em + 24px); 
+    padding: 12px;
+    min-width: calc(1em + 24px);
+    max-width: calc(1em + 24px);
     border-radius: 100px;
     background-color: var(--color-accent);
-    color: transparent; 
+    color: transparent;
     text-decoration: none;
     border: none;
-    white-space: nowrap; 
+    white-space: nowrap;
     pointer-events: auto;
     cursor: pointer;
     opacity: 0;
-    overflow: hidden; 
-    transition: 
+    overflow: hidden;
+    transition:
         opacity 0.4s ease,
-        max-width 0.8s ease, 
+        max-width 0.8s ease,
         padding 0.8s cubic-bezier(0.19, 1, 0.22, 1),
-        color 0.3s linear; 
+        color 0.3s linear;
 }
 
 .cta-btn.is-visible {
@@ -347,16 +343,15 @@ section {
     color: var(--color-btn-text);
 }
 
-/* cta roll: text area only (ignores padding) */
+/* cta roll text — starts hidden, rolls in after btn reveals */
 .cta-btn .ui-roll {
     display: block;
     position: relative;
     overflow: hidden;
-    line-height: 1; /* roll math */
+    line-height: 1; /* roll math depends on this */
     transform: translateY(150%);
     opacity: 0;
-    
-    transition: 
+    transition:
         transform 0.6s cubic-bezier(0.19, 1, 0.22, 1),
         opacity 0.4s ease;
 }
@@ -387,7 +382,7 @@ section {
     transform: translateY(100%);
 }
 
-/* roll only when btn visible */
+/* roll only when btn is visible */
 .cta-btn.is-visible:hover .ui-roll-visible {
     transform: translateY(-100%);
     transition-delay: 0s;
@@ -399,28 +394,28 @@ section {
 }
 
 .cta-arrow {
-    height: 0.5em; 
-    width: auto; 
-    display: block; 
+    height: 0.5em;
+    width: auto;
+    display: block;
 }
 
 .ui-roll-hidden { transform: translateY(150%); opacity: 1; }
 
 /* masking */
-.text-mask { 
-    display: block; 
-    overflow: hidden; 
-    line-height: 1.2; }
-.text-reveal-inner { 
-    display: block; 
-    transform: translateY(110%); 
-    transition: transform 1.0s cubic-bezier(0.19, 1, 0.22, 1); 
-    will-change: transform; 
+.text-mask {
+    display: block;
+    overflow: hidden;
+    line-height: 1.2;
 }
-.is-visible .text-reveal-inner { 
-    transform: translateY(0%); 
+.text-reveal-inner {
+    display: block;
+    transform: translateY(110%);
+    transition: transform 1.0s cubic-bezier(0.19, 1, 0.22, 1);
+    will-change: transform;
 }
-
+.is-visible .text-reveal-inner {
+    transform: translateY(0%);
+}
 
 /* grain overlay */
 body::after {
@@ -442,7 +437,7 @@ body::after {
     display: flex;
     top: 0;
     left: 0;
-    height: 7px; 
+    height: 7px;
     width: auto;
     transform: scale(-100%);
 }
