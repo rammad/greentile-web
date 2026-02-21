@@ -9,7 +9,14 @@
     position: relative;
     width: 100%;
     padding: 0;
-    min-height: 160vh; /* sticky lingers for ~60vh of scroll after section enters */
+    /* Phase 1 (100vh): section enters from below, title scrolls to centre.
+                        This is approach scroll — not part of section height.
+       Phase 2  (80vh): dead zone. Title stays centred, posters animate in.
+       Phase 3 (100vh): CSS sticky releases (section bottom constraint).
+                        Title + images scroll up naturally.
+                        Starts at 80vh into the section — not the very end.
+       Total = 180vh. */
+    min-height: 240vh;
 }
 
 /* ── Single sticky viewport ─────────────── */
@@ -31,13 +38,14 @@
 
 .events-title-wrap {
     position: absolute;
-    top: 50%;
+    top: 0;
+    bottom: 0;
     left: 0;
     right: 0;
-    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
     z-index: 1;
     pointer-events: none;
-    overflow: hidden;
     padding: 0 var(--standard-margin, 20px);
 }
 
@@ -68,21 +76,13 @@
 }
 
 /*
- * Cards start one full card-height below their grid slot (clipped by the
- * sticky's overflow:hidden). --card-extra adds a random 0–80 px on top so
- * each card travels a slightly different distance before landing at Y = 0.
+ * transform and opacity are set as inline styles on every scroll frame by
+ * section-events.js — position is a direct function of scroll, not an
+ * animation. will-change promotes the layer to the GPU compositor.
  */
 .event-card {
     opacity: 0;
-    transform: translateY(calc(100% + var(--card-extra, 0px)));
-    transition:
-        opacity var(--time-fade-in, 0.6s) ease,
-        transform 1.8s var(--ease-out-long, cubic-bezier(0, 0, .2, 1));
-}
-
-.event-card.is-visible {
-    opacity: 1;
-    transform: translateY(0);
+    will-change: transform, opacity;
 }
 
 .event-poster {
@@ -108,8 +108,9 @@
         grid-template-columns: repeat(2, 1fr);
     }
 
+    /* Override inline styles set by scroll JS — show immediately on mobile */
     .event-card {
-        opacity: 1;
-        transform: none;
+        opacity: 1 !important;
+        transform: none !important;
     }
 }

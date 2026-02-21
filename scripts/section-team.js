@@ -27,76 +27,79 @@
 
         if (!textInner) return;
 
+        const textCol = section.querySelector('.team-text-col');
+
         // ── Proportional text scroll ──────────────────────────────────────
         //
-        // The .team-text-col is a sticky 100vh clip window. JS drives a
-        // translateY on .team-text-inner so the text content scrolls in
+        // The .team-text-col is a sticky clip window. JS drives a
+        // translate3d on .team-text-inner so the text content scrolls in
         // proportion to how far the user has scrolled through the section.
         //
         // Mapping:
-        //   progress = 0  →  section top  at viewport top   (translateY = 0)
-        //   progress = 1  →  section bottom at viewport bottom (translateY = −maxScroll)
+        //   progress = 0  →  section top  at viewport top   (offset = 0)
+        //   progress = 1  →  section bottom at viewport bottom (offset = maxScroll)
         //
-        // maxScroll = max(0, textInner.scrollHeight − 100vh)
-        // If the text fits entirely in the viewport, nothing moves (sticky).
-        //
-        // Result: text always finishes scrolling at the exact moment the
-        // last poster reaches the bottom of the viewport.
+        // Jitter-free: we cache layout measurements at load/resize so the
+        // hot scroll path never triggers a forced reflow. Scroll position
+        // comes from the Lenis event detail — no getBoundingClientRect().
 
-        let ticking = false;
+        // Cached layout values — stable between resizes
+        let sectionTop   = 0; // section.offsetTop within scroll-content
+        let totalScroll  = 0; // section.offsetHeight - vh
+        let maxScroll    = 0; // how much text overflows the clip column
+
+        function recalc() {
+            const vh     = window.innerHeight;
+            sectionTop   = section.offsetTop;
+            totalScroll  = section.offsetHeight - vh;
+            const colH   = textCol ? textCol.offsetHeight : vh;
+            maxScroll    = Math.max(0, textInner.scrollHeight - colH);
+        }
+
+        let currentScroll = 0;
+        let ticking       = false;
 
         function tick() {
             ticking = false;
 
-            // On mobile the layout is single-column and the text col
-            // is back in normal flow — clear any transform and bail.
             if (window.innerWidth <= 768) {
                 textInner.style.transform = '';
                 return;
             }
 
-            const vh       = window.innerHeight;
-            const rect     = section.getBoundingClientRect();
-            const sectionH = section.offsetHeight;
-
-            // Total scrollable distance for this section
-            const totalScroll = sectionH - vh;
-            if (totalScroll <= 0) {
-                textInner.style.transform = 'translateY(0)';
+            if (totalScroll <= 0 || maxScroll === 0) {
+                textInner.style.transform = 'translate3d(0,0,0)';
                 return;
             }
 
-            // How far the section top has passed above the viewport top
-            // (negative rect.top → we've scrolled past the section start)
-            const progress = Math.max(0, Math.min(1, -rect.top / totalScroll));
+            const progress = Math.max(0, Math.min(1,
+                (currentScroll - sectionTop) / totalScroll
+            ));
 
-            // How much the text content overflows the sticky 100vh column
-            const maxScroll = Math.max(0, textInner.scrollHeight - vh);
-
-            // Text shorter than the viewport → leave it pinned at the top
-            if (maxScroll === 0) {
-                textInner.style.transform = 'translateY(0)';
-                return;
-            }
-
-            const offset = (progress * maxScroll).toFixed(2);
-            textInner.style.transform = `translateY(${-offset}px)`;
+            // Round to whole pixels — fractional values cause the GPU to
+            // interpolate between pixels, which blurs/jitters text on some
+            // names while leaving others fine depending on their start alignment.
+            const offset = Math.round(progress * maxScroll);
+            textInner.style.transform = `translate3d(0, ${-offset}px, 0)`;
         }
 
-        function schedule() {
+        function schedule(e) {
+            currentScroll = e.detail.scroll;
             if (!ticking) {
                 ticking = true;
                 requestAnimationFrame(tick);
             }
         }
 
-        // Drive scroll via the project-wide Lenis scroll event
         window.addEventListener('lenis-scroll', schedule);
 
-        // Also respond to resize (column heights change, recalculate)
-        window.addEventListener('resize', schedule, { passive: true });
+        window.addEventListener('resize', () => {
+            recalc();
+            ticking = false;
+            requestAnimationFrame(tick);
+        }, { passive: true });
 
-        // Initial pass — two rAF frames to let the grid paint first
-        requestAnimationFrame(() => requestAnimationFrame(tick));
+        // Initial measurement + render once layout is settled
+        requestAnimationFrame(() => { recalc(); requestAnimationFrame(tick); });
     });
 })();

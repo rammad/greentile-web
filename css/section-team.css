@@ -62,10 +62,10 @@
 .team-layout {
     display: grid;
     grid-template-columns:
-        minmax(80px, 15%)                                               /* title  */
-        1fr                                                             /* spacer */
+        auto                                                            /* title  — hugs its content */
+        1fr                                                             /* spacer — pushes images+text right */
         calc((100vh - var(--space-for-nav, 90px) - 60px) * 4 / 5)     /* images */
-        clamp(220px, 25vw, 380px);                                     /* text   */
+        auto;                                                           /* text   — hugs widest name */
     column-gap: calc(var(--standard-margin, 20px) * 2);
     align-items: start;
     padding: 0 var(--standard-margin);
@@ -80,7 +80,7 @@
 
 .team-title-col {
     position: sticky;
-    top: var(--space-for-nav, 90px);
+    top: calc(var(--space-for-nav, 90px) + var(--standard-margin, 20px));
     align-self: start;
 }
 
@@ -124,17 +124,23 @@
  */
 .team-text-col {
     position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow: hidden;
+    /* Stick at the same Y the section content starts — keeps the first
+       name aligned with the first image and the title on entry. */
+    top: calc(var(--space-for-nav, 90px) + var(--standard-margin, 20px));
+    height: calc(100vh - var(--space-for-nav, 90px) - var(--standard-margin, 20px));
+    /* overflow: clip instead of hidden — avoids the Chrome/Safari compositing
+       conflict that occurs when a sticky element with overflow: hidden contains
+       a transformed child (causes some text to blur/jitter while other text
+       on the same layer looks fine). clip does the same visual crop without
+       creating a scroll container. */
+    overflow: clip;
     align-self: start;
     box-sizing: border-box;
 }
 
 .team-text-inner {
-    /* Padding pushes content below the sticky nav */
-    padding-top: calc(var(--space-for-nav, 90px) + var(--standard-margin, 20px));
-    will-change: transform;
+    /* No will-change here — letting the browser composite the sticky column
+       as a single layer is cleaner than promoting the inner div separately. */
 }
 
 .team-member-name {

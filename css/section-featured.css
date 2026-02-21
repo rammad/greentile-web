@@ -6,16 +6,27 @@
     height: 150vh;
 }
 
+/* wrapper clips the blurred image to section bounds without affecting sticky children */
+.featured-bg-wrap {
+    position: absolute;
+    inset: 0;
+    /* overflow: hidden; */
+    z-index: 0;
+    pointer-events: none;
+}
+
 /* blurred background — scrolls naturally with the section */
 .featured-bg-img {
     position: absolute;
-    inset: -60px;
-    width: calc(100% + 120px);
-    height: calc(100% + 120px);
+    top: 40px;
+    left: -80px;
+    right: -80px;
+    bottom: -80px;
+    width: calc(100% + 160px);
+    height: calc(100% - 20px);
     object-fit: cover;
     object-position: center;
     filter: blur(48px);
-    transform: scale(1.05);
     z-index: 0;
     pointer-events: none;
     user-select: none;
@@ -64,12 +75,6 @@
 }
 
 .featured-marquee-item {
-    font-family: var(--font-header);
-    font-size: clamp(80px, 13vw, 200px);
-    font-weight: 800;
-    letter-spacing: -0.01em;
-    line-height: 1;
-    text-transform: uppercase;
     color: rgba(255, 255, 255, 1);
     flex-shrink: 0;
 }

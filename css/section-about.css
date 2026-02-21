@@ -258,16 +258,16 @@
     left: 0;
     right: 0;
     width: 100%;
-    padding-top: 80px; /* sit below sticky nav */
+    /* Push the menu down so it and the body read as a centered pair */
+    padding-top: 20vh;
     pointer-events: auto;
     z-index: 50;
 }
 
-/* ── about-us: slide content anchored to lower half of viewport so it
-      sits below the pinned menu ── */
+/* ── about-us: slide content pulled up symmetrically toward the menu ── */
 .about.has-persistent-menu .about-slide-sticky.is-pinned {
     align-items: flex-end;
-    padding-bottom: 10vh;
+    padding-bottom: 20vh;
 }
 
 /* Strip the layout-only padding-top when content is inside the fixed sticky */
@@ -304,9 +304,9 @@
 
 @media (max-width: 768px) {
     .about.has-persistent-menu .about-menu-persistent.is-pinned {
-        padding-top: 60px;
+        padding-top: 12vh;
     }
     .about.has-persistent-menu .about-slide-sticky.is-pinned {
-        padding-bottom: 6vh;
+        padding-bottom: 12vh;
     }
 }
