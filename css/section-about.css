@@ -4,7 +4,7 @@
     position: relative;
     width: 100%;
     min-height: 100vh;
-    overflow: hidden;
+    /* overflow: hidden; */
     background-color: transparent;
 }
 
@@ -41,8 +41,8 @@
     position: relative;
     width: 100%;
     z-index: 10;
-    padding-top: 5vh;
-    padding-bottom: 5vh;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .about-slide {

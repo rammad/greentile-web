@@ -22,8 +22,6 @@
         const subtitle = section.querySelector('.text-mask');
         if (subtitle) subtitle.classList.add('is-visible');
 
-        await wait(staggerTime);
-
         const lines = [...section.querySelectorAll('.animate-line')];
         lines.forEach((line, i) => {
             line.classList.remove('is-visible');

@@ -39,12 +39,12 @@
 :root {
     --c-off-white: #FFFCFA;
     --c-bright-green: #30FA30;
-    --c-lighter-green: #88cd88; /* possibly for lighter gradient sections */
+    --c-lighter-green: #6ffc6f; /* possibly for lighter gradient sections */
     --c-dark-green: #0E4A0E;
     --c-black: #000000;
     --c-light-grey: #EDEDED;
     --c-yellow: #FDE523;
-    --c-light-yellow: #FDE523;
+    --c-light-yellow: #feea4f;
 
     --color-bg: var(--c-off-white);
     --color-text-main: var(--c-dark-green);
@@ -282,7 +282,9 @@ section {
 }
 
 .word-wrapper {
-    display: inline-block;
+    display: inline-flex !important;
+    align-items: flex-start;
+    height: 0.95em;
     white-space: nowrap;
     overflow: hidden;
     vertical-align: bottom;
@@ -290,6 +292,8 @@ section {
 
 .char-reveal {
     display: inline-block !important;
+    vertical-align: top;
+    line-height: 1;
     opacity: 0;
     transform: translateY(var(--cascade-travel)) rotateX(-5deg);
     transform-origin: bottom center;

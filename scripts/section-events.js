@@ -60,7 +60,7 @@
         //   40% → stagger delays  (stepSize × n gaps)
         //   60% → travel distance (same for every card)
 
-        const readingBuffer  = 0.05;
+        const readingBuffer  = 0;
         const n              = cards.length;
         const availableRange = 1 - readingBuffer;
         const totalDelay     = availableRange * 0.4;

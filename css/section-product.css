@@ -39,8 +39,8 @@
     /* overscroll-behavior-y: contain; stop scroll from bubbling to the page */
     scrollbar-width: none;
     -ms-overflow-style: none;
-    margin-top: var(--standard-margin);
-    margin-bottom: calc(var(--standard-margin) * 2);
+    margin-top: calc(var(--standard-margin) * 4);
+    margin-bottom: calc(var(--standard-margin) * 6);
     width: 100%;
 }
 

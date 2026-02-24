@@ -5,10 +5,9 @@
     width: 100%;
     padding: 0;
     /* animation range is fixed at 2×vh in JS (phase2Len = ih * 2).
-       section height only controls dwell after animation + sticky release.
        sticky range = min-height − 100vh. animation ends at 200vh into sticky range.
-       dwell = min-height − 300vh → 315vh gives ~15vh before sticky releases */
-    min-height: 315vh;
+       min-height = 300vh → 0 dwell, sticky releases the moment last card lands */
+    min-height: 300vh;
 }
 
 .events-sticky {
