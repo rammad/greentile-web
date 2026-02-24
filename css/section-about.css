@@ -41,8 +41,8 @@
     position: relative;
     width: 100%;
     z-index: 10;
-    padding-top: 20vh;
-    padding-bottom: 20vh;
+    padding-top: 5vh;
+    padding-bottom: 5vh;
 }
 
 .about-slide {
@@ -50,12 +50,10 @@
     width: 100%;
 }
 
-/* keeps body text centered in viewport while pinned */
+/* natural scroll position — JS applies translateY to the text block to create
+ * the Doppler pull effect; no sticky needed (and sticky + lerp causes jumps) */
 .about-slide-sticky {
-    position: sticky;
-    top: 0;
-    left: 0;
-    right: 0;
+    position: relative;
     min-height: 100vh;
     height: 100vh;
     width: 100%;
@@ -75,8 +73,9 @@
     max-width: 600px;
     padding: 0 20px;
     text-align: center;
-    transform: translateY(var(--pinned-scroll-offset, 0px));
-    transition: transform 0.1s linear;
+    opacity: 0;
+    will-change: opacity, transform, filter;
+    /* no CSS transitions — JS lerp handles all smoothing to avoid double-smoothing jitter */
 }
 
 .scatter-img {
@@ -88,10 +87,10 @@
     aspect-ratio: 4 / 5;
     object-fit: cover;
     opacity: 0;
-    transform: translateX(var(--slide-start, 0px)) scale(1);
+    transform: scale(1);
     transition:
         opacity var(--time-fade-out) linear,
-        transform var(--time-fade-out) ease-in;
+        transform 0.1s linear;
     will-change: transform, opacity;
 }
 
@@ -99,7 +98,7 @@
     opacity: 1;
     transition:
         opacity var(--time-fade-in) ease,
-        transform var(--time-fade-in) ease;
+        transform 0.1s linear;
 }
 
 .about-text-block .cta-btn {
@@ -111,68 +110,13 @@
     white-space: nowrap;
 }
 
-/* lenis doesn't support css sticky — js adds .is-pinned to switch to position:fixed */
-.about-slide-sticky.is-pinned {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: 100vh;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-    pointer-events: none;
-}
-.about-slide-sticky.is-pinned .about-text-block {
-    pointer-events: auto;
-}
-
-/* hide instantly while position:fixed is being applied, then fade in after .is-pinning is removed */
-.about-slide-sticky.is-pinning .about-text-block {
-    opacity: 0;
-    filter: blur(var(--blur-standard));
-    transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease;
-}
-
-/* fade out before removing pin so there's no pop when returning to document flow */
-.about-slide-sticky.is-unpinning .about-text-block {
-    opacity: 0;
-    filter: blur(var(--blur-standard));
-    transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease;
-}
-
-/* body text slides in from scroll direction on enter, exits in opposite direction */
-.about[data-scroll-direction="down"] .type-body2:not(.is-visible),
-.about[data-scroll-direction="down"] .type-body1:not(.is-visible) {
-    transform: translateY(100px);
-}
-
-.about[data-scroll-direction="up"] .type-body2:not(.is-visible),
-.about[data-scroll-direction="up"] .type-body1:not(.is-visible) {
-    transform: translateY(-100px);
-}
-
-.about[data-scroll-direction="down"] .about-slide-sticky.is-unpinning .type-body2,
-.about[data-scroll-direction="down"] .about-slide-sticky.is-unpinning .type-body1 {
-    transform: translateY(-100px);
-}
-
-.about[data-scroll-direction="up"] .about-slide-sticky.is-unpinning .type-body2,
-.about[data-scroll-direction="up"] .about-slide-sticky.is-unpinning .type-body1 {
-    transform: translateY(100px);
-}
-
-.about .type-body2,
-.about .type-body1 {
-    transition: opacity var(--time-fade-in) ease, filter var(--time-fade-in) ease, transform var(--time-fade-in) ease;
-}
-
-.about .type-body2.is-visible,
-.about .type-body1.is-visible {
-    transform: translateY(0);
+/* text elements inside the about slide inherit opacity from .about-text-block (JS-driven).
+ * reset the global opacity:0 + blur defaults so only the parent controls visibility. */
+.about-slide-sticky .type-body1,
+.about-slide-sticky .type-body2 {
+    opacity: 1;
+    filter: none;
+    transition: none;
 }
 
 /* about-us page: persistent menu + full-height slides */
@@ -262,13 +206,13 @@
 }
 
 /* slide content pulled up symmetrically toward the pinned menu */
-.about.has-persistent-menu .about-slide-sticky.is-pinned {
+.about.has-persistent-menu .about-slide-sticky {
     align-items: flex-end;
     padding-bottom: 20vh;
 }
 
-/* strip layout padding when content is inside the fixed sticky */
-.about.has-persistent-menu .about-slide-sticky.is-pinned .about-content {
+/* strip layout padding when content is inside the sticky */
+.about.has-persistent-menu .about-slide-sticky .about-content {
     padding-top: 0;
     width: 100%;
     max-width: 600px;
@@ -278,24 +222,6 @@
 /* needs position:relative so absolute-child .cta-btn resolves correctly */
 .about.has-persistent-menu .about-content {
     position: relative;
-}
-
-/* hide body text during pin/unpin transitions (same pattern as .about-text-block) */
-.about.has-persistent-menu .about-slide-sticky.is-pinning .about-content,
-.about.has-persistent-menu .about-slide-sticky.is-unpinning .about-content {
-    opacity: 0;
-    filter: blur(var(--blur-standard));
-    transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease;
-}
-
-.about.has-persistent-menu .about-content .type-body1 {
-    opacity: 0;
-    filter: blur(var(--blur-standard));
-}
-
-.about.has-persistent-menu .about-content .type-body1.is-visible {
-    opacity: 1;
-    filter: blur(0);
 }
 
 @media (max-width: 768px) {

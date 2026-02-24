@@ -6,30 +6,31 @@
     height: 150vh;
 }
 
-/* clips blurred bg to section bounds without affecting sticky children */
+/* overflow: hidden here clips the blurred bg to section bounds (hard edges)
+   without touching the sticky .featured-frame sibling */
 .featured-bg-wrap {
     position: absolute;
     inset: 0;
-    /* overflow: hidden; */
+    overflow: hidden;
     z-index: 0;
     pointer-events: none;
 }
 
-/* blurred bg scrolls naturally with the section */
+/* oversized vertically so the parallax shift never reveals empty space */
 .featured-bg-img {
     position: absolute;
-    top: 40px;
+    top: -20%;
     left: -80px;
     right: -80px;
-    bottom: -80px;
     width: calc(100% + 160px);
-    height: calc(100% - 20px);
+    height: 140%;
     object-fit: cover;
     object-position: center;
     filter: blur(48px);
     z-index: 0;
     pointer-events: none;
     user-select: none;
+    will-change: transform;
 }
 
 /* dark scrim over scrolling bg */
@@ -40,17 +41,12 @@
     z-index: 1;
 }
 
-/* sticky frame — marquee + poster stick here */
 .featured-frame {
-    position: sticky;
-    top: 0;
-    height: 100vh;
+    position: relative;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: var(--space-for-nav);
-    padding-bottom: var(--standard-margin);
-    box-sizing: border-box;
     z-index: 2;
 }
 
@@ -84,12 +80,11 @@
     to   { transform: translateX(-50%); }
 }
 
-/* centered poster wrap */
+/* centered poster wrap — height = viewport minus nav + bottom margin */
 .featured-poster-wrap {
     position: relative;
     z-index: 3;
-    height: 100%;
-    /* max-height: 520px; — might want this on smaller screens */
+    height: calc(100vh - var(--space-for-nav) - var(--standard-margin));
     aspect-ratio: 4 / 5;
     flex-shrink: 0;
 }
@@ -111,10 +106,6 @@
 }
 
 @media (max-width: 768px) {
-    .featured-section {
-        height: 140vh;
-    }
-
     .featured-poster-wrap {
         height: auto;
         width: min(72vw, 300px);

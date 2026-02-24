@@ -1,47 +1,73 @@
-/* about section – column-based image scatter + slide stack with sticky body text */
+/* about section – column-based image scatter + scroll-driven body text */
 
 (function () {
     const {
-        animate,
-        transitionCta,
         observeElementInOut,
-        wait,
-        waitForTransition,
         staggerTime
     } = window.AnimationUtils || {};
 
-    // tweak these to adjust image scatter layout
-    const MOBILE_BREAKPOINT = 768;
-    const STEP_Y_MOBILE = 140;
-    const STEP_Y_DESKTOP = 160;
-    const COL_LEFT_X_MIN = -5;
-    const COL_LEFT_X_MAX = 25;
-    const COL_RIGHT_X_MIN = 65;
-    const COL_RIGHT_X_MAX = 95;
-    const IMG_WIDTH_MOBILE_MIN = 40;
-    const IMG_WIDTH_MOBILE_MAX = 55;
-    const IMG_WIDTH_DESKTOP_MIN = 7;
-    const IMG_WIDTH_DESKTOP_MAX = 15;
-    const IMG_JITTER_RANGE = 120;
-    const IMG_Z_INDEX_MAX = 20;
-    const SLIDE_START_OFFSET_VW = 20;
-    const ABOUT_BLOCK_ENTER_THRESHOLD = 0.3;
+    // ── image scatter layout ────────────────────────────────────────────────────
+    const MOBILE_BREAKPOINT      = 768;
+    const STEP_Y_MOBILE          = 140;
+    const STEP_Y_DESKTOP         = 160;
+    const COL_LEFT_X_MIN         = -5;
+    const COL_LEFT_X_MAX         = 25;
+    const COL_RIGHT_X_MIN        = 65;
+    const COL_RIGHT_X_MAX        = 95;
+    const IMG_WIDTH_MOBILE_MIN   = 40;
+    const IMG_WIDTH_MOBILE_MAX   = 55;
+    const IMG_WIDTH_DESKTOP_MIN  = 7;
+    const IMG_WIDTH_DESKTOP_MAX  = 15;
+    const IMG_JITTER_RANGE       = 120;
+    const IMG_Z_INDEX_MAX        = 20;
     const ABOUT_COL_ENTER_THRESHOLD = 0.25;
-    const PIN_ENTER_RATIO = 0.4;
-    const PIN_LEAVE_RATIO = 0.3;
-    const PIN_OBSERVER_THRESHOLDS = [PIN_LEAVE_RATIO, 0.25, PIN_ENTER_RATIO, 0.5, 0.75, 1];
+    const IMG_VARIATION_MIN_DIFF = 0.2;
 
-    const IMG_VARIATION_MIN_DIFF = 0.2; // min difference (0-1) from previous image — higher = more forced variation
+    const IMG_SCALE_MIN = 1.0;
+    const IMG_SCALE_MAX = 1.0;
 
-    // picks a random value that's far enough from the previous one
+    // larger images scroll faster and sit in front (depth parallax)
+    const IMG_DEPTH_PARALLAX_STRENGTH = 0.3;
+    const IMG_SPEED_FACTOR_MIN        = 0.5;
+    const IMG_SPEED_FACTOR_MAX        = 1.0;
+
+    // ── body text scroll animation ──────────────────────────────────────────────
+    //
+    //  d  = stickyTop / halfVH          (0 = text at centre, ±n = n half-viewports away)
+    //  t  = |d| / FADE_RANGE            (0 = centre, 1 = outer boundary)
+    //
+    //  Position:
+    //    pullFactor = (1 − t)^PULL_POWER
+    //    translateY = −stickyTop × pullFactor
+    //
+    //    PULL_POWER is the key Doppler knob:
+    //      lower (0.2–0.5) → strong pull, near-zero movement near centre, dramatic curve
+    //      higher (1–3)    → weaker pull, more movement throughout
+    //    At PULL_POWER=0.4, text moves at ~8% of scroll speed at stickyTop=100px.
+    //
+    //  Opacity + blur:
+    //    Derived from where the text *actually lands* on screen after the pull.
+    //    Fully opaque at centre, fades as it physically moves away.
+    //    OPACITY_FALLOFF controls the radius (× halfVH) before opacity reaches 0.
+    //
+    //  Smoothing: JS lerp per-frame — no CSS transitions (those conflict with
+    //             per-frame updates and produce jitter/lag cascades).
+
+    const CONTENT_FADE_RANGE      = 1.5;
+    const CONTENT_PULL_POWER      = 0.6;  // lower = more dramatic slowing near centre
+    const CONTENT_OPACITY_FALLOFF = 1;  // opacity → 0 when text is this × halfVH from centre
+    const CONTENT_MAX_BLUR        = 8;
+
+    function smoothstep(t) {
+        const c = Math.max(0, Math.min(1, t));
+        return c * c * (3 - 2 * c);
+    }
+
     function getVariedRandom(min, max, previousValue = null, minDiff = IMG_VARIATION_MIN_DIFF) {
-        if (previousValue === null) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+        if (previousValue === null) return Math.floor(Math.random() * (max - min + 1)) + min;
         const range = max - min;
         const minDistance = range * minDiff;
-        let attempts = 0;
-        let value;
+        let attempts = 0, value;
         do {
             value = Math.floor(Math.random() * (max - min + 1)) + min;
             attempts++;
@@ -49,57 +75,51 @@
         return value;
     }
 
-    // both currently 1.0 but leaving these here to tweak the curved-surface scale effect
-    const IMG_SCALE_MIN = 1.0;
-    const IMG_SCALE_MAX = 1.0;
-
-    const PINNED_TEXT_SCROLL_RANGE = 50;      // total px the text can drift up/down while pinned
-    const PINNED_TEXT_PARALLAX_FACTOR = 0.1;  // how much scroll delta affects position (0–1)
-
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('about');
         if (!section) return;
 
         const viewport = document.getElementById('scroll-viewport') || null;
-        const track = section.querySelector('.about-image-track');
-        const images = track ? Array.from(track.querySelectorAll('.scatter-img')) : [];
-        let trackHeight = 0;
-        let lastScrollY = 0;
+        const track    = section.querySelector('.about-image-track');
+        const images   = track ? Array.from(track.querySelectorAll('.scatter-img')) : [];
+        let trackHeight   = 0;
+        let lastScrollY   = 0;
         let scrollDirection = 'down';
-        let pinnedScrollStart = 0;
+
+        // ── layout ────────────────────────────────────────────────────────────
 
         const initLayout = () => {
             const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
-            const stepY = isMobile ? STEP_Y_MOBILE : STEP_Y_DESKTOP;
-            let currentY = 0;
-            const prevLeft = { x: null, w: null };
+            const stepY    = isMobile ? STEP_Y_MOBILE : STEP_Y_DESKTOP;
+            let currentY   = 0;
+            const prevLeft  = { x: null, w: null };
             const prevRight = { x: null, w: null };
 
             images.forEach((img, index) => {
                 const isLeft = index % 2 === 0;
-                const prev = isLeft ? prevLeft : prevRight;
+                const prev   = isLeft ? prevLeft : prevRight;
 
-                const minX = isLeft ? COL_LEFT_X_MIN : COL_RIGHT_X_MIN;
-                const maxX = isLeft ? COL_LEFT_X_MAX : COL_RIGHT_X_MAX;
+                const minX   = isLeft ? COL_LEFT_X_MIN  : COL_RIGHT_X_MIN;
+                const maxX   = isLeft ? COL_LEFT_X_MAX  : COL_RIGHT_X_MAX;
                 const randomX = getVariedRandom(minX, maxX, prev.x);
 
-                const minW = isMobile ? IMG_WIDTH_MOBILE_MIN : IMG_WIDTH_DESKTOP_MIN;
-                const maxW = isMobile ? IMG_WIDTH_MOBILE_MAX : IMG_WIDTH_DESKTOP_MAX;
+                const minW   = isMobile ? IMG_WIDTH_MOBILE_MIN  : IMG_WIDTH_DESKTOP_MIN;
+                const maxW   = isMobile ? IMG_WIDTH_MOBILE_MAX  : IMG_WIDTH_DESKTOP_MAX;
                 const randomW = getVariedRandom(minW, maxW, prev.w);
 
                 const jitter = Math.floor(Math.random() * IMG_JITTER_RANGE) - IMG_JITTER_RANGE / 2;
-                const finalY = currentY + jitter;
+                img.style.width  = `${randomW}vw`;
+                img.style.left   = `${randomX}%`;
+                img.style.top    = `${currentY + jitter}px`;
 
-                img.style.width = `${randomW}vw`;
-                img.style.left = `${randomX}%`;
-                img.style.top = `${finalY}px`;
-                img.style.zIndex = Math.floor(Math.random() * IMG_Z_INDEX_MAX);
-                const startX = isLeft ? `-${SLIDE_START_OFFSET_VW}vw` : `${SLIDE_START_OFFSET_VW}vw`;
-                img.style.setProperty('--slide-start', startX);
+                const normalizedSize = (randomW - minW) / Math.max(1, maxW - minW);
+                img.style.zIndex     = 1 + Math.round(normalizedSize * (IMG_Z_INDEX_MAX - 1));
+                img.dataset.speedFactor = (
+                    IMG_SPEED_FACTOR_MIN + normalizedSize * (IMG_SPEED_FACTOR_MAX - IMG_SPEED_FACTOR_MIN)
+                ).toFixed(3);
 
                 prev.x = randomX;
                 prev.w = randomW;
-
                 currentY += stepY;
             });
 
@@ -109,15 +129,15 @@
 
         function buildSlideStack() {
             const stickyContent = section.querySelector('.about-sticky-content');
-            const textBlocks = section.querySelectorAll('.about-text-block');
+            const textBlocks    = section.querySelectorAll('.about-text-block');
             if (!stickyContent || textBlocks.length === 0 || trackHeight <= 0) return;
 
             const slideHeight = trackHeight / textBlocks.length;
-            const slidesWrap = document.createElement('div');
+            const slidesWrap  = document.createElement('div');
             slidesWrap.className = 'about-slides';
 
-            [].forEach.call(textBlocks, (block, i) => {
-                const slide = document.createElement('div');
+            [].forEach.call(textBlocks, (block) => {
+                const slide  = document.createElement('div');
                 slide.className = 'about-slide';
                 slide.style.height = `${slideHeight}px`;
 
@@ -130,43 +150,20 @@
 
             section.appendChild(slidesWrap);
             stickyContent.remove();
-
-            section.querySelectorAll('.about-text-block').forEach((block) => {
-                const cta = block.querySelector('.cta-btn');
-                const bodyText = block.querySelectorAll('.type-body2, .type-body1');
-                observeElementInOut(block, {
-                    root: viewport,
-                    enterThreshold: ABOUT_BLOCK_ENTER_THRESHOLD,
-                    repeat: true,
-                    onEnter() {
-                        block.style.pointerEvents = 'auto';
-                    },
-                    onLeave() {
-                        block.style.pointerEvents = 'none';
-                        const sticky = block.closest('.about-slide-sticky');
-                        if (sticky) sticky.classList.add('is-unpinning');
-                        bodyText.forEach((el) => el.classList.remove('is-visible'));
-                        if (cta && transitionCta) transitionCta(cta, 'exit');
-                        setTimeout(() => {
-                            if (sticky) sticky.classList.remove('is-unpinning');
-                        }, 600);
-                    }
-                });
-            });
         }
 
         function setupColumnObservers() {
-            const colLeft = document.createElement('div');
-            colLeft.className = 'about-col about-col-left';
+            const colLeft  = document.createElement('div');
+            colLeft.className  = 'about-col about-col-left';
             const colRight = document.createElement('div');
             colRight.className = 'about-col about-col-right';
             track.appendChild(colLeft);
             track.appendChild(colRight);
 
-            const leftImages = images.filter((_, i) => i % 2 === 0);
+            const leftImages  = images.filter((_, i) => i % 2 === 0);
             const rightImages = images.filter((_, i) => i % 2 === 1);
 
-            observeElementInOut(colLeft, {
+            observeElementInOut(colLeft,  {
                 root: viewport,
                 enterThreshold: ABOUT_COL_ENTER_THRESHOLD,
                 onEnter() { leftImages.forEach((img) => img.classList.add('is-visible')); }
@@ -181,155 +178,86 @@
         initLayout();
         buildSlideStack();
         setupColumnObservers();
-
         track.classList.add('about-image-track-positioned');
+
+        // ── per-frame updates ─────────────────────────────────────────────────
 
         function updateImageScales() {
             if (!viewport) return;
-            const viewportRect = viewport.getBoundingClientRect();
+            const viewportRect    = viewport.getBoundingClientRect();
             const viewportCenterY = viewportRect.height / 2;
+            const sectionTop      = section.getBoundingClientRect().top;
+            const depthOffset     = Math.max(0, viewportRect.height - sectionTop);
 
             images.forEach((img) => {
-                const imgRect = img.getBoundingClientRect();
-                const imgCenterY = imgRect.top + imgRect.height / 2 - viewportRect.top;
-                const distanceFromCenter = Math.abs(imgCenterY - viewportCenterY);
-                const maxDistance = viewportRect.height / 2;
-                const proximity = 1 - Math.min(distanceFromCenter / maxDistance, 1);
-                const scale = IMG_SCALE_MIN + (IMG_SCALE_MAX - IMG_SCALE_MIN) * proximity;
-                img.style.transform = `translateX(${img.classList.contains('is-visible') ? '0px' : img.style.getPropertyValue('--slide-start')}) scale(${scale})`;
+                const imgRect     = img.getBoundingClientRect();
+                const imgCenterY  = imgRect.top + imgRect.height / 2 - viewportRect.top;
+                const dist        = Math.abs(imgCenterY - viewportCenterY);
+                const proximity   = 1 - Math.min(dist / (viewportRect.height / 2), 1);
+                const scale       = IMG_SCALE_MIN + (IMG_SCALE_MAX - IMG_SCALE_MIN) * proximity;
+                const speedFactor = parseFloat(img.dataset.speedFactor ?? '1');
+                const parallaxY   = depthOffset * (1 - speedFactor) * IMG_DEPTH_PARALLAX_STRENGTH;
+                img.style.transform = `translateY(${parallaxY.toFixed(2)}px) scale(${scale})`;
             });
         }
 
         function updateScrollDirection() {
             if (!window.lenis) return;
-            const currentScrollY = window.lenis.scroll;
-            if (currentScrollY > lastScrollY) scrollDirection = 'down';
-            else if (currentScrollY < lastScrollY) scrollDirection = 'up';
-            lastScrollY = currentScrollY;
+            const s = window.lenis.scroll;
+            if (s > lastScrollY) scrollDirection = 'down';
+            else if (s < lastScrollY) scrollDirection = 'up';
+            lastScrollY = s;
             section.setAttribute('data-scroll-direction', scrollDirection);
         }
 
-        // subtle parallax on pinned text — maps slide center distance to vertical offset
-        function updatePinnedTextParallax(currentScroll) {
-            if (!pinnedSticky) return;
+        const slides = section.querySelectorAll('.about-slide');
 
-            const slide = pinnedSticky.closest('.about-slide');
-            if (!slide) return;
+        /* Derives body text position, opacity and blur directly from scroll position.
+         * Lenis fires this at 60 fps with smooth interpolated values — no additional
+         * lerp or CSS transition is needed and both cause jump artifacts. */
+        function updateSlideContent() {
+            const vpH    = viewport ? viewport.getBoundingClientRect().height : window.innerHeight;
+            const halfVH = vpH / 2;
 
-            const viewportHeight = window.innerHeight;
-            const slideRect = slide.getBoundingClientRect();
-            const slideCenterY = slideRect.top + (slideRect.height / 2);
-            const viewportCenterY = viewportHeight / 2;
-            const distanceFromCenter = slideCenterY - viewportCenterY;
+            slides.forEach((slide) => {
+                const sticky    = slide.querySelector('.about-slide-sticky');
+                if (!sticky) return;
+                const textBlock = sticky.querySelector('.about-text-block');
+                if (!textBlock) return;
 
-            const offset = -distanceFromCenter * PINNED_TEXT_PARALLAX_FACTOR;
-            const clampedOffset = Math.max(-PINNED_TEXT_SCROLL_RANGE / 2, Math.min(PINNED_TEXT_SCROLL_RANGE / 2, offset));
+                const stickyTop = sticky.getBoundingClientRect().top;
+                const d = stickyTop / halfVH;
+                const t = Math.max(0, Math.min(1, Math.abs(d) / CONTENT_FADE_RANGE));
 
-            const textBlock = pinnedSticky.querySelector('.about-text-block');
-            if (textBlock) {
-                textBlock.style.setProperty('--pinned-scroll-offset', `${-clampedOffset}px`);
-            }
+                // Doppler pull: low PULL_POWER = strong pull = near-zero movement near centre
+                const pullFactor  = Math.pow(1 - t, CONTENT_PULL_POWER);
+                const translateY  = -stickyTop * pullFactor;
+
+                // Opacity + blur from where the text actually lands on screen after pull
+                const textCenterY    = stickyTop + halfVH + translateY;
+                const distFromCenter = Math.abs(textCenterY - halfVH);
+                const opacityT       = Math.max(0, Math.min(1, distFromCenter / (halfVH * CONTENT_OPACITY_FALLOFF)));
+                const opacity        = 1 - smoothstep(opacityT);
+                const blur           = CONTENT_MAX_BLUR * opacityT;
+
+                textBlock.style.opacity       = opacity.toFixed(4);
+                textBlock.style.filter        = `blur(${blur.toFixed(2)}px)`;
+                textBlock.style.transform     = `translateY(${translateY.toFixed(2)}px)`;
+                textBlock.style.pointerEvents = opacity > 0.05 ? 'auto' : 'none';
+            });
         }
 
-        window.addEventListener('lenis-scroll', (e) => {
-            const currentScroll = e.detail?.scroll ?? 0;
+        window.addEventListener('lenis-scroll', () => {
             updateScrollDirection();
             updateImageScales();
-            updatePinnedTextParallax(currentScroll);
+            updateSlideContent();
         });
+
+        // run once immediately so values are set before the first scroll event
         updateImageScales();
+        updateSlideContent();
 
-        const slides = section.querySelectorAll('.about-slide');
-        const slideRatios = new Map();
-        let pinnedSticky = null;
-        let unpinningInProgress = false;
-        const pinDelayMs = typeof staggerTime === 'number' ? staggerTime : 200;
-
-        function clearPin(sticky) {
-            if (!sticky) return;
-            sticky.classList.remove('is-pinned', 'is-pinning', 'is-unpinning');
-            sticky.querySelectorAll('.type-body2, .type-body1').forEach((el) => el.classList.remove('is-visible'));
-            const cta = sticky.querySelector('.cta-btn');
-            if (cta && transitionCta) transitionCta(cta, 'exit');
-            const textBlock = sticky.querySelector('.about-text-block');
-            if (textBlock) textBlock.style.removeProperty('--pinned-scroll-offset');
-        }
-
-        async function applyPin(candidateSticky) {
-            if (pinnedSticky && pinnedSticky !== candidateSticky) {
-                startUnpin(pinnedSticky);
-            }
-
-            pinnedSticky = candidateSticky;
-            pinnedScrollStart = window.lenis ? window.lenis.scroll : 0;
-            candidateSticky.classList.add('is-pinned', 'is-pinning');
-            candidateSticky.classList.remove('is-unpinning');
-
-            await wait(pinDelayMs);
-            if (pinnedSticky !== candidateSticky) return;
-
-            candidateSticky.classList.remove('is-pinning');
-            const bodyText = candidateSticky.querySelectorAll('.type-body2, .type-body1');
-            for (const el of bodyText) {
-                if (animate) await animate(el, 'is-visible');
-                else el.classList.add('is-visible');
-            }
-            const cta = candidateSticky.querySelector('.cta-btn');
-            if (cta && transitionCta) await transitionCta(cta, 'enter');
-        }
-
-        async function startUnpin(sticky) {
-            if (!sticky || sticky.classList.contains('is-unpinning') || unpinningInProgress) return;
-            unpinningInProgress = true;
-            sticky.classList.add('is-unpinning');
-
-            // fade out text first, then remove pin — avoids a pop when returning to flow
-            sticky.querySelectorAll('.type-body2, .type-body1').forEach((el) => el.classList.remove('is-visible'));
-            const cta = sticky.querySelector('.cta-btn');
-            if (cta && transitionCta) transitionCta(cta, 'exit');
-
-            const textElements = sticky.querySelectorAll('.type-body2, .type-body1');
-            if (textElements.length > 0 && waitForTransition) {
-                await waitForTransition(textElements[0]);
-            } else if (wait) {
-                await wait(pinDelayMs);
-            }
-
-            clearPin(sticky);
-            if (pinnedSticky === sticky) pinnedSticky = null;
-            unpinningInProgress = false;
-        }
-
-        const pinObserver = new IntersectionObserver(
-            (entries) => {
-                if (unpinningInProgress) return;
-
-                entries.forEach((e) => slideRatios.set(e.target, e.intersectionRatio));
-                const currentSlide = pinnedSticky ? pinnedSticky.closest('.about-slide') : null;
-                const currentRatio = currentSlide ? (slideRatios.get(currentSlide) ?? 0) : 0;
-
-                if (pinnedSticky && currentRatio <= PIN_LEAVE_RATIO) {
-                    startUnpin(pinnedSticky);
-                    return;
-                }
-
-                let maxRatio = 0;
-                let candidateSticky = null;
-                slides.forEach((slide) => {
-                    const r = slideRatios.get(slide) ?? 0;
-                    if (r >= PIN_ENTER_RATIO && r > maxRatio) {
-                        maxRatio = r;
-                        candidateSticky = slide.querySelector('.about-slide-sticky');
-                    }
-                });
-
-                if (candidateSticky && candidateSticky !== pinnedSticky) {
-                    applyPin(candidateSticky);
-                }
-            },
-            { root: viewport, threshold: PIN_OBSERVER_THRESHOLDS }
-        );
-        slides.forEach((s) => pinObserver.observe(s));
+        // ── resize ────────────────────────────────────────────────────────────
 
         let resizeTimer;
         const resizeDebounceMs = typeof staggerTime === 'number' ? staggerTime : 200;
@@ -340,6 +268,7 @@
                 const slidesAfterResize = section.querySelectorAll('.about-slide');
                 const slideHeight = trackHeight / slidesAfterResize.length;
                 slidesAfterResize.forEach((s) => { s.style.height = `${slideHeight}px`; });
+                updateSlideContent();
             }, resizeDebounceMs);
         });
     });

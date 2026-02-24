@@ -73,14 +73,6 @@
     gap: 8px; 
     width: max-content;
     align-items: center;
-    
-    opacity: 0;
-    transition: opacity var(--time-fade-in) ease;
-}
-
-.socials-track.is-visible{
-    opacity: 1;
-    transition: opacity var(--time-fade-out) ease;
 }
 
 .social-img {
@@ -88,10 +80,25 @@
     aspect-ratio: 4 / 5;
     object-fit: cover;
     flex-shrink: 0;
+
+    opacity: 0;
+    transform: translateY(60px);
+    transition:
+        opacity var(--time-fade-in) var(--ease-standard),
+        transform var(--time-fade-in) var(--ease-standard);
+}
+
+.social-img.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .social-img.push-down {
-    transform: translateY(64px); 
+    transform: translateY(calc(64px + 60px));
+}
+
+.social-img.push-down.is-visible {
+    transform: translateY(64px);
 }
 
 @media (max-width: 768px) {

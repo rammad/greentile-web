@@ -14,13 +14,14 @@
 
 .pdp-sticky-wrapper {
     /* back-arrow is absolute so grid fills full padded area */
-    --pdp-target-height: calc(100vh - var(--space-for-nav) - 2 * var(--standard-margin));
+    --pdp-v-padding: calc(var(--standard-margin) * 2.5);
+    --pdp-target-height: calc(100vh - var(--space-for-nav) - 2 * var(--pdp-v-padding));
 
     position: sticky;
     top: var(--space-for-nav);
     width: 100%;
     height: calc(100vh - var(--space-for-nav));
-    padding: var(--standard-margin);
+    padding: var(--pdp-v-padding) var(--standard-margin);
     box-sizing: border-box;
 }
 
@@ -35,69 +36,17 @@
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
-    overscroll-behavior-y: contain; /* stop scroll from bubbling to the page */
+    /* overscroll-behavior-y: contain; stop scroll from bubbling to the page */
     scrollbar-width: none;
     -ms-overflow-style: none;
-    margin-bottom: var(--standard-margin);
+    margin-top: var(--standard-margin);
+    margin-bottom: calc(var(--standard-margin) * 2);
     width: 100%;
 }
 
 .pdp-desc::-webkit-scrollbar {
     display: none;
 }
-
-
-/* old sticky layout — keeping for reference in case we need to revert
-.pdp-grid {
-    --pdp-target-height: calc(100vh - (var(--space-for-nav) + var(--standard-margin)));
-    --pdp-col-width: calc(var(--pdp-target-height) * 0.8);
-
-    display: flex;
-    justify-content: center;
-    gap: 80px;
-    width: 100%;
-
-    align-items: start !important; 
-    overflow: visible !important;
-    height: auto !important;
-}
-
-.pdp-info {
-    width: var(--pdp-col-width);
-    display: flex;
-    flex: 0 0 auto;
-    flex-direction: column;
-    height: auto;
-    min-height: 100%;
-    align-self: stretch;
-    overflow: visible;
-}
-
-.pdp-image-col {
-    width: var(--pdp-col-width);
-    display: flex;
-    flex: 0 0 auto;
-    flex-direction: column;
-    height: auto;
-    min-height: 100%;
-    align-self: stretch;
-    overflow: visible;
-}
-
-.pdp-poster {
-    display: block;
-    width: 100%;
-    height: var(--pdp-target-height);
-    object-fit: cover;
-    
-    opacity: 0;
-    transition: opacity var(--time-fade-out) ease,
-}
-
-.pdp-poster.is-visible {
-    opacity: 1; 
-    transition: opacity var(--time-fade-in) ease;
-} */
 
 .pdp-grid {
     --pdp-col-width: calc(var(--pdp-target-height) * 0.8);
@@ -108,7 +57,7 @@
 
     display: flex;
     justify-content: center;
-    gap: 4vw;
+    gap: 8vw;
     align-items: stretch;
 }
 
@@ -125,28 +74,33 @@
     overflow: hidden;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    padding: calc(var(--standard-margin) * 2) 0;
+    box-sizing: border-box;
 }
 
 .pdp-info::-webkit-scrollbar {
     display: none;
 }
 
-/* overflow visible so thumbnails can extend left outside the column */
 .pdp-image-col {
-    position: relative;
     overflow: visible;
+    position: relative;
 }
 
-/* all posters absolutely stacked; js drives width/height/left per click */
-.pdp-poster {
-    position: absolute;
-    top: 0;
-    left: 0;
+/* transform-scroll track — images bleed outside column bounds */
+.pdp-image-track {
+    display: block;
     width: 100%;
-    height: 100%;
+    will-change: transform;
+}
+
+.pdp-poster {
+    display: block;
+    width: 100%;
+    height: auto;
     object-fit: cover;
+    aspect-ratio: 4 / 5;
     opacity: 0;
-    cursor: pointer;
     transition: opacity var(--time-fade-in) ease;
 }
 
@@ -186,21 +140,17 @@
     }
 
     .pdp-image-col {
-        position: relative;
-        aspect-ratio: 4 / 5;
-        overflow: hidden;
+        overflow: visible;
+    }
+
+    .pdp-image-track {
+        transform: none !important;
     }
 
     .pdp-poster {
-        position: absolute;
-        top: 0; left: 0;
+        display: block;
         width: 100%;
-        height: 100%;
-    }
-
-    /* only show first poster on mobile */
-    .pdp-poster:not(:first-child) {
-        display: none;
+        height: auto;
     }
 
     .pdp-desc {

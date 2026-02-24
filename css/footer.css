@@ -59,6 +59,14 @@
     animation: seamless-scroll var(--marquee-duration) linear infinite;
 }
 
+.marquee-content.marquee-reverse.has-seamless-animation {
+    animation-direction: reverse;
+}
+
+.marquee-content.marquee-reverse .arrow {
+    transform: scaleX(-1);
+}
+
 /* vvv come back to this, not working how i want >:( */
 /* .marquee-content.has-seamless-animation:hover {
     animation: seamless-scroll calc(var(--marquee-duration) * 2) linear infinite;

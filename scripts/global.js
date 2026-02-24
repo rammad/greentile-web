@@ -72,9 +72,9 @@ const SCROLL_SPEED = 40;
 const SCROLL_WHEEL_THRESHOLD = 80;       // accumulated wheel delta before triggering section change
 const SCROLL_EASE_FACTOR = 0.08;         // 0.05 = velvety, 0.15 = snappy
 const SCROLL_SENSITIVITY = 0.002;        // 500px wheel ≈ 1 section at 0.002
-const LENIS_LERP = 0.18;                 // how fast scroll catches up, 0.1 = default
-const LENIS_DURATION = 0.4;             // max scroll duration in seconds, lower = snappier
-const LENIS_WHEEL_MULTIPLIER = 1.2;     // wheel speed multiplier
+const LENIS_LERP = 0.1;                 // smoothness: lower = silkier (Lenis default is 0.1)
+const LENIS_DURATION = 1.0;             // scroll animation duration in seconds
+const LENIS_WHEEL_MULTIPLIER = 1.0;     // wheel speed multiplier
 
 const ENTER_THRESHOLD = 0.15; // how much of element must be visible to trigger entrance
 
@@ -137,6 +137,8 @@ const animate = async (element, className = 'is-visible', overlap = 0) => {
 const transitionHeader = async (element, direction = 'enter') => {
     if (!element) return;
 
+    const charDelay = 15;
+
     if (direction === 'enter') {
         element.classList.remove('header-hidden');
         const chars = element.querySelectorAll('.char-reveal');
@@ -147,7 +149,7 @@ const transitionHeader = async (element, direction = 'enter') => {
         void element.offsetWidth; 
         chars.forEach((c, i) => { 
             c.style.transition = ''; 
-            c.style.transitionDelay = `${i * 30}ms`; 
+            c.style.transitionDelay = `${i * charDelay}ms`; 
         });
         if (window.playCascade) {
             window.playCascade(element);

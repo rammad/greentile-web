@@ -3,20 +3,10 @@
 (() => {
     const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils;
 
-    // tweak these to adjust the image swipe layout
-    const THUMB_W_PCT       = 30;    // thumbnail width as % of image column
-    const THUMB_GAP_PCT     = 5;     // gap between thumbnails as %
-    const THUMB_STEP_PCT    = THUMB_W_PCT + THUMB_GAP_PCT; // slot size = 35%
-    const TAB_OFFSET_PX     = 20;    // px each past image steps right to peek as a tab
-    const MOBILE_BREAKPOINT = 1024;
-
     document.addEventListener('DOMContentLoaded', () => {
         initProductPage();
+        initImageScroll();
         updateQty(0);
-
-        if (window.innerWidth > MOBILE_BREAKPOINT) {
-            setupImageScrollTrack();
-        }
     });
 
     async function initProductPage() {
@@ -59,126 +49,66 @@
         if (cta) transitionCta(cta, 'enter');
     }
 
-    function setupImageScrollTrack() {
-        const imageCol = document.querySelector('.pdp-image-col');
-        const desc     = document.querySelector('.pdp-desc');
-        const posters  = Array.from(imageCol ? imageCol.querySelectorAll('.pdp-poster') : []);
+    function initImageScroll() {
+        const MOBILE_BREAKPOINT = 1024;
+        if (window.innerWidth <= MOBILE_BREAKPOINT) return;
 
-        if (!imageCol || posters.length < 2) return;
+        const col   = document.querySelector('.pdp-image-col');
+        const track = document.querySelector('.pdp-image-track');
+        const desc  = document.querySelector('.pdp-desc');
+        if (!col || !track) return;
 
-        const N = posters.length;
-        let activeIdx   = 0;
-        let isAnimating = false;
+        const LERP   = 0.12;   // smoothing factor (higher = snappier)
+        const SCALAR = 0.8;    // wheel delta multiplier
 
-        const SWIPE_MS   = 500;
-        const SWIPE_EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
-        const SWIPE_TRANSITION = [
-            `left   ${SWIPE_MS}ms ${SWIPE_EASE}`,
-            `width  ${SWIPE_MS}ms ${SWIPE_EASE}`,
-            `height ${SWIPE_MS}ms ${SWIPE_EASE}`,
-            `top    ${SWIPE_MS}ms ${SWIPE_EASE}`,
-        ].join(', ');
+        let targetY  = 0;
+        let currentY = 0;
+        let rafId    = null;
 
-        // z-index fixed by sequence order: higher index = higher z
-        // so forward swipes cover previous image, backward swipes reveal it underneath
-        posters.forEach((poster, i) => { poster.style.zIndex = i + 1; });
-
-        function applyPositions(active, animate) {
-            const colW     = imageCol.clientWidth;
-            const colH     = imageCol.clientHeight;
-            const thumbH   = (colW * THUMB_W_PCT / 100) * (5 / 4);
-            const thumbTop = colH - thumbH;
-
-            posters.forEach((poster, i) => {
-                poster.style.transition = animate ? SWIPE_TRANSITION : '';
-                const ahead = i - active;
-
-                if (ahead < 0) {
-                    /* past: full size, staggered right so each peeks as a tab */
-                    const tabOffset = Math.abs(ahead) * TAB_OFFSET_PX;
-                    poster.style.top    = '0px';
-                    poster.style.left   = `${tabOffset}px`;
-                    poster.style.width  = '100%';
-                    poster.style.height = `${colH}px`;
-                } else if (ahead === 0) {
-                    /* active: fills column flush to left */
-                    poster.style.top    = '0px';
-                    poster.style.left   = '0px';
-                    poster.style.width  = '100%';
-                    poster.style.height = `${colH}px`;
-                } else {
-                    /* upcoming: thumbnails peeking from the left */
-                    const leftPct = -(ahead * THUMB_STEP_PCT);
-                    poster.style.top    = `${thumbTop}px`;
-                    poster.style.left   = `${leftPct}%`;
-                    poster.style.width  = `${THUMB_W_PCT}%`;
-                    poster.style.height = `${thumbH}px`;
-                }
-            });
+        function maxScroll() {
+            return Math.max(0, track.offsetHeight - col.clientHeight);
         }
 
-        // always steps one image at a time so clicking 3 steps away animates through each
-        let sequenceTarget = null;
+        function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
-        function stepOnce() {
-            if (sequenceTarget === null || activeIdx === sequenceTarget) {
-                sequenceTarget = null;
-                isAnimating    = false;
-                return;
+        function tick() {
+            currentY += (targetY - currentY) * LERP;
+            track.style.transform = `translateY(${-currentY}px)`;
+            if (Math.abs(targetY - currentY) > 0.1) {
+                rafId = requestAnimationFrame(tick);
+            } else {
+                currentY = targetY;
+                track.style.transform = `translateY(${-currentY}px)`;
+                rafId = null;
             }
-            const dir     = sequenceTarget > activeIdx ? 1 : -1;
-            const nextIdx = activeIdx + dir;
-            if (nextIdx < 0 || nextIdx >= N) { isAnimating = false; return; }
-
-            isAnimating = true;
-            activeIdx   = nextIdx;
-            applyPositions(activeIdx, true);
-
-            setTimeout(() => {
-                posters.forEach(p => { p.style.transition = ''; });
-                stepOnce(); // re-evaluates sequenceTarget each step
-            }, SWIPE_MS);
         }
 
-        function goToImage(target) {
-            if (target < 0 || target >= N || target === activeIdx) return;
-            sequenceTarget = target;
-            if (!isAnimating) stepOnce();
-            // if mid-animation, stepOnce() will pick up new sequenceTarget when it finishes
+        function nudge(delta) {
+            targetY = clamp(targetY + delta * SCALAR, 0, maxScroll());
+            if (!rafId) rafId = requestAnimationFrame(tick);
         }
 
-        applyPositions(0, false);
-
-        posters.forEach((poster, i) => {
-            poster.addEventListener('click', () => goToImage(i));
-        });
-
-        // wheel: single step, skip if already animating
-        function onWheel(e) {
-            if (desc && desc.contains(e.target)) return;
+        // wheel over image col scrolls images; everywhere else scrolls page
+        col.addEventListener('wheel', e => {
             e.preventDefault();
-            if (isAnimating) return;
-            goToImage(activeIdx + (e.deltaY > 0 ? 1 : -1));
-        }
-        window.addEventListener('wheel', onWheel, { passive: false });
+            nudge(e.deltaY);
+        }, { passive: false });
 
-        // touch swipe
+        // touch swipe on image col
         let touchY = 0;
-        window.addEventListener('touchstart', e => {
-            if (desc && desc.contains(e.target)) return;
+        col.addEventListener('touchstart', e => {
             touchY = e.touches[0].clientY;
         }, { passive: true });
-        window.addEventListener('touchend', e => {
-            if (desc && desc.contains(e.target)) return;
-            const dy = touchY - e.changedTouches[0].clientY;
-            if (Math.abs(dy) > 40) goToImage(activeIdx + (dy > 0 ? 1 : -1));
+        col.addEventListener('touchmove', e => {
+            const dy = touchY - e.touches[0].clientY;
+            touchY   = e.touches[0].clientY;
+            nudge(dy);
         }, { passive: true });
 
-        // resize: re-measure and snap to current index
-        let resizeTimer;
         window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => applyPositions(activeIdx, false), 150);
+            targetY  = clamp(targetY, 0, maxScroll());
+            currentY = targetY;
+            track.style.transform = `translateY(${-currentY}px)`;
         });
     }
 

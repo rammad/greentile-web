@@ -6,7 +6,13 @@
     function runHeroEnter(heroTitle) {
         heroTitle.classList.remove('header-hidden');
         heroTitle.classList.add('is-initialized');
-        if (window.playCascade) window.playCascade(heroTitle);
+        if (!window.playCascade) return;
+        const words = heroTitle.querySelectorAll('.word-wrapper');
+        if (words.length > 0) {
+            words.forEach(word => window.playCascade(word));
+        } else {
+            window.playCascade(heroTitle);
+        }
     }
 
     document.addEventListener('DOMContentLoaded', () => {

@@ -8,21 +8,17 @@
         const section = document.querySelector('.events-section');
         if (!section) return;
 
-        const title = document.getElementById('event-title');
-        const grid  = section.querySelector('.events-grid');
-        const cards = section.querySelectorAll('.event-card');
-        const btn   = section.querySelector('.cta-btn');
+        const title     = document.getElementById('event-title');
+        const titleWrap = section.querySelector('.events-title-wrap');
+        const grid      = section.querySelector('.events-grid');
+        const cards     = section.querySelectorAll('.event-card');
+        const btn       = section.querySelector('.cta-btn');
 
         if (grid && cards.length) {
             grid.style.setProperty('--poster-count', cards.length);
         }
 
-        // season-aware title (e.g. "Spring 2026 Calendar")
         if (title) {
-            const season = getCurrentSeason ? getCurrentSeason() : { label: 'Spring' };
-            const year   = new Date().getFullYear();
-            title.textContent = `${season.label} ${year} Calendar`;
-
             let fontsReady  = false;
             let wantsReveal = false;
 
@@ -54,35 +50,40 @@
         // scroll-driven card positions
         //
         // phase 1 (1× innerHeight): section enters, title scrolls to centre. no cards yet.
-        // phase 2 (section.offsetHeight − innerHeight): title stays centred, cards animate in.
-        //   a readingBuffer fraction passes before the first card moves.
-        //   thresholds are compressed into [0.4 → 0.9] then shuffled for random arrival order.
+        // phase 2 (section.offsetHeight − innerHeight): cards animate in sequentially.
+        //
+        // All cards travel at identical speed (same travelDuration in progress-space).
+        // The cascade is created by delaying each card's start by a fixed stepSize,
+        // NOT by varying speed. Cards arrive in order 0, 1, 2 …
+        //
+        // Available progress range after readingBuffer is split 40/60:
+        //   40% → stagger delays  (stepSize × n gaps)
+        //   60% → travel distance (same for every card)
 
-        const readingBuffer = 0.25; // fraction of phase 2 before any card moves
-        const rangeStart    = 0.4;
-        const rangeEnd      = 0.9;
+        const readingBuffer  = 0.05;
+        const n              = cards.length;
+        const availableRange = 1 - readingBuffer;
+        const totalDelay     = availableRange * 0.4;
+        const travelDuration = availableRange * 0.6;
+        const stepSize       = n > 1 ? totalDelay / (n - 1) : 0;
 
-        const thresholds = Array.from(cards, (_, i) =>
-            cards.length > 1
-                ? rangeStart + (i / (cards.length - 1)) * (rangeEnd - rangeStart)
-                : (rangeStart + rangeEnd) / 2
-        );
-        for (let i = thresholds.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [thresholds[i], thresholds[j]] = [thresholds[j], thresholds[i]];
-        }
-        const maxThreshold = Math.max(...thresholds);
+        // card i starts moving at this scroll progress value
+        const cardStarts = Array.from(cards, (_, i) => readingBuffer + i * stepSize);
+        const btnThreshold = cardStarts[n - 1] + travelDuration; // after last card fully arrives
 
         // cached layout values, recalculated after fonts/layout settle
         let phase2Start = 0;
         let phase2Len   = 1;
-        let startOffset = window.innerHeight * 0.5;
+        let startOffset = window.innerHeight;
+
+        // disable CSS transitions on the title wrap — it's scroll-driven so lag is unwanted
+        if (titleWrap) titleWrap.style.transition = 'none';
 
         const recalcLayout = () => {
             const ih    = window.innerHeight;
             phase2Start = section.offsetTop;
-            phase2Len   = Math.max(1, section.offsetHeight - ih);
-            startOffset = ih * 0.35;
+            phase2Len   = ih * 2; // fixed animation range — decoupled from section height
+            startOffset = ih;     // start fully off the bottom of the screen
             applyPositions(window.lenis ? window.lenis.scroll : 0);
         };
 
@@ -90,17 +91,23 @@
         window.addEventListener('resize', recalcLayout);
 
         const applyPositions = scrollY => {
-            const raw = (scrollY - phase2Start) / phase2Len;
-            // subtract reading buffer, then re-normalise to 0→1
-            const progress = Math.max(0, (raw - readingBuffer) / (1 - readingBuffer));
+            const progress = Math.max(0, Math.min(1, (scrollY - phase2Start) / phase2Len));
 
             cards.forEach((card, i) => {
-                const p = Math.max(0, Math.min(1, progress / thresholds[i]));
-                card.style.transform = `translateY(${startOffset * (1 - p)}px)`;
-                card.style.opacity   = String(Math.min(1, p * 2));
+                // localP: 0 = not yet started, 1 = fully arrived. same duration for all cards.
+                const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
+                card.style.transform = `translateY(${startOffset * (1 - localP)}px)`;
+                card.style.opacity   = '1';
             });
 
-            if (btn && transitionCta && progress >= maxThreshold &&
+            // fade + blur the title as the first card scrolls in — directly proportional
+            if (titleWrap) {
+                const fadeP = Math.max(0, Math.min(1, (progress - cardStarts[n - 1]) / travelDuration));
+                titleWrap.style.opacity = String(1 - fadeP);
+                titleWrap.style.filter  = fadeP > 0 ? `blur(${fadeP * 10}px)` : '';
+            }
+
+            if (btn && transitionCta && progress >= btnThreshold &&
                 !btn.classList.contains('is-visible')) {
                 transitionCta(btn, 'enter');
             }

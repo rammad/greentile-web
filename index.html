@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/base.css?v=13">
     <link rel="stylesheet" href="css/nav.css?v=5">
     <link rel="stylesheet" href="css/section-hero.css?v=7">
-    <link rel="stylesheet" href="css/section-about.css?v=8">
+    <link rel="stylesheet" href="css/section-about.css?v=19">
     <link rel="stylesheet" href="css/section-events.css?v=9">
     <link rel="stylesheet" href="css/section-featured.css?v=2">
     <link rel="stylesheet" href="css/section-socials.css?v=8">
@@ -18,9 +18,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.0.43/dist/lenis.min.js"></script>
 
-    <script src="scripts/global.js?v=10" defer></script>
+    <script src="scripts/global.js?v=11" defer></script>
     <script src="scripts/background-gradient.js?v=4" defer></script>
-    <script src="scripts/scroll.js?v=6" defer></script>
+    <script src="scripts/scroll.js?v=8" defer></script>
 
     <canvas id="gradient-canvas"></canvas>
 
@@ -52,12 +52,12 @@
 
     <div id="scroll-viewport" class="scroll-viewport">
         <div id="scroll-content" class="scroll-content">
-    <section id="hero" class="hero standard-margins" data-colors="#32CD32, #f0f4f0, #FABA2F">
+    <section id="hero" class="hero standard-margins" data-colors="#30FA30, #FFFCFA, #FDE523">
         <h1 class="type-display-hero animate-cascade">Green Tile Social Club</h1>
     </section>
-    <script src="scripts/section-hero.js?v=4" defer></script>
+    <script src="scripts/section-hero.js?v=5" defer></script>
 
-    <section id="about" class="about" data-colors="#f0f4f0, #88cd88, #f0f4f0">
+    <section id="about" class="about" data-colors="#FFFCFA, #FFFCFA, #30FA30">
         
         <div class="about-sticky-content">
                 
@@ -121,23 +121,26 @@
         </div>
 
     </section>
-    <script src="scripts/section-about.js?v=6" defer></script>
+    <script src="scripts/section-about.js?v=15" defer></script>
 
     <section id="events" class="events-section sticky-track" data-colors="#f0f4f0, #f0f4f0, #88cd88">
 
         <div class="events-sticky">
+            <div class="events-sticky-inner">
 
-            <div class="events-title-wrap">
-                <h2 id="event-title" class="type-display-hero fit-text" data-fit-managed="true"></h2>
-            </div>
-
-            <div class="events-content">
-                <div class="events-grid">
-                    <div class="event-card"><img src="images/poster1.png" class="event-poster" alt="Event 1"></div>
-                    <div class="event-card"><img src="images/poster2.png" class="event-poster" alt="Event 2"></div>
-                    <div class="event-card"><img src="images/poster3.png" class="event-poster" alt="Event 3"></div>
-                    <div class="event-card"><img src="images/poster1.png" class="event-poster" alt="Event 4"></div>
+                <div class="events-title-wrap">
+                    <h2 id="event-title" class="type-display-hero fit-text" data-fit-managed="true">upcoming events</h2>
                 </div>
+
+                <div class="events-content">
+                    <div class="events-grid">
+                        <div class="event-card"><img src="images/poster1.png" class="event-poster" alt="Event 1"></div>
+                        <div class="event-card"><img src="images/poster2.png" class="event-poster" alt="Event 2"></div>
+                        <div class="event-card"><img src="images/poster3.png" class="event-poster" alt="Event 3"></div>
+                        <div class="event-card"><img src="images/poster1.png" class="event-poster" alt="Event 4"></div>
+                    </div>
+                </div>
+
                 <div class="events-content-footer">
                     <a href="events.html" class="cta-btn">
                         <div class="ui-roll roll-hover">
@@ -152,12 +155,14 @@
                         </div>
                     </a>
                 </div>
-            </div>
 
+            </div>
         </div>
 
     </section>
     <script src="scripts/section-events.js?v=8" defer></script>
+
+    <div class="section-spacer"></div>
 
     <section id="featured" class="featured-section" data-colors="#f0f4f0, #f0f4f0, #88cd88">
         <div class="featured-bg-wrap">
@@ -201,6 +206,8 @@
     </section>
     <script src="scripts/section-featured.js?v=2" defer></script>
 
+    <div class="section-spacer"></div>
+
     <section id="socials-footer" class="socials-footer" data-colors="#f0f4f0, #f0f4f0, #88cd88">
         <div id="socials" class="socials-section">
             <div class="socials-header">
@@ -234,7 +241,7 @@
                     </div>
                 </div>
                 <div class="marquee-bar">
-                    <div class="marquee-content">
+                    <div class="marquee-content marquee-reverse">
                         <span class="marquee-item type-sub1">STREAM GTSC SOUNDS @ PARLOR</span>
                         <img class="marquee-item arrow" src="images/graphics/arrow-right.png" alt="Back to Events">
                     </div>
@@ -242,7 +249,7 @@
             </div>
 
             <div class="footer-main">
-                <div id="footer-gradient-container" data-colors="#32CD32, #f0f4f0, #FABA2F">
+                <div id="footer-gradient-container" data-colors="#30FA30, #FFFCFA, #FDE523">
                     <canvas id="footer-canvas"></canvas>
                 </div>
                 <div class="footer-links">
@@ -278,7 +285,7 @@
         </div>
     </div>
 
-    <script src="scripts/scroll.js?v=7" defer></script>
+    <script src="scripts/scroll.js?v=8" defer></script>
 
 </body>
 </html>

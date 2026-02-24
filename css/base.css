@@ -37,14 +37,14 @@
 
 /* variables */
 :root {
-    --c-off-white: #f0f4f0;
-    --c-bright-green: #32CD32;
-    --c-lighter-green: #88cd88;
-    --c-dark-green: #1a3c1a;
+    --c-off-white: #FFFCFA;
+    --c-bright-green: #30FA30;
+    --c-lighter-green: #88cd88; /* possibly for lighter gradient sections */
+    --c-dark-green: #0E4A0E;
     --c-black: #000000;
-    --c-light-grey: #e0e0e0;
-    --c-yellow: #FABA2F;
-    --c-light-yellow: #f8cc6f;
+    --c-light-grey: #EDEDED;
+    --c-yellow: #FDE523;
+    --c-light-yellow: #FDE523;
 
     --color-bg: var(--c-off-white);
     --color-text-main: var(--c-dark-green);
@@ -81,7 +81,8 @@
     --size-display-xl: 160px;
     --size-h1: 96px;
     --size-h2: 64px;
-    --size-sub1: 24px;
+    --size-h3: 48px;
+    --size-sub1: 20px;
     --size-sub2: 14px;
     --size-body1: 18px;
     --size-body2: 36px;
@@ -208,6 +209,14 @@ section {
     text-transform: uppercase;
     line-height: 1;
     margin: 0;
+}
+
+.type-h3 {
+    font-family: var(--font-header);
+    font-size: var(--size-h3);
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1;
 }
 
 .type-sub1 {

@@ -4,11 +4,11 @@
     position: relative;
     width: 100%;
     padding: 0;
-    /* phase 1 (100vh): section enters, title scrolls to centre
-       phase 2 (80vh): dead zone, cards animate in
-       phase 3 (100vh): sticky releases, content scrolls up naturally
-       total = ~240vh */
-    min-height: 240vh;
+    /* animation range is fixed at 2×vh in JS (phase2Len = ih * 2).
+       section height only controls dwell after animation + sticky release.
+       sticky range = min-height − 100vh. animation ends at 200vh into sticky range.
+       dwell = min-height − 300vh → 315vh gives ~15vh before sticky releases */
+    min-height: 315vh;
 }
 
 .events-sticky {
@@ -17,6 +17,14 @@
     width: 100%;
     height: 100vh;
     overflow: hidden;
+}
+
+/* explicit position: relative + full height makes this the unambiguous
+   containing block for the absolutely-positioned footer */
+.events-sticky-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -73,10 +81,14 @@
 }
 
 .events-content-footer {
+    position: absolute;
+    bottom: calc(var(--standard-margin, 20px) * 2.5);
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: var(--standard-margin, 20px);
+    z-index: 3;
 }
 
 @media (max-width: 768px) {

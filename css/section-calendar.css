@@ -52,18 +52,18 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding: 0 var(--standard-margin);
+    padding: 0 var(--standard-margin) var(--section-padding);
     overflow: hidden;
 }
 
 .calendar-interface-wrapper {
     position: relative;
     width: 100%;
-    height: auto;
-    max-height: 100%;
+    flex: 1;
+    min-height: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
 }
 
 .calendar-grid-packed {
@@ -84,12 +84,13 @@
     position: relative;
     z-index: 10;
     width: 100%;
-    height: auto;
+    max-height: 100%;
     overflow-y: auto;
     scrollbar-width: none;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-top: calc(var(--standard-margin) * 3);
 }
 .calendar-list::-webkit-scrollbar { display: none; }
 
@@ -116,8 +117,10 @@
 .calendar-poster-wrapper {
     position: absolute; 
     z-index: 1;
-    top: 0; left: 10%; 
-    height: 100%;
+    top: 0;
+    bottom: 0;
+    left: 10%;
+    height: auto;
     display: flex;
     align-items: center;
     pointer-events: none;
@@ -133,9 +136,9 @@
 }
 
 .calendar-poster-img {
-    height: auto; max-height: 100%;
-    width: 100%;
-    object-fit: contain;
+    height: 100%;
+    width: auto;
+    object-fit: cover;
     opacity: 1; 
 }
 

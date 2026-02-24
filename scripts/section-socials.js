@@ -42,8 +42,13 @@
         }
 
         if (gallery) {
+            const imgs = gallery.querySelectorAll('.social-img');
             observeElementInOut(gallery, {
-                onEnter() { setTimeout(() => gallery.classList.add('is-visible'), stagger * 3); }
+                onEnter() {
+                    imgs.forEach((img, i) => {
+                        setTimeout(() => img.classList.add('is-visible'), stagger * 3 + i * 100);
+                    });
+                }
             });
         }
     });
