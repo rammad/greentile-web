@@ -1,10 +1,7 @@
 /* about section – column-based image scatter + scroll-driven body text */
 
 (function () {
-    const {
-        observeElementInOut,
-        staggerTime
-    } = window.AnimationUtils || {};
+    const { staggerTime } = window.AnimationUtils || {};
 
     // ── image scatter layout ────────────────────────────────────────────────────
     const MOBILE_BREAKPOINT      = 768;
@@ -20,16 +17,15 @@
     const IMG_WIDTH_DESKTOP_MAX  = 15;
     const IMG_JITTER_RANGE       = 120;
     const IMG_Z_INDEX_MAX        = 20;
-    const ABOUT_COL_ENTER_THRESHOLD = 0.25;
     const IMG_VARIATION_MIN_DIFF = 0.2;
 
     const IMG_SCALE_MIN = 1.0;
     const IMG_SCALE_MAX = 1.0;
 
     // larger images scroll faster and sit in front (depth parallax)
-    const IMG_DEPTH_PARALLAX_STRENGTH = 0.3;
-    const IMG_SPEED_FACTOR_MIN        = 0.5;
-    const IMG_SPEED_FACTOR_MAX        = 1.0;
+    const IMG_DEPTH_PARALLAX_STRENGTH = 0.5;
+    const IMG_SPEED_FACTOR_MIN        = 0.8;
+    const IMG_SPEED_FACTOR_MAX        = 1.2;
 
     // ── body text scroll animation ──────────────────────────────────────────────
     //
@@ -152,32 +148,8 @@
             stickyContent.remove();
         }
 
-        function setupColumnObservers() {
-            const colLeft  = document.createElement('div');
-            colLeft.className  = 'about-col about-col-left';
-            const colRight = document.createElement('div');
-            colRight.className = 'about-col about-col-right';
-            track.appendChild(colLeft);
-            track.appendChild(colRight);
-
-            const leftImages  = images.filter((_, i) => i % 2 === 0);
-            const rightImages = images.filter((_, i) => i % 2 === 1);
-
-            observeElementInOut(colLeft,  {
-                root: viewport,
-                enterThreshold: ABOUT_COL_ENTER_THRESHOLD,
-                onEnter() { leftImages.forEach((img) => img.classList.add('is-visible')); }
-            });
-            observeElementInOut(colRight, {
-                root: viewport,
-                enterThreshold: ABOUT_COL_ENTER_THRESHOLD,
-                onEnter() { rightImages.forEach((img) => img.classList.add('is-visible')); }
-            });
-        }
-
         initLayout();
         buildSlideStack();
-        setupColumnObservers();
         track.classList.add('about-image-track-positioned');
 
         // ── per-frame updates ─────────────────────────────────────────────────

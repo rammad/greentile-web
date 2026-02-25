@@ -8,11 +8,11 @@
         const section = document.querySelector('.events-section');
         if (!section) return;
 
-        const title     = document.getElementById('event-title');
+        const title = document.getElementById('event-title');
         const titleWrap = section.querySelector('.events-title-wrap');
-        const grid      = section.querySelector('.events-grid');
-        const cards     = section.querySelectorAll('.event-card');
-        const btn       = section.querySelector('.cta-btn');
+        const grid = section.querySelector('.events-grid');
+        const cards = section.querySelectorAll('.event-card');
+        const btn = section.querySelector('.cta-btn');
 
         if (grid && cards.length) {
             grid.style.setProperty('--poster-count', cards.length);
@@ -80,10 +80,10 @@
         if (titleWrap) titleWrap.style.transition = 'none';
 
         const recalcLayout = () => {
-            const ih    = window.innerHeight;
+            const ih = window.innerHeight;
             phase2Start = section.offsetTop;
-            phase2Len   = ih * 2; // fixed animation range — decoupled from section height
-            startOffset = ih;     // start fully off the bottom of the screen
+            phase2Len = ih * 2; // fixed animation range — decoupled from section height
+            startOffset = ih; // start fully off the bottom of the screen
             applyPositions(window.lenis ? window.lenis.scroll : 0);
         };
 
@@ -102,14 +102,17 @@
 
             // fade + blur the title as the first card scrolls in — directly proportional
             if (titleWrap) {
-                const fadeP = Math.max(0, Math.min(1, (progress - cardStarts[n - 1]) / travelDuration));
+                const fadeP = Math.max(0, Math.min(1, (progress - cardStarts[1]) / travelDuration));
                 titleWrap.style.opacity = String(1 - fadeP);
                 titleWrap.style.filter  = fadeP > 0 ? `blur(${fadeP * 10}px)` : '';
             }
 
-            if (btn && transitionCta && progress >= btnThreshold &&
-                !btn.classList.contains('is-visible')) {
-                transitionCta(btn, 'enter');
+            if (btn && transitionCta) {
+                if (progress >= btnThreshold && !btn.classList.contains('is-visible')) {
+                    transitionCta(btn, 'enter');
+                } else if (progress < btnThreshold && btn.classList.contains('is-visible')) {
+                    transitionCta(btn, 'exit');
+                }
             }
         };
 
