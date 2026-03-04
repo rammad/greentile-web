@@ -430,6 +430,54 @@ section {
     transform: translateY(0%);
 }
 
+/* page curtain transition */
+#page-curtain {
+    position: fixed;
+    inset: 0;
+    background: var(--c-off-white);
+    z-index: 9500;
+    transform: translateY(0);
+    pointer-events: none;
+    will-change: transform;
+}
+#page-curtain.is-open {
+    transform: translateY(-100%);
+}
+
+/* curtain mahjong tiles */
+.curtain-tiles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.curtain-tile {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 88px;
+    height: 120px;
+    margin: -60px 0 0 -44px;
+    background: #c8c8c8;
+    border-radius: 8px;
+    will-change: transform;
+}
+
+/* mahjong call label above snapped tiles */
+.curtain-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-family: var(--font-subheader);
+    font-size: var(--size-sub1);
+    font-weight: 100;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-subheader);
+    white-space: nowrap;
+    will-change: transform, opacity;
+}
+
 /* grain overlay */
 body::after {
     content: '';

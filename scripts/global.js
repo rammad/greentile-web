@@ -78,6 +78,9 @@ const LENIS_WHEEL_MULTIPLIER = 1.0;     // wheel speed multiplier
 
 const ENTER_THRESHOLD = 0.15; // how much of element must be visible to trigger entrance
 
+// resolved immediately unless initPageTransition replaces it with a deferred promise
+window.pageReady = Promise.resolve();
+
 function observeElementInOut(element, options = {}) {
     if (!element) return () => {};
     const {
@@ -96,7 +99,8 @@ function observeElementInOut(element, options = {}) {
                 if (visible && onEnter) {
                     if (!didEnter || repeat) {
                         didEnter = true;
-                        onEnter(entry.target);
+                        // gate first-entry animations behind the curtain lifting
+                        window.pageReady.then(() => onEnter(entry.target));
                     }
                 } else if (!visible && repeat) {
                     didEnter = false;
@@ -208,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // initCTA(); /* section scripts handle ctas */
     initCascadeReveal();
     initFitText();
+    initPageTransition();
     setTimeout(() => {
         const nav = document.querySelector('nav');
         if(nav) nav.classList.add('nav-loaded');
@@ -324,6 +329,115 @@ class MarqueeManager {
             track.classList.add('is-initialized');
         });
     }
+}
+
+// scattered landing positions (x, y, rotation) relative to tile center
+const CURTAIN_TILE_SCATTER = [
+    { x: -108, y: 22,  r: -20 },
+    { x:    8, y: 32,  r:  12 },
+    { x:  102, y:  9,  r:  -8 },
+];
+// snapped row: tile width 88px + gap 4px = 92px between centers
+const CURTAIN_TILE_SNAP_X = [-92, 0, 92];
+
+function createCurtainTiles(curtain) {
+    const wrap = document.createElement('div');
+    wrap.className = 'curtain-tiles';
+    for (let i = 0; i < 3; i++) {
+        const tile = document.createElement('div');
+        tile.className = 'curtain-tile';
+        tile.style.transform = 'translate(0px, -600px) rotate(0deg)';
+        wrap.appendChild(tile);
+    }
+    curtain.appendChild(wrap);
+    return wrap;
+}
+
+async function playTileAnimation(wrap, fast = false) {
+    const tiles    = wrap.querySelectorAll('.curtain-tile');
+    const stagger  = fast ? 45  : 80;
+    const dropMs   = fast ? 380 : 580;
+    const snapMs   = fast ? 220 : 320;
+    const labelMs  = fast ? 280 : 380;
+    const holdMs   = fast ? 80  : 120;
+    const dropEase = 'cubic-bezier(0, 0, 0.04, 1)';    // near-instant launch, very long friction tail
+    const snapEase = 'cubic-bezier(0.99, 0, 0.15, 1.6)'; // pinned still, explosive snap, hard overshoot
+
+    // phase 1: drop in with scatter, staggered
+    tiles.forEach((tile, i) => {
+        setTimeout(() => {
+            tile.style.transition = `transform ${dropMs}ms ${dropEase}`;
+            const { x, y, r } = CURTAIN_TILE_SCATTER[i];
+            tile.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
+        }, i * stagger);
+    });
+
+    await wait(stagger * (tiles.length - 1) + dropMs + 55);
+
+    // phase 2: snap into a neat row simultaneously
+    tiles.forEach((tile, i) => {
+        tile.style.transition = `transform ${snapMs}ms ${snapEase}`;
+        tile.style.transform  = `translate(${CURTAIN_TILE_SNAP_X[i]}px, 0px) rotate(0deg)`;
+    });
+
+    await wait(snapMs);
+
+    // phase 3: mahjong call label grows in above the tiles
+    const CURTAIN_WORDS = ['click', 'pong', 'chow'];
+    const label = document.createElement('div');
+    label.className = 'curtain-label';
+    label.textContent = CURTAIN_WORDS[Math.floor(Math.random() * CURTAIN_WORDS.length)];
+    label.style.cssText = `transform: translate(-50%, -110px) scale(0.78); opacity: 0; transition: none;`;
+    wrap.appendChild(label);
+
+    label.getBoundingClientRect(); // force layout
+    label.style.transition = `transform ${labelMs}ms cubic-bezier(0, 0, 0.2, 1), opacity ${labelMs}ms cubic-bezier(0, 0, 0.2, 1)`;
+    label.style.transform  = 'translate(-50%, -110px) scale(1)';
+    label.style.opacity    = '1';
+
+    await wait(labelMs + holdMs);
+}
+
+function initPageTransition() {
+    const curtain = document.getElementById('page-curtain');
+    if (!curtain) return;
+
+    let navigating = false;
+
+    // hold page animations until curtain lifts
+    let resolvePageReady;
+    window.pageReady = new Promise(resolve => { resolvePageReady = resolve; });
+
+    // entry: tile animation plays while curtain covers, then curtain lifts
+    const entryWrap = createCurtainTiles(curtain);
+    requestAnimationFrame(() => {
+        requestAnimationFrame(async () => {
+            await playTileAnimation(entryWrap, false);
+            entryWrap.remove();
+            resolvePageReady(); // unblock section animations — they play during the reveal
+            curtain.style.transition = 'transform 0.85s cubic-bezier(0.16, 1, 0.3, 1)';
+            curtain.classList.add('is-open');
+        });
+    });
+
+    // exit: curtain drops, tile animation plays, then navigate
+    document.addEventListener('click', (e) => {
+        if (navigating) return;
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('tel')) return;
+        if (/^https?:\/\//i.test(href)) return;
+
+        e.preventDefault();
+        navigating = true;
+
+        curtain.style.transition = 'transform 0.6s cubic-bezier(0.76, 0, 0.24, 1)';
+        curtain.classList.remove('is-open');
+
+        setTimeout(() => { window.location.href = href; }, 640);
+    });
 }
 
 function initNavbar() {
