@@ -36,11 +36,11 @@
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
-    /* overscroll-behavior-y: contain; stop scroll from bubbling to the page */
+    overscroll-behavior-y: contain; /* stop scroll from bubbling to the page */
     scrollbar-width: none;
     -ms-overflow-style: none;
-    margin-top: calc(var(--standard-margin) * 4);
-    margin-bottom: calc(var(--standard-margin) * 6);
+    margin-top: calc(var(--standard-margin) * 2);
+    margin-bottom: calc(var(--standard-margin) * 4);
     width: 100%;
 }
 

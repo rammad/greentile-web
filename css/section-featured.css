@@ -3,11 +3,12 @@
 .featured-section {
     position: relative;
     width: 100%;
-    height: 150vh;
+    /* min-height is set by JS so phase lengths and section height stay in sync.
+       fallback keeps the section visible if JS hasn't run yet. */
+    min-height: 100vh;
 }
 
-/* overflow: hidden here clips the blurred bg to section bounds (hard edges)
-   without touching the sticky .featured-frame sibling */
+/* clips blurred bg to section bounds — sibling to .featured-frame so sticky is unaffected */
 .featured-bg-wrap {
     position: absolute;
     inset: 0;
@@ -33,24 +34,20 @@
     will-change: transform;
 }
 
-/* dark scrim over scrolling bg */
-.featured-section::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-}
-
+/* sticky container — clips both marquee and poster while they travel */
 .featured-frame {
-    position: relative;
-    height: 100%;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2;
 }
 
-/* marquee sits behind poster */
+/* marquee fills the frame; translateY driven by phase 1 in JS */
 .featured-marquee-layer {
     position: absolute;
     inset: 0;
@@ -60,6 +57,7 @@
     overflow: hidden;
     pointer-events: none;
     user-select: none;
+    will-change: transform;
 }
 
 .featured-marquee-track {
@@ -80,13 +78,14 @@
     to   { transform: translateX(-50%); }
 }
 
-/* centered poster wrap — height = viewport minus nav + bottom margin */
+/* poster — translateY driven by phase 2 in JS; sits on top of marquee */
 .featured-poster-wrap {
     position: relative;
     z-index: 3;
     height: calc(100vh - var(--space-for-nav) - var(--standard-margin));
     aspect-ratio: 4 / 5;
     flex-shrink: 0;
+    will-change: transform;
 }
 
 .featured-img {
@@ -95,14 +94,6 @@
     object-fit: cover;
     object-position: center;
     display: block;
-    opacity: 0;
-    transform: translateY(24px) scale(1.04);
-    transition: opacity 0.9s ease, transform 1s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.featured-img.is-visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
 }
 
 @media (max-width: 768px) {

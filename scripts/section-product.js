@@ -53,13 +53,15 @@
         const MOBILE_BREAKPOINT = 1024;
         if (window.innerWidth <= MOBILE_BREAKPOINT) return;
 
-        const col   = document.querySelector('.pdp-image-col');
-        const track = document.querySelector('.pdp-image-track');
-        const desc  = document.querySelector('.pdp-desc');
+        const col     = document.querySelector('.pdp-image-col');
+        const track   = document.querySelector('.pdp-image-track');
+        const desc    = document.querySelector('.pdp-desc');
+        const wrapper = document.querySelector('.pdp-sticky-wrapper');
         if (!col || !track) return;
 
-        const LERP   = 0.12;   // smoothing factor (higher = snappier)
-        const SCALAR = 0.8;    // wheel delta multiplier
+        const LERP         = 0.12;  // smoothing factor (higher = snappier)
+        const SCALAR       = 0.8;   // wheel delta multiplier for image col
+        const DESC_SCALAR  = 0.35;  // slower scroll for description
 
         let targetY  = 0;
         let currentY = 0;
@@ -88,13 +90,26 @@
             if (!rafId) rafId = requestAnimationFrame(tick);
         }
 
-        // wheel over image col scrolls images; everywhere else scrolls page
-        col.addEventListener('wheel', e => {
-            e.preventDefault();
-            nudge(e.deltaY);
-        }, { passive: false });
+        // Block all page scroll on the sticky wrapper — keeps the one-screen look
+        if (wrapper) {
+            wrapper.addEventListener('wheel', e => {
+                e.preventDefault();
+            }, { passive: false });
+        }
 
-        // touch swipe on image col
+        // Image col scroll
+        col.addEventListener('wheel', e => {
+            nudge(e.deltaY);
+        }, { passive: true });
+
+        // Description scroll — manual so we control speed (wrapper already blocks default)
+        if (desc) {
+            desc.addEventListener('wheel', e => {
+                desc.scrollTop += e.deltaY * DESC_SCALAR;
+            }, { passive: true });
+        }
+
+        // Touch swipe on image col
         let touchY = 0;
         col.addEventListener('touchstart', e => {
             touchY = e.touches[0].clientY;

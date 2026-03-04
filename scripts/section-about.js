@@ -27,31 +27,9 @@
     const IMG_SPEED_FACTOR_MIN        = 0.8;
     const IMG_SPEED_FACTOR_MAX        = 1.2;
 
-    // ── body text scroll animation ──────────────────────────────────────────────
-    //
-    //  d  = stickyTop / halfVH          (0 = text at centre, ±n = n half-viewports away)
-    //  t  = |d| / FADE_RANGE            (0 = centre, 1 = outer boundary)
-    //
-    //  Position:
-    //    pullFactor = (1 − t)^PULL_POWER
-    //    translateY = −stickyTop × pullFactor
-    //
-    //    PULL_POWER is the key Doppler knob:
-    //      lower (0.2–0.5) → strong pull, near-zero movement near centre, dramatic curve
-    //      higher (1–3)    → weaker pull, more movement throughout
-    //    At PULL_POWER=0.4, text moves at ~8% of scroll speed at stickyTop=100px.
-    //
-    //  Opacity + blur:
-    //    Derived from where the text *actually lands* on screen after the pull.
-    //    Fully opaque at centre, fades as it physically moves away.
-    //    OPACITY_FALLOFF controls the radius (× halfVH) before opacity reaches 0.
-    //
-    //  Smoothing: JS lerp per-frame — no CSS transitions (those conflict with
-    //             per-frame updates and produce jitter/lag cascades).
-
     const CONTENT_FADE_RANGE      = 1.5;
     const CONTENT_PULL_POWER      = 0.6;  // lower = more dramatic slowing near centre
-    const CONTENT_OPACITY_FALLOFF = 1;  // opacity → 0 when text is this × halfVH from centre
+    const CONTENT_OPACITY_FALLOFF = 2;  // opacity → 0 when text is this × halfVH from centre
     const CONTENT_MAX_BLUR        = 8;
 
     function smoothstep(t) {
@@ -142,6 +120,13 @@
                 sticky.appendChild(block);
                 slide.appendChild(sticky);
                 slidesWrap.appendChild(slide);
+
+                // CTAs live inside the text block and need is-visible up-front so they
+                // render expanded; the parent .about-text-block opacity handles fading.
+                block.querySelectorAll('.cta-btn').forEach((cta) => {
+                    cta.classList.add('is-visible');
+                    cta.querySelectorAll('.ui-roll').forEach((roll) => roll.classList.add('is-visible'));
+                });
             });
 
             section.appendChild(slidesWrap);
@@ -184,6 +169,43 @@
 
         const slides = section.querySelectorAll('.about-slide');
 
+        // ── persistent-menu (about-us.html only) ──────────────────────────────
+        const hasPersistentMenu = section.classList.contains('has-persistent-menu');
+        const menuEl    = hasPersistentMenu ? section.querySelector('.about-menu-persistent') : null;
+        const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
+
+        if (hasPersistentMenu && menuItems.length > 0) {
+            menuItems.forEach(item => item.classList.add('is-visible'));
+        }
+
+        function updatePersistentMenu() {
+            if (!hasPersistentMenu || !menuEl) return;
+
+            const vpRect  = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
+            const secRect = section.getBoundingClientRect();
+
+            // pin while section fills the viewport
+            const isPinned = secRect.top <= vpRect.top && secRect.bottom >= vpRect.top + vpRect.height;
+            menuEl.classList.toggle('is-pinned', isPinned);
+
+            // active item = slide whose sticky centre is closest to viewport centre
+            const halfVH  = vpRect.height / 2;
+            const vpTop   = vpRect.top;
+            let closestIdx  = 0;
+            let closestDist = Infinity;
+
+            slides.forEach((slide, i) => {
+                const sticky = slide.querySelector('.about-slide-sticky');
+                if (!sticky) return;
+                const rect    = sticky.getBoundingClientRect();
+                const centerY = rect.top + rect.height / 2 - vpTop;
+                const dist    = Math.abs(centerY - halfVH);
+                if (dist < closestDist) { closestDist = dist; closestIdx = i; }
+            });
+
+            menuItems.forEach((item, i) => item.classList.toggle('is-active', i === closestIdx));
+        }
+
         /* Derives body text position, opacity and blur directly from scroll position.
          * Lenis fires this at 60 fps with smooth interpolated values — no additional
          * lerp or CSS transition is needed and both cause jump artifacts. */
@@ -223,11 +245,13 @@
             updateScrollDirection();
             updateImageScales();
             updateSlideContent();
+            updatePersistentMenu();
         });
 
         // run once immediately so values are set before the first scroll event
         updateImageScales();
         updateSlideContent();
+        updatePersistentMenu();
 
         // ── resize ────────────────────────────────────────────────────────────
 
