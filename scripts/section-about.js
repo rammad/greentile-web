@@ -82,9 +82,11 @@
                 const randomW = getVariedRandom(minW, maxW, prev.w);
 
                 const jitter = Math.floor(Math.random() * IMG_JITTER_RANGE) - IMG_JITTER_RANGE / 2;
+                const naturalTop = currentY + jitter;
                 img.style.width  = `${randomW}vw`;
                 img.style.left   = `${randomX}%`;
-                img.style.top    = `${currentY + jitter}px`;
+                img.style.top    = `${naturalTop}px`;
+                img.dataset.naturalTop = String(naturalTop);
 
                 const normalizedSize = (randomW - minW) / Math.max(1, maxW - minW);
                 img.style.zIndex     = 1 + Math.round(normalizedSize * (IMG_Z_INDEX_MAX - 1));
@@ -154,7 +156,14 @@
                 const scale       = IMG_SCALE_MIN + (IMG_SCALE_MAX - IMG_SCALE_MIN) * proximity;
                 const speedFactor = parseFloat(img.dataset.speedFactor ?? '1');
                 const parallaxY   = depthOffset * (1 - speedFactor) * IMG_DEPTH_PARALLAX_STRENGTH;
-                img.style.transform = `translateY(${parallaxY.toFixed(2)}px) scale(${scale})`;
+
+                const naturalTop  = parseFloat(img.dataset.naturalTop ?? '0');
+                const imgH        = img.offsetHeight;
+                const minParallax = -naturalTop;
+                const maxParallax = trackHeight - naturalTop - imgH;
+                const clampedY    = Math.max(minParallax, Math.min(maxParallax, parallaxY));
+
+                img.style.transform = `translateY(${clampedY.toFixed(2)}px) scale(${scale})`;
             });
         }
 

@@ -56,15 +56,15 @@
         // The cascade is created by delaying each card's start by a fixed stepSize,
         // NOT by varying speed. Cards arrive in order 0, 1, 2 …
         //
-        // Available progress range after readingBuffer is split 40/60:
-        //   40% → stagger delays  (stepSize × n gaps)
-        //   60% → travel distance (same for every card)
+        // Available progress range after readingBuffer is split 20/80:
+        //   20% → stagger delays  (stepSize × n gaps)
+        //   80% → travel distance (same for every card)
 
         const readingBuffer  = 0;
         const n              = cards.length;
         const availableRange = 1 - readingBuffer;
-        const totalDelay     = availableRange * 0.4;
-        const travelDuration = availableRange * 0.6;
+        const totalDelay     = availableRange * 0.2;
+        const travelDuration = availableRange * 0.8;
         const stepSize       = n > 1 ? totalDelay / (n - 1) : 0;
 
         // card i starts moving at this scroll progress value
@@ -81,8 +81,8 @@
 
         const recalcLayout = () => {
             const ih = window.innerHeight;
-            phase2Start = section.offsetTop;
-            phase2Len = ih * 2; // fixed animation range — decoupled from section height
+            phase2Start = section.offsetTop - ih * 0.4; // begin before section fully sticks
+            phase2Len = ih * 1; // fixed animation range — decoupled from section height
             startOffset = ih; // start fully off the bottom of the screen
             applyPositions(window.lenis ? window.lenis.scroll : 0);
         };
@@ -99,13 +99,6 @@
                 card.style.transform = `translateY(${startOffset * (1 - localP)}px)`;
                 card.style.opacity   = '1';
             });
-
-            // fade + blur the title as the first card scrolls in — directly proportional
-            if (titleWrap) {
-                const fadeP = Math.max(0, Math.min(1, (progress - cardStarts[1]) / travelDuration));
-                titleWrap.style.opacity = String(1 - fadeP);
-                titleWrap.style.filter  = fadeP > 0 ? `blur(${fadeP * 10}px)` : '';
-            }
 
             if (btn && transitionCta) {
                 if (progress >= btnThreshold && !btn.classList.contains('is-visible')) {

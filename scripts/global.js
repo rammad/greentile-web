@@ -330,11 +330,5 @@ function initNavbar() {
     const nav = document.querySelector('.sticky-nav');
     if (!nav) return;
     const links = nav.querySelectorAll('a');
-    let scrollTimer;
     links.forEach(link => { if (link.children.length === 0) link.innerText = link.innerText; });
-    window.addEventListener('lenis-scroll', () => {
-        nav.classList.add('nav-hidden');
-        clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(() => { nav.classList.remove('nav-hidden'); }, 500);
-    }, { passive: true });
 }

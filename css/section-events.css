@@ -4,10 +4,9 @@
     position: relative;
     width: 100%;
     padding: 0;
-    /* animation range is fixed at 2×vh in JS (phase2Len = ih * 2).
-       sticky range = min-height − 100vh. animation ends at 200vh into sticky range.
-       min-height = 300vh → 0 dwell, sticky releases the moment last card lands */
-    min-height: 300vh;
+    /* animation range is fixed at 1×vh in JS (phase2Len = ih * 1), starting 0.4×vh early.
+       net sticky range needed = 1×vh − 0.4×vh = 0.6×vh. min-height = 100vh + 60vh = 160vh */
+    min-height: 160vh;
 }
 
 .events-sticky {
@@ -25,20 +24,19 @@
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding-top: var(--space-for-nav, 90px);
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-/* title: absolute-centered behind the posters */
+/* title: flows at the top inside the column */
 .events-title-wrap {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    flex-shrink: 0;
     display: flex;
-    align-items: center;
-    z-index: 1;
+    align-items: flex-start;
     pointer-events: none;
     padding: 0 var(--standard-margin, 20px);
 }
@@ -53,7 +51,7 @@
 .events-content {
     position: relative;
     width: 100%;
-    z-index: 2;
+    margin-top: var(--standard-margin, 20px);
 }
 
 .events-grid {

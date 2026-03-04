@@ -23,12 +23,7 @@
     align-items: center;
     z-index: 1000;
 
-    transition: transform var(--time-fade-in) cubic-bezier(0.2, 0.8, 0.2, 1), 
-                background 0.3s ease;
-}
-
-.sticky-nav.nav-hidden {
-    transform: translate3d(0, -150%, 0);
+    transition: background 0.3s ease;
 }
 
 .nav-center { 

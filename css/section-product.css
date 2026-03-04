@@ -9,6 +9,7 @@
 }
 
 .pdp-sticky-wrapper .back-arrow {
+    top: var(--pdp-v-padding);
     left: var(--standard-margin);
 }
 
@@ -39,8 +40,8 @@
     overscroll-behavior-y: contain; /* stop scroll from bubbling to the page */
     scrollbar-width: none;
     -ms-overflow-style: none;
-    margin-top: calc(var(--standard-margin) * 2);
-    margin-bottom: calc(var(--standard-margin) * 4);
+    padding-top: var(--standard-margin);
+    margin-bottom: calc(var(--standard-margin) * 3);
     width: 100%;
 }
 
@@ -74,7 +75,6 @@
     overflow: hidden;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding: calc(var(--standard-margin) * 2) 0;
     box-sizing: border-box;
 }
 
@@ -102,6 +102,7 @@
     aspect-ratio: 4 / 5;
     opacity: 0;
     transition: opacity var(--time-fade-in) ease;
+    margin-bottom: var(--standard-margin);
 }
 
 .pdp-poster.is-visible {
