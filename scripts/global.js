@@ -222,26 +222,51 @@ document.addEventListener('DOMContentLoaded', () => {
 function initCascadeReveal() {
     const targets = document.querySelectorAll('.animate-cascade');
     targets.forEach(el => {
-        if(el.classList.contains('is-initialized')) return;
+        if (el.classList.contains('is-initialized')) return;
+
         const splitTextInNode = (node) => {
-            const text = node.innerText;
-            node.innerHTML = ''; 
+            const text = node.innerText.trim();
+            node.innerHTML = '';
             const words = text.split(' ');
+
             words.forEach((wordText, wordIndex) => {
+                const chars = [...wordText]; // unicode-safe split
+
                 const wordSpan = document.createElement('span');
                 wordSpan.classList.add('word-wrapper');
-                wordText.split('').forEach(char => {
-                    const charSpan = document.createElement('span');
-                    charSpan.classList.add('char-reveal');
-                    charSpan.innerText = char;
-                    wordSpan.appendChild(charSpan);
+
+                // invisible spacer that holds the word's natural width/height
+                const ghost = document.createElement('span');
+                ghost.classList.add('word-ghost');
+                ghost.setAttribute('aria-hidden', 'true');
+                ghost.textContent = wordText;
+                wordSpan.appendChild(ghost);
+
+                // one absolutely-positioned layer per character
+                chars.forEach((_, charIndex) => {
+                    const layer = document.createElement('span');
+                    layer.classList.add('char-reveal');
+                    layer.setAttribute('aria-hidden', 'true');
+
+                    chars.forEach((char, j) => {
+                        const charSpan = document.createElement('span');
+                        charSpan.classList.add('ghost-char');
+                        charSpan.textContent = char;
+                        // only the "owned" character is visible in this layer
+                        if (j !== charIndex) charSpan.style.opacity = '0';
+                        layer.appendChild(charSpan);
+                    });
+
+                    wordSpan.appendChild(layer);
                 });
+
                 node.appendChild(wordSpan);
                 if (wordIndex < words.length - 1) {
                     node.appendChild(document.createTextNode(' '));
                 }
             });
         };
+
         if (el.children.length > 0) Array.from(el.children).forEach(child => splitTextInNode(child));
         else splitTextInNode(el);
         el.classList.add('is-initialized');

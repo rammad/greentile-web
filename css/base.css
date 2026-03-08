@@ -294,22 +294,29 @@ section {
 }
 
 .word-wrapper {
-    display: inline-flex !important;
-    align-items: flex-start;
-    height: 0.95em;
+    display: inline-block !important;
+    position: relative;
     white-space: nowrap;
-    overflow: hidden;
     vertical-align: bottom;
 }
 
+/* invisible spacer — holds the word's natural width so layout is unaffected */
+.word-ghost {
+    display: inline-block;
+    visibility: hidden;
+    white-space: pre;
+}
+
+/* one full-word layer per character, stacked absolutely over the ghost */
 .char-reveal {
     display: inline-block !important;
-    vertical-align: top;
-    line-height: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: pre;
     opacity: 0;
     transform: translateY(var(--cascade-travel)) rotateX(-5deg);
     transform-origin: bottom center;
-    white-space: pre-wrap;
     transition:
         transform var(--time-cascade) var(--ease-standard),
         opacity var(--time-cascade) var(--ease-standard);
@@ -318,6 +325,11 @@ section {
 .char-reveal.is-visible {
     opacity: 1;
     transform: translateY(0) rotateX(0deg);
+}
+
+/* individual character slots inside each layer */
+.ghost-char {
+    display: inline;
 }
 
 .hero-faded {
