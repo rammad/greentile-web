@@ -302,8 +302,14 @@ class GradientEngine {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const pageSection = document.querySelector('section[data-colors]');
+    const pageSectionColors = pageSection
+        ? pageSection.getAttribute('data-colors').split(',').map(s => s.trim())
+        : ['#47ff54', '#f1ffe8', '#f0fd7c'];
+
     new GradientEngine('gradient-canvas', {
-        colors: ['#47ff54', '#f1ffe8', '#f0fd7c'],
+        colors: pageSectionColors,
+        useSectionObserver: !!document.querySelector('#scroll-viewport'),
 
         heightDensity: 0.9,
         heightStrength: 0.14,

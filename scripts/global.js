@@ -355,11 +355,14 @@ function createCurtainTiles(curtain) {
 
 async function playTileAnimation(wrap, fast = false) {
     const tiles    = wrap.querySelectorAll('.curtain-tile');
+
+    // vvv try to swap these with standard stagger values maybe idk if its possible or necessary its a one shot animation
     const stagger  = fast ? 45  : 80;
     const dropMs   = fast ? 380 : 580;
     const snapMs   = fast ? 220 : 320;
     const labelMs  = fast ? 280 : 380;
     const holdMs   = fast ? 80  : 120;
+    
     const dropEase = 'cubic-bezier(0, 0, 0.04, 1)';    // near-instant launch, very long friction tail
     const snapEase = 'cubic-bezier(0.99, 0, 0.15, 1.6)'; // pinned still, explosive snap, hard overshoot
 
@@ -383,7 +386,7 @@ async function playTileAnimation(wrap, fast = false) {
     await wait(snapMs);
 
     // phase 3: mahjong call label grows in above the tiles
-    const CURTAIN_WORDS = ['click', 'pong', 'chow'];
+    const CURTAIN_WORDS = ['pong', 'chow'];
     const label = document.createElement('div');
     label.className = 'curtain-label';
     label.textContent = CURTAIN_WORDS[Math.floor(Math.random() * CURTAIN_WORDS.length)];
