@@ -8,8 +8,8 @@
  */
 
 (function () {
-    const PHASE1_VH      = 0.5;
-    const PHASE2_VH      = 0.7;
+    const PHASE1_VH      = 0;
+    const PHASE2_VH      = 0.35;
     const DWELL_VH       = 0;
     const PARALLAX_FACTOR = 0.35;
 
@@ -33,7 +33,7 @@
             phase1Len     = ih * PHASE1_VH;
             phase2Len     = ih * PHASE2_VH;
             phaseStart    = section.offsetTop;
-            marqueeOffset = ih * 0.25; // marquee already partially visible on entry
+            marqueeOffset = 0; // marquee is centered as soon as section pins
             posterOffset  = ih;       // poster starts fully off-screen below
 
             // keep section tall enough to fit both phases + dwell

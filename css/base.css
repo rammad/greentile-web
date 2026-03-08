@@ -6,14 +6,24 @@
     font-style: normal;
 }
 
+@import url("https://use.typekit.net/fbu0ukm.css");
+
 @font-face {
+    font-family: 'Obviously Sans';
+    src: url('../fonts/ObviouslyVariable.ttf') format('truetype');
+    font-weight: 100 900;
+    font-stretch: 25% 400%;
+    font-style: normal;
+}
+
+/* @font-face {
     font-family: 'OT Jubilee Ruby';
     src: url('../fonts/OTJubilee-RubyExtrabold.otf') format('opentype');
     font-weight: 800;
     font-style: normal;
-}
+} */
 
-@font-face {
+/* @font-face {
     font-family: 'Arizona Flare Light';
     src: url('../fonts/ABCArizonaFlare-Light-Trial.otf') format('opentype');
     font-weight: 100 900;
@@ -25,7 +35,7 @@
     src: url('../fonts/ABCArizonaSans-Bold-Trial.otf') format('opentype');
     font-weight: 100 900;
     font-style: normal;
-}
+} */
 
 /* variable font — not loaded yet, keeping for later
 @font-face {
@@ -56,10 +66,10 @@
 
     --color-bg-gradient: url('../images/temp-grad.png');
 
-    --font-display: 'OT Jubilee Ruby', serif;
+    --font-display: 'OT Jubilee Golden', serif;
     --font-header: 'OT Jubilee Golden', serif;
-    --font-body: 'Arizona Flare Light', normal;
-    --font-subheader: 'Arizona Sans Bold', normal;
+    --font-body: 'angie-sans', normal;
+    --font-subheader: 'Obviously Sans', normal;
 
     --time-fade-in: 0.6s;
     --time-fade-out: 0.2s;
@@ -82,7 +92,7 @@
     --size-h1: 96px;
     --size-h2: 64px;
     --size-h3: 48px;
-    --size-sub1: 20px;
+    --size-sub1: 16px;
     --size-sub2: 14px;
     --size-body1: 18px;
     --size-body2: 36px;
@@ -214,7 +224,7 @@ section {
 .type-h3 {
     font-family: var(--font-header);
     font-size: var(--size-h3);
-    font-weight: 800;
+    font-weight: 750;
     text-transform: uppercase;
     line-height: 1;
 }
@@ -222,7 +232,9 @@ section {
 .type-sub1 {
     font-family: var(--font-subheader);
     font-size: var(--size-sub1);
-    font-weight: 700;
+    font-weight: 400;
+    font-variation-settings: 'wdth' 525;
+    color: var(--color-text-subheader);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     /* font-variation-settings: 'SRFF' 0; */
@@ -231,8 +243,8 @@ section {
 .type-sub2 {
     font-family: var(--font-subheader);
     font-size: var(--size-sub2);
-    font-weight: 100;
-    font-style: normal;
+    font-weight: 300;
+    font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
     line-height: 100%;
     text-transform: uppercase;
