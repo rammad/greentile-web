@@ -27,7 +27,6 @@
     justify-self: center;
     gap: 32px; 
     align-items: center;
-    overflow: hidden;
 }
 
 .nav-left {
@@ -38,7 +37,6 @@
 .nav-right {
     display: flex;
     justify-self: end;
-    overflow: hidden;
 }
 
 .nav-logo {
@@ -47,67 +45,13 @@
     display: block;
 }
 
-/* rolling text links */
-
 .sticky-nav a {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    
-    height: 1.25em;
-    line-height: 1.25;
     color: var(--color-text-main);
     text-decoration: none;
 }
 
-.sticky-nav a span {
-    display: inline-block;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.sticky-nav a::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    color: var(--color-text-main);
-    
-    text-align: center;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.sticky-nav a:hover span {
-    transform: translateY(-100%);
-}
-.sticky-nav a:hover::after {
-    transform: translateY(-100%);
-}
-
-/* underline (disabled — maybe bring back later)
-.sticky-nav a::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: var(--color-text-main);
-    
-    transform: scaleX(0);
-    transform-origin: right center;
-    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.sticky-nav a:hover::before {
-    transform: scaleX(1);
-    transform-origin: left center;
-} */
-
 @media (max-width: 768px) {
-    .nav-center{
+    .nav-center {
         gap: 16px;
     }
 }

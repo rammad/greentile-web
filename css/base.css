@@ -176,10 +176,13 @@ section {
 .type-display-hero {
     font-family: var(--font-display);
     text-transform: uppercase;
-    line-height: 1;
+    line-height: 0.85;
     text-align: center;
     font-size: var(--size-display-hero);
+    overflow: visible;
     opacity: 0;
+    /* trim leading above caps and below baseline in supporting browsers */
+    text-box: trim-both cap alphabetic;
 }
 .type-display-hero.is-initialized { opacity: 1; }
 .type-display-hero span { display: inline; }
@@ -198,18 +201,21 @@ section {
     font-family: var(--font-display);
     font-size: var(--size-display-xl);
     font-weight: 800;
-    line-height: 1;
+    line-height: 0.85;
     text-transform: uppercase;
     text-align: center;
+    overflow: visible;
+    text-box: trim-both cap alphabetic;
 }
 
 .type-h1 {
     font-family: var(--font-header);
     font-size: var(--size-h1);
     font-weight: 800;
-    line-height: 1;
+    line-height: 0.85;
     text-transform: uppercase;
-    overflow: hidden;
+    overflow: visible;
+    text-box: trim-both cap alphabetic;
 }
 
 .type-h2 {
@@ -217,8 +223,9 @@ section {
     font-size: var(--size-h2);
     font-weight: 800;
     text-transform: uppercase;
-    line-height: 1;
+    line-height: 0.85;
     margin: 0;
+    text-box: trim-both cap alphabetic;
 }
 
 .type-h3 {
@@ -226,7 +233,8 @@ section {
     font-size: var(--size-h3);
     font-weight: 750;
     text-transform: uppercase;
-    line-height: 1;
+    line-height: 0.85;
+    text-box: trim-both cap alphabetic;
 }
 
 .type-sub1 {
@@ -237,6 +245,7 @@ section {
     color: var(--color-text-subheader);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    line-height: 1;
     /* font-variation-settings: 'SRFF' 0; */
 }
 
@@ -246,7 +255,7 @@ section {
     font-weight: 300;
     font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
-    line-height: 100%;
+    line-height: 1;
     text-transform: uppercase;
     text-decoration: none;
     /* font-variation-settings: 'SRFF' 0; */
@@ -305,6 +314,7 @@ section {
     display: inline-block;
     visibility: hidden;
     white-space: pre;
+    line-height: inherit;
 }
 
 /* one full-word layer per character, stacked absolutely over the ghost */
@@ -339,7 +349,7 @@ section {
 }
 
 /* ui */
-.ui-roll { position: relative; overflow: hidden; display: inline-block; cursor: pointer; }
+.ui-roll { position: relative; overflow: hidden; display: inline-block; cursor: pointer; line-height: 1; }
 .ui-roll-layer { display: block; transition: transform var(--time-roll) var(--ease-standard); }
 .ui-roll-visible { transform: translateY(110%); }
 .ui-roll-hidden { position: absolute; top: 0; left: 0; transform: translateY(100%); }
@@ -442,7 +452,7 @@ section {
 .text-mask {
     display: block;
     overflow: hidden;
-    line-height: 1.2;
+    line-height: 1;
 }
 .text-reveal-inner {
     display: block;

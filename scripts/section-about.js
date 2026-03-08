@@ -123,12 +123,8 @@
                 slide.appendChild(sticky);
                 slidesWrap.appendChild(slide);
 
-                // CTAs live inside the text block and need is-visible up-front so they
-                // render expanded; the parent .about-text-block opacity handles fading.
-                block.querySelectorAll('.cta-btn').forEach((cta) => {
-                    cta.classList.add('is-visible');
-                    cta.querySelectorAll('.ui-roll').forEach((roll) => roll.classList.add('is-visible'));
-                });
+                // CTAs animate in via scroll — is-visible added by updateSlideContent
+                // once the parent text block reaches near-centre opacity.
             });
 
             section.appendChild(slidesWrap);
@@ -177,6 +173,7 @@
         }
 
         const slides = section.querySelectorAll('.about-slide');
+        let scrollHasFired = false;
 
         // ── persistent-menu (about-us.html only) ──────────────────────────────
         const hasPersistentMenu = section.classList.contains('has-persistent-menu');
@@ -247,10 +244,37 @@
                 textBlock.style.filter        = `blur(${blur.toFixed(2)}px)`;
                 textBlock.style.transform     = `translateY(${translateY.toFixed(2)}px)`;
                 textBlock.style.pointerEvents = opacity > 0.05 ? 'auto' : 'none';
+
+                // Animate CTA in when near centre, out when scrolling away.
+                // Guard: skip on the initial synchronous call before any scroll.
+                const ctaBtns = textBlock.querySelectorAll('.cta-btn');
+                if (scrollHasFired && ctaBtns.length > 0) {
+                    const isNear    = opacity > 0.85;
+                    const wasNear   = textBlock.dataset.ctaVisible === 'true';
+
+                    if (isNear && !wasNear) {
+                        textBlock.dataset.ctaVisible = 'true';
+                        ctaBtns.forEach((cta) => {
+                            if (cta._rollTimeout) clearTimeout(cta._rollTimeout);
+                            cta.classList.add('is-visible');
+                            cta._rollTimeout = setTimeout(() => {
+                                cta.querySelectorAll('.ui-roll').forEach((r) => r.classList.add('is-visible'));
+                            }, 500);
+                        });
+                    } else if (!isNear && wasNear) {
+                        textBlock.dataset.ctaVisible = 'false';
+                        ctaBtns.forEach((cta) => {
+                            if (cta._rollTimeout) clearTimeout(cta._rollTimeout);
+                            cta.querySelectorAll('.ui-roll').forEach((r) => r.classList.remove('is-visible'));
+                            cta.classList.remove('is-visible');
+                        });
+                    }
+                }
             });
         }
 
         window.addEventListener('lenis-scroll', () => {
+            scrollHasFired = true;
             updateScrollDirection();
             updateImageScales();
             updateSlideContent();

@@ -11,13 +11,10 @@
 .hero .type-display-hero {
     position: absolute;
     top: auto;
-    bottom: 0;
+    bottom: var(--standard-margin);
     left: 50%;
-
-    overflow: hidden;
-    
+    overflow: visible;
     transform: translateX(-50%);
-    
     width: 100%;
     text-align: center;
     z-index: 0;

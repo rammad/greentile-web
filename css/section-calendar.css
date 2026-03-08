@@ -17,13 +17,14 @@
     flex-shrink: 0;
     width: 100%;
     opacity: 1;
+    overflow: visible;
 }
 
 .calendar-header .type-display-hero {
     font-size: 9.1vw;
     margin: 0;
     line-height: 0.85;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .calendar-controls {
@@ -31,15 +32,17 @@
     justify-content: space-between;
     align-items: center; 
     margin: 24px 20px 0 20px;
+    padding: 4px 0;
+    overflow: visible;
 }
-.filters-list { display: flex; gap: 24px; align-items: baseline; }
-.view-controls { display: flex; align-items: baseline; }
+.filters-list { display: flex; gap: 24px; align-items: center; }
+.view-controls { display: flex; align-items: center; }
 
 .filter-btn, .view-btn {
     background: none; border: none; padding: 0; 
     cursor: pointer; color: var(--color-placeholder);
     transition: color 0.3s ease;
-    line-height: 1; display: inline-block;
+    display: inline-block;
 }
 .filter-btn.active, .filter-btn:hover,
 .view-btn.active, .view-btn:hover { color: var(--color-text-main); }
@@ -88,6 +91,7 @@
     overflow-y: auto;
     scrollbar-width: none;
     display: flex;
+    gap: var(--standard-margin);
     flex-direction: column;
     justify-content: flex-start;
     padding-top: calc(var(--standard-margin) * 3);
