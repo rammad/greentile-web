@@ -356,29 +356,68 @@ class MarqueeManager {
     }
 }
 
-// scattered landing positions (x, y, rotation) relative to tile center
-const CURTAIN_TILE_SCATTER = [
-    { x: -108, y: 22,  r: -20 },
-    { x:    8, y: 32,  r:  12 },
-    { x:  102, y:  9,  r:  -8 },
+// each combo defines the tile images shown and the mahjong call label
+// type: 'pong' (3 of a kind) | 'chow' (3-tile sequence) | 'gong' (4 of a kind)
+const T = (name) => `images/graphics/tiles/two-tone/${name}.png`;
+const CURTAIN_COMBOS = [
+    // --- pongs (6) ---
+    { type: 'pong', tiles: [T('East'),        T('East'),        T('East')]        },
+    { type: 'pong', tiles: [T('West'),        T('West'),        T('West')]        },
+    { type: 'pong', tiles: [T('Fortune'),     T('Fortune'),     T('Fortune')]     },
+    { type: 'pong', tiles: [T('White Board'), T('White Board'), T('White Board')] },
+    { type: 'pong', tiles: [T('7 Circles'),   T('7 Circles'),   T('7 Circles')]   },
+    { type: 'pong', tiles: [T('5 Sticks'),    T('5 Sticks'),    T('5 Sticks')]    },
+    // --- chows (6) ---
+    { type: 'chow', tiles: [T('1 Circle'),    T('2 Circles'),   T('3 Circles')]   },
+    { type: 'chow', tiles: [T('7 Circles'),   T('8 Circles'),   T('9 Circles')]   },
+    { type: 'chow', tiles: [T('4 Sticks'),    T('5 Sticks'),    T('6 Sticks')]    },
+    { type: 'chow', tiles: [T('1 Stick'),     T('2 Sticks'),    T('3 Sticks')]    },
+    { type: 'chow', tiles: [T('10 Thousand'), T('20 Thousand'), T('30 Thousand')] },
+    { type: 'chow', tiles: [T('40 Thousand'), T('50 Thousand'), T('60 Thousand')] },
+    // --- gongs (4) ---
+    { type: 'gong', tiles: [T('Center'),   T('Center'),   T('Center'),   T('Center')]   },
+    { type: 'gong', tiles: [T('Fortune'),  T('Fortune'),  T('Fortune'),  T('Fortune')]  },
+    { type: 'gong', tiles: [T('1 Circle'), T('1 Circle'), T('1 Circle'), T('1 Circle')] },
+    { type: 'gong', tiles: [T('9 Sticks'), T('9 Sticks'), T('9 Sticks'), T('9 Sticks')] },
 ];
-// snapped row: tile width 88px + gap 4px = 92px between centers
-const CURTAIN_TILE_SNAP_X = [-92, 0, 92];
 
-function createCurtainTiles(curtain) {
+// scattered landing positions per hand size (x, y, rotation) relative to tile center
+const CURTAIN_TILE_SCATTER = {
+    3: [
+        { x: -108, y: 22,  r: -20 },
+        { x:    8, y: 32,  r:  12 },
+        { x:  102, y:  9,  r:  -8 },
+    ],
+    4: [
+        { x: -148, y: 18,  r: -22 },
+        { x:  -32, y: 38,  r:  16 },
+        { x:   56, y: 12,  r:  -8 },
+        { x:  148, y: 28,  r:  18 },
+    ],
+};
+
+// tile width 88px + gap 4px = 92px stride; compute a centered row for any count
+function getTileSnapX(count) {
+    const stride = 92;
+    const start  = -((count - 1) / 2) * stride;
+    return Array.from({ length: count }, (_, i) => Math.round(start + i * stride));
+}
+
+function createCurtainTiles(curtain, combo) {
     const wrap = document.createElement('div');
     wrap.className = 'curtain-tiles';
-    for (let i = 0; i < 3; i++) {
+    combo.tiles.forEach(src => {
         const tile = document.createElement('div');
         tile.className = 'curtain-tile';
         tile.style.opacity = '0';
+        if (src) tile.style.backgroundImage = `url('${src}')`;
         wrap.appendChild(tile);
-    }
+    });
     curtain.appendChild(wrap);
     return wrap;
 }
 
-async function playTileAnimation(wrap, fast = false) {
+async function playTileAnimation(wrap, combo, fast = false) {
     const tiles    = wrap.querySelectorAll('.curtain-tile');
 
     // vvv try to swap these with standard stagger values maybe idk if its possible or necessary its a one shot animation
@@ -391,9 +430,13 @@ async function playTileAnimation(wrap, fast = false) {
     const fadeEase = 'cubic-bezier(0, 0, 0.05, 1)';      // strong ease-out fade
     const snapEase = 'cubic-bezier(0.99, 0, 0.15, 1.6)'; // pinned still, explosive snap, hard overshoot
 
+    const count   = tiles.length;
+    const scatter = CURTAIN_TILE_SCATTER[count] ?? CURTAIN_TILE_SCATTER[3];
+    const snapX   = getTileSnapX(count);
+
     // phase 1: pre-position at scatter coords, then fade in staggered
     tiles.forEach((tile, i) => {
-        const { x, y, r } = CURTAIN_TILE_SCATTER[i];
+        const { x, y, r } = scatter[i];
         tile.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
     });
     tiles[0].getBoundingClientRect(); // force layout before animating
@@ -409,16 +452,15 @@ async function playTileAnimation(wrap, fast = false) {
     // phase 2: snap into a neat row simultaneously
     tiles.forEach((tile, i) => {
         tile.style.transition = `transform ${snapMs}ms ${snapEase}`;
-        tile.style.transform  = `translate(${CURTAIN_TILE_SNAP_X[i]}px, 0px) rotate(0deg)`;
+        tile.style.transform  = `translate(${snapX[i]}px, 0px) rotate(0deg)`;
     });
 
     await wait(snapMs);
 
     // phase 3: mahjong call label grows in above the tiles
-    const CURTAIN_WORDS = ['pong', 'chow'];
     const label = document.createElement('div');
     label.className = 'curtain-label type-subBold1';
-    label.textContent = CURTAIN_WORDS[Math.floor(Math.random() * CURTAIN_WORDS.length)];
+    label.textContent = combo.type;
     label.style.cssText = `transform: translate(-50%, -110px) scale(0.78); opacity: 0; transition: none;`;
     wrap.appendChild(label);
 
@@ -441,10 +483,11 @@ function initPageTransition() {
     window.pageReady = new Promise(resolve => { resolvePageReady = resolve; });
 
     // entry: tile animation plays while curtain covers, then curtain lifts
-    const entryWrap = createCurtainTiles(curtain);
+    const entryCombo = CURTAIN_COMBOS[Math.floor(Math.random() * CURTAIN_COMBOS.length)];
+    const entryWrap  = createCurtainTiles(curtain, entryCombo);
     requestAnimationFrame(() => {
         requestAnimationFrame(async () => {
-            await playTileAnimation(entryWrap, false);
+            await playTileAnimation(entryWrap, entryCombo, false);
             entryWrap.remove();
             resolvePageReady(); // unblock section animations — they play during the reveal
             curtain.style.transition = 'transform 0.85s cubic-bezier(0.16, 1, 0.3, 1)';

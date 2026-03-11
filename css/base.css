@@ -520,7 +520,9 @@ section {
     width: 88px;
     height: 120px;
     margin: -60px 0 0 -44px;
-    background: #c8c8c8;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     border-radius: 8px;
     will-change: transform, opacity;
 }
