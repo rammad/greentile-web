@@ -92,9 +92,11 @@
     --size-h1: 96px;
     --size-h2: 64px;
     --size-h3: 48px;
-    --size-sub1: 16px;
-    --size-sub2: 14px;
-    --size-body1: 18px;
+    --size-subBold1: 20px; /* for mission */
+    --size-subBold2: 12px; /* for secondary info (ex event date) */
+    --size-subRegular1: 14px; /* for nav and buttons */
+    --size-subRegular2: 10px; /* for badges (ex pdp meta) */
+    --size-body1: 14px;
     --size-body2: 36px;
 
     /* mobile type sizes */
@@ -237,28 +239,54 @@ section {
     text-box: trim-both cap alphabetic;
 }
 
-.type-sub1 {
+/* type-sub classes: Bold = wdth 525 / weight 400; Regular = wdth 450 / weight 300
+   1 = primary size, 2 = secondary size
+   subBold1    20px  section label headers (mission, What We Do)
+   subBold2    12px  secondary bold info (event date, location, marquee)
+   subRegular1 14px  nav links and buttons
+   subRegular2 10px  badges and PDP meta (tags, qty, team names) */
+.type-subBold1 {
     font-family: var(--font-subheader);
-    font-size: var(--size-sub1);
+    font-size: var(--size-subBold1);
     font-weight: 400;
     font-variation-settings: 'wdth' 525;
     color: var(--color-text-subheader);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     line-height: 1;
-    /* font-variation-settings: 'SRFF' 0; */
 }
 
-.type-sub2 {
+.type-subBold2 {
     font-family: var(--font-subheader);
-    font-size: var(--size-sub2);
+    font-size: var(--size-subBold2);
+    font-weight: 400;
+    font-variation-settings: 'wdth' 525;
+    color: var(--color-text-subheader);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1;
+}
+
+.type-subRegular1 {
+    font-family: var(--font-subheader);
+    font-size: var(--size-subRegular1);
     font-weight: 300;
     font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
     line-height: 1;
     text-transform: uppercase;
     text-decoration: none;
-    /* font-variation-settings: 'SRFF' 0; */
+}
+
+.type-subRegular2 {
+    font-family: var(--font-subheader);
+    font-size: var(--size-subRegular2);
+    font-weight: 300;
+    font-variation-settings: 'wdth' 450;
+    color: var(--color-text-subheader);
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
 }
 
 .type-body1 {
@@ -503,7 +531,7 @@ section {
     top: 50%;
     left: 50%;
     font-family: var(--font-subheader);
-    font-size: var(--size-sub1);
+    font-size: var(--size-subBold1);
     font-weight: 100;
     text-transform: uppercase;
     letter-spacing: 0.12em;
@@ -542,8 +570,10 @@ body::after {
     .type-display-xl { font-size: var(--size-display-xl-mobile); }
     .type-h1 { font-size: var(--size-h1-mobile); }
     .type-h2 { font-size: var(--size-h2-mobile); }
-    .type-sub1 { font-size: var(--size-sub1-mobile); }
-    .type-sub2 { font-size: var(--size-sub2-mobile); }
+    .type-subBold1 { font-size: var(--size-sub1-mobile); }
+    .type-subBold2 { font-size: var(--size-sub2-mobile); }
+    .type-subRegular1 { font-size: var(--size-sub2-mobile); }
+    .type-subRegular2 { font-size: var(--size-subRegular2); }
     .type-body1 { font-size: var(--size-body1-mobile); }
     .type-body2 { font-size: var(--size-body2-mobile); }
     .standard-margins { padding: var(--section-padding-mobile); }

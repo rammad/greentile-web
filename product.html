@@ -10,17 +10,24 @@
     <link rel="stylesheet" href="css/section-product.css?v=10">
 
     <style>
-        /* native scroll (this page only) —
-           body must stay overflow:visible so position:sticky works.
-           only html gets overflow:auto to be the actual scroll root. */
         html {
-            overflow: auto !important;
-            height: auto !important;
+            overflow: hidden !important;
+            height: 100% !important;
         }
         body {
-            overflow: visible !important;
-            height: auto !important;
+            overflow: hidden !important;
+            height: 100% !important;
             overscroll-behavior-y: none;
+        }
+        @media (max-width: 1024px) {
+            html {
+                overflow: auto !important;
+                height: auto !important;
+            }
+            body {
+                overflow: visible !important;
+                height: auto !important;
+            }
         }
     </style>
 </head>
@@ -34,10 +41,10 @@
             </a>
         </div>
         <div class="nav-center">
-            <a href="events.html" class="type-sub2">PLAY WITH US</a>
-            <a href="about-us.html" class="type-sub2">WORK WITH US</a>
+            <a href="events.html" class="type-subRegular1">PLAY WITH US</a>
+            <a href="about-us.html" class="type-subRegular1">WORK WITH US</a>
         </div>
-        <div class="nav-right"><a href="#" class="type-sub2">CONTACT US</a></div>
+        <div class="nav-right"><a href="#" class="type-subRegular1">CONTACT US</a></div>
     </nav>
 
     <section class="pdp-section">
@@ -60,7 +67,7 @@
             </div>
             <div class="pdp-info">
                 <div class="pdp-meta-row text-mask">
-                    <span class="type-sub1 text-reveal-inner">
+                    <span class="type-subBold2 text-reveal-inner">
                         Sunday, February 22 &bull; 12PM - 6PM
                     </span>
                 </div>
@@ -70,31 +77,32 @@
                 </h1>
                 
                 <div class="pdp-meta-row text-mask">
-                    <span class="type-sub1 text-reveal-inner">
+                    <span class="type-subBold2 text-reveal-inner">
                         Industry City's 52A, 33 35th St, Brooklyn, NY
                     </span>
                 </div>
                 
                 <div class="pdp-meta-row">
                     <div class="pdp-tag">
-                        <span class="type-sub2 text-reveal-inner">3 Point Hong Kong Style</span>
+                        <span class="type-subRegular2 text-reveal-inner">3 Point Hong Kong Style</span>
                     </div>
                     <div class="pdp-tag">
-                        <span class="type-sub2 text-reveal-inner">Non Points</span>
+                        <span class="type-subRegular2 text-reveal-inner">Non Points</span>
                     </div>
                     <div class="pdp-tag">
-                        <span class="type-sub2 text-reveal-inner">Vendors</span>
+                        <span class="type-subRegular2 text-reveal-inner">Vendors</span>
                     </div>
                     <div class="pdp-tag">
-                        <span class="type-sub2 text-reveal-inner">Food and Drinks</span>
+                        <span class="type-subRegular2 text-reveal-inner">Food and Drinks</span>
                     </div>
                     <div class="pdp-tag">
-                        <span class="type-sub2 text-reveal-inner">Live DJ</span>
+                        <span class="type-subRegular2 text-reveal-inner">Live DJ</span>
                     </div>
                 </div>
 
-                <div class="pdp-desc type-body1">
-                    <p class="type-body1">
+                <div class="pdp-desc-wrapper">
+                    <div class="pdp-desc type-body1">
+                        <p class="type-body1">
                         this year, your green tile new year ticket includes:
                         <br>🀄️ 40! mahjong! tables! more than we've ever had. tables are first come, first served, with rotational house rules so everyone gets to play. points & non-points tables available; no teaching lessons (but you can always learn from a neighbor)
                         <br>🥃 new this year: enjoy free Martell cocktails + Tsingtao beer
@@ -127,26 +135,26 @@
                         <br>📸 take pics at Checkpoint photo booths around the room
                         <br>🎟 stay till the end to try your chances at the GTSC Raffle!!!
                     </p>
-                </div>
+                    </div>
+                </div><!-- /.pdp-desc-wrapper -->
 
                 <div class="ticket-actions">
-                    
+                    <div class="max-qty-label pdp-tag type-subRegular2" id="max-qty-msg">Max Limit Reached</div>
+
                     <div class="qty-wrapper">
-                        <div class="max-qty-label pdp-tag type-sub2 text-reveal-inner" id="max-qty-msg">Max Limit Reached</div>
-                        
                         <div class="qty-selector">
-                            <button class="qty-btn type-sub2" onclick="updateQty(-1)">&minus;</button>
-                            <span class="qty-val type-sub2" id="ticket-qty">1</span>
-                            <button class="qty-btn type-sub2" onclick="updateQty(1)">&plus;</button>
+                            <button class="qty-btn type-subRegular2" onclick="updateQty(-1)">&minus;</button>
+                            <span class="qty-val type-subRegular2" id="ticket-qty">1</span>
+                            <button class="qty-btn type-subRegular2" onclick="updateQty(1)">&plus;</button>
                         </div>
                     </div>
 
                     <a href="#" class="cta-btn buy-button-override">
                         <div class="ui-roll roll-hover ">
-                            <span class="type-sub2 ui-roll-layer ui-roll-visible">
+                            <span class="type-subRegular1 ui-roll-layer ui-roll-visible">
                                 <span>$25</span><span>&ndash;</span><span>Buy Now</span>
                             </span>
-                            <span class="type-sub2 ui-roll-layer ui-roll-hidden">
+                            <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">
                                 <span>$25</span><span>&ndash;</span><span>Buy Now</span>
                             </span>
                         </div>

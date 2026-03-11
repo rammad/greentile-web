@@ -6,6 +6,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         initProductPage();
         initImageScroll();
+        initDescFade();
         updateQty(0);
     });
 
@@ -125,6 +126,25 @@
             currentY = targetY;
             track.style.transform = `translateY(${-currentY}px)`;
         });
+    }
+
+    function initDescFade() {
+        const desc    = document.querySelector('.pdp-desc');
+        const wrapper = document.querySelector('.pdp-desc-wrapper');
+        if (!desc || !wrapper) return;
+
+        function updateFades() {
+            const atTop    = desc.scrollTop <= 2;
+            const atBottom = desc.scrollTop + desc.clientHeight >= desc.scrollHeight - 2;
+            wrapper.classList.toggle('hide-top-fade', atTop);
+            wrapper.classList.toggle('hide-bottom-fade', atBottom);
+        }
+
+        desc.addEventListener('scroll', updateFades, { passive: true });
+        updateFades();
+
+        // re-check after content/layout settles
+        window.addEventListener('resize', updateFades);
     }
 
     // qty selector
