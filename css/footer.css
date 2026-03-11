@@ -8,8 +8,7 @@
     background-color: transparent;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: visible;
+    overflow: clip;
     justify-content: flex-end;
 }
 
@@ -107,16 +106,15 @@
     left: auto;
     transform: none;
     overflow: visible;
+    padding-bottom: var(--standard-margin);
 }
 
 .footer-links {
     display: flex;
     justify-content: space-between;
-    width: auto;
+    width: 100%;
     align-items: flex-end;
     margin-bottom: var(--standard-margin);
-    margin-right: var(--standard-margin);
-    margin-left: var(--standard-margin);
 }
 
 .footer-link a {

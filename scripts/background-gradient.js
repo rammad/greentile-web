@@ -20,6 +20,12 @@ class GradientEngine {
             colorGradientFalloff: 1.0,  // 1 = linear, >1 = sharper bands, <1 = softer
             colorGradientBalance: 0.5,  // 0 = more color1, 1 = more color2, 0.5 = even
 
+            // edge-bias: 0 = full gradient everywhere; >0 = center fades to uColor1
+            // sections opt in via data-edge="0.8" on the <section> element
+            edgeStrength: 0.0,
+            edgePower: 3.0,   // >1 keeps center clean, pushes colors toward the rim
+            edgeNoise: 0.25,  // how much the height noise warps the edge boundary
+
             // rotation per pixel of scroll
             scrollRotationSpeed: { x: 0, y: 0, z: 0 },
 
@@ -56,6 +62,7 @@ class GradientEngine {
             varying float vDistort;
             varying float vColorNoise;
             varying vec3 vNormal;
+            varying vec4 vClipPos;
 
             uniform float uTime;
             uniform float uHeightDensity;
@@ -139,7 +146,8 @@ class GradientEngine {
                 vDistort = heightNoise;
                 vColorNoise = colorNoise;
 
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
+                vClipPos = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
+                gl_Position = vClipPos;
             }
         `;
     }
@@ -150,12 +158,19 @@ class GradientEngine {
             varying float vDistort;
             varying float vColorNoise;
             varying vec3 vNormal;
+            varying vec4 vClipPos;
 
             uniform vec3 uColor1;
             uniform vec3 uColor2;
             uniform vec3 uColor3;
             uniform float uColorGradientFalloff;
             uniform float uColorGradientBalance;
+
+            // uEdgeStrength = 0: original behavior (full gradient everywhere)
+            // uEdgeStrength > 0: center fades to uColor1, all colors concentrate at perimeter
+            uniform float uEdgeStrength;
+            uniform float uEdgePower;  // controls how tight the falloff is toward the edge
+            uniform float uEdgeNoise;  // how much vDistort warps the edge boundary (0 = perfect circle)
 
             void main() {
                 float height = (vDistort * 0.5) + 0.5;
@@ -170,9 +185,16 @@ class GradientEngine {
 
                 vec3 baseColor = mix(uColor1, uColor2, colorMix);
                 float highlight = smoothstep(0.6, 1.0, height);
-                vec3 finalColor = mix(baseColor, uColor3, highlight);
+                vec3 fullColor = mix(baseColor, uColor3, highlight);
 
-                gl_FragColor = vec4(finalColor, 1.0);
+                // screen-edge vignette: warp the NDC distance with height noise so the
+                // boundary undulates with the gradient instead of sitting as a clean circle
+                vec2 ndc = vClipPos.xy / vClipPos.w;
+                float warpedDist = clamp(length(ndc) + vDistort * uEdgeNoise, 0.0, 2.0);
+                float screenEdge = clamp(pow(warpedDist, uEdgePower), 0.0, 1.0);
+                float colorMask = mix(1.0, screenEdge, uEdgeStrength);
+
+                gl_FragColor = vec4(mix(uColor1, fullColor, colorMask), 1.0);
             }
         `;
     }
@@ -182,6 +204,7 @@ class GradientEngine {
 
         this.currentColors = cfg.colors.map(c => new THREE.Color(this.resolveColor(c)));
         this.targetColors = cfg.colors.map(c => new THREE.Color(this.resolveColor(c)));
+        this.targetEdgeStrength = cfg.edgeStrength;
 
         this.scene = new THREE.Scene();
 
@@ -201,7 +224,10 @@ class GradientEngine {
             uColorGradientBalance: { value: cfg.colorGradientBalance },
             uColor1: { value: this.currentColors[0] },
             uColor2: { value: this.currentColors[1] },
-            uColor3: { value: this.currentColors[2] }
+            uColor3: { value: this.currentColors[2] },
+            uEdgeStrength: { value: cfg.edgeStrength },
+            uEdgePower:    { value: cfg.edgePower },
+            uEdgeNoise:    { value: cfg.edgeNoise }
         };
 
         const material = new THREE.ShaderMaterial({
@@ -243,15 +269,24 @@ class GradientEngine {
             mutations.forEach((m) => {
                 if (m.type === 'attributes' && m.attributeName === 'class') {
                     const el = m.target;
-                    if (el.classList.contains('is-active') && el.hasAttribute('data-colors')) {
-                        this.updateColors(el.getAttribute('data-colors'));
+                    if (el.classList.contains('is-active')) {
+                        if (el.hasAttribute('data-colors')) this.updateColors(el.getAttribute('data-colors'));
+                        if (el.hasAttribute('data-edge'))  this.updateEdge(parseFloat(el.getAttribute('data-edge')));
                     }
                 }
             });
         });
         document.querySelectorAll('section[data-colors]').forEach(s => observer.observe(s, { attributes: true }));
         const active = document.querySelector('section.is-active[data-colors]');
-        if (active) this.updateColors(active.getAttribute('data-colors'));
+        if (active) {
+            this.updateColors(active.getAttribute('data-colors'));
+            if (active.hasAttribute('data-edge')) this.updateEdge(parseFloat(active.getAttribute('data-edge')));
+        }
+    }
+
+    updateEdge(strength, power) {
+        if (!isNaN(strength)) this.targetEdgeStrength = strength;
+        if (power !== undefined && !isNaN(power)) this.uniforms.uEdgePower.value = power;
     }
 
     updateColors(colorString) {
@@ -297,6 +332,7 @@ class GradientEngine {
         this.uniforms.uColor1.value.lerp(this.targetColors[0], 0.05);
         this.uniforms.uColor2.value.lerp(this.targetColors[1], 0.05);
         this.uniforms.uColor3.value.lerp(this.targetColors[2], 0.05);
+        this.uniforms.uEdgeStrength.value += (this.targetEdgeStrength - this.uniforms.uEdgeStrength.value) * 0.05;
         this.renderer.render(this.scene, this.camera);
     }
 }

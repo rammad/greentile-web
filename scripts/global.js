@@ -371,7 +371,7 @@ function createCurtainTiles(curtain) {
     for (let i = 0; i < 3; i++) {
         const tile = document.createElement('div');
         tile.className = 'curtain-tile';
-        tile.style.transform = 'translate(0px, -600px) rotate(0deg)';
+        tile.style.opacity = '0';
         wrap.appendChild(tile);
     }
     curtain.appendChild(wrap);
@@ -382,25 +382,29 @@ async function playTileAnimation(wrap, fast = false) {
     const tiles    = wrap.querySelectorAll('.curtain-tile');
 
     // vvv try to swap these with standard stagger values maybe idk if its possible or necessary its a one shot animation
-    const stagger  = fast ? 45  : 80;
-    const dropMs   = fast ? 380 : 580;
+    const stagger  = fast ? 45  : 65;
+    const fadeMs   = fast ? 240 : 340;
     const snapMs   = fast ? 220 : 320;
     const labelMs  = fast ? 280 : 380;
     const holdMs   = fast ? 80  : 120;
-    
-    const dropEase = 'cubic-bezier(0, 0, 0.04, 1)';    // near-instant launch, very long friction tail
+
+    const fadeEase = 'cubic-bezier(0, 0, 0.05, 1)';      // strong ease-out fade
     const snapEase = 'cubic-bezier(0.99, 0, 0.15, 1.6)'; // pinned still, explosive snap, hard overshoot
 
-    // phase 1: drop in with scatter, staggered
+    // phase 1: pre-position at scatter coords, then fade in staggered
+    tiles.forEach((tile, i) => {
+        const { x, y, r } = CURTAIN_TILE_SCATTER[i];
+        tile.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
+    });
+    tiles[0].getBoundingClientRect(); // force layout before animating
     tiles.forEach((tile, i) => {
         setTimeout(() => {
-            tile.style.transition = `transform ${dropMs}ms ${dropEase}`;
-            const { x, y, r } = CURTAIN_TILE_SCATTER[i];
-            tile.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
+            tile.style.transition = `opacity ${fadeMs}ms ${fadeEase}`;
+            tile.style.opacity = '1';
         }, i * stagger);
     });
 
-    await wait(stagger * (tiles.length - 1) + dropMs + 55);
+    await wait(stagger * (tiles.length - 1) + fadeMs + 20);
 
     // phase 2: snap into a neat row simultaneously
     tiles.forEach((tile, i) => {
@@ -413,7 +417,7 @@ async function playTileAnimation(wrap, fast = false) {
     // phase 3: mahjong call label grows in above the tiles
     const CURTAIN_WORDS = ['pong', 'chow'];
     const label = document.createElement('div');
-    label.className = 'curtain-label';
+    label.className = 'curtain-label type-subBold1';
     label.textContent = CURTAIN_WORDS[Math.floor(Math.random() * CURTAIN_WORDS.length)];
     label.style.cssText = `transform: translate(-50%, -110px) scale(0.78); opacity: 0; transition: none;`;
     wrap.appendChild(label);

@@ -522,7 +522,7 @@ section {
     margin: -60px 0 0 -44px;
     background: #c8c8c8;
     border-radius: 8px;
-    will-change: transform;
+    will-change: transform, opacity;
 }
 
 /* mahjong call label above snapped tiles */
@@ -530,12 +530,6 @@ section {
     position: absolute;
     top: 50%;
     left: 50%;
-    font-family: var(--font-subheader);
-    font-size: var(--size-subBold1);
-    font-weight: 100;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--color-text-subheader);
     white-space: nowrap;
     will-change: transform, opacity;
 }
