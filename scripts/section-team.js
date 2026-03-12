@@ -8,6 +8,7 @@
         if (!section) return;
 
         const textInner = section.querySelector('.team-text-inner');
+        const titleCol  = section.querySelector('.team-title-col');
         const posters   = section.querySelectorAll('.team-poster-wrap');
 
         // staggered fade+slide on each poster as it enters view
@@ -34,6 +35,7 @@
         let sectionTop   = 0;
         let totalScroll  = 0;
         let maxScroll    = 0;
+        let exitStart    = 0;
 
         function recalc() {
             const vh     = window.innerHeight;
@@ -41,6 +43,7 @@
             totalScroll  = section.offsetHeight - vh;
             const colH   = textCol ? textCol.offsetHeight : vh;
             maxScroll    = Math.max(0, textInner.scrollHeight - colH);
+            exitStart    = Math.max(0, sectionTop + section.offsetHeight - vh);
         }
 
         let currentScroll = 0;
@@ -51,11 +54,13 @@
 
             if (window.innerWidth <= 768) {
                 textInner.style.transform = '';
+                if (titleCol) titleCol.style.transform = '';
                 return;
             }
 
             if (totalScroll <= 0 || maxScroll === 0) {
                 textInner.style.transform = 'translate3d(0,0,0)';
+                if (titleCol) titleCol.style.transform = '';
                 return;
             }
 
@@ -66,6 +71,16 @@
             // round to whole pixels — fractional values blur text on some gpus
             const offset = Math.round(progress * maxScroll);
             textInner.style.transform = `translate3d(0, ${-offset}px, 0)`;
+
+            // release title from sticky once the section bottom enters the viewport
+            if (titleCol) {
+                if (exitStart > 0 && currentScroll > exitStart) {
+                    const pushUp = Math.round(currentScroll - exitStart);
+                    titleCol.style.transform = `translate3d(0, ${-pushUp}px, 0)`;
+                } else {
+                    titleCol.style.transform = '';
+                }
+            }
         }
 
         function schedule(e) {

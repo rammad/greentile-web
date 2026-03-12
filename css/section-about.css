@@ -1,41 +1,11 @@
-/* about section – slide stack + sticky body text + column-based image scatter */
+/* about section (index.html) — slide stack + sticky body text */
 
 .about {
     position: relative;
     width: 100%;
     min-height: 100vh;
-    /* overflow: hidden; */
     background-color: transparent;
 }
-
-.about-image-track {
-    position: relative;
-    width: 100%;
-    overflow: visible;
-    min-height: 100vh;
-}
-
-/* track sits behind slides; height set by js */
-.about-image-track-positioned {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    z-index: 0;
-}
-
-/* invisible sentinels that span left/right halves — used to trigger column image visibility */
-.about-col {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 50%;
-    pointer-events: none;
-    z-index: 0;
-}
-.about-col-left { left: 0; }
-.about-col-right { left: 50%; }
 
 .about-slides {
     position: relative;
@@ -75,21 +45,7 @@
     text-align: center;
     opacity: 0;
     will-change: opacity, transform, filter;
-    /* no CSS transitions — JS lerp handles all smoothing to avoid double-smoothing jitter */
-}
-
-.scatter-img {
-    position: absolute;
-    top: 0; left: 0;
-    display: block;
-    width: 22vw;
-    height: auto;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-    opacity: 1;
-    transform: scale(1);
-    transition: transform 0.1s linear;
-    will-change: transform;
+    /* no CSS transitions — JS drives all smoothing to avoid double-smoothing jitter */
 }
 
 .about-text-block .cta-btn {
@@ -108,118 +64,4 @@
     opacity: 1;
     filter: none;
     transition: none;
-}
-
-/* about-us page: persistent menu + full-height slides */
-
-.about.has-persistent-menu .about-slide {
-    min-height: 100vh;
-}
-
-.about-menu-persistent {
-    position: absolute;
-    top: 25%;
-    left: 0;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-    pointer-events: auto;
-}
-
-.about-menu-persistent ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    text-align: center;
-}
-
-.about-menu-persistent .menu-label {
-    margin-bottom: 20px;
-    display: block;
-}
-
-.about-menu-persistent .menu-item {
-    color: var(--color-placeholder);
-    opacity: 0;
-    filter: blur(var(--blur-standard));
-    margin-bottom: var(--standard-gap);
-    cursor: pointer;
-    transition: all var(--time-fade-out) ease;
-}
-
-.about-menu-persistent .menu-item.is-active {
-    color: var(--color-text-main);
-    transition: all var(--time-fade-in) ease;
-}
-
-.about-menu-persistent .menu-item.is-visible {
-    opacity: 1;
-    filter: blur(0);
-    transition: all var(--time-fade-in) ease;
-}
-
-.about.has-persistent-menu .about-content {
-    padding-top: 350px;
-}
-
-@media (max-width: 768px) {
-    .about-menu-persistent { top: 12%; }
-    .about-menu-persistent .menu-item { font-size: 40px; margin-bottom: 4px; }
-    .about.has-persistent-menu .about-content { padding-top: 280px; }
-}
-
-.about-content .cta-btn {
-    position: absolute;
-    top: 150%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-top: var(--standard-margin);
-    white-space: nowrap;
-}
-
-.has-persistent-menu .cta-btn {
-    top: 100%;
-}
-
-/* menu switches to position:fixed while section is in view */
-.about.has-persistent-menu .about-menu-persistent.is-pinned {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    padding-top: 20vh; /* pushes menu down so menu + body read as a centered pair */
-    pointer-events: auto;
-    z-index: 50;
-}
-
-/* slide content pulled up symmetrically toward the pinned menu */
-.about.has-persistent-menu .about-slide-sticky {
-    align-items: flex-end;
-    padding-bottom: 20vh;
-}
-
-/* strip layout padding when content is inside the sticky */
-.about.has-persistent-menu .about-slide-sticky .about-content {
-    padding-top: 0;
-    width: 100%;
-    max-width: 600px;
-    text-align: center;
-}
-
-/* needs position:relative so absolute-child .cta-btn resolves correctly */
-.about.has-persistent-menu .about-content {
-    position: relative;
-}
-
-@media (max-width: 768px) {
-    .about.has-persistent-menu .about-menu-persistent.is-pinned {
-        padding-top: 12vh;
-    }
-    .about.has-persistent-menu .about-slide-sticky.is-pinned {
-        padding-bottom: 12vh;
-    }
 }

@@ -1,0 +1,140 @@
+/* what we do section (about-us.html) — fixed body text + persistent menu + scroll tracking */
+
+.what-we-do {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background-color: transparent;
+}
+
+/* scroll-track slides — no visible content, just set heights for JS to measure */
+.what-we-do .about-slides {
+    position: relative;
+    width: 100%;
+    z-index: 0;
+}
+
+.what-we-do .about-slide {
+    position: relative;
+    width: 100%;
+}
+
+/* ── fixed body text container ───────────────────────────────────────────── */
+
+/* Always fixed — lives outside #scroll-content to avoid Lenis transform context */
+.what-we-do-body {
+    position: fixed;
+    top: 68vh;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: grid;
+    justify-items: center;
+    z-index: 50;
+    pointer-events: none;
+}
+
+/* all text blocks occupy the same grid cell so they stack on top of each other */
+.what-we-do-body .about-text-block {
+    grid-area: 1 / 1;
+    width: 100%;
+    max-width: 600px;
+    padding: 0 20px;
+    text-align: center;
+    position: relative;
+    /* opacity, filter, and transition are driven entirely by JS inline styles */
+    will-change: opacity, filter;
+}
+
+/* reset base.css opacity:0 on all child type elements — parent block controls visibility */
+.what-we-do-body .type-body1,
+.what-we-do-body .type-body2,
+.what-we-do-body p {
+    opacity: 1 !important;
+    filter: none !important;
+    transition: none !important;
+}
+
+/* about-content wrapper */
+.what-we-do .about-content {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.what-we-do .about-content .cta-btn {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: var(--standard-margin);
+    white-space: nowrap;
+}
+
+/* ── persistent menu ─────────────────────────────────────────────────────── */
+
+.about-menu-persistent {
+    position: absolute;
+    top: 25%;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    pointer-events: auto;
+}
+
+.about-menu-persistent ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.about-menu-persistent .menu-label {
+    margin-bottom: 20px;
+    display: block;
+}
+
+.about-menu-persistent .menu-item {
+    color: var(--color-placeholder);
+    opacity: 0;
+    filter: blur(var(--blur-standard));
+    margin-bottom: var(--standard-gap);
+    cursor: pointer;
+    transition: all var(--time-fade-out) ease;
+}
+
+.about-menu-persistent .menu-item.is-active {
+    color: var(--color-text-main);
+    transition: all var(--time-fade-in) ease;
+}
+
+.about-menu-persistent .menu-item.is-visible {
+    opacity: 1;
+    filter: blur(0);
+    transition: all var(--time-fade-in) ease;
+}
+
+/* menu and body switch to position:fixed while section fills the viewport */
+.what-we-do .about-menu-persistent.is-pinned {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding-top: 28vh;
+    pointer-events: auto;
+    z-index: 50;
+}
+
+@media (max-width: 768px) {
+    .about-menu-persistent            { top: 10%; }
+    .about-menu-persistent .menu-item { font-size: 40px; margin-bottom: 4px; }
+
+    .what-we-do .about-menu-persistent.is-pinned { padding-top: 15vh; }
+    .what-we-do-body                              { top: 68vh; }
+}

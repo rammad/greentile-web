@@ -403,6 +403,14 @@ function getTileSnapX(count) {
     return Array.from({ length: count }, (_, i) => Math.round(start + i * stride));
 }
 
+function preloadComboImages(combo) {
+    return Promise.all(combo.tiles.map(src => new Promise(resolve => {
+        const img = new Image();
+        img.onload = img.onerror = resolve;
+        img.src = src;
+    })));
+}
+
 function createCurtainTiles(curtain, combo) {
     const wrap = document.createElement('div');
     wrap.className = 'curtain-tiles';
@@ -487,6 +495,7 @@ function initPageTransition() {
     const entryWrap  = createCurtainTiles(curtain, entryCombo);
     requestAnimationFrame(() => {
         requestAnimationFrame(async () => {
+            await preloadComboImages(entryCombo);
             await playTileAnimation(entryWrap, entryCombo, false);
             entryWrap.remove();
             resolvePageReady(); // unblock section animations — they play during the reveal
