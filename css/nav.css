@@ -30,7 +30,7 @@
     justify-content: center;
     gap: 32px; 
     align-items: center;
-    padding: 7px 20px;
+    padding: 7px 20px 3px;
 }
 
 .nav-left {
@@ -43,7 +43,7 @@
     display: flex;
     justify-self: end;
     align-items: center;
-    padding: 7px 20px;
+    padding: 7px 20px 3px;
 }
 
 .nav-logo {

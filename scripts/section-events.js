@@ -18,6 +18,15 @@
             grid.style.setProperty('--poster-count', cards.length);
         }
 
+        // hover rotation — each card gets a random angle within ±[MIN, MAX] degrees
+        const HOVER_ROTATE_MIN = 2;
+        const HOVER_ROTATE_MAX = 4;
+        cards.forEach(card => {
+            const sign = Math.random() < 0.5 ? -1 : 1;
+            const deg  = sign * (HOVER_ROTATE_MIN + Math.random() * (HOVER_ROTATE_MAX - HOVER_ROTATE_MIN));
+            card.style.setProperty('--hover-rotate', `${deg.toFixed(1)}deg`);
+        });
+
         if (title) {
             let fontsReady  = false;
             let wantsReveal = false;

@@ -66,6 +66,11 @@
 .event-card {
     opacity: 0;
     will-change: transform, opacity;
+    transition: rotate 0.2s ease-out;
+}
+
+.event-card:hover {
+    rotate: var(--hover-rotate);
 }
 
 .event-poster {
