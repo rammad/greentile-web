@@ -82,6 +82,8 @@
     height: calc(100vh - var(--space-for-nav) - var(--standard-margin));
     aspect-ratio: 4 / 5;
     flex-shrink: 0;
+    overflow: hidden;
+    border-radius: var(--poster-radius);
     will-change: transform;
 }
 

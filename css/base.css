@@ -87,6 +87,8 @@
     --standard-margin: 20px;
     --standard-gap: 8px;
 
+    --poster-radius: 8%;
+
     /* desktop type sizes */
     --size-display-hero: 8.6vw;
     --size-display-xl: 160px;

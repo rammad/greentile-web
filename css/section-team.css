@@ -64,6 +64,7 @@
     aspect-ratio: 4 / 5;
     object-fit: cover;
     display: block;
+    border-radius: var(--poster-radius);
 }
 
 /* sticky clip column — js drives translateY on .team-text-inner proportional to scroll progress

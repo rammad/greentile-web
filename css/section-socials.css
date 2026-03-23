@@ -80,6 +80,7 @@
     aspect-ratio: 4 / 5;
     object-fit: cover;
     flex-shrink: 0;
+    border-radius: var(--poster-radius);
 
     opacity: 0;
     transform: translateY(60px);

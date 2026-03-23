@@ -140,6 +140,7 @@
     height: auto;
     object-fit: cover;
     aspect-ratio: 4 / 5;
+    border-radius: var(--poster-radius);
     opacity: 0;
     transition: opacity var(--time-fade-in) ease;
     margin-bottom: var(--standard-margin);

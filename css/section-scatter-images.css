@@ -37,6 +37,7 @@
     height: auto;
     aspect-ratio: 4 / 5;
     object-fit: cover;
+    border-radius: var(--poster-radius);
     opacity: 1;
     transform: scale(1);
     transition: transform 0.1s linear;
