@@ -68,7 +68,6 @@
     height: 60px;
     pointer-events: none;
     z-index: 2;
-    transition: opacity var(--time-fade-in) ease;
 }
 
 .pdp-desc-wrapper::before {
@@ -219,7 +218,7 @@
 .ticket-actions {
     position: relative;
     display: flex;
-    align-items: flex-end;
+    align-items: stretch;
     gap: var(--standard-gap);
     width: 100%;
     flex-shrink: 0;
@@ -243,6 +242,7 @@
     transition: opacity var(--time-fade-in) ease, visibility var(--time-fade-in) ease;
     pointer-events: none;
     z-index: 1;
+    color: #777777;
 }
 
 .max-qty-label.is-visible {
@@ -256,19 +256,21 @@
     justify-content: space-between;
     background-color: var(--color-placeholder);
     border-radius: 100px;
-    padding: 12px 20px;
+    padding: 0 20px;
     min-width: 140px;
-    height: auto;
+    height: 100%;
 }
 
 .qty-btn {
     background: none; border: none;
     cursor: pointer; 
     padding: 0 4px;
+    color: #777777;
 }
 
 .qty-val {
     min-width: 24px; text-align: center;
+    color: #777777;
 }
 
 .buy-btn-override {

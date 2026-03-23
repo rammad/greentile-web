@@ -130,13 +130,13 @@
     pointer-events: none;
     opacity: 0;
     filter: blur(10px);
-    transition: opacity var(--time-fade-out) ease, filter var(--time-fade-out) ease; 
+    transition: opacity 0.1s ease, filter 0.1s ease; 
 }
 
 .calendar-poster-wrapper.active { 
     opacity: 1; 
     filter: blur(0px);
-    transition: opacity var(--time-fade-in) ease, filter var(--time-fade-in) ease;
+    transition: opacity 0.3s ease, filter 0.3s ease;
 }
 
 .calendar-poster-img {

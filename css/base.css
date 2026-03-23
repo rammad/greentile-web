@@ -471,12 +471,6 @@ section {
     transition-delay: 0s;
 }
 
-.cta-arrow {
-    height: 0.5em;
-    width: auto;
-    display: block;
-}
-
 .ui-roll-hidden { transform: translateY(150%); opacity: 1; }
 
 /* masking */
