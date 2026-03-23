@@ -425,15 +425,14 @@ function createCurtainTiles(curtain, combo) {
     return wrap;
 }
 
-async function playTileAnimation(wrap, combo, fast = false) {
+async function playTileAnimation(wrap, combo) {
     const tiles    = wrap.querySelectorAll('.curtain-tile');
 
-    // vvv try to swap these with standard stagger values maybe idk if its possible or necessary its a one shot animation
-    const stagger  = fast ? 45  : 65;
-    const fadeMs   = fast ? 240 : 340;
-    const snapMs   = fast ? 220 : 320;
-    const labelMs  = fast ? 280 : 380;
-    const holdMs   = fast ? 80  : 120;
+    const stagger  = 65;
+    const fadeMs   = 340;
+    const snapMs   = 320;
+    const labelMs  = 260;
+    const holdMs   = 60;  // very short hold — curtain rises right at the click
 
     const fadeEase = 'cubic-bezier(0, 0, 0.05, 1)';      // strong ease-out fade
     const snapEase = 'cubic-bezier(0.99, 0, 0.15, 1.6)'; // pinned still, explosive snap, hard overshoot
@@ -463,21 +462,42 @@ async function playTileAnimation(wrap, combo, fast = false) {
         tile.style.transform  = `translate(${snapX[i]}px, 0px) rotate(0deg)`;
     });
 
-    await wait(snapMs);
+    // phase 3: label + action lines — start during the snap so it arrives right at the click
+    setTimeout(() => {
+        const labelWrap = document.createElement('div');
+        labelWrap.className = 'curtain-label-wrap type-subBold1';
+        labelWrap.style.cssText = `transform: translate(-50%, -110px) scale(0.82); opacity: 0; transition: none;`;
 
-    // phase 3: mahjong call label grows in above the tiles
-    const label = document.createElement('div');
-    label.className = 'curtain-label type-subBold1';
-    label.textContent = combo.type;
-    label.style.cssText = `transform: translate(-50%, -110px) scale(0.78); opacity: 0; transition: none;`;
-    wrap.appendChild(label);
+        const makeLines = (side) => {
+            const div = document.createElement('div');
+            div.className = `curtain-action-lines curtain-action-lines--${side}`;
+            for (let i = 0; i < 3; i++) {
+                const line = document.createElement('div');
+                line.className = 'curtain-action-line';
+                div.appendChild(line);
+            }
+            return div;
+        };
 
-    label.getBoundingClientRect(); // force layout
-    label.style.transition = `transform ${labelMs}ms cubic-bezier(0, 0, 0.2, 1), opacity ${labelMs}ms cubic-bezier(0, 0, 0.2, 1)`;
-    label.style.transform  = 'translate(-50%, -110px) scale(1)';
-    label.style.opacity    = '1';
+        const text = document.createElement('span');
+        text.textContent = combo.type;
 
-    await wait(labelMs + holdMs);
+        labelWrap.appendChild(makeLines('left'));
+        labelWrap.appendChild(text);
+        labelWrap.appendChild(makeLines('right'));
+        wrap.appendChild(labelWrap);
+
+        labelWrap.getBoundingClientRect(); // force layout
+        labelWrap.style.transition = `transform ${labelMs}ms cubic-bezier(0, 0, 0.2, 1), opacity ${labelMs}ms cubic-bezier(0, 0, 0.2, 1)`;
+        labelWrap.style.transform  = 'translate(-50%, -110px) scale(1)';
+        labelWrap.style.opacity    = '1';
+
+        // action lines burst in just after the label starts
+        setTimeout(() => labelWrap.classList.add('lines-active'), 25);
+    }, Math.round(snapMs * 0.70));
+
+    // curtain rises right at the end of the click — no long hold
+    await wait(snapMs + holdMs);
 }
 
 function initPageTransition() {
@@ -496,11 +516,11 @@ function initPageTransition() {
     requestAnimationFrame(() => {
         requestAnimationFrame(async () => {
             await preloadComboImages(entryCombo);
-            await playTileAnimation(entryWrap, entryCombo, false);
-            entryWrap.remove();
+            await playTileAnimation(entryWrap, entryCombo);
             resolvePageReady(); // unblock section animations — they play during the reveal
             curtain.style.transition = 'transform 0.85s cubic-bezier(0.16, 1, 0.3, 1)';
             curtain.classList.add('is-open');
+            setTimeout(() => entryWrap.remove(), 900); // let tiles + label ride up with curtain
         });
     });
 

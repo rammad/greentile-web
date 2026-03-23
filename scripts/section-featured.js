@@ -1,17 +1,24 @@
-/* featured section – two-phase scroll entry + parallax background
+/* featured section – three-layer parallax
  *
- * Adjust only the three multipliers below — section height is derived automatically.
+ * The section scrolls normally with the page.  Each layer travels at a
+ * different speed relative to the viewport, creating the illusion of depth.
+ * All layers are at their natural (centred) position when the section centre
+ * sits at the viewport centre; they diverge symmetrically as the section
+ * enters and exits.
  *
- * PHASE1_VH  — how many viewport-heights the marquee travels to reach center
- * PHASE2_VH  — how many viewport-heights the poster travels to reach center
- * DWELL_VH   — how long both sit in place before the section releases
+ * delta is normalised by section height (–1 … +1 across the visible range),
+ * so the offsets below are in px and stay consistent across screen sizes.
+ *
+ * Positive px  →  layer lags behind scroll  (feels far away)
+ * Negative px  →  layer leads the scroll    (feels closest)
+ *
+ * Tune only these three values:
  */
 
 (function () {
-    const PHASE1_VH      = 0;
-    const PHASE2_VH      = 0.35;
-    const DWELL_VH       = 0;
-    const PARALLAX_FACTOR = 0.35;
+    const BG_PX      =  480;
+    const MARQUEE_PX = -120;
+    const POSTER_PX  = -240;
 
     document.addEventListener('DOMContentLoaded', () => {
         const section      = document.querySelector('.featured-section');
@@ -21,43 +28,30 @@
         const posterWrap   = section.querySelector('.featured-poster-wrap');
         const bgImg        = section.querySelector('.featured-bg-img');
 
-        // cached layout values — refreshed after fonts load and on resize
-        let phaseStart       = 0;
-        let phase1Len        = 1;
-        let phase2Len        = 1;
-        let marqueeOffset    = 0;
-        let posterOffset     = 0;
+        let sectionCenterY = 0;
+        let sectionHeight  = 1;
 
         const recalcLayout = () => {
-            const ih      = window.innerHeight;
-            phase1Len     = ih * PHASE1_VH;
-            phase2Len     = ih * PHASE2_VH;
-            phaseStart    = section.offsetTop;
-            marqueeOffset = 0; // marquee is centered as soon as section pins
-            posterOffset  = ih;       // poster starts fully off-screen below
-
-            // keep section tall enough to fit both phases + dwell
-            section.style.minHeight = `${ih + phase1Len + phase2Len + ih * DWELL_VH}px`;
-
-            applyPositions(window.lenis ? window.lenis.scroll : 0);
+            sectionCenterY = section.offsetTop + section.offsetHeight * 0.5;
+            sectionHeight  = section.offsetHeight;
         };
 
         document.fonts.ready.then(recalcLayout);
         window.addEventListener('resize', recalcLayout);
 
         const applyPositions = (scrollY) => {
-            const scrolled = scrollY - phaseStart;
+            const vh = window.innerHeight;
+            // normalised delta: 0 at section centre, ±1 at section edges
+            const delta = (scrollY + vh * 0.5 - sectionCenterY) / sectionHeight;
 
-            // phase 1: marquee enters
-            if (marqueeLayer) {
-                const p1 = Math.max(0, Math.min(1, scrolled / phase1Len));
-                marqueeLayer.style.transform = `translateY(${(marqueeOffset * (1 - p1)).toFixed(2)}px)`;
+            if (bgImg) {
+                bgImg.style.transform = `translateY(${(delta * BG_PX).toFixed(2)}px)`;
             }
-
-            // phase 2: poster enters after marquee has fully arrived
+            if (marqueeLayer) {
+                marqueeLayer.style.transform = `translateY(${(delta * MARQUEE_PX).toFixed(2)}px)`;
+            }
             if (posterWrap) {
-                const p2 = Math.max(0, Math.min(1, (scrolled - phase1Len) / phase2Len));
-                posterWrap.style.transform = `translateY(${(posterOffset * (1 - p2)).toFixed(2)}px)`;
+                posterWrap.style.transform = `translateY(${(delta * POSTER_PX).toFixed(2)}px)`;
             }
         };
 
@@ -65,14 +59,8 @@
             applyPositions(detail.scroll);
         }, { passive: true });
 
-        // RAF loop: bg parallax runs every frame independent of scroll events
-        function tick() {
-            if (bgImg) {
-                const sectionTop = section.getBoundingClientRect().top;
-                bgImg.style.transform = `translateY(${(-sectionTop * PARALLAX_FACTOR).toFixed(2)}px)`;
-            }
-            requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
+        requestAnimationFrame(() => {
+            applyPositions(window.lenis ? window.lenis.scroll : 0);
+        });
     });
 })();

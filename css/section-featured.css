@@ -3,9 +3,7 @@
 .featured-section {
     position: relative;
     width: 100%;
-    /* min-height is set by JS so phase lengths and section height stay in sync.
-       fallback keeps the section visible if JS hasn't run yet. */
-    min-height: 100vh;
+    min-height: 120vh;
 }
 
 /* clips blurred bg to section bounds — sibling to .featured-frame so sticky is unaffected */
@@ -34,12 +32,11 @@
     will-change: transform;
 }
 
-/* sticky container — clips both marquee and poster while they travel */
+/* frame fills the section and centres its children; parallax handled by JS */
 .featured-frame {
-    position: sticky;
-    top: 0;
+    position: relative;
     width: 100%;
-    height: 100vh;
+    min-height: 120vh;
     overflow: hidden;
     display: flex;
     align-items: center;
