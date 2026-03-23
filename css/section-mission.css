@@ -33,7 +33,7 @@
 
 .mission-section .type-display-hero {
     width: 100%;
-    margin: 0 auto 0.2em;
+    margin: 0 auto 0.3em;
 }
 
 .mission-section .animate-line {
@@ -48,5 +48,5 @@
 }
 
 .mission-section .text-mask{
-    margin-bottom: var(--standard-margin);
+    margin-bottom: calc(var(--standard-margin) * 2);
 }

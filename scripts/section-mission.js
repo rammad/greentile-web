@@ -7,7 +7,7 @@
 
     function fitMissionLines(section) {
         if (!fitTextToWidth) return;
-        const lines = [...section.querySelectorAll('.animate-line, .animate-cascade')];
+        const lines = [...section.querySelectorAll('.animate-line')];
         if (!lines.length) return;
         lines.forEach(line => fitTextToWidth(line));
         // use the size the longest line produced (smallest value) so all lines match
@@ -22,17 +22,10 @@
         const subtitle = section.querySelector('.text-mask');
         if (subtitle) subtitle.classList.add('is-visible');
 
-        // whole-line fade (animate-line)
         const lines = [...section.querySelectorAll('.animate-line')];
         lines.forEach((line, i) => {
             line.classList.remove('is-visible');
             setTimeout(() => line.classList.add('is-visible'), i * LINE_STAGGER_MS);
-        });
-
-        // char-by-char cascade (animate-cascade)
-        const cascadeLines = [...section.querySelectorAll('.animate-cascade')];
-        cascadeLines.forEach((line, i) => {
-            setTimeout(() => window.playCascade && window.playCascade(line), i * LINE_STAGGER_MS);
         });
     }
 
@@ -41,9 +34,6 @@
         const subtitle = section.querySelector('.text-mask');
         if (subtitle) subtitle.classList.remove('is-visible');
         section.querySelectorAll('.animate-line').forEach(line => line.classList.remove('is-visible'));
-        section.querySelectorAll('.animate-cascade').forEach(line => {
-            window.reverseCascade && window.reverseCascade(line);
-        });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
