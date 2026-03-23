@@ -9,11 +9,11 @@
 window.ScatterImages = (function () {
 
     const MOBILE_BREAKPOINT      = 768;
-    const STEP_Y_MOBILE          = 140;
-    const STEP_Y_DESKTOP         = 160;
+    const STEP_Y_MOBILE          = 180;
+    const STEP_Y_DESKTOP         = 180;
     const COL_LEFT_X_MIN         = -5;
-    const COL_LEFT_X_MAX         = 25;
-    const COL_RIGHT_X_MIN        = 65;
+    const COL_LEFT_X_MAX         = 12;
+    const COL_RIGHT_X_MIN        = 75;
     const COL_RIGHT_X_MAX        = 95;
     const IMG_WIDTH_MOBILE_MIN   = 40;
     const IMG_WIDTH_MOBILE_MAX   = 55;

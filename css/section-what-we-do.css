@@ -24,7 +24,7 @@
 /* Always fixed — lives outside #scroll-content to avoid Lenis transform context */
 .what-we-do-body {
     position: fixed;
-    top: 68vh;
+    top: 62vh;
     left: 0;
     right: 0;
     width: 100%;
@@ -55,20 +55,19 @@
     transition: none !important;
 }
 
-/* about-content wrapper */
-.what-we-do .about-content {
+/* about-content wrapper — scoped to .what-we-do-body because JS moves blocks there at runtime */
+.what-we-do-body .about-content {
     position: relative;
     width: 100%;
     max-width: 600px;
     text-align: center;
 }
 
-.what-we-do .about-content .cta-btn {
+.what-we-do-body .about-content .cta-btn {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 36px);
     left: 50%;
     transform: translateX(-50%);
-    margin-top: var(--standard-margin);
     white-space: nowrap;
 }
 
@@ -76,7 +75,7 @@
 
 .about-menu-persistent {
     position: absolute;
-    top: 25%;
+    top: 8vh;
     left: 0;
     width: 100%;
     display: flex;
@@ -101,40 +100,33 @@
 
 .about-menu-persistent .menu-item {
     color: var(--color-placeholder);
-    opacity: 0;
-    filter: blur(var(--blur-standard));
+    opacity: 1;
     margin-bottom: var(--standard-gap);
     cursor: pointer;
-    transition: all var(--time-fade-out) ease;
+    transition: color var(--time-fade-out) ease;
 }
 
 .about-menu-persistent .menu-item.is-active {
     color: var(--color-text-main);
-    transition: all var(--time-fade-in) ease;
+    transition: color var(--time-fade-in) ease;
 }
 
-.about-menu-persistent .menu-item.is-visible {
-    opacity: 1;
-    filter: blur(0);
-    transition: all var(--time-fade-in) ease;
-}
-
-/* menu and body switch to position:fixed while section fills the viewport */
+/* menu switches to fixed when its natural scroll position reaches the target */
 .what-we-do .about-menu-persistent.is-pinned {
     position: fixed;
-    top: 0;
+    top: 28vh;
     left: 0;
     right: 0;
     width: 100%;
-    padding-top: 28vh;
+    padding-top: 0;
     pointer-events: auto;
     z-index: 50;
 }
 
 @media (max-width: 768px) {
-    .about-menu-persistent            { top: 10%; }
+    .about-menu-persistent            { top: 5vh; }
     .about-menu-persistent .menu-item { font-size: 40px; margin-bottom: 4px; }
 
-    .what-we-do .about-menu-persistent.is-pinned { padding-top: 15vh; }
-    .what-we-do-body                              { top: 68vh; }
+    .what-we-do .about-menu-persistent.is-pinned { top: 15vh; padding-top: 0; }
+    .what-we-do-body                              { top: 62vh; }
 }

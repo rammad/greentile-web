@@ -13,7 +13,7 @@
         const icons = section.querySelector('.socials-icons');
         const gallery = section.querySelector('.socials-track');
 
-        const stagger = staggerTime || 200;
+        const stagger = staggerTime;
 
         if (subtitle) {
             observeElementInOut(subtitle, {
@@ -37,7 +37,7 @@
 
         if (icons) {
             observeElementInOut(icons, {
-                onEnter() { setTimeout(() => icons.classList.add('is-visible'), stagger * 2); }
+                onEnter() { setTimeout(() => icons.classList.add('is-visible'), stagger); }
             });
         }
 
@@ -46,7 +46,7 @@
             observeElementInOut(gallery, {
                 onEnter() {
                     imgs.forEach((img, i) => {
-                        setTimeout(() => img.classList.add('is-visible'), stagger * 3 + i * 100);
+                        setTimeout(() => img.classList.add('is-visible'), stagger * i);
                     });
                 }
             });

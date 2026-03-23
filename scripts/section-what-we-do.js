@@ -3,7 +3,6 @@
 (function () {
     const { staggerTime } = window.AnimationUtils || {};
 
-    const MENU_STAGGER_MS = 150;   // delay between each menu item fading in
     const TIME_FADE_IN    = 0.6;   // seconds
     const TIME_FADE_OUT   = 0.25;  // seconds
     const BODY_BLUR_PX    = 8;
@@ -23,16 +22,6 @@
         const menuEl    = section.querySelector('.about-menu-persistent');
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
 
-        let menuAnimated = false;
-
-        /* Cascade menu items in one by one. Only ever runs once. */
-        function animateMenuIn() {
-            if (menuAnimated) return;
-            menuAnimated = true;
-            menuItems.forEach((item, i) => {
-                setTimeout(() => item.classList.add('is-visible'), i * MENU_STAGGER_MS);
-            });
-        }
 
         // ── build: fixed body text container + scroll track slides ────────────
 
@@ -133,32 +122,53 @@
         // ── scroll track slides ───────────────────────────────────────────────
 
         let scrollHasFired = false;
-        const slides = section.querySelectorAll('.about-slide');
+
+        // These match the CSS values exactly so the absolute→fixed transition is seamless.
+        const MENU_OFFSET_VH_DESKTOP = 0.08; // CSS: top: 8vh  (default)
+        const MENU_PIN_VH_DESKTOP    = 0.28; // CSS: top: 28vh (pinned)
+        const MENU_OFFSET_VH_MOBILE  = 0.05; // CSS: top: 5vh  (mobile)
+        const MENU_PIN_VH_MOBILE     = 0.15; // CSS: top: 15vh (mobile pinned)
+
+        function calcIsPinned(vpRect, secRect) {
+            const isMobile     = window.innerWidth < 768;
+            const offsetVH     = isMobile ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP;
+            const pinVH        = isMobile ? MENU_PIN_VH_MOBILE    : MENU_PIN_VH_DESKTOP;
+            const vpH          = vpRect.height;
+            // Where the menu's top edge sits in the viewport under natural scroll
+            const menuNaturalTop = secRect.top + offsetVH * vpH;
+            // Pin when menu has reached target AND section hasn't fully passed
+            return menuNaturalTop <= pinVH * vpH && secRect.bottom >= vpH;
+        }
 
         function updateActiveSlide() {
             const vpRect  = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
             const secRect = section.getBoundingClientRect();
 
-            const isPinned         = secRect.top <= vpRect.top && secRect.bottom >= vpRect.top + vpRect.height;
-            const justBecamePinned = isPinned && !wasPinned;
+            const isPinned           = calcIsPinned(vpRect, secRect);
+            const justBecamePinned   = isPinned && !wasPinned;
             const justBecameUnpinned = !isPinned && wasPinned;
 
             if (menuEl) menuEl.classList.toggle('is-pinned', isPinned);
 
             const blocks = bodyEl ? Array.from(bodyEl.querySelectorAll('.about-text-block')) : [];
 
-            // ── section enters: cascade menu, then fade body text in ──────────
+            // ── section enters: fade body text in ────────────────────────────
             if (justBecamePinned) {
-                animateMenuIn();
-                const bodyDelay = menuItems.length * MENU_STAGGER_MS;
-                setTimeout(() => {
-                    showBlock(blocks[activeIdx]);
-                    if (scrollHasFired) showCtas(blocks[activeIdx]);
-                }, bodyDelay);
+                // Clear any exit-anchor so CSS top value takes back over
+                if (menuEl) menuEl.style.top = '';
+                showBlock(blocks[activeIdx]);
+                if (scrollHasFired) showCtas(blocks[activeIdx]);
             }
 
             // ── section exits: hide body text ─────────────────────────────────
             if (justBecameUnpinned) {
+                // Anchor menu at its current visual position (pinVH * vpH from top)
+                // so it scrolls off naturally instead of snapping to its absolute offset.
+                if (menuEl) {
+                    const isMobile = window.innerWidth < 768;
+                    const pinPx    = (isMobile ? MENU_PIN_VH_MOBILE : MENU_PIN_VH_DESKTOP) * vpRect.height;
+                    menuEl.style.top = `${pinPx - secRect.top}px`;
+                }
                 blocks.forEach((b) => { hideBlock(b); hideCtas(b); });
             }
 
@@ -166,21 +176,24 @@
 
             // ── while pinned: menu active item + cross-fade slides ────────────
             if (!isPinned) {
-                menuItems.forEach((item, i) => item.classList.toggle('is-active', i === activeIdx));
+                menuItems.forEach((item) => item.classList.remove('is-active'));
                 return;
             }
 
-            const halfVH    = vpRect.height / 2;
-            const vpTop     = vpRect.top;
-            let closestIdx  = 0;
-            let closestDist = Infinity;
+            // Map scroll progress through the pinned range proportionally to slide index.
+            // "Closest-center" logic can never reach the last slide on shorter sections;
+            // this approach divides the full pinned scroll range evenly so every item is reachable.
+            const isMobileCalc = window.innerWidth < 768;
+            const offsetPx     = (isMobileCalc ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP) * vpRect.height;
+            const pinPx        = (isMobileCalc ? MENU_PIN_VH_MOBILE    : MENU_PIN_VH_DESKTOP)    * vpRect.height;
+            const scrollStart  = pinPx - offsetPx;              // secRect.top at first pin
+            const scrollEnd    = vpRect.height - secRect.height; // secRect.top at forward unpin
+            const scrollRange  = scrollStart - scrollEnd;
 
-            slides.forEach((slide, i) => {
-                const rect    = slide.getBoundingClientRect();
-                const centerY = rect.top + rect.height / 2 - vpTop;
-                const dist    = Math.abs(centerY - halfVH);
-                if (dist < closestDist) { closestDist = dist; closestIdx = i; }
-            });
+            const progress   = scrollRange > 0
+                ? Math.max(0, Math.min(1, (scrollStart - secRect.top) / scrollRange))
+                : 0;
+            const closestIdx = Math.min(menuItems.length - 1, Math.floor(progress * menuItems.length));
 
             menuItems.forEach((item, i) => item.classList.toggle('is-active', i === closestIdx));
 
@@ -195,13 +208,13 @@
             }
         }
 
-        // Initial pinning/menu state — no opacity changes
+        // Initial pinning/menu state — no opacity changes; all items start gray
         (function initMenuState() {
-            const vpRect  = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
-            const secRect = section.getBoundingClientRect();
-            const isPinned = secRect.top <= vpRect.top && secRect.bottom >= vpRect.top + vpRect.height;
+            const vpRect   = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
+            const secRect  = section.getBoundingClientRect();
+            const isPinned = calcIsPinned(vpRect, secRect);
             if (menuEl) menuEl.classList.toggle('is-pinned', isPinned);
-            menuItems.forEach((item, i) => item.classList.toggle('is-active', i === activeIdx));
+            menuItems.forEach((item) => item.classList.remove('is-active'));
             wasPinned = isPinned;
         })();
 
