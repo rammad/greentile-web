@@ -1,67 +1,52 @@
-/* about section (index.html) — slide stack + sticky body text */
+/* about section (index.html) — natural scroll, large text, inline images */
 
 .about {
     position: relative;
     width: 100%;
-    min-height: 100vh;
-    background-color: transparent;
 }
 
-.about-slides {
-    position: relative;
-    width: 100%;
-    z-index: 10;
-    padding-top: 0;
-    padding-bottom: 0;
-}
-
-.about-slide {
-    position: relative;
-    width: 100%;
-}
-
-/* natural scroll position — JS applies translateY to the text block to create
- * the Doppler pull effect; no sticky needed (and sticky + lerp causes jumps) */
-.about-slide-sticky {
-    position: relative;
-    min-height: 100vh;
-    height: 100vh;
-    width: 100%;
+.about-inner {
+    /* padding: 15vh var(--section-padding) 15vh; */
+    width: 60%;
+    margin: 0 auto;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    pointer-events: none;
+    gap: 64px;
 }
 
-.about-slide-sticky .about-text-block {
+/* override type-h1 spacing for inline-image paragraph */
+.about-inner .type-h2 {
+    line-height: 1.4;
+    text-align: center;
+    text-box: normal;
+}
+
+/* inline photo thumbnails — 4:5 ratio, larger than line height */
+.about-inline-img {
+    display: inline-block;
+    height: 1.8em;
+    width: calc(1.8em * 0.8);
+    object-fit: cover;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin: 0 0.8em;
+    flex-shrink: 0;
+}
+
+/* CTA button */
+.about-cta {
     pointer-events: auto;
 }
 
-.about-text-block {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    padding: 0 20px;
-    text-align: center;
-    opacity: 0;
-    will-change: opacity, transform, filter;
-    /* no CSS transitions — JS drives all smoothing to avoid double-smoothing jitter */
-}
+@media (max-width: 768px) {
+    .about-inner {
+        width: 90%;
+        padding: 10vh var(--section-padding) 10vh;
+        gap: 48px;
+    }
 
-.about-text-block .cta-btn {
-    position: absolute;
-    top: 150%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-top: var(--standard-margin);
-    white-space: nowrap;
-}
-
-/* text elements inside the about slide inherit opacity from .about-text-block (JS-driven).
- * reset the global opacity:0 + blur defaults so only the parent controls visibility. */
-.about-slide-sticky .type-body1,
-.about-slide-sticky .type-body2 {
-    opacity: 1;
-    filter: none;
-    transition: none;
+    .about-inner .type-h1 {
+        line-height: 1.35;
+    }
 }

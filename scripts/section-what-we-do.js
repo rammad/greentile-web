@@ -1,27 +1,138 @@
-/* what we do section (about-us.html) — fixed body text + persistent menu + scroll tracking */
+/* what we do section (about-us.html) — scatter images + fixed body text + persistent menu */
 
 (function () {
     const { staggerTime } = window.AnimationUtils || {};
 
-    const TIME_FADE_IN    = 0.6;   // seconds
-    const TIME_FADE_OUT   = 0.25;  // seconds
-    const BODY_BLUR_PX    = 8;
+    // ── scatter images ────────────────────────────────────────────────────────
+
+    const MOBILE_BREAKPOINT      = 768;
+    const STEP_Y_MOBILE          = 180;
+    const STEP_Y_DESKTOP         = 180;
+    const COL_LEFT_X_MIN         = -5;
+    const COL_LEFT_X_MAX         = 12;
+    const COL_RIGHT_X_MIN        = 75;
+    const COL_RIGHT_X_MAX        = 95;
+    const IMG_WIDTH_MOBILE_MIN   = 40;
+    const IMG_WIDTH_MOBILE_MAX   = 55;
+    const IMG_WIDTH_DESKTOP_MIN  = 7;
+    const IMG_WIDTH_DESKTOP_MAX  = 15;
+    const IMG_JITTER_RANGE       = 120;
+    const IMG_Z_INDEX_MAX        = 20;
+    const IMG_VARIATION_MIN_DIFF = 0.2;
+    const IMG_SCALE_MIN          = 1.0;
+    const IMG_SCALE_MAX          = 1.0;
+    const IMG_DEPTH_PARALLAX_STRENGTH = 0.5;
+    const IMG_SPEED_FACTOR_MIN   = 0.8;
+    const IMG_SPEED_FACTOR_MAX   = 1.2;
+
+    function getVariedRandom(min, max, previousValue = null, minDiff = IMG_VARIATION_MIN_DIFF) {
+        if (previousValue === null) return Math.floor(Math.random() * (max - min + 1)) + min;
+        const range       = max - min;
+        const minDistance = range * minDiff;
+        let attempts = 0, value;
+        do {
+            value = Math.floor(Math.random() * (max - min + 1)) + min;
+            attempts++;
+        } while (Math.abs(value - previousValue) < minDistance && attempts < 10);
+        return value;
+    }
+
+    function initScatter(section, viewport) {
+        const track  = section.querySelector('.about-image-track');
+        const images = track ? Array.from(track.querySelectorAll('.scatter-img')) : [];
+        const state  = { trackHeight: 0 };
+
+        function initLayout() {
+            const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+            const stepY    = isMobile ? STEP_Y_MOBILE : STEP_Y_DESKTOP;
+            let currentY   = 0;
+            const prevLeft  = { x: null, w: null };
+            const prevRight = { x: null, w: null };
+
+            images.forEach((img, index) => {
+                const isLeft = index % 2 === 0;
+                const prev   = isLeft ? prevLeft : prevRight;
+
+                const minX    = isLeft ? COL_LEFT_X_MIN  : COL_RIGHT_X_MIN;
+                const maxX    = isLeft ? COL_LEFT_X_MAX  : COL_RIGHT_X_MAX;
+                const randomX = getVariedRandom(minX, maxX, prev.x);
+
+                const minW    = isMobile ? IMG_WIDTH_MOBILE_MIN  : IMG_WIDTH_DESKTOP_MIN;
+                const maxW    = isMobile ? IMG_WIDTH_MOBILE_MAX  : IMG_WIDTH_DESKTOP_MAX;
+                const randomW = getVariedRandom(minW, maxW, prev.w);
+
+                const jitter     = Math.floor(Math.random() * IMG_JITTER_RANGE) - IMG_JITTER_RANGE / 2;
+                const naturalTop = currentY + jitter;
+                img.style.width  = `${randomW}vw`;
+                img.style.left   = `${randomX}%`;
+                img.style.top    = `${naturalTop}px`;
+                img.dataset.naturalTop = String(naturalTop);
+
+                const normalizedSize = (randomW - minW) / Math.max(1, maxW - minW);
+                img.style.zIndex     = 1 + Math.round(normalizedSize * (IMG_Z_INDEX_MAX - 1));
+                img.dataset.speedFactor = (
+                    IMG_SPEED_FACTOR_MIN + normalizedSize * (IMG_SPEED_FACTOR_MAX - IMG_SPEED_FACTOR_MIN)
+                ).toFixed(3);
+
+                prev.x = randomX;
+                prev.w = randomW;
+                currentY += stepY;
+            });
+
+            state.trackHeight = currentY;
+            if (track) track.style.height = `${state.trackHeight}px`;
+        }
+
+        function updateImageScales() {
+            if (!viewport) return;
+            const viewportRect    = viewport.getBoundingClientRect();
+            const viewportCenterY = viewportRect.height / 2;
+            const sectionTop      = section.getBoundingClientRect().top;
+            const depthOffset     = Math.max(0, viewportRect.height - sectionTop);
+
+            images.forEach((img) => {
+                const imgRect    = img.getBoundingClientRect();
+                const imgCenterY = imgRect.top + imgRect.height / 2 - viewportRect.top;
+                const dist       = Math.abs(imgCenterY - viewportCenterY);
+                const proximity  = 1 - Math.min(dist / (viewportRect.height / 2), 1);
+                const scale      = IMG_SCALE_MIN + (IMG_SCALE_MAX - IMG_SCALE_MIN) * proximity;
+
+                const speedFactor = parseFloat(img.dataset.speedFactor ?? '1');
+                const parallaxY   = depthOffset * (1 - speedFactor) * IMG_DEPTH_PARALLAX_STRENGTH;
+
+                const naturalTop  = parseFloat(img.dataset.naturalTop ?? '0');
+                const imgH        = img.offsetHeight;
+                const minParallax = -naturalTop;
+                const maxParallax = state.trackHeight - naturalTop - imgH;
+                const clampedY    = Math.max(minParallax, Math.min(maxParallax, parallaxY));
+
+                img.style.transform = `translateY(${clampedY.toFixed(2)}px) scale(${scale})`;
+            });
+        }
+
+        initLayout();
+        if (track) track.classList.add('about-image-track-positioned');
+
+        return { state, initLayout, updateImageScales };
+    }
+
+    // ── section logic ─────────────────────────────────────────────────────────
+
+    const TIME_FADE_IN  = 0.6;
+    const TIME_FADE_OUT = 0.25;
+    const BODY_BLUR_PX  = 8;
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('about');
         if (!section) return;
 
         const viewport = document.getElementById('scroll-viewport') || null;
-
-        const scatter = window.ScatterImages
-            ? window.ScatterImages.init(section, viewport)
-            : null;
+        const scatter  = initScatter(section, viewport);
 
         // ── persistent menu ───────────────────────────────────────────────────
 
         const menuEl    = section.querySelector('.about-menu-persistent');
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
-
 
         // ── build: fixed body text container + scroll track slides ────────────
 
@@ -33,14 +144,12 @@
             const stickyContent = section.querySelector('.about-sticky-content');
             const textBlocks    = Array.from(section.querySelectorAll('.about-text-block'));
             if (!stickyContent || textBlocks.length === 0) return;
-            if (!scatter || scatter.state.trackHeight <= 0) return;
+            if (scatter.state.trackHeight <= 0) return;
 
             bodyEl = document.createElement('div');
             bodyEl.className = 'what-we-do-body';
             textBlocks.forEach((block) => bodyEl.appendChild(block));
 
-            // Attach outside #scroll-content so position:fixed is relative to the
-            // real viewport, not Lenis's translateY transform on scroll-content.
             const scrollViewport = document.getElementById('scroll-viewport');
             (scrollViewport || document.body).appendChild(bodyEl);
 
@@ -60,9 +169,6 @@
 
         buildLayout();
 
-        /* All blocks start hidden. Commit that state and add transitions.
-         * Opacity only ever changes from async lenis-scroll events,
-         * so transitions are always already committed when they fire. */
         function initBlockStates() {
             if (!bodyEl) return;
             const blocks = Array.from(bodyEl.querySelectorAll('.about-text-block'));
@@ -119,24 +225,21 @@
             });
         }
 
-        // ── scroll track slides ───────────────────────────────────────────────
+        // ── scroll track ──────────────────────────────────────────────────────
 
         let scrollHasFired = false;
 
-        // These match the CSS values exactly so the absolute→fixed transition is seamless.
-        const MENU_OFFSET_VH_DESKTOP = 0.08; // CSS: top: 8vh  (default)
-        const MENU_PIN_VH_DESKTOP    = 0.28; // CSS: top: 28vh (pinned)
-        const MENU_OFFSET_VH_MOBILE  = 0.05; // CSS: top: 5vh  (mobile)
-        const MENU_PIN_VH_MOBILE     = 0.15; // CSS: top: 15vh (mobile pinned)
+        const MENU_OFFSET_VH_DESKTOP = 0.08;
+        const MENU_PIN_VH_DESKTOP    = 0.28;
+        const MENU_OFFSET_VH_MOBILE  = 0.05;
+        const MENU_PIN_VH_MOBILE     = 0.15;
 
         function calcIsPinned(vpRect, secRect) {
-            const isMobile     = window.innerWidth < 768;
-            const offsetVH     = isMobile ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP;
-            const pinVH        = isMobile ? MENU_PIN_VH_MOBILE    : MENU_PIN_VH_DESKTOP;
-            const vpH          = vpRect.height;
-            // Where the menu's top edge sits in the viewport under natural scroll
+            const isMobile       = window.innerWidth < 768;
+            const offsetVH       = isMobile ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP;
+            const pinVH          = isMobile ? MENU_PIN_VH_MOBILE    : MENU_PIN_VH_DESKTOP;
+            const vpH            = vpRect.height;
             const menuNaturalTop = secRect.top + offsetVH * vpH;
-            // Pin when menu has reached target AND section hasn't fully passed
             return menuNaturalTop <= pinVH * vpH && secRect.bottom >= vpH;
         }
 
@@ -152,18 +255,13 @@
 
             const blocks = bodyEl ? Array.from(bodyEl.querySelectorAll('.about-text-block')) : [];
 
-            // ── section enters: fade body text in ────────────────────────────
             if (justBecamePinned) {
-                // Clear any exit-anchor so CSS top value takes back over
                 if (menuEl) menuEl.style.top = '';
                 showBlock(blocks[activeIdx]);
                 if (scrollHasFired) showCtas(blocks[activeIdx]);
             }
 
-            // ── section exits: hide body text ─────────────────────────────────
             if (justBecameUnpinned) {
-                // Anchor menu at its current visual position (pinVH * vpH from top)
-                // so it scrolls off naturally instead of snapping to its absolute offset.
                 if (menuEl) {
                     const isMobile = window.innerWidth < 768;
                     const pinPx    = (isMobile ? MENU_PIN_VH_MOBILE : MENU_PIN_VH_DESKTOP) * vpRect.height;
@@ -174,20 +272,16 @@
 
             wasPinned = isPinned;
 
-            // ── while pinned: menu active item + cross-fade slides ────────────
             if (!isPinned) {
                 menuItems.forEach((item) => item.classList.remove('is-active'));
                 return;
             }
 
-            // Map scroll progress through the pinned range proportionally to slide index.
-            // "Closest-center" logic can never reach the last slide on shorter sections;
-            // this approach divides the full pinned scroll range evenly so every item is reachable.
             const isMobileCalc = window.innerWidth < 768;
             const offsetPx     = (isMobileCalc ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP) * vpRect.height;
             const pinPx        = (isMobileCalc ? MENU_PIN_VH_MOBILE    : MENU_PIN_VH_DESKTOP)    * vpRect.height;
-            const scrollStart  = pinPx - offsetPx;              // secRect.top at first pin
-            const scrollEnd    = vpRect.height - secRect.height; // secRect.top at forward unpin
+            const scrollStart  = pinPx - offsetPx;
+            const scrollEnd    = vpRect.height - secRect.height;
             const scrollRange  = scrollStart - scrollEnd;
 
             const progress   = scrollRange > 0
@@ -200,15 +294,12 @@
             if (closestIdx !== activeIdx) {
                 hideCtas(blocks[activeIdx]);
                 hideBlock(blocks[activeIdx]);
-
                 showBlock(blocks[closestIdx]);
                 if (scrollHasFired) showCtas(blocks[closestIdx]);
-
                 activeIdx = closestIdx;
             }
         }
 
-        // Initial pinning/menu state — no opacity changes; all items start gray
         (function initMenuState() {
             const vpRect   = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
             const secRect  = section.getBoundingClientRect();
@@ -218,11 +309,11 @@
             wasPinned = isPinned;
         })();
 
-        if (scatter) scatter.updateImageScales();
+        scatter.updateImageScales();
 
         window.addEventListener('lenis-scroll', () => {
             scrollHasFired = true;
-            if (scatter) scatter.updateImageScales();
+            scatter.updateImageScales();
             updateActiveSlide();
         });
 
@@ -233,9 +324,9 @@
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                if (scatter) scatter.initLayout();
+                scatter.initLayout();
                 const slidesAfterResize = section.querySelectorAll('.about-slide');
-                if (scatter && slidesAfterResize.length > 0) {
+                if (slidesAfterResize.length > 0) {
                     const slideHeight = scatter.state.trackHeight / slidesAfterResize.length;
                     slidesAfterResize.forEach((s) => { s.style.height = `${slideHeight}px`; });
                 }
