@@ -33,7 +33,7 @@
 .clients-paren {
     font-size: var(--size-display-xl);
     font-family: var(--font-subheader);
-    font-weight: 300;
+    font-weight: 200;
     font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
     line-height: 1;
