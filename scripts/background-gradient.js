@@ -329,10 +329,10 @@ class GradientEngine {
         this.mesh.rotation.y = scrollPos * sr.y;
         this.mesh.rotation.z = scrollPos * sr.z;
 
-        this.uniforms.uColor1.value.lerp(this.targetColors[0], 0.05);
-        this.uniforms.uColor2.value.lerp(this.targetColors[1], 0.05);
-        this.uniforms.uColor3.value.lerp(this.targetColors[2], 0.05);
-        this.uniforms.uEdgeStrength.value += (this.targetEdgeStrength - this.uniforms.uEdgeStrength.value) * 0.05;
+        this.uniforms.uColor1.value.lerp(this.targetColors[0], 0.15);
+        this.uniforms.uColor2.value.lerp(this.targetColors[1], 0.15);
+        this.uniforms.uColor3.value.lerp(this.targetColors[2], 0.15);
+        this.uniforms.uEdgeStrength.value += (this.targetEdgeStrength - this.uniforms.uEdgeStrength.value) * 0.15;
         this.renderer.render(this.scene, this.camera);
     }
 }

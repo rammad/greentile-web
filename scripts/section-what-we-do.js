@@ -135,6 +135,26 @@
         const menuEl    = section.querySelector('.about-menu-persistent');
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
 
+        const MENU_ITEM_STAGGER_MS = 120;
+
+        function revealMenuItems() {
+            const label = menuEl ? menuEl.querySelector('.menu-label') : null;
+            if (label) label.classList.add('is-visible');
+            menuItems.forEach((item, i) => {
+                item.style.transitionDelay = `${i * MENU_ITEM_STAGGER_MS}ms`;
+                item.classList.add('is-revealed');
+            });
+        }
+
+        function hideMenuItems() {
+            const label = menuEl ? menuEl.querySelector('.menu-label') : null;
+            if (label) label.classList.remove('is-visible');
+            menuItems.forEach(item => {
+                item.style.transitionDelay = '0ms';
+                item.classList.remove('is-revealed');
+            });
+        }
+
         // ── build: fixed body text container + scroll track slides ────────────
 
         let bodyEl    = null;
@@ -263,11 +283,13 @@
 
             if (justBecamePinned) {
                 if (menuEl) menuEl.style.top = '';
+                revealMenuItems();
                 showBlock(blocks[activeIdx]);
                 if (scrollHasFired) showCtas(blocks[activeIdx]);
             }
 
             if (justBecameUnpinned) {
+                hideMenuItems();
                 if (menuEl) {
                     const isMobile = window.innerWidth < 768;
                     const pinPx    = (isMobile ? MENU_PIN_VH_MOBILE : MENU_PIN_VH_DESKTOP) * vpRect.height;
@@ -313,6 +335,9 @@
             if (menuEl) menuEl.classList.toggle('is-pinned', isPinned);
             menuItems.forEach((item) => item.classList.remove('is-active'));
             wasPinned = isPinned;
+            if (isPinned) {
+                window.pageReady.then(() => revealMenuItems());
+            }
         })();
 
         scatter.updateImageScales();

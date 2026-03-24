@@ -57,6 +57,22 @@
     text-decoration: none;
 }
 
+.nav-active-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.nav-active-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 20px;
+    height: 1.5px;
+    background: var(--c-dark-green);
+    transform: translateX(-50%);
+}
+
 @media (max-width: 768px) {
     .nav-center {
         gap: 16px;

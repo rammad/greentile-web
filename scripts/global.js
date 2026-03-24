@@ -547,4 +547,19 @@ function initNavbar() {
     if (!nav) return;
     const links = nav.querySelectorAll('a');
     links.forEach(link => { if (link.children.length === 0) link.innerText = link.innerText; });
+
+    const page = window.location.pathname.split('/').pop() || 'index.html';
+    const eventsPages = ['events.html', 'product.html', 'archives.html'];
+
+    nav.querySelectorAll('.nav-center a, .nav-right a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href || href === '#') return;
+        const isActive = page === href || (href === 'events.html' && eventsPages.includes(page));
+        if (isActive) {
+            const wrap = document.createElement('span');
+            wrap.className = 'nav-active-wrap';
+            link.parentNode.insertBefore(wrap, link);
+            wrap.appendChild(link);
+        }
+    });
 }

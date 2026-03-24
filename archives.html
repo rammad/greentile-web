@@ -11,10 +11,14 @@
     
     <style>
         html, body { overflow: auto !important; height: auto !important; }
+        body { background-color: transparent; }
     </style>
 </head>
 <body>
     <div id="page-curtain"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <canvas id="gradient-canvas"></canvas>
 
     <nav class="sticky-nav">
         <div class="nav-left">
@@ -40,7 +44,7 @@
         </div>
     </nav>
 
-    <section class="archives-page">
+    <section class="archives-page" data-colors="#FFFCFA, #b4f8b4, #FFFCFA" data-edge="0">
         <div class="archives-header">
             <a href="events.html" class="back-arrow">
                 <img src="images/graphics/arrow-right.png" alt="Back to Events">
@@ -80,6 +84,7 @@
     </section>
 
     <script src="scripts/global.js?v=12"></script>
+    <script src="scripts/background-gradient.js?v=4"></script>
     <script src="scripts/section-archives.js?v=5"></script>
 </body>
 </html>

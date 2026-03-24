@@ -269,4 +269,10 @@ function initRowPacker() {
 
         container.appendChild(rowEl);
     });
+
+    container.querySelectorAll('.grid-card').forEach(card => {
+        const sign = Math.random() < 0.5 ? -1 : 1;
+        const deg  = sign * (2 + Math.random() * 2);
+        card.style.setProperty('--hover-rotate', `${deg.toFixed(1)}deg`);
+    });
 }

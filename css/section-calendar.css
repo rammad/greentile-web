@@ -39,15 +39,31 @@
 .view-controls { display: flex; align-items: center; }
 
 .filter-btn, .view-btn {
-    background: none; border: none; padding: 0; 
-    cursor: pointer; color: var(--color-placeholder);
-    transition: color 0.3s ease;
+    background: none; border: none;
+    padding: 0 0 5px 0;
+    cursor: pointer; color: var(--color-text-main);
     display: inline-block;
 }
-.filter-btn.active, .filter-btn:hover,
-.view-btn.active, .view-btn:hover { color: var(--color-text-main); }
 
-.divider { color: var(--color-placeholder); margin: 0 8px; display: inline-block; line-height: 1; }
+.filter-btn::after,
+.view-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 20px;
+    height: 1.5px;
+    background: var(--c-dark-green);
+    transform: translateX(-50%) scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.filter-btn.active::after,
+.view-btn.active::after {
+    transform: translateX(-50%) scaleX(1);
+}
+
+.divider { color: var(--color-text-main); margin: 0 8px; display: inline-block; line-height: 1; }
 
 .calendar-body {
     position: relative;
@@ -196,6 +212,11 @@
     background: #f0f0f0;
     overflow: hidden;
     border-radius: var(--poster-radius);
+    transition: rotate 0.2s ease-out;
+}
+
+.grid-card:hover {
+    rotate: var(--hover-rotate);
 }
 
 .grid-card-poster {
@@ -207,7 +228,6 @@
 }
 
 .grid-card:hover .grid-card-poster {
-    transform: scale(1.02);
     z-index: 2;
 }
 

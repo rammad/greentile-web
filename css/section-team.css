@@ -1,5 +1,4 @@
-/* team section
-   three-column layout: sticky title (left), scrolling images (middle), proportionally scrolling bios (right) */
+/* team section — three-column layout: title (left), images (center, wider), names (right) */
 
 .team-section {
     position: relative;
@@ -8,20 +7,9 @@
     padding-bottom: calc(var(--standard-margin, 20px) * 3);
 }
 
-/*
- * four-column grid:
- *   col 1 – title: narrow sticky label
- *   col 2 – spacer (1fr): pushes images + text to right
- *   col 3 – images: sized so each 4/5 poster fills ~80vh
- *   col 4 – text: auto width for readable bios
- */
 .team-layout {
     display: grid;
-    grid-template-columns:
-        auto                                                            /* title  */
-        1fr                                                             /* spacer */
-        calc((100vh - var(--space-for-nav, 90px) - 60px) * 4 / 5)     /* images */
-        auto;                                                           /* text   */
+    grid-template-columns: 1fr 1.4fr 1fr;
     column-gap: calc(var(--standard-margin, 20px) * 2);
     align-items: start;
     padding: 0 var(--standard-margin);
@@ -29,12 +17,16 @@
 }
 
 .team-title-col  { grid-column: 1; }
-.team-images-col { grid-column: 3; }
-.team-text-col   { grid-column: 4; }
+.team-images-col { grid-column: 2; }
+.team-text-col   { grid-column: 3; }
 
 .team-title-col {
     position: sticky;
     top: calc(var(--space-for-nav, 90px) + var(--standard-margin, 20px));
+    height: calc(100vh - var(--space-for-nav, 90px) - var(--standard-margin, 20px) * 2);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
     align-self: start;
 }
 
@@ -67,39 +59,21 @@
     border-radius: var(--poster-radius);
 }
 
-/* sticky clip column — js drives translateY on .team-text-inner proportional to scroll progress
-   overflow: clip avoids the chrome/safari compositing conflict with sticky + transformed child
-   (overflow: hidden would create a scroll container and cause text to blur/jitter) */
 .team-text-col {
     position: sticky;
     top: calc(var(--space-for-nav, 90px) + var(--standard-margin, 20px));
-    height: calc(100vh - var(--space-for-nav, 90px) - var(--standard-margin, 20px));
-    overflow: clip;
     align-self: start;
     box-sizing: border-box;
 }
 
-.team-text-inner {
-    /* no will-change — letting the browser composite the sticky column as a single layer
-       is cleaner than promoting the inner div separately */
-}
-
-.team-member-name {
-    display: block;
-    margin-bottom: calc(var(--standard-margin, 20px) * 1.5);
-}
-
-.team-member-name:last-child {
-    margin-bottom: 0;
+.team-names {
+    line-height: 1.6;
 }
 
 @media (prefers-reduced-motion: reduce) {
     .team-poster-wrap {
         opacity: 1;
         transform: none;
-        transition: none;
-    }
-    .team-text-inner {
         transition: none;
     }
 }
@@ -119,6 +93,14 @@
     .team-text-col { grid-column: 1; }
 
     .team-title-col {
+        order: -1;
+        position: relative;
+        top: 0;
+        height: auto;
+        align-self: start;
+    }
+
+    .team-text-col {
         position: relative;
         top: 0;
     }
@@ -126,16 +108,5 @@
     .team-poster-wrap {
         opacity: 1;
         transform: none;
-    }
-
-    .team-text-col {
-        position: relative;
-        height: auto;
-        overflow: visible;
-    }
-
-    .team-text-inner {
-        padding-top: 0;
-        transform: none !important;
     }
 }
