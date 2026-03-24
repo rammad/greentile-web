@@ -254,7 +254,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: var(--c-dark-green-20);
+    background-color: var(--c-dark-green-10);
     border-radius: 100px;                  /* intentional pill — not scaled */
     padding: 0 var(--standard-margin);
     min-width: calc(140 / 1920 * 100vw);
@@ -265,12 +265,12 @@
     background: none; border: none;
     cursor: pointer;
     padding: 0 calc(4 / 1920 * 100vw);
-    color: var(--c-dark-green-50);
+    color: var(--c-dark-green);
 }
 
 .qty-val {
     min-width: calc(24 / 1920 * 100vw); text-align: center;
-    color: var(--c-dark-green-50);
+    color: var(--c-dark-green);
 }
 
 .buy-btn-override {
@@ -279,7 +279,7 @@
 
 .pdp-tag {
     display: inline-block;
-    background-color: var(--c-dark-green-20);
+    background-color: var(--c-dark-green-10);
     padding: calc(4 / 1920 * 100vw) var(--standard-gap);
     border-radius: calc(4 / 1920 * 100vw);
     margin: 0 var(--standard-gap) var(--standard-gap) 0;

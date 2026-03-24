@@ -9,7 +9,7 @@
 
         const title = section.querySelector('.animate-cascade');
         const subtitle = section.querySelector('.text-mask');
-        const body = section.querySelector('.type-body2');
+        const body = section.querySelector('.type-body2, .type-body1');
         const icons = section.querySelector('.socials-icons');
         const gallery = section.querySelector('.socials-track');
 

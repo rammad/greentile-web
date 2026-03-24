@@ -53,6 +53,7 @@
     --c-mid-green: #23AA21;
     --c-lighter-green: #e6f8e6; /* possibly for lighter gradient sections */
     --c-dark-green: #0E4A0E;
+    --c-dark-green-10: #E7EDE7; /* 10% of dark green */
     --c-dark-green-20: #CFDBCF; /* 20% of dark green */
     --c-dark-green-50: #87A587; /* 50% of dark green */
     --c-black: #000000;
