@@ -91,7 +91,7 @@
     border-radius: var(--poster-radius);
 
     opacity: 0;
-    transform: translateY(calc(60 / 1920 * 100vw));
+    transform: translateY(calc(-4 / 1920 * 100vw));
     transition:
         opacity var(--time-fade-in) var(--ease-standard),
         transform var(--time-fade-in) var(--ease-standard);
@@ -99,15 +99,15 @@
 
 .social-img.is-visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(calc(-64 / 1920 * 100vw));
 }
 
 .social-img.push-down {
-    transform: translateY(calc((64 + 60) / 1920 * 100vw));
+    transform: translateY(calc(60 / 1920 * 100vw));
 }
 
 .social-img.push-down.is-visible {
-    transform: translateY(calc(64 / 1920 * 100vw));
+    transform: translateY(0);
 }
 
 @media (max-width: 768px) {

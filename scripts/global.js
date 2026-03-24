@@ -394,9 +394,12 @@ const CURTAIN_TILE_SCATTER = {
     ],
 };
 
+// scales a design-width pixel value (based on 1920px) to match the CSS vw units
+function vwPx(px) { return px * (window.innerWidth / 1920); }
+
 // tile width 88px + gap 4px = 92px stride; compute a centered row for any count
 function getTileSnapX(count) {
-    const stride = 92;
+    const stride = vwPx(92);
     const start  = -((count - 1) / 2) * stride;
     return Array.from({ length: count }, (_, i) => Math.round(start + i * stride));
 }
@@ -442,7 +445,7 @@ async function playTileAnimation(wrap, combo) {
     // phase 1: pre-position at scatter coords, then fade in staggered
     tiles.forEach((tile, i) => {
         const { x, y, r } = scatter[i];
-        tile.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
+        tile.style.transform = `translate(${vwPx(x)}px, ${vwPx(y)}px) rotate(${r}deg)`;
     });
     tiles[0].getBoundingClientRect(); // force layout before animating
     tiles.forEach((tile, i) => {
@@ -464,7 +467,8 @@ async function playTileAnimation(wrap, combo) {
     setTimeout(() => {
         const labelWrap = document.createElement('div');
         labelWrap.className = 'curtain-label-wrap type-subBold1';
-        labelWrap.style.cssText = `transform: translate(-50%, -110px) scale(0.82); opacity: 0; transition: none;`;
+        const labelOffsetPx = Math.round(vwPx(110));
+        labelWrap.style.cssText = `transform: translate(-50%, -${labelOffsetPx}px) scale(0.82); opacity: 0; transition: none;`;
 
         const makeLines = (side) => {
             const div = document.createElement('div');
@@ -487,7 +491,7 @@ async function playTileAnimation(wrap, combo) {
 
         labelWrap.getBoundingClientRect(); // force layout
         labelWrap.style.transition = `transform ${labelMs}ms cubic-bezier(0, 0, 0.2, 1), opacity ${labelMs}ms cubic-bezier(0, 0, 0.2, 1)`;
-        labelWrap.style.transform  = 'translate(-50%, -110px) scale(1)';
+        labelWrap.style.transform  = `translate(-50%, -${labelOffsetPx}px) scale(1)`;
         labelWrap.style.opacity    = '1';
 
         // action lines burst in just after the label starts

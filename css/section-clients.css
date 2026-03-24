@@ -1,84 +1,123 @@
 /* clients section */
 
-.scroll-content .clients-section {
-    position: relative;
-    margin-top: 0;
-}
-
 .clients-section {
-    position: absolute;
-    top: 0;
-    left: 0;
+    min-height: auto;
     width: 100%;
-    height: auto;
-    margin-top: var(--gap-xl);
+    padding: calc(var(--standard-margin) * 2) var(--standard-margin);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    
-    opacity: 0;
-    pointer-events: none;
-    z-index: 10;
-    transition: opacity 0.8s ease;
+    gap: var(--gap-xl);
 }
 
-.clients-section.is-active {
-    opacity: 1;
-    pointer-events: auto;
-}
+/* ── previous clients block ── */
 
-.clients-header {
-    margin-bottom: var(--gap-lg);
-    width: 100%;
-    text-align: left;
-}
-
-/* logo marquee with edge fade — disabled for now
-.logo-marquee {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
-} */
-
-.logo-track {
+.clients-previous {
     display: flex;
     align-items: center;
-    gap: var(--gap-lg);
-    width: max-content;
+    gap: calc(32 / 1920 * 100vw);
+    width: 50%;
+    align-self: center;
 
     opacity: 0;
-    transition: opacity var(--time-fade-out);
+    transform: translateY(calc(20 / 1920 * 100vw));
+    transition:
+        opacity var(--time-fade-in) var(--ease-standard),
+        transform var(--time-fade-in) var(--ease-standard);
 }
 
-.logo-track.is-visible {
+.clients-previous.is-visible {
     opacity: 1;
-    transition: opacity var(--time-fade-in);
+    transform: translateY(0);
 }
 
-/* logo marquee animation — disabled, logos are static for now
-.logo-track.has-seamless-animation {
-    animation: marquee-scroll var(--marquee-duration, 60s) linear infinite;
+.clients-paren {
+    font-size: var(--size-display-xl);
+    font-family: var(--font-subheader);
+    font-weight: 300;
+    font-variation-settings: 'wdth' 450;
+    color: var(--color-text-subheader);
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
 }
 
-@keyframes marquee-scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(var(--marquee-end)); }
-} */
+.clients-previous-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: calc(12 / 1920 * 100vw);
+    padding: var(--standard-margin) 0;
+    text-align: center;
+}
+
+.clients-previous-inner p {
+    opacity: 1;
+    filter: none;
+    max-width: 60%;
+    align-self: center;
+}
+
+
+/* ── press logos ── */
+
+.press-logos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    opacity: 0;
+    transform: translateY(calc(20 / 1920 * 100vw));
+    transition:
+        opacity var(--time-fade-in) var(--ease-standard),
+        transform var(--time-fade-in) var(--ease-standard);
+}
+
+.press-logos.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 
 .client-logo {
-    height: calc(80 / 1920 * 100vw);
+    height: calc(48 / 1920 * 100vw);
     width: auto;
-    max-width: calc(120 / 1920 * 100vw);
+    max-width: calc(140 / 1920 * 100vw);
     object-fit: contain;
-    opacity: 0.5; 
-    filter: grayscale(100%);
-    transition: opacity 0.3s ease, filter 0.3s ease;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
 }
 
 .client-logo:hover {
     opacity: 1;
-    filter: grayscale(0%);
+}
+
+@media (max-width: 768px) {
+    .clients-section {
+        padding: 60px 20px;
+        gap: 48px;
+    }
+
+    .clients-paren {
+        font-size: 48px;
+    }
+
+    .clients-previous {
+        width: 100%;
+        gap: 12px;
+    }
+
+    .clients-previous-inner {
+        gap: 10px;
+    }
+
+    .press-logos {
+        flex-wrap: wrap;
+        gap: 24px;
+        justify-content: center;
+    }
+
+    .client-logo {
+        height: 28px;
+        max-width: 80px;
+    }
 }
