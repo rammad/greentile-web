@@ -1,5 +1,40 @@
 /* events / calendar page */
 
+const STICKER_ASSETS = {
+    'coming-soon': {
+        blanks: [
+            'images/graphics/coming-soon/Blank/GTSC WEB EVENT STICKER_CS SHAPE 1 INSIDE BLANK.svg',
+            'images/graphics/coming-soon/Blank/GTSC WEB EVENT STICKER_CS SHAPE 3 INSIDE BLANK.svg',
+            'images/graphics/coming-soon/Blank/GTSC WEB EVENT STICKER_CS SHAPE 4 INSIDE BLANK.svg',
+        ],
+        text: 'images/graphics/coming-soon/Text only/GTSC WEB EVENT STICKER_CS INSIDE TEXT ONLY WHITE.svg',
+    },
+    'sold-out': {
+        blanks: [
+            'images/graphics/sold-out/Blank/GTSC WEB EVENT STICKER_SO SHAPE 1 BLANK.svg',
+            'images/graphics/sold-out/Blank/GTSC WEB EVENT STICKER_SO SHAPE 2 BLANK.svg',
+            'images/graphics/sold-out/Blank/GTSC WEB EVENT STICKER_SO SHAPE 3 BLANK.svg',
+            'images/graphics/sold-out/Blank/GTSC WEB EVENT STICKER_SO SHAPE 4 BLANK.svg',
+        ],
+        text: 'images/graphics/sold-out/Text only/GTSC WEB EVENT STICKER_SO TEXT ONLY WHITE.svg',
+    }
+};
+
+function randomPick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function buildBadgeHTML(type) {
+    const assets = STICKER_ASSETS[type];
+    return `<img class="badge-layer badge-layer-blank" src="${randomPick(assets.blanks)}" alt="">` +
+           `<img class="badge-layer badge-layer-text" src="${assets.text}" alt="">`;
+}
+
+function populateBadge(el, type) {
+    if (!el) return;
+    el.innerHTML = buildBadgeHTML(type);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const { staggerTime, wait, transitionHeader } = window.AnimationUtils;
 
@@ -68,6 +103,9 @@ function initEventInteractions() {
     const statusSoon = document.getElementById('status-soon');
     const statusSold = document.getElementById('status-sold');
 
+    populateBadge(statusSoon, 'coming-soon');
+    populateBadge(statusSold, 'sold-out');
+
     if (rows.length > 0 && posterWrapper && posterImg) {
         rows.forEach(row => {
             row.addEventListener('mouseenter', () => {
@@ -85,10 +123,14 @@ function initEventInteractions() {
                     posterImg.style.opacity = '1';
 
                     if (status === 'coming-soon') {
-                        if (statusSoon) statusSoon.style.opacity = '1';
+                        if (statusSoon) {
+                            populateBadge(statusSoon, 'coming-soon');
+                            statusSoon.style.opacity = '1';
+                        }
                         posterImg.style.opacity = '0';
                     } else if (status === 'sold-out') {
                         if (statusSold) {
+                            populateBadge(statusSold, 'sold-out');
                             statusSold.style.opacity = '1';
                             randomizeSticker(statusSold);
                         }
@@ -201,11 +243,11 @@ function initRowPacker() {
 
         const card = document.createElement('a');
         card.href = href;
-        card.className = 'grid-card';
+        card.className = 'grid-card' + (status ? ` grid-${status}` : '');
         card.innerHTML = `
             <img src="${imgUrl}" class="grid-card-poster" ${status === 'coming-soon' ? 'style="opacity: 0;">' : '>'}
-            ${status === 'coming-soon' ? '<div class="status-badge badge-soon"></div>' : ''}
-            ${status === 'sold-out' ? '<div class="status-badge badge-sold"></div>' : ''}
+            ${status === 'coming-soon' ? `<div class="status-badge badge-soon">${buildBadgeHTML('coming-soon')}</div>` : ''}
+            ${status === 'sold-out' ? `<div class="status-badge badge-sold">${buildBadgeHTML('sold-out')}</div>` : ''}
         `;
 
         currentGroup.items.push(card);
