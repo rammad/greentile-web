@@ -21,7 +21,7 @@
 }
 
 .socials-header .type-body1, .socials-header .type-body2 {
-    max-width: 50%;
+    max-width: 60%;
 }
 
 .socials-icons {
@@ -43,13 +43,26 @@
 .icon-circle {
     width: 64px;
     height: 64px;
-    background-color: var(--color-placeholder);
-    border-radius: 50%;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: transform 0.2s ease;
 }
+
+.icon-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+}
+
 .icon-circle:hover {
     transform: scale(1.1);
+}
+
+.icon-circle:hover img {
+    opacity: 0.2;
 }
 
 .socials-track {

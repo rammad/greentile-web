@@ -46,10 +46,11 @@
 } */
 
 /* variables */
+/* design base: 1920px — all calc() values resolve to their px equivalent at 1920px wide */
 :root {
     --c-off-white: #FFFCFA;
     --c-bright-green: #30FA30;
-    --c-lighter-green: #6bf86b; /* possibly for lighter gradient sections */
+    --c-lighter-green: #b9f8b9; /* possibly for lighter gradient sections */
     --c-dark-green: #0E4A0E;
     --c-black: #000000;
     /* --c-light-grey: #EDEDED; */
@@ -81,28 +82,28 @@
 
     --cascade-travel: 15%; /* vertical travel distance for char-reveal animations */
 
-    --blur-standard: 10px;
+    --blur-standard: 10px; /* fixed — blur does not scale with viewport */
 
-    --space-for-nav: 90px;
-    --standard-margin: 20px;
-    --standard-gap: 8px;
+    --space-for-nav:      calc(90  / 1920 * 100vw); /* 90px  */
+    --standard-margin:    calc(20  / 1920 * 100vw); /* 20px  */
+    --standard-gap:       calc(8   / 1920 * 100vw); /* 8px   */
 
     --poster-radius: 8%;
 
     /* desktop type sizes */
-    --size-display-hero: 8.6vw;
-    --size-display-xl: 160px;
-    --size-h1: 96px;
-    --size-h2: 64px;
-    --size-h3: 48px;
-    --size-subBold1: 20px; /* for mission */
-    --size-subBold2: 12px; /* for secondary info (ex event date) */
-    --size-subRegular1: 14px; /* for nav and buttons */
-    --size-subRegular2: 10px; /* for badges (ex pdp meta) */
-    --size-body1: 14px;
-    --size-body2: 36px;
+    --size-display-hero:   8.6vw;                    /* already vw */
+    --size-display-xl:    calc(160 / 1920 * 100vw); /* 160px */
+    --size-h1:            calc(96  / 1920 * 100vw); /* 96px  */
+    --size-h2:            calc(64  / 1920 * 100vw); /* 64px  */
+    --size-h3:            calc(48  / 1920 * 100vw); /* 48px  */
+    --size-subBold1:      calc(20  / 1920 * 100vw); /* 20px  — section label headers */
+    --size-subBold2:      calc(12  / 1920 * 100vw); /* 12px  — secondary info (event date, marquee) */
+    --size-subRegular1:   calc(14  / 1920 * 100vw); /* 14px  — nav and buttons */
+    --size-subRegular2:   calc(10  / 1920 * 100vw); /* 10px  — badges (pdp meta) */
+    --size-body1:         calc(14  / 1920 * 100vw); /* 14px  */
+    --size-body2:         calc(20  / 1920 * 100vw); /* 36px  */
 
-    /* mobile type sizes */
+    /* mobile type sizes — addressed in mobile pass, kept as px */
     --size-display-hero-mobile: 15vw;
     --size-display-xl-mobile: 100px;
     --size-h1-mobile: 96px;
@@ -112,10 +113,11 @@
     --size-body1-mobile: 14px;
     --size-body2-mobile: 24px;
 
-    --section-spacing: 200px;
-    --section-padding: 20px;
-    --section-nav-padding: 100px;
+    --section-spacing:         calc(200 / 1920 * 100vw); /* 200px */
+    --section-padding:         calc(20  / 1920 * 100vw); /* 20px  */
+    --section-nav-padding:     calc(100 / 1920 * 100vw); /* 100px */
 
+    /* mobile spacing — addressed in mobile pass, kept as px */
     --section-spacing-mobile: 80px;
     --section-padding-mobile: 20px;
     --section-nav-padding-mobile: 60px;
@@ -309,7 +311,7 @@ section {
     font-family: var(--font-body);
     font-size: var(--size-body2);
     font-weight: 300;
-    line-height: 1;
+    line-height: 1.2;
     /* font-variation-settings: 'SRFF' 25; */
 
     opacity: 0;
@@ -325,7 +327,7 @@ section {
 .header-hidden {
     opacity: 0 !important;
     filter: blur(var(--blur-standard));
-    transform: translateY(-15px);
+    transform: translateY(calc(-15 / 1920 * 100vw)); /* -15px */
     transition:
         opacity var(--time-fade-out) ease,
         filter var(--time-fade-out) ease,
@@ -394,10 +396,10 @@ section {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px;
-    min-width: calc(1em + 24px);
-    max-width: calc(1em + 24px);
-    border-radius: 100px;
+    padding: calc(12 / 1920 * 100vw);                          /* 12px  */
+    min-width: calc(1em + calc(24 / 1920 * 100vw));            /* 1em + 24px */
+    max-width: calc(1em + calc(24 / 1920 * 100vw));            /* 1em + 24px */
+    border-radius: 100px;                                       /* intentional pill — not scaled */
     background-color: var(--color-accent);
     color: transparent;
     text-decoration: none;
@@ -416,8 +418,8 @@ section {
 
 .cta-btn.is-visible {
     opacity: 1;
-    max-width: 400px;
-    padding: 12px 20px;
+    max-width: calc(400 / 1920 * 100vw);                       /* 400px */
+    padding: calc(12 / 1920 * 100vw) calc(20 / 1920 * 100vw); /* 12px 20px */
     color: var(--color-btn-text);
 }
 
@@ -442,7 +444,7 @@ section {
 .cta-btn .ui-roll-layer {
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: calc(40 / 1920 * 100vw); /* 40px */
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
@@ -514,13 +516,13 @@ section {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 88px;
-    height: 120px;
-    margin: -60px 0 0 -44px;
+    width: calc(88  / 1920 * 100vw);                                /* 88px  */
+    height: calc(120 / 1920 * 100vw);                               /* 120px */
+    margin: calc(-60 / 1920 * 100vw) 0 0 calc(-44 / 1920 * 100vw); /* -60px 0 0 -44px */
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    border-radius: 8px;
+    border-radius: calc(8 / 1920 * 100vw);                          /* 8px   */
     will-change: transform, opacity;
 }
 
@@ -540,7 +542,7 @@ section {
     left: 50%;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: calc(10 / 1920 * 100vw); /* 10px */
     white-space: nowrap;
     will-change: transform, opacity;
     pointer-events: none;
@@ -549,24 +551,24 @@ section {
 .curtain-action-lines {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: calc(6 / 1920 * 100vw); /* 6px */
     flex-shrink: 0;
 }
 .curtain-action-lines--left  { align-items: flex-end; }
 .curtain-action-lines--right { align-items: flex-start; }
 
 .curtain-action-line {
-    height: 3px;
+    height: calc(3 / 1920 * 100vw);        /* 3px */
     background: currentColor;
-    border-radius: 2px;
+    border-radius: calc(2 / 1920 * 100vw); /* 2px */
     opacity: 0;
     transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1), opacity 0.07s ease;
 }
 
 /* widths: flanks shorter, middle longest */
 .curtain-action-line:nth-child(1),
-.curtain-action-line:nth-child(3) { width: 14px; }
-.curtain-action-line:nth-child(2) { width: 22px; }
+.curtain-action-line:nth-child(3) { width: calc(14 / 1920 * 100vw); } /* 14px */
+.curtain-action-line:nth-child(2) { width: calc(22 / 1920 * 100vw); } /* 22px */
 
 /* radiating fan — lines hidden, each carrying its resting angle */
 .curtain-action-lines--left .curtain-action-line:nth-child(1) { transform: rotate(18deg) scaleX(0); transform-origin: right center; }
@@ -611,7 +613,7 @@ body::after {
     display: flex;
     top: 0;
     left: 0;
-    height: 7px;
+    height: calc(7 / 1920 * 100vw); /* 7px */
     width: auto;
     transform: scale(-100%);
 }
