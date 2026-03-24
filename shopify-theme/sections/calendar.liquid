@@ -1,0 +1,258 @@
+<section
+  class="calendar-page"
+  id="cal-page-container"
+  data-colors="{{ section.settings.gradient_color_1 }}, {{ section.settings.gradient_color_2 }}, {{ section.settings.gradient_color_3 }}"
+  data-edge="{{ section.settings.gradient_edge }}"
+>
+  <div class="calendar-header">
+    <h1 class="type-display-hero animate-cascade">{{ section.settings.title }}</h1>
+    <div class="calendar-controls">
+      <div class="text-mask">
+        <span class="type-subRegular1 text-reveal-inner">Filters</span>
+      </div>
+    </div>
+    <div class="calendar-controls">
+      <div class="filters-list">
+        <button class="filter-btn type-subRegular1 ui-roll roll-hover active">
+          <span class="ui-roll-layer ui-roll-visible">All</span>
+          <span class="ui-roll-layer ui-roll-hidden">All</span>
+        </button>
+        {% for block in section.blocks %}
+          {% if block.type == 'month_filter' %}
+            <button class="filter-btn type-subRegular1 ui-roll roll-hover" {{ block.shopify_attributes }}>
+              <span class="ui-roll-layer ui-roll-visible">{{ block.settings.label }}</span>
+              <span class="ui-roll-layer ui-roll-hidden">{{ block.settings.label }}</span>
+            </button>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="filters-list">
+        <div class="view-controls">
+          <button class="view-btn type-subRegular1 ui-roll roll-hover active" id="btn-list">
+            <span class="ui-roll-layer ui-roll-visible">List</span>
+            <span class="ui-roll-layer ui-roll-hidden">List</span>
+          </button>
+          <span class="divider">/</span>
+          <button class="view-btn type-subRegular1 ui-roll roll-hover" id="btn-grid">
+            <span class="ui-roll-layer ui-roll-visible">Grid</span>
+            <span class="ui-roll-layer ui-roll-hidden">Grid</span>
+          </button>
+          <span class="divider">/</span>
+          <a
+            href="{{ section.settings.archives_url | default: '/pages/archives' }}"
+            class="filter-btn type-subRegular1 ui-roll roll-hover"
+          >
+            <span class="ui-roll-layer ui-roll-visible">Archives</span>
+            <span class="ui-roll-layer ui-roll-hidden">Archives</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calendar-body">
+    <div class="calendar-interface-wrapper">
+      <div class="calendar-list">
+        {% for block in section.blocks %}
+          {% if block.type == 'event_row' %}
+            <a
+              href="{{ block.settings.url | default: '#' }}"
+              class="calendar-row"
+              data-img="{% if block.settings.poster %}{{ block.settings.poster | image_url: width: 800 }}{% endif %}"
+              data-title="{{ block.settings.title }}"
+              {% if block.settings.status != 'none' %}
+                data-status="{{ block.settings.status }}"
+              {% endif %}
+              {{ block.shopify_attributes }}
+            >
+              <span class="cal-date type-h2">{{ block.settings.date_display }}</span><span class="cal-name type-h2">{{ block.settings.title }}</span>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="calendar-poster-wrapper" id="poster-wrapper">
+        <img src="" alt="Event Poster" class="calendar-poster-img" id="poster-img">
+        <div class="status-badge badge-soon" id="status-soon"></div>
+        <div class="status-badge badge-sold" id="status-sold"></div>
+      </div>
+    </div>
+    <div id="dynamic-grid-container" class="calendar-grid-packed"></div>
+  </div>
+</section>
+
+<script src="{{ 'section-calendar.js' | asset_url }}"></script>
+
+{% schema %}
+{
+  "name": "Events calendar",
+  "max_blocks": 30,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Spring Calendar 2025"
+    },
+    {
+      "type": "url",
+      "id": "archives_url",
+      "label": "Archives page URL"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#e6f8e6"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "range",
+      "id": "gradient_edge",
+      "label": "Gradient edge",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "month_filter",
+      "name": "Month filter",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Month"
+        }
+      ]
+    },
+    {
+      "type": "event_row",
+      "name": "Event row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Event Name"
+        },
+        {
+          "type": "text",
+          "id": "date_display",
+          "label": "Date display",
+          "default": "03.07"
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Poster"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "status",
+          "label": "Status",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "coming-soon", "label": "Coming soon" },
+            { "value": "sold-out", "label": "Sold out" }
+          ],
+          "default": "none"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Events calendar",
+      "blocks": [
+        {
+          "type": "month_filter",
+          "settings": { "label": "March" }
+        },
+        {
+          "type": "month_filter",
+          "settings": { "label": "April" }
+        },
+        {
+          "type": "month_filter",
+          "settings": { "label": "May" }
+        },
+        {
+          "type": "event_row",
+          "settings": {
+            "title": "Intro to Mahjong",
+            "date_display": "03.07",
+            "status": "none"
+          }
+        },
+        {
+          "type": "event_row",
+          "settings": {
+            "title": "Monthly Meetup",
+            "date_display": "03.10",
+            "status": "none"
+          }
+        },
+        {
+          "type": "event_row",
+          "settings": {
+            "title": "Mott Street Girls x GTSC",
+            "date_display": "03.23",
+            "status": "none"
+          }
+        },
+        {
+          "type": "event_row",
+          "settings": {
+            "title": "Mahjong After Hours",
+            "date_display": "04.04",
+            "status": "none"
+          }
+        },
+        {
+          "type": "event_row",
+          "settings": {
+            "title": "Monthly Meetup",
+            "date_display": "04.14",
+            "status": "none"
+          }
+        },
+        {
+          "type": "event_row",
+          "settings": {
+            "title": "Spring Mahjong Supperclub",
+            "date_display": "05.02",
+            "status": "none"
+          }
+        },
+        {
+          "type": "event_row",
+          "settings": {
+            "title": "Mahjong After Hours",
+            "date_display": "05.05",
+            "status": "none"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

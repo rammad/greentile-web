@@ -1,0 +1,20 @@
+{
+  "current": {
+    "color_off_white": "#FFFCFA",
+    "color_bright_green": "#30FA30",
+    "color_dark_green": "#0E4A0E",
+    "color_yellow": "#FDE523",
+    "color_light_yellow": "#feea4f",
+    "social_instagram": "https://instagram.com/greentilesocialclub",
+    "social_tiktok": "https://tiktok.com/@greentilesocialclub",
+    "social_discord": "https://discord.gg/mwgd9P3cb4",
+    "footer_marquee_1": "our podcast greenroom now on spotify",
+    "footer_marquee_2": "STREAM GTSC SOUNDS @ PARLOR",
+    "footer_display_text": "Green Tile Social Club",
+    "footer_gradient_color_1": "#30FA30",
+    "footer_gradient_color_2": "#FFFCFA",
+    "footer_gradient_color_3": "#FDE523",
+    "sections": {},
+    "content_for_index": []
+  }
+}

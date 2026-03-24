@@ -1,0 +1,66 @@
+<section id="clients" class="clients-section">
+  <div class="clients-previous">
+    <span class="clients-paren">(</span>
+    <div class="clients-previous-inner">
+      <span class="type-subBold2">{{ section.settings.label }}</span>
+      <p class="type-body1">{{ section.settings.client_list }}</p>
+    </div>
+    <span class="clients-paren">)</span>
+  </div>
+  <div class="press-logos">
+    {% for block in section.blocks %}
+      {% if block.type == 'press_logo' and block.settings.image %}
+        <img src="{{ block.settings.image | image_url: width: 400 }}" class="client-logo" alt="{{ block.settings.image.alt | default: '' }}" {{ block.shopify_attributes }}>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+<script src="{{ 'section-clients.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Clients",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "PREVIOUS CLIENTS"
+    },
+    {
+      "type": "textarea",
+      "id": "client_list",
+      "label": "Client list",
+      "default": "Anheuser-Busch, Boston Consulting Group, Brookfield, Citi, Chelsea Piers, Deloitte, Holwell, Shuster & Goldberg, Jefferies, Meta, Prose, Publicis, Ralph Lauren, Reddit, Schroders, Soho Grand, Stripe, Visa"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "press_logo",
+      "name": "Press logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Clients",
+      "blocks": [
+        { "type": "press_logo" },
+        { "type": "press_logo" },
+        { "type": "press_logo" },
+        { "type": "press_logo" },
+        { "type": "press_logo" },
+        { "type": "press_logo" },
+        { "type": "press_logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,63 @@
+<nav class="sticky-nav">
+  <div class="nav-left">
+    <a href="/" class="logo-link">
+      <img src="{{ 'gtsc-logo-1tile.svg' | asset_url }}" class="nav-logo" alt="{{ shop.name }}">
+    </a>
+  </div>
+  <div class="nav-center">
+    {% for block in section.blocks %}
+      {% if block.type == 'nav_link' %}
+        <a href="{{ block.settings.url }}" class="type-subRegular1 ui-roll roll-hover" {{ block.shopify_attributes }}>
+          <span class="ui-roll-layer ui-roll-visible">{{ block.settings.label }}</span>
+          <span class="ui-roll-layer ui-roll-hidden">{{ block.settings.label }}</span>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div class="nav-right">
+    {% if section.settings.right_link_label != blank %}
+      <a href="{{ section.settings.right_link_url | default: '#' }}" class="type-subRegular1 ui-roll roll-hover">
+        <span class="ui-roll-layer ui-roll-visible">{{ section.settings.right_link_label }}</span>
+        <span class="ui-roll-layer ui-roll-hidden">{{ section.settings.right_link_label }}</span>
+      </a>
+    {% endif %}
+  </div>
+</nav>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "text",
+      "id": "right_link_label",
+      "label": "Right Link Label",
+      "default": "SAY HI"
+    },
+    {
+      "type": "url",
+      "id": "right_link_url",
+      "label": "Right Link URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Nav Link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Link"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

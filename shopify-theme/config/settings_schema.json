@@ -1,0 +1,119 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Green Tile Social Club",
+    "theme_version": "1.0.0",
+    "theme_author": "GTSC",
+    "theme_documentation_url": "",
+    "theme_support_url": ""
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_off_white",
+        "label": "Off White / Background",
+        "default": "#FFFCFA"
+      },
+      {
+        "type": "color",
+        "id": "color_bright_green",
+        "label": "Bright Green / Accent",
+        "default": "#30FA30"
+      },
+      {
+        "type": "color",
+        "id": "color_dark_green",
+        "label": "Dark Green / Text",
+        "default": "#0E4A0E"
+      },
+      {
+        "type": "color",
+        "id": "color_yellow",
+        "label": "Yellow",
+        "default": "#FDE523"
+      },
+      {
+        "type": "color",
+        "id": "color_light_yellow",
+        "label": "Light Yellow",
+        "default": "#feea4f"
+      }
+    ]
+  },
+  {
+    "name": "Social Media",
+    "settings": [
+      {
+        "type": "url",
+        "id": "social_instagram",
+        "label": "Instagram URL",
+        "default": "https://instagram.com/greentilesocialclub"
+      },
+      {
+        "type": "url",
+        "id": "social_tiktok",
+        "label": "TikTok URL",
+        "default": "https://tiktok.com/@greentilesocialclub"
+      },
+      {
+        "type": "url",
+        "id": "social_discord",
+        "label": "Discord URL",
+        "default": "https://discord.gg/mwgd9P3cb4"
+      }
+    ]
+  },
+  {
+    "name": "Footer",
+    "settings": [
+      {
+        "type": "text",
+        "id": "footer_marquee_1",
+        "label": "Marquee Line 1",
+        "default": "our podcast greenroom now on spotify"
+      },
+      {
+        "type": "url",
+        "id": "footer_marquee_1_url",
+        "label": "Marquee Line 1 URL"
+      },
+      {
+        "type": "text",
+        "id": "footer_marquee_2",
+        "label": "Marquee Line 2",
+        "default": "STREAM GTSC SOUNDS @ PARLOR"
+      },
+      {
+        "type": "url",
+        "id": "footer_marquee_2_url",
+        "label": "Marquee Line 2 URL"
+      },
+      {
+        "type": "text",
+        "id": "footer_display_text",
+        "label": "Footer Display Text",
+        "default": "Green Tile Social Club"
+      },
+      {
+        "type": "color",
+        "id": "footer_gradient_color_1",
+        "label": "Footer Gradient Color 1",
+        "default": "#30FA30"
+      },
+      {
+        "type": "color",
+        "id": "footer_gradient_color_2",
+        "label": "Footer Gradient Color 2",
+        "default": "#FFFCFA"
+      },
+      {
+        "type": "color",
+        "id": "footer_gradient_color_3",
+        "label": "Footer Gradient Color 3",
+        "default": "#FDE523"
+      }
+    ]
+  }
+]

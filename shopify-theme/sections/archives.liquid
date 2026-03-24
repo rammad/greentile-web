@@ -1,0 +1,126 @@
+<section
+  class="archives-page"
+  data-colors="{{ section.settings.gradient_color_1 }}, {{ section.settings.gradient_color_2 }}, {{ section.settings.gradient_color_3 }}"
+  data-edge="{{ section.settings.gradient_edge }}"
+>
+  <div class="archives-header">
+    <a href="{{ section.settings.back_url | default: '/pages/events' }}" class="back-arrow">
+      <img src="{{ 'arrow-right.png' | asset_url }}" alt="Back to Events">
+    </a>
+    <h1 class="archives-title animate-cascade">{{ section.settings.title }}</h1>
+  </div>
+
+  <div id="dynamic-archive-container">
+    {% for block in section.blocks %}
+      {% if block.type == 'archive_item' and block.settings.image %}
+        <a
+          href="{{ block.settings.url | default: '#' }}"
+          class="archive-cell"
+          data-month="{{ block.settings.month_label }}"
+          {{ block.shopify_attributes }}
+        >
+          <img src="{{ block.settings.image | image_url: width: 600 }}" class="archive-poster" alt="">
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <div class="load-more-container">
+    <button id="btn-load-more" class="cta-btn">
+      <div class="ui-roll roll-hover">
+        <span class="type-subRegular1 ui-roll-layer ui-roll-visible">Load More</span>
+        <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">Load More</span>
+      </div>
+    </button>
+  </div>
+</section>
+
+<script src="{{ 'section-archives.js' | asset_url }}"></script>
+
+{% schema %}
+{
+  "name": "Event archives",
+  "max_blocks": 50,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Event Archives"
+    },
+    {
+      "type": "url",
+      "id": "back_url",
+      "label": "Back link URL"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#dcf8dc"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "range",
+      "id": "gradient_edge",
+      "label": "Gradient edge",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "archive_item",
+      "name": "Archive item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "month_label",
+          "label": "Month label",
+          "default": "March 2025"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Event archives",
+      "blocks": [
+        { "type": "archive_item", "settings": { "month_label": "March 2025" } },
+        { "type": "archive_item", "settings": { "month_label": "April 2025" } },
+        { "type": "archive_item", "settings": { "month_label": "May 2025" } },
+        { "type": "archive_item", "settings": { "month_label": "March 2025" } },
+        { "type": "archive_item", "settings": { "month_label": "April 2025" } },
+        { "type": "archive_item", "settings": { "month_label": "May 2025" } },
+        { "type": "archive_item", "settings": { "month_label": "March 2025" } },
+        { "type": "archive_item", "settings": { "month_label": "April 2025" } },
+        { "type": "archive_item", "settings": { "month_label": "May 2025" } },
+        { "type": "archive_item", "settings": { "month_label": "March 2025" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

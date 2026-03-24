@@ -1,0 +1,100 @@
+<section
+  id="mission"
+  class="mission-section"
+  data-colors="{{ section.settings.gradient_color_1 }}, {{ section.settings.gradient_color_2 }}, {{ section.settings.gradient_color_3 }}"
+>
+  <div class="text-mask">
+    <span class="type-subBold1 text-reveal-inner">{{ section.settings.label }}</span>
+  </div>
+  {% for block in section.blocks %}
+    {% if block.type == 'line' %}
+      <h1 class="type-display-hero animate-line" {{ block.shopify_attributes }}>{{ block.settings.text }}</h1>
+    {% endif %}
+  {% endfor %}
+</section>
+<script src="{{ 'section-mission.js' | asset_url }}" defer></script>
+<div class="section-spacer"></div>
+
+{% schema %}
+{
+  "name": "Mission",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "mission"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#30FA30"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#feea4f"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "line",
+      "name": "Line",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Mission line"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    {
+      "name": "Mission",
+      "blocks": [
+        {
+          "type": "line",
+          "settings": {
+            "text": "Since day one, we've been"
+          }
+        },
+        {
+          "type": "line",
+          "settings": {
+            "text": "about creating Asian"
+          }
+        },
+        {
+          "type": "line",
+          "settings": {
+            "text": "American spaces +"
+          }
+        },
+        {
+          "type": "line",
+          "settings": {
+            "text": "experiences that center"
+          }
+        },
+        {
+          "type": "line",
+          "settings": {
+            "text": "and celebrate our joy."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

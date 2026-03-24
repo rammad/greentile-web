@@ -1,0 +1,108 @@
+/* featured section */
+
+.featured-section {
+    position: relative;
+    width: 100%;
+    min-height: 120vh;
+}
+
+/* clips blurred bg to section bounds — sibling to .featured-frame so sticky is unaffected */
+.featured-bg-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* oversized vertically so the parallax shift never reveals empty space */
+.featured-bg-img {
+    position: absolute;
+    top: -20%;
+    left: calc(-80 / 1920 * 100vw);
+    right: calc(-80 / 1920 * 100vw);
+    width: calc(100% + calc(160 / 1920 * 100vw));
+    height: 140%;
+    object-fit: cover;
+    object-position: center;
+    filter: blur(48px);
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+    will-change: transform;
+}
+
+/* frame fills the section and centres its children; parallax handled by JS */
+.featured-frame {
+    position: relative;
+    width: 100%;
+    min-height: 120vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+/* marquee fills the frame; translateY driven by phase 1 in JS */
+.featured-marquee-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+    will-change: transform;
+}
+
+.featured-marquee-track {
+    display: flex;
+    gap: calc(40 / 1920 * 100vw);
+    white-space: nowrap;
+    animation: featured-scroll 90s linear infinite;
+    will-change: transform;
+}
+
+.featured-marquee-item {
+    color: rgba(255, 255, 255, 1);
+    flex-shrink: 0;
+}
+
+@keyframes featured-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+/* poster — translateY driven by phase 2 in JS; sits on top of marquee */
+.featured-poster-wrap {
+    position: relative;
+    z-index: 3;
+    height: calc(100vh - var(--space-for-nav) - var(--standard-margin));
+    aspect-ratio: 4 / 5;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: var(--poster-radius);
+    will-change: transform;
+}
+
+.featured-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .featured-poster-wrap {
+        height: auto;
+        width: min(72vw, 300px);
+        max-height: none;
+    }
+
+    .featured-marquee-item {
+        font-size: clamp(64px, 18vw, 100px);
+    }
+}

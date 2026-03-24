@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>
+    {{- page_title -}}
+    {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+    {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+    {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+  </title>
+
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}">
+  {% endif %}
+
+  {{ content_for_header }}
+
+  {%- comment -%} Typekit (angie-sans) {%- endcomment -%}
+  <link rel="stylesheet" href="https://use.typekit.net/fbu0ukm.css">
+
+  {%- comment -%} Self-hosted fonts {%- endcomment -%}
+  <style>
+    @font-face {
+      font-family: 'OT Jubilee Golden';
+      src: url({{ 'OTJubilee-GoldenExtrabold.otf' | asset_url }}) format('opentype');
+      font-weight: 800;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Obviously Sans';
+      src: url({{ 'ObviouslyVariable.ttf' | asset_url }}) format('truetype');
+      font-weight: 100 900;
+      font-stretch: 25% 400%;
+      font-style: normal;
+      font-display: swap;
+    }
+  </style>
+
+  {%- comment -%} Core CSS {%- endcomment -%}
+  {{ 'base.css' | asset_url | stylesheet_tag }}
+  {{ 'nav.css' | asset_url | stylesheet_tag }}
+  {{ 'footer.css' | asset_url | stylesheet_tag }}
+
+  {%- comment -%} Section CSS — loaded for all pages (small files, cached) {%- endcomment -%}
+  {{ 'section-hero.css' | asset_url | stylesheet_tag }}
+  {{ 'section-about.css' | asset_url | stylesheet_tag }}
+  {{ 'section-events.css' | asset_url | stylesheet_tag }}
+  {{ 'section-featured.css' | asset_url | stylesheet_tag }}
+  {{ 'section-socials.css' | asset_url | stylesheet_tag }}
+  {{ 'section-mission.css' | asset_url | stylesheet_tag }}
+  {{ 'section-what-we-do.css' | asset_url | stylesheet_tag }}
+  {{ 'section-team.css' | asset_url | stylesheet_tag }}
+  {{ 'section-clients.css' | asset_url | stylesheet_tag }}
+  {{ 'section-calendar.css' | asset_url | stylesheet_tag }}
+  {{ 'section-product.css' | asset_url | stylesheet_tag }}
+  {{ 'section-archives.css' | asset_url | stylesheet_tag }}
+
+  {%- comment -%} Page-specific overrides {%- endcomment -%}
+  {% if template == 'product' %}
+    <style>
+      html { overflow: hidden !important; height: 100% !important; }
+      body { overflow: hidden !important; height: 100% !important; overscroll-behavior-y: none; }
+      @media (max-width: 1024px) {
+        html { overflow: auto !important; height: auto !important; }
+        body { overflow: visible !important; height: auto !important; }
+      }
+    </style>
+  {% endif %}
+  {% if template.suffix == 'events' or template.suffix == 'archives' %}
+    <style>body { background-color: transparent; }</style>
+  {% endif %}
+  {% if template.suffix == 'archives' %}
+    <style>html, body { overflow: auto !important; height: auto !important; }</style>
+  {% endif %}
+
+  {%- comment -%} CDN libraries {%- endcomment -%}
+  {% unless template == 'product' %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  {% endunless %}
+  {% if template == 'index' or template.suffix == 'about-us' %}
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.0.43/dist/lenis.min.js"></script>
+  {% endif %}
+</head>
+
+<body>
+  <div id="page-curtain"></div>
+
+  {% unless template == 'product' %}
+    <canvas id="gradient-canvas"></canvas>
+  {% endunless %}
+
+  {% section 'header' %}
+
+  {% if template == 'index' or template.suffix == 'about-us' %}
+    <div id="scroll-viewport" class="scroll-viewport">
+      <div id="scroll-content" class="scroll-content">
+  {% endif %}
+
+  <main role="main">
+    {{ content_for_layout }}
+  </main>
+
+  {% if template == 'index' or template.suffix == 'about-us' %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% unless template.suffix == 'events' or template.suffix == 'archives' %}
+    {% section 'footer' %}
+  {% endunless %}
+
+  {%- comment -%} Asset URL config for JS modules {%- endcomment -%}
+  {% render 'js-asset-config' %}
+
+  <script src="{{ 'global.js' | asset_url }}" defer></script>
+  {% unless template == 'product' %}
+    <script src="{{ 'background-gradient.js' | asset_url }}" defer></script>
+  {% endunless %}
+  {% if template == 'index' or template.suffix == 'about-us' %}
+    <script src="{{ 'scroll.js' | asset_url }}" defer></script>
+  {% endif %}
+</body>
+</html>

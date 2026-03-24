@@ -1,0 +1,56 @@
+<section
+  id="hero"
+  class="hero standard-margins"
+  data-colors="{{ section.settings.gradient_color_1 }}, {{ section.settings.gradient_color_2 }}, {{ section.settings.gradient_color_3 }}"
+  data-edge="{{ section.settings.gradient_edge }}"
+>
+  <h1 class="type-display-hero animate-cascade fit-text">{{ section.settings.title }}</h1>
+</section>
+<script src="{{ 'section-hero.js' | asset_url }}" defer></script>
+<div class="section-spacer"></div>
+
+{% schema %}
+{
+  "name": "Hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Green Tile Social Club"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#30FA30"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#feea4f"
+    },
+    {
+      "type": "range",
+      "id": "gradient_edge",
+      "label": "Gradient edge",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero"
+    }
+  ]
+}
+{% endschema %}

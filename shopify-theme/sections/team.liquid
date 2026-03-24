@@ -1,0 +1,101 @@
+<section
+  id="team"
+  class="team-section"
+  data-colors="{{ section.settings.gradient_color_1 }}, {{ section.settings.gradient_color_2 }}, {{ section.settings.gradient_color_3 }}"
+  data-edge="{{ section.settings.gradient_edge }}"
+>
+  <div class="team-layout">
+    <div class="team-title-col">
+      <div class="team-title-inner">
+        <div class="type-h1 team-title-text animate-line">{{ section.settings.title }}</div>
+      </div>
+    </div>
+    <div class="team-images-col">
+      {% for block in section.blocks %}
+        {% if block.type == 'team_photo' and block.settings.image %}
+          <div class="team-poster-wrap" {{ block.shopify_attributes }}>
+            <img class="team-poster" src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.image.alt | default: 'Team Member' }}">
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="team-text-col">
+      <div class="team-text-sticky">
+        <p class="team-names type-body1">{{ section.settings.names_text }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="{{ 'section-team.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Team",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "MEET THE TEAM"
+    },
+    {
+      "type": "textarea",
+      "id": "names_text",
+      "label": "Names",
+      "default": "Marcus Okafor, Priya Nair, Tyler Kowalski, Fatima Al-Rashid, Jordan Beaumont, Yuki Tanaka, Carmen Reyes, Elijah Brooks, Sofia Andersen, Dev Patel, Naomi Fletcher, Rami Khalil, Ingrid Svensson, Kwame Asante, Lucia Ferretti, Tobias Müller, Aaliyah Johnson, Sebastián Cruz, Mei-Ling Cho, Finn O'Sullivan, Zara Osei, Nikolai Petrov, Amara Diallo, Blake Harrington, Hana Mizrahi, Olusegun Adeyemi, Valentina Moreau, Isaac Nakamura, Celine Dubois, Andre Simmons"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#dcf8dc"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "range",
+      "id": "gradient_edge",
+      "label": "Gradient edge",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "team_photo",
+      "name": "Team photo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "Team",
+      "blocks": [
+        { "type": "team_photo" },
+        { "type": "team_photo" },
+        { "type": "team_photo" },
+        { "type": "team_photo" }
+      ]
+    }
+  ]
+}
+{% endschema %}
