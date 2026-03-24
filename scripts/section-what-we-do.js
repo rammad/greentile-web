@@ -121,6 +121,7 @@
     const TIME_FADE_IN  = 0.6;
     const TIME_FADE_OUT = 0.25;
     const BODY_BLUR_PX  = 8;
+    const BODY_GAP_VH   = 0.05;
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('about');
@@ -252,6 +253,11 @@
             const justBecameUnpinned = !isPinned && wasPinned;
 
             if (menuEl) menuEl.classList.toggle('is-pinned', isPinned);
+
+            if (bodyEl && menuEl && isPinned) {
+                const gap = vpRect.height * BODY_GAP_VH;
+                bodyEl.style.top = `${menuEl.getBoundingClientRect().bottom + gap}px`;
+            }
 
             const blocks = bodyEl ? Array.from(bodyEl.querySelectorAll('.about-text-block')) : [];
 

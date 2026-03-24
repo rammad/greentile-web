@@ -43,7 +43,7 @@
     height: 1.8em;
     width: calc(1.8em * 0.8);
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: var(--poster-radius);
     vertical-align: middle;
     margin: 0 0.3em;
     flex-shrink: 0;

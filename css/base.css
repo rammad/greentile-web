@@ -84,11 +84,11 @@
 
     --blur-standard: 10px; /* fixed — blur does not scale with viewport */
 
-    --space-for-nav:      calc(90  / 1920 * 100vw); /* 90px  */
+    --space-for-nav:      calc(80  / 1920 * 100vw); /* 90px  */
     --standard-margin:    calc(20  / 1920 * 100vw); /* 20px  */
     --standard-gap:       calc(8   / 1920 * 100vw); /* 8px   */
 
-    --poster-radius: 8%;
+    --poster-radius: 8% / 6.4%; /* 8% * 4/5 = %6.4 */
 
     /* desktop type sizes */
     --size-display-hero:   8.6vw;                    /* already vw */
@@ -419,7 +419,7 @@ section {
 .cta-btn.is-visible {
     opacity: 1;
     max-width: calc(400 / 1920 * 100vw);                       /* 400px */
-    padding: calc(12 / 1920 * 100vw) calc(20 / 1920 * 100vw); /* 12px 20px */
+    padding: calc(14 / 1920 * 100vw) calc(20 / 1920 * 100vw) calc(10 / 1920 * 100vw); /* 14px 20px 10px — optical center */
     color: var(--color-btn-text);
 }
 

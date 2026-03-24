@@ -356,25 +356,23 @@ class MarqueeManager {
     }
 }
 
-// each combo defines the tile images shown and the mahjong call label
-// type: 'pong' (3 of a kind) | 'chow' (3-tile sequence) | 'gong' (4 of a kind)
 const T = (name) => `images/graphics/tiles/two-tone/${name}.png`;
 const CURTAIN_COMBOS = [
-    // --- pongs (6) ---
+    // pongs
     { type: 'pong', tiles: [T('East'),        T('East'),        T('East')]        },
     { type: 'pong', tiles: [T('West'),        T('West'),        T('West')]        },
     { type: 'pong', tiles: [T('Fortune'),     T('Fortune'),     T('Fortune')]     },
     { type: 'pong', tiles: [T('White Board'), T('White Board'), T('White Board')] },
     { type: 'pong', tiles: [T('7 Circles'),   T('7 Circles'),   T('7 Circles')]   },
     { type: 'pong', tiles: [T('5 Sticks'),    T('5 Sticks'),    T('5 Sticks')]    },
-    // --- chows (6) ---
+    // chows
     { type: 'chow', tiles: [T('1 Circle'),    T('2 Circles'),   T('3 Circles')]   },
     { type: 'chow', tiles: [T('7 Circles'),   T('8 Circles'),   T('9 Circles')]   },
     { type: 'chow', tiles: [T('4 Sticks'),    T('5 Sticks'),    T('6 Sticks')]    },
     { type: 'chow', tiles: [T('1 Stick'),     T('2 Sticks'),    T('3 Sticks')]    },
     { type: 'chow', tiles: [T('10 Thousand'), T('20 Thousand'), T('30 Thousand')] },
     { type: 'chow', tiles: [T('40 Thousand'), T('50 Thousand'), T('60 Thousand')] },
-    // --- gongs (4) ---
+    // gongs
     { type: 'gong', tiles: [T('Center'),   T('Center'),   T('Center'),   T('Center')]   },
     { type: 'gong', tiles: [T('Fortune'),  T('Fortune'),  T('Fortune'),  T('Fortune')]  },
     { type: 'gong', tiles: [T('1 Circle'), T('1 Circle'), T('1 Circle'), T('1 Circle')] },
@@ -432,7 +430,7 @@ async function playTileAnimation(wrap, combo) {
     const fadeMs   = 340;
     const snapMs   = 320;
     const labelMs  = 260;
-    const holdMs   = 60;  // very short hold — curtain rises right at the click
+    const holdMs   = 240;
 
     const fadeEase = 'cubic-bezier(0, 0, 0.05, 1)';      // strong ease-out fade
     const snapEase = 'cubic-bezier(0.99, 0, 0.15, 1.6)'; // pinned still, explosive snap, hard overshoot

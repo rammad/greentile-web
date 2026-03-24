@@ -24,7 +24,7 @@
     right: 0;
     width: 100%;
     height: calc(100vh - var(--space-for-nav));
-    padding: var(--pdp-v-padding) var(--standard-margin);
+    padding: calc(var(--pdp-v-padding) - 10px) var(--standard-margin) var(--pdp-v-padding);
     box-sizing: border-box;
 }
 
