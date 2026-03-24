@@ -11,7 +11,7 @@
     left: 0;
     width: 100%;
     height: auto;
-    margin-top: 120px;
+    margin-top: var(--gap-xl);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -29,7 +29,7 @@
 }
 
 .clients-header {
-    margin-bottom: 64px;
+    margin-bottom: var(--gap-lg);
     width: 100%;
     text-align: left;
 }
@@ -46,7 +46,7 @@
 .logo-track {
     display: flex;
     align-items: center;
-    gap: 64px; 
+    gap: var(--gap-lg);
     width: max-content;
 
     opacity: 0;
@@ -69,9 +69,9 @@
 } */
 
 .client-logo {
-    height: 80px;
+    height: calc(80 / 1920 * 100vw);
     width: auto;
-    max-width: 120px;
+    max-width: calc(120 / 1920 * 100vw);
     object-fit: contain;
     opacity: 0.5; 
     filter: grayscale(100%);

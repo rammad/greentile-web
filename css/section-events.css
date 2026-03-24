@@ -83,7 +83,7 @@
 
 .events-content-footer {
     position: absolute;
-    bottom: -80px;
+    bottom: calc(-80 / 1920 * 100vw);
     left: 0;
     right: 0;
     display: flex;

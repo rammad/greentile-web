@@ -50,8 +50,11 @@
 :root {
     --c-off-white: #FFFCFA;
     --c-bright-green: #30FA30;
-    --c-lighter-green: #b4f8b4; /* possibly for lighter gradient sections */
+    --c-mid-green: #23AA21;
+    --c-lighter-green: #e6f8e6; /* possibly for lighter gradient sections */
     --c-dark-green: #0E4A0E;
+    --c-dark-green-20: #CFDBCF; /* 20% of dark green */
+    --c-dark-green-50: #87A587; /* 50% of dark green */
     --c-black: #000000;
     /* --c-light-grey: #EDEDED; */
     --c-light-grey: #E2DEDB;
@@ -84,9 +87,11 @@
 
     --blur-standard: 10px; /* fixed — blur does not scale with viewport */
 
-    --space-for-nav:      calc(80  / 1920 * 100vw); /* 90px  */
+    --space-for-nav:      calc(80  / 1920 * 100vw); /* 80px  */
     --standard-margin:    calc(20  / 1920 * 100vw); /* 20px  */
     --standard-gap:       calc(8   / 1920 * 100vw); /* 8px   */
+    --gap-lg:             calc(64  / 1920 * 100vw); /* 64px  — component-level gap */
+    --gap-xl:             calc(120 / 1920 * 100vw); /* 120px — section-level gap   */
 
     --poster-radius: 8% / 6.4%; /* 8% * 4/5 = %6.4 */
 

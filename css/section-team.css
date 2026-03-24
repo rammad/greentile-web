@@ -40,7 +40,7 @@
     width: 100%;
     overflow: hidden;
     opacity: 0;
-    transform: translateY(32px);
+    transform: translateY(calc(32 / 1920 * 100vw));
     transition:
         opacity 0.8s ease,
         transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);

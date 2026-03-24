@@ -12,7 +12,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 64px;
+    gap: var(--gap-lg);
 }
 
 /* text block — full width so JS line measurements are stable */

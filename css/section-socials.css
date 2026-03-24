@@ -9,11 +9,11 @@
     min-height: 100vh;
     width: 100%;
     position: relative;
-    margin-bottom: 120px;
+    margin-bottom: var(--gap-xl);
 }
 
 .socials-header {
-    padding: 20vh 20px;
+    padding: 20vh var(--standard-margin);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -26,10 +26,10 @@
 
 .socials-icons {
     display: flex;
-    gap: 16px;
+    gap: calc(16 / 1920 * 100vw);
     justify-content: center;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(calc(20 / 1920 * 100vw));
     transition: 
         opacity var(--time-fade-in) var(--ease-standard), 
         transform var(--time-fade-in) var(--ease-standard);
@@ -41,8 +41,8 @@
 }
 
 .icon-circle {
-    width: 64px;
-    height: 64px;
+    width: calc(64 / 1920 * 100vw);
+    height: calc(64 / 1920 * 100vw);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -67,20 +67,20 @@
 
 .socials-track {
     display: flex;
-    gap: 8px; 
+    gap: var(--standard-gap);
     width: max-content;
     align-items: center;
 }
 
 .social-img {
-    width: 400px;
+    width: calc(400 / 1920 * 100vw);
     aspect-ratio: 4 / 5;
     object-fit: cover;
     flex-shrink: 0;
     border-radius: var(--poster-radius);
 
     opacity: 0;
-    transform: translateY(60px);
+    transform: translateY(calc(60 / 1920 * 100vw));
     transition:
         opacity var(--time-fade-in) var(--ease-standard),
         transform var(--time-fade-in) var(--ease-standard);
@@ -92,11 +92,11 @@
 }
 
 .social-img.push-down {
-    transform: translateY(calc(64px + 60px));
+    transform: translateY(calc((64 + 60) / 1920 * 100vw));
 }
 
 .social-img.push-down.is-visible {
-    transform: translateY(64px);
+    transform: translateY(calc(64 / 1920 * 100vw));
 }
 
 @media (max-width: 768px) {

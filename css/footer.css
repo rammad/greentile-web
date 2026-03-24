@@ -37,8 +37,8 @@
 .marquee-bar {
     width: 100%;
     overflow: hidden;
-    padding: 8px 0;
-    margin-top: 8px;
+    padding: calc(8 / 1920 * 100vw) 0;
+    margin-top: calc(8 / 1920 * 100vw);
     white-space: nowrap;
     display: flex;
     background-color: var(--color-accent);
@@ -78,11 +78,11 @@
 }
 
 .marquee-item {
-    padding: 0 48px;
+    padding: 0 calc(48 / 1920 * 100vw);
 }
 
 .marquee-item.arrow{
-    height: 7px;
+    height: calc(7 / 1920 * 100vw);
 }
 
 .footer-main {
@@ -90,7 +90,7 @@
     flex-direction: column;
     justify-content: flex-end;
     flex-grow: 1;
-    margin-top: 8px;
+    margin-top: calc(8 / 1920 * 100vw);
     position: relative;
     z-index: 1;
     padding-left: var(--section-padding);

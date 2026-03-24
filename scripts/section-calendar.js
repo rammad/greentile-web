@@ -121,6 +121,7 @@ function initEventInteractions() {
                     if (statusSoon) statusSoon.style.opacity = '0';
                     if (statusSold) statusSold.style.opacity = '0';
                     posterImg.style.opacity = '1';
+                    posterImg.classList.remove('is-sold-out');
 
                     if (status === 'coming-soon') {
                         if (statusSoon) {
@@ -134,6 +135,7 @@ function initEventInteractions() {
                             statusSold.style.opacity = '1';
                             randomizeSticker(statusSold);
                         }
+                        posterImg.classList.add('is-sold-out');
                     }
                 }
             });
@@ -141,6 +143,7 @@ function initEventInteractions() {
             row.addEventListener('mouseleave', () => {
                 if (window.innerWidth > 768) {
                     posterWrapper.classList.remove('active');
+                    posterImg.classList.remove('is-sold-out');
                 }
             });
 
