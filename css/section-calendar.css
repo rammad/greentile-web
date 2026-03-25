@@ -9,11 +9,11 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    padding-top: var(--space-for-nav);
+    padding-top: var(--padding-5);
 }
 
 .calendar-header {
-    padding: 0 0 calc(24 / 1920 * 100vw) 0;
+    padding: 0 0 var(--padding-3) 0;
     flex-shrink: 0;
     width: 100%;
     opacity: 1;
@@ -23,7 +23,7 @@
 .calendar-header .type-display-hero {
     font-size: 9.1vw;
     margin: 0;
-    line-height: 0.85;
+    line-height: var(--lh-tight);
     overflow: visible;
 }
 
@@ -31,16 +31,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center; 
-    margin: calc(24 / 1920 * 100vw) var(--standard-margin) 0 var(--standard-margin);
-    padding: calc(4 / 1920 * 100vw) 0;
+    margin: var(--gap-2) var(--gap-2) 0;
+    padding: var(--padding-1) 0;
     overflow: visible;
 }
-.filters-list { display: flex; gap: calc(24 / 1920 * 100vw); align-items: center; }
+.filters-list { display: flex; gap: var(--gap-2); align-items: center; }
 .view-controls { display: flex; align-items: center; }
 
 .filter-btn, .view-btn {
     background: none; border: none;
-    padding: 0 0 calc(2 / 1920 * 100vw) 0;
+    padding: 0 0 var(--padding-1) 0;
     cursor: pointer; color: var(--color-text-main);
     display: inline-block;
     position: relative;
@@ -52,7 +52,7 @@
     position: absolute;
     bottom: 0;
     left: 50%;
-    width: calc(20 / 1920 * 100vw);
+    width: var(--padding-3);
     height: 1.5px;                         /* intentional hair line — not scaled */
     background: var(--c-dark-green);
     transform: translateX(-50%) scaleX(0);
@@ -64,7 +64,7 @@
     transform: translateX(-50%) scaleX(1);
 }
 
-.divider { color: var(--color-text-main); margin: 0 var(--standard-gap); display: inline-block; line-height: 1; }
+.divider { color: var(--color-text-main); margin: 0 var(--gap-1); display: inline-block; line-height: var(--lh-single); }
 
 .calendar-body {
     position: relative;
@@ -72,7 +72,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding: 0 var(--standard-margin) var(--section-padding);
+    padding: 0 var(--padding-3) var(--padding-4);
     overflow: hidden;
 }
 
@@ -92,7 +92,7 @@
     overflow-y: auto;
     scrollbar-width: none;
     flex-direction: column;
-    gap: calc(60 / 1920 * 100vw);
+    gap: var(--gap-4);
     display: none; 
 }
 .calendar-grid-packed::-webkit-scrollbar { display: none; }
@@ -108,10 +108,10 @@
     overflow-y: auto;
     scrollbar-width: none;
     display: flex;
-    gap: var(--standard-margin);
+    gap: var(--gap-2);
     flex-direction: column;
     justify-content: flex-start;
-    padding-top: calc(var(--standard-margin) * 3);
+    padding-top: var(--padding-4);
 }
 .calendar-list::-webkit-scrollbar { display: none; }
 
@@ -167,7 +167,7 @@
 .packed-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    column-gap: var(--standard-margin);
+    column-gap: var(--gap-2);
     width: 100%;
     margin: 0 auto;
     animation: fadeIn var(--time-fade-in) ease forwards;
@@ -187,16 +187,16 @@
     display: flex;
     align-items: center;
     white-space: nowrap;
-    margin-bottom: calc(24 / 1920 * 100vw);
+    margin-bottom: var(--gap-2);
     min-height: var(--size-subBold1);
 }
 .month-header::after, .spacer-line::after {
     content: ''; display: block; flex-grow: 1; height: 1px; background-color: #e0e0e0;
 }
-.month-header:not(.continuation-header)::after { margin-left: calc(16 / 1920 * 100vw); }
+.month-header:not(.continuation-header)::after { margin-left: var(--gap-2); }
 .continuation-header { width: 100%; display: flex; }
 
-.chunk-grid { display: grid; gap: var(--standard-margin); row-gap: var(--standard-margin); }
+.chunk-grid { display: grid; gap: var(--gap-2); row-gap: var(--gap-2); }
 .cols-1 { grid-template-columns: repeat(1, 1fr); }
 .cols-2 { grid-template-columns: repeat(2, 1fr); }
 .cols-3 { grid-template-columns: repeat(3, 1fr); }
@@ -239,14 +239,17 @@
 
 .calendar-page .grid-sold-out .grid-card-poster {
     filter: grayscale(100%);
+    opacity: 0.5;
 }
 
 .calendar-page .grid-sold-out:hover .grid-card-poster {
     filter: grayscale(0%);
+    opacity: 1;
 }
 
 .calendar-poster-img.is-sold-out {
     filter: grayscale(100%);
+    opacity: 0.5;
 }
 
 .status-badge {

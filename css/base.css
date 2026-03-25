@@ -51,7 +51,9 @@
     --c-off-white: #FFFCFA;
     --c-bright-green: #30FA30;
     --c-mid-green: #23AA21;
-    --c-lighter-green: #e6f8e6; /* possibly for lighter gradient sections */
+    --c-bright-green-10: #EAFFEA; /* 10% bright green over white */
+    --c-bright-green-20: #D6FED6; /* 20% bright green over white */
+    --c-lighter-green: #EAFFEA; /* alias for 10% — lighter gradient sections */
     --c-dark-green: #0E4A0E;
     --c-dark-green-10: #E7EDE7; /* 10% of dark green */
     --c-dark-green-20: #CFDBCF; /* 20% of dark green */
@@ -88,16 +90,31 @@
 
     --blur-standard: 10px; /* fixed — blur does not scale with viewport */
 
-    --space-for-nav:      calc(80  / 1920 * 100vw); /* 80px  */
-    --standard-margin:    calc(20  / 1920 * 100vw); /* 20px  */
-    --standard-gap:       calc(8   / 1920 * 100vw); /* 8px   */
-    --gap-lg:             calc(64  / 1920 * 100vw); /* 64px  — component-level gap */
-    --gap-xl:             calc(120 / 1920 * 100vw); /* 120px — section-level gap   */
+    /* padding — strictly for CSS padding */
+    --padding-1: calc(4  / 1920 * 100vw);  /* 4px  */
+    --padding-2: calc(12 / 1920 * 100vw);  /* 12px */
+    --padding-3: calc(20 / 1920 * 100vw);  /* 20px */
+    --padding-4: calc(40 / 1920 * 100vw);  /* 40px */
+    --padding-5: calc(80 / 1920 * 100vw);  /* 80px — also nav clearance */
+
+    /* gap — strictly for CSS gap and margin */
+    --gap-1: calc(8   / 1920 * 100vw);  /* 8px   */
+    --gap-2: calc(20  / 1920 * 100vw);  /* 20px  */
+    --gap-3: calc(40  / 1920 * 100vw);  /* 40px  */
+    --gap-4: calc(64  / 1920 * 100vw);  /* 64px  */
+    --gap-5: calc(120 / 1920 * 100vw);  /* 120px */
 
     --poster-radius: 8% / 6.4%; /* 8% * 4/5 = %6.4 */
+    --poster-full-height: calc(100vh - 2 * var(--padding-5));
+
+    /* line-height — named so any reader knows the intent */
+    --lh-tight:  0.85;  /* all-caps display/header — flush with text-box trim */
+    --lh-single: 1;     /* single-line labels, UI, subheaders */
+    --lh-body:   1.2;   /* body text */
+    --lh-open:   1.4;   /* large multi-line display text */
 
     /* desktop type sizes */
-    --size-display-hero:   8.6vw;                    /* already vw */
+    --size-display-hero:   8.6vw;
     --size-display-xl:    calc(160 / 1920 * 100vw); /* 160px */
     --size-h1:            calc(96  / 1920 * 100vw); /* 96px  */
     --size-h2:            calc(64  / 1920 * 100vw); /* 64px  */
@@ -119,14 +136,11 @@
     --size-body1-mobile: 14px;
     --size-body2-mobile: 24px;
 
-    --section-spacing:         calc(200 / 1920 * 100vw); /* 200px */
-    --section-padding:         calc(20  / 1920 * 100vw); /* 20px  */
-    --section-nav-padding:     calc(100 / 1920 * 100vw); /* 100px */
+    --section-spacing: calc(200 / 1920 * 100vw); /* 200px — between major sections */
 
     /* mobile spacing — addressed in mobile pass, kept as px */
     --section-spacing-mobile: 80px;
     --section-padding-mobile: 20px;
-    --section-nav-padding-mobile: 60px;
 }
 
 /* reset */
@@ -189,7 +203,7 @@ section {
 .type-display-hero {
     font-family: var(--font-display);
     text-transform: uppercase;
-    line-height: 0.85;
+    line-height: var(--lh-tight);
     text-align: center;
     font-size: var(--size-display-hero);
     overflow: visible;
@@ -214,7 +228,7 @@ section {
     font-family: var(--font-display);
     font-size: var(--size-display-xl);
     font-weight: 800;
-    line-height: 0.85;
+    line-height: var(--lh-tight);
     text-transform: uppercase;
     text-align: center;
     overflow: visible;
@@ -225,7 +239,7 @@ section {
     font-family: var(--font-header);
     font-size: var(--size-h1);
     font-weight: 800;
-    line-height: 0.85;
+    line-height: var(--lh-tight);
     text-transform: uppercase;
     overflow: visible;
     text-box: trim-both cap alphabetic;
@@ -236,7 +250,7 @@ section {
     font-size: var(--size-h2);
     font-weight: 800;
     text-transform: uppercase;
-    line-height: 0.85;
+    line-height: var(--lh-tight);
     margin: 0;
     text-box: trim-both cap alphabetic;
 }
@@ -246,7 +260,7 @@ section {
     font-size: var(--size-h3);
     font-weight: 750;
     text-transform: uppercase;
-    line-height: 0.85;
+    line-height: var(--lh-tight);
     text-box: trim-both cap alphabetic;
 }
 
@@ -264,7 +278,7 @@ section {
     color: var(--color-text-subheader);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    line-height: 1;
+    line-height: var(--lh-single);
 }
 
 .type-subBold2 {
@@ -275,7 +289,7 @@ section {
     color: var(--color-text-subheader);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    line-height: 1;
+    line-height: var(--lh-single);
 }
 
 .type-subRegular1 {
@@ -284,7 +298,7 @@ section {
     font-weight: 300;
     font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
-    line-height: 1;
+    line-height: var(--lh-single);
     text-transform: uppercase;
     text-decoration: none;
 }
@@ -295,7 +309,7 @@ section {
     font-weight: 300;
     font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
-    line-height: 1;
+    line-height: var(--lh-single);
     text-transform: uppercase;
     text-decoration: none;
 }
@@ -304,7 +318,7 @@ section {
     font-family: var(--font-body);
     font-size: var(--size-body1);
     font-weight: 300;
-    line-height: 1.2;
+    line-height: var(--lh-body);
     /* font-variation-settings: 'SRFF' 25; */
 
     opacity: 0;
@@ -317,7 +331,7 @@ section {
     font-family: var(--font-body);
     font-size: var(--size-body2);
     font-weight: 300;
-    line-height: 1.2;
+    line-height: var(--lh-body);
     /* font-variation-settings: 'SRFF' 25; */
 
     opacity: 0;
@@ -326,8 +340,14 @@ section {
 }
 .type-body2.is-visible { opacity: 1; filter: blur(0); }
 
-.standard-margins { padding: var(--section-nav-padding) var(--section-padding) var(--section-padding) var(--section-padding); }
+.standard-margins { padding: var(--padding-5) var(--padding-3) var(--padding-3); }
 .section-spacer { margin-top: var(--section-spacing); margin-bottom: var(--section-spacing); }
+
+.section-standard {
+    position: relative;
+    width: 100%;
+    padding: var(--padding-5) var(--padding-3) var(--padding-3);
+}
 
 /* utils */
 .header-hidden {
@@ -387,6 +407,23 @@ section {
     transition: opacity var(--time-fade-out) ease;
 }
 
+/* reusable reveal patterns — apply via class, toggle with .is-visible */
+.fade-reveal {
+    opacity: 0;
+    filter: blur(var(--blur-standard));
+    transition: opacity var(--time-fade-in) ease, filter var(--time-fade-in) ease;
+}
+.fade-reveal.is-visible { opacity: 1; filter: blur(0); }
+
+.slide-reveal {
+    opacity: 0;
+    transform: translateY(var(--gap-2));
+    transition:
+        opacity var(--time-fade-in) var(--ease-standard),
+        transform var(--time-fade-in) var(--ease-standard);
+}
+.slide-reveal.is-visible { opacity: 1; transform: translateY(0); }
+
 /* ui */
 .ui-roll { position: relative; overflow: hidden; display: inline-block; cursor: pointer; line-height: 1; }
 .ui-roll-layer { display: block; transition: transform var(--time-roll) var(--ease-standard); }
@@ -402,9 +439,9 @@ section {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: calc(12 / 1920 * 100vw);                          /* 12px  */
-    min-width: calc(1em + calc(24 / 1920 * 100vw));            /* 1em + 24px */
-    max-width: calc(1em + calc(24 / 1920 * 100vw));            /* 1em + 24px */
+    padding: var(--padding-2);
+    min-width: calc(1em + var(--padding-3));
+    max-width: calc(1em + var(--padding-3));
     border-radius: 100px;                                       /* intentional pill — not scaled */
     background-color: var(--color-accent);
     color: transparent;
@@ -425,7 +462,7 @@ section {
 .cta-btn.is-visible {
     opacity: 1;
     max-width: calc(400 / 1920 * 100vw);                       /* 400px */
-    padding: calc(14 / 1920 * 100vw) calc(20 / 1920 * 100vw) calc(10 / 1920 * 100vw); /* 14px 20px 10px — optical center */
+    padding: calc(14 / 1920 * 100vw) var(--padding-3) calc(10 / 1920 * 100vw); /* optical center — 14/10 are intentional offsets */
     color: var(--color-btn-text);
 }
 
@@ -450,7 +487,7 @@ section {
 .cta-btn .ui-roll-layer {
     display: flex;
     align-items: center;
-    gap: calc(40 / 1920 * 100vw); /* 40px */
+    gap: var(--gap-3);
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
@@ -636,5 +673,6 @@ body::after {
     .type-body1 { font-size: var(--size-body1-mobile); }
     .type-body2 { font-size: var(--size-body2-mobile); }
     .standard-margins { padding: var(--section-padding-mobile); }
+    .section-standard { padding: var(--section-padding-mobile); }
     .section-spacer { padding-top: var(--section-spacing-mobile); padding-bottom: var(--section-spacing-mobile); }
 }

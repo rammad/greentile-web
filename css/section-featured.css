@@ -19,9 +19,9 @@
 .featured-bg-img {
     position: absolute;
     top: -20%;
-    left: calc(-80 / 1920 * 100vw);
-    right: calc(-80 / 1920 * 100vw);
-    width: calc(100% + calc(160 / 1920 * 100vw));
+    left: calc(-1 * var(--padding-5));
+    right: calc(-1 * var(--padding-5));
+    width: calc(100% + 2 * var(--padding-5));
     height: 140%;
     object-fit: cover;
     object-position: center;
@@ -59,7 +59,7 @@
 
 .featured-marquee-track {
     display: flex;
-    gap: calc(40 / 1920 * 100vw);
+    gap: var(--gap-3);
     white-space: nowrap;
     animation: featured-scroll 90s linear infinite;
     will-change: transform;
@@ -79,7 +79,7 @@
 .featured-poster-wrap {
     position: relative;
     z-index: 3;
-    height: calc(100vh - var(--space-for-nav) - var(--standard-margin));
+    height: var(--poster-full-height);
     aspect-ratio: 4 / 5;
     flex-shrink: 0;
     overflow: hidden;

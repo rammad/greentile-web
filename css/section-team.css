@@ -3,16 +3,16 @@
 .team-section {
     position: relative;
     width: 100%;
-    padding-top: calc(var(--space-for-nav, 90px) + var(--standard-margin, 20px));
-    padding-bottom: calc(var(--standard-margin, 20px) * 3);
+    padding-top: calc(var(--padding-5) + var(--padding-3));
+    padding-bottom: var(--padding-4);
 }
 
 .team-layout {
     display: grid;
     grid-template-columns: 1fr 1.4fr 1fr;
-    column-gap: calc(var(--standard-margin, 20px) * 2);
+    column-gap: var(--gap-3);
     align-items: stretch;
-    padding: 0 var(--standard-margin);
+    padding: 0 var(--padding-3);
     box-sizing: border-box;
 }
 
@@ -22,18 +22,18 @@
 
 .team-title-inner {
     position: sticky;
-    top: calc(var(--space-for-nav, 90px) + var(--standard-margin, 20px));
-    height: calc(100vh - var(--space-for-nav, 90px) - var(--standard-margin, 20px) * 2);
+    top: calc(var(--padding-5) + var(--padding-3));
+    height: calc(100vh - var(--padding-5) - var(--padding-4));
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding-bottom: var(--standard-margin);
+    padding-bottom: var(--padding-3);
 }
 
 .team-images-col {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--standard-margin, 20px) * 2);
+    gap: var(--gap-3);
 }
 
 .team-poster-wrap {
@@ -61,17 +61,17 @@
 
 .team-text-col {
     box-sizing: border-box;
-    padding: 0 calc(var(--standard-margin) * 2);
+    padding: 0 var(--padding-4);
 }
 
 .team-text-sticky {
     position: sticky;
-    top: calc(var(--space-for-nav, 90px) + var(--standard-margin, 20px));
-    height: calc(100vh - var(--space-for-nav, 90px) - var(--standard-margin, 20px) * 2);
+    top: calc(var(--padding-5) + var(--padding-3));
+    height: calc(100vh - var(--padding-5) - var(--padding-4));
 }
 
 .team-title-text {
-    line-height: 1;
+    line-height: var(--lh-single);
 }
 
 .team-section .animate-line {
@@ -99,12 +99,12 @@
 
 @media (max-width: 768px) {
     .team-section {
-        padding-bottom: var(--standard-margin, 20px);
+        padding-bottom: var(--padding-3);
     }
 
     .team-layout {
         grid-template-columns: 1fr;
-        row-gap: calc(var(--standard-margin, 20px) * 2);
+        row-gap: var(--gap-3);
     }
 
     .team-title-col,

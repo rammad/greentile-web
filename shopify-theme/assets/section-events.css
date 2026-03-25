@@ -4,9 +4,9 @@
     position: relative;
     width: 100%;
     padding: 0;
-    /* animation range is fixed at 1×vh in JS (phase2Len = ih * 1), starting 0.4×vh early.
-       net sticky range needed = 1×vh − 0.4×vh = 0.6×vh. min-height = 100vh + 60vh = 160vh */
-    min-height: 160vh;
+    /* animation range needs 60vh of sticky scroll (see section-events.js).
+       extra section-spacing absorbs the spacer that used to follow this section. */
+    min-height: calc(160vh + var(--section-spacing));
 }
 
 .events-sticky {
@@ -23,9 +23,14 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    justify-content: flex-start;
-    padding-top: var(--space-for-nav, 90px);
+    gap: var(--gap-lg);
+    padding-top: calc(var(--space-for-nav) - calc(var(--standard-margin) * 2));
     box-sizing: border-box;
+}
+
+.events-sticky-inner::before {
+    content: '';
+    flex: 1;
 }
 
 /* title: flows at the top inside the column */
@@ -47,7 +52,6 @@
 .events-content {
     position: relative;
     width: 100%;
-    flex: 1;
     display: flex;
     align-items: center;
 }
@@ -82,10 +86,7 @@
 }
 
 .events-content-footer {
-    position: absolute;
-    bottom: calc(-80 / 1920 * 100vw);
-    left: 0;
-    right: 0;
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;

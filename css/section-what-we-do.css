@@ -85,7 +85,7 @@
     grid-area: 1 / 1;
     width: 100%;
     max-width: calc(600 / 1920 * 100vw);
-    padding: 0 var(--standard-margin);
+    padding: 0 var(--padding-3);
     text-align: center;
     position: relative;
     /* opacity, filter, and transition are driven entirely by JS inline styles */
@@ -111,7 +111,7 @@
 
 .what-we-do-body .about-content .cta-btn {
     position: absolute;
-    top: calc(100% + calc(36 / 1920 * 100vw));
+    top: calc(100% + var(--gap-3));
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
@@ -128,6 +128,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: var(--gap-2);
     z-index: 50;
     pointer-events: auto;
 }
@@ -137,17 +138,17 @@
     padding: 0;
     margin: 0;
     text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .about-menu-persistent .menu-label {
-    margin-bottom: var(--standard-margin);
     display: block;
 }
 
 .about-menu-persistent .menu-item {
     color: var(--c-dark-green-20);
     opacity: 0;
-    margin-bottom: var(--standard-margin);
     cursor: pointer;
     transition: color var(--time-fade-out) ease, opacity var(--time-fade-out) ease;
 }

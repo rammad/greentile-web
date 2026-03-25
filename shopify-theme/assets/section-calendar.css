@@ -239,14 +239,17 @@
 
 .calendar-page .grid-sold-out .grid-card-poster {
     filter: grayscale(100%);
+    opacity: 0.5;
 }
 
 .calendar-page .grid-sold-out:hover .grid-card-poster {
     filter: grayscale(0%);
+    opacity: 1;
 }
 
 .calendar-poster-img.is-sold-out {
     filter: grayscale(100%);
+    opacity: 0.5;
 }
 
 .status-badge {

@@ -6,26 +6,26 @@
     min-height: 100vh;
     height: auto !important; 
     overflow: visible !important;
-    padding-top: var(--space-for-nav); 
-    padding-bottom: var(--gap-xl);
-    padding-left: var(--standard-margin);
-    padding-right: var(--standard-margin);
+    padding-top: var(--padding-5); 
+    padding-bottom: var(--padding-5);
+    padding-left: var(--padding-3);
+    padding-right: var(--padding-3);
 }
 
 .archives-page.is-active { opacity: 1; }
 
 .archives-header {
     text-align: center;
-    margin-bottom: calc(80 / 1920 * 100vw);
+    margin-bottom: var(--gap-4);
     position: relative;
-    padding: 0 calc(40 / 1920 * 100vw);
+    padding: 0 var(--padding-4);
     overflow: hidden;
 }
 
 .archives-title {
     font-family: var(--font-header);
     font-size: 8vw; 
-    line-height: 0.85;
+    line-height: var(--lh-tight);
     font-weight: 800;
     text-transform: uppercase;
     color: var(--color-text-main);
@@ -34,7 +34,7 @@
 
 .archives-page .grid-card-poster {
     filter: grayscale(100%);
-    opacity: 1;
+    opacity: 0.5;
 }
 
 .archives-page .grid-card:hover .grid-card-poster {
@@ -43,7 +43,7 @@
 }
 
 .load-more-container {
-    margin-top: calc(100 / 1920 * 100vw);
+    margin-top: var(--gap-5);
     display: flex;
     justify-content: center;
     width: 100%;

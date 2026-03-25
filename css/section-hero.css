@@ -9,13 +9,15 @@
 }
 
 .hero .type-display-hero {
-    position: absolute;
-    top: auto;
-    bottom: var(--standard-margin);
-    left: 50%;
-    overflow: visible;
-    transform: translateX(-50%);
     width: 100%;
     text-align: center;
     z-index: 0;
+
+    position: absolute;
+    top: auto;
+    bottom: var(--padding-3);
+
+    left: 50%;
+    overflow: visible;
+    transform: translateX(-50%);
 }

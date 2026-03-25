@@ -34,7 +34,7 @@
 
 .archives-page .grid-card-poster {
     filter: grayscale(100%);
-    opacity: 1;
+    opacity: 0.5;
 }
 
 .archives-page .grid-card:hover .grid-card-poster {

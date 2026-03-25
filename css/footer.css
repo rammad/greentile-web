@@ -37,8 +37,8 @@
 .marquee-bar {
     width: 100%;
     overflow: hidden;
-    padding: calc(8 / 1920 * 100vw) 0;
-    margin-top: calc(8 / 1920 * 100vw);
+    padding: var(--padding-2) 0;
+    margin-top: var(--gap-1);
     white-space: nowrap;
     display: flex;
     background-color: var(--color-accent);
@@ -78,7 +78,7 @@
 }
 
 .marquee-item {
-    padding: 0 calc(48 / 1920 * 100vw);
+    padding: 0 var(--padding-4);
 }
 
 .marquee-item.arrow{
@@ -90,11 +90,11 @@
     flex-direction: column;
     justify-content: flex-end;
     flex-grow: 1;
-    margin-top: calc(8 / 1920 * 100vw);
+    margin-top: var(--gap-1);
     position: relative;
     z-index: 1;
-    padding-left: var(--section-padding);
-    padding-right: var(--section-padding);
+    padding-left: var(--padding-3);
+    padding-right: var(--padding-3);
     box-sizing: border-box;
 }
 
@@ -106,7 +106,7 @@
     left: auto;
     transform: none;
     overflow: visible;
-    padding-bottom: var(--standard-margin);
+    padding-bottom: var(--padding-3);
 }
 
 .footer-links {
@@ -114,13 +114,13 @@
     justify-content: space-between;
     width: 100%;
     align-items: flex-end;
-    margin-bottom: var(--standard-margin);
+    margin-bottom: var(--gap-2);
 }
 
 .footer-link a {
     text-decoration: none;
     margin-bottom: 0; 
-    line-height: 1; 
+    line-height: var(--lh-single); 
 }
 
 @media (max-width: 768px) {

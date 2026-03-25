@@ -47,7 +47,7 @@
     aspect-ratio: 4 / 5;
     opacity: 0;
     filter: blur(10px);    /* fixed — blur does not scale */
-    transform: translate3d(0, calc(40 / 1920 * 100vw), 0);
+    transform: translate3d(0, var(--padding-4), 0);
     transition: opacity 0.5s ease, filter 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -60,7 +60,7 @@
 .menu-group.prev .menu-photo {
     opacity: 0;
     filter: blur(10px);    /* fixed — blur does not scale */
-    transform: translate3d(0, calc(-40 / 1920 * 100vw), 0);
+    transform: translate3d(0, calc(-1 * var(--padding-4)), 0);
 }
 
 .menu-container {
@@ -70,9 +70,10 @@
     display: flex; 
     flex-direction: column; 
     align-items: center;
+    gap: var(--gap-3);
     max-width: calc(1000 / 1920 * 100vw);
     width: 100%;
-    padding: 0 var(--standard-margin);
+    padding: 0 var(--padding-3);
 }
 
 .menu-label {
@@ -81,19 +82,18 @@
     font-weight: 700; 
     letter-spacing: 0.1em;
     text-transform: uppercase; 
-    margin-bottom: calc(48 / 1920 * 100vw); 
     color: var(--color-text-main); 
 }
 
 .menu-list { 
-    list-style: none; padding: 0; margin: 0 0 calc(48 / 1920 * 100vw) 0; 
+    list-style: none; padding: 0; margin: 0; 
 }
 
 .menu-item {
     font-family: var(--font-header);
     font-size: var(--size-h2);
     font-weight: 800;
-    line-height: 1.1;
+    line-height: var(--lh-single);
     text-transform: uppercase;
     color: var(--color-placeholder);
     transition: color 0.5s ease, opacity 0.5s ease;
@@ -111,6 +111,7 @@
 .cta-block {
     position: absolute; top: 0; left: 0; width: 100%;
     display: flex; flex-direction: column; align-items: center;
+    gap: var(--gap-2);
     opacity: 0; 
     pointer-events: none; 
     transform: translateY(calc(10 / 1920 * 100vw));
@@ -125,10 +126,9 @@
 
 .cta-text { 
     font-family: var(--font-body);
-    font-size: calc(18 / 1920 * 100vw);
-    line-height: 1.6; 
+    font-size: var(--size-body2);
+    line-height: var(--lh-open); 
     color: var(--color-text-main); 
-    margin-bottom: calc(32 / 1920 * 100vw); 
     text-align: center;
 }
 

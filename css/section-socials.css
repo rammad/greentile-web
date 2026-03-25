@@ -9,15 +9,15 @@
     min-height: 100vh;
     width: 100%;
     position: relative;
-    margin-bottom: var(--gap-xl);
+    margin-bottom: var(--gap-5);
 }
 
 .socials-header {
-    padding: 20vh var(--standard-margin);
+    padding: 20vh var(--padding-3);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: calc(var(--standard-margin) * 2);
+    gap: var(--gap-3);
 }
 
 .socials-header .type-body1, .socials-header .type-body2 {
@@ -26,10 +26,10 @@
 
 .socials-icons {
     display: flex;
-    gap: calc(16 / 1920 * 100vw);
+    gap: var(--gap-2);
     justify-content: center;
     opacity: 0;
-    transform: translateY(calc(20 / 1920 * 100vw));
+    transform: translateY(var(--padding-3));
     transition: 
         opacity var(--time-fade-in) var(--ease-standard), 
         transform var(--time-fade-in) var(--ease-standard);
@@ -78,7 +78,7 @@
 
 .socials-track {
     display: flex;
-    gap: var(--standard-gap);
+    gap: var(--gap-1);
     width: max-content;
     align-items: center;
 }

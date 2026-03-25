@@ -44,6 +44,7 @@
         if (gallery) {
             const imgs = gallery.querySelectorAll('.social-img');
             observeElementInOut(gallery, {
+                enterThreshold: 0.01,
                 onEnter() {
                     imgs.forEach((img, i) => {
                         setTimeout(() => img.classList.add('is-visible'), stagger * i);
