@@ -100,7 +100,7 @@
                 
                 const header = document.createElement('div');
                 header.className = 'month-header';
-                header.classList.add('type-sub2')
+                header.classList.add('type-subBold2')
                 if (chunk.isContinuation) {
                     header.innerHTML = '<span class="spacer-line"></span>';
                     header.classList.add('continuation-header');

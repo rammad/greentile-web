@@ -1,8 +1,0 @@
-{%- comment -%}
-  Reusable roll-hover text link.
-  Usage: {% render 'ui-roll', text: 'Browse All Events', url: '/pages/events', type_class: 'type-subRegular1' %}
-{%- endcomment -%}
-<a href="{{ url | default: '#' }}" class="{{ type_class | default: 'type-subRegular1' }} ui-roll roll-hover">
-  <span class="ui-roll-layer ui-roll-visible">{{ text }}</span>
-  <span class="ui-roll-layer ui-roll-hidden">{{ text }}</span>
-</a>

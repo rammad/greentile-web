@@ -90,22 +90,30 @@
 
     --blur-standard: 10px; /* fixed — blur does not scale with viewport */
 
-    /* padding — strictly for CSS padding */
-    --padding-1: calc(4  / 1920 * 100vw);  /* 4px  */
-    --padding-2: calc(12 / 1920 * 100vw);  /* 12px */
-    --padding-3: calc(20 / 1920 * 100vw);  /* 20px */
-    --padding-4: calc(40 / 1920 * 100vw);  /* 40px */
-    --padding-5: calc(80 / 1920 * 100vw);  /* 80px — also nav clearance */
-
-    /* gap — strictly for CSS gap and margin */
-    --gap-1: calc(8   / 1920 * 100vw);  /* 8px   */
-    --gap-2: calc(20  / 1920 * 100vw);  /* 20px  */
-    --gap-3: calc(40  / 1920 * 100vw);  /* 40px  */
-    --gap-4: calc(64  / 1920 * 100vw);  /* 64px  */
-    --gap-5: calc(120 / 1920 * 100vw);  /* 120px */
+    /* spacing — single unified scale, named by px value at 1920w
+       4px base grid, every 4px from 4–40, then larger jumps.
+       Use for padding, gap, and margin interchangeably. */
+    --space-4:   calc(4   / 1920 * 100vw);
+    --space-8:   calc(8   / 1920 * 100vw);
+    --space-12:  calc(12  / 1920 * 100vw);
+    --space-16:  calc(16  / 1920 * 100vw);
+    --space-20:  calc(20  / 1920 * 100vw);
+    --space-24:  calc(24  / 1920 * 100vw);
+    --space-28:  calc(28  / 1920 * 100vw);
+    --space-32:  calc(32  / 1920 * 100vw);
+    --space-36:  calc(36  / 1920 * 100vw);
+    --space-40:  calc(40  / 1920 * 100vw);
+    --space-48:  calc(48  / 1920 * 100vw);
+    --space-56:  calc(56  / 1920 * 100vw);
+    --space-64:  calc(64  / 1920 * 100vw);
+    --space-80:  calc(80  / 1920 * 100vw);
+    --space-96:  calc(96  / 1920 * 100vw);
+    --space-120: calc(120 / 1920 * 100vw);
+    --space-160: calc(160 / 1920 * 100vw);
+    --space-200: calc(200 / 1920 * 100vw);
 
     --poster-radius: 8% / 6.4%; /* 8% * 4/5 = %6.4 */
-    --poster-full-height: calc(100vh - 2 * var(--padding-5));
+    --poster-full-height: calc(100vh - 2 * var(--space-80));
 
     /* line-height — named so any reader knows the intent */
     --lh-tight:  0.85;  /* all-caps display/header — flush with text-box trim */
@@ -120,7 +128,7 @@
     --size-h2:            calc(64  / 1920 * 100vw); /* 64px  */
     --size-h3:            calc(48  / 1920 * 100vw); /* 48px  */
     --size-subBold1:      calc(20  / 1920 * 100vw); /* 20px  — section label headers */
-    --size-subBold2:      calc(12  / 1920 * 100vw); /* 12px  — secondary info (event date, marquee) */
+    --size-subBold2:      calc(14  / 1920 * 100vw); /* 12px  — secondary info (event date, marquee) */
     --size-subRegular1:   calc(14  / 1920 * 100vw); /* 14px  — nav and buttons */
     --size-subRegular2:   calc(10  / 1920 * 100vw); /* 10px  — badges (pdp meta) */
     --size-body1:         calc(14  / 1920 * 100vw); /* 14px  */
@@ -136,7 +144,7 @@
     --size-body1-mobile: 14px;
     --size-body2-mobile: 24px;
 
-    --section-spacing: calc(200 / 1920 * 100vw); /* 200px — between major sections */
+    --section-spacing: var(--space-200);
 
     /* mobile spacing — addressed in mobile pass, kept as px */
     --section-spacing-mobile: 80px;
@@ -340,13 +348,13 @@ section {
 }
 .type-body2.is-visible { opacity: 1; filter: blur(0); }
 
-.standard-margins { padding: var(--padding-5) var(--padding-3) var(--padding-3); }
+.standard-margins { padding: var(--space-80) var(--space-20) var(--space-20); }
 .section-spacer { margin-top: var(--section-spacing); margin-bottom: var(--section-spacing); }
 
 .section-standard {
     position: relative;
     width: 100%;
-    padding: var(--padding-5) var(--padding-3) var(--padding-3);
+    padding: var(--space-80) var(--space-20) var(--space-20);
 }
 
 /* utils */
@@ -417,7 +425,7 @@ section {
 
 .slide-reveal {
     opacity: 0;
-    transform: translateY(var(--gap-2));
+    transform: translateY(var(--space-20));
     transition:
         opacity var(--time-fade-in) var(--ease-standard),
         transform var(--time-fade-in) var(--ease-standard);
@@ -439,9 +447,9 @@ section {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--padding-2);
-    min-width: calc(1em + var(--padding-3));
-    max-width: calc(1em + var(--padding-3));
+    padding: var(--space-12);
+    min-width: calc(1em + var(--space-20));
+    max-width: calc(1em + var(--space-20));
     border-radius: 100px;                                       /* intentional pill — not scaled */
     background-color: var(--color-accent);
     color: transparent;
@@ -462,7 +470,7 @@ section {
 .cta-btn.is-visible {
     opacity: 1;
     max-width: calc(400 / 1920 * 100vw);                       /* 400px */
-    padding: calc(14 / 1920 * 100vw) var(--padding-3) calc(10 / 1920 * 100vw); /* optical center — 14/10 are intentional offsets */
+    padding: calc(14 / 1920 * 100vw) var(--space-20) calc(10 / 1920 * 100vw); /* optical center — 14/10 are intentional offsets */
     color: var(--color-btn-text);
 }
 
@@ -487,7 +495,7 @@ section {
 .cta-btn .ui-roll-layer {
     display: flex;
     align-items: center;
-    gap: var(--gap-3);
+    gap: var(--space-40);
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 

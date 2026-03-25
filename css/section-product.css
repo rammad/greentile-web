@@ -9,25 +9,25 @@
 }
 
 .pdp-sticky-wrapper .back-arrow {
-    top: var(--padding-4);
-    left: var(--padding-3);
+    top: var(--space-40);
+    left: var(--space-20);
 }
 
 .pdp-sticky-wrapper {
     position: fixed;
-    top: var(--padding-5);
+    top: var(--space-80);
     left: 0;
     right: 0;
     width: 100%;
-    height: calc(100vh - var(--padding-5));
-    padding: var(--padding-4) var(--padding-3);
+    height: calc(100vh - var(--space-80));
+    padding: var(--space-40) var(--space-20);
     box-sizing: border-box;
 }
 
 .pdp-meta-row,
 .pdp-hero-title {
     flex-shrink: 0;
-    margin-bottom: var(--gap-2);
+    margin-bottom: var(--space-20);
     width: 100%;
 }
 
@@ -38,7 +38,7 @@
     overscroll-behavior-y: contain; /* stop scroll from bubbling to the page */
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-top: var(--padding-3);
+    padding-top: var(--space-20);
     width: 100%;
     height: 100%;
 }
@@ -52,7 +52,7 @@
     min-height: 0;
     position: relative;
     overflow: hidden;
-    margin-bottom: var(--gap-4);
+    margin-bottom: var(--space-64);
 }
 
 .pdp-desc-wrapper::before,
@@ -137,7 +137,7 @@
     border-radius: var(--poster-radius);
     opacity: 0;
     transition: opacity var(--time-fade-in) ease;
-    margin-bottom: var(--gap-2);
+    margin-bottom: var(--space-20);
 }
 
 .pdp-poster.is-visible {
@@ -200,7 +200,7 @@
     .pdp-desc-wrapper {
         flex: none;
         min-height: unset;
-        margin-bottom: var(--gap-2);
+        margin-bottom: var(--space-20);
     }
 
     .pdp-desc-wrapper::before,
@@ -214,7 +214,7 @@
     position: relative;
     display: flex;
     align-items: stretch;
-    gap: var(--gap-1);
+    gap: var(--space-8);
     width: 100%;
     flex-shrink: 0;
 }
@@ -230,7 +230,7 @@
     position: absolute;
     bottom: 100%;
     left: 0;
-    margin-bottom: var(--gap-1);
+    margin-bottom: var(--space-8);
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
@@ -251,7 +251,7 @@
     justify-content: space-between;
     background-color: var(--c-dark-green-10);
     border-radius: 100px;                  /* intentional pill — not scaled */
-    padding: 0 var(--padding-3);
+    padding: 0 var(--space-20);
     min-width: calc(140 / 1920 * 100vw);
     height: 100%;
 }
@@ -259,7 +259,7 @@
 .qty-btn {
     background: none; border: none;
     cursor: pointer;
-    padding: 0 var(--padding-1);
+    padding: 0 var(--space-4);
     color: var(--c-dark-green);
 }
 
@@ -275,9 +275,9 @@
 .pdp-tag {
     display: inline-block;
     background-color: var(--c-dark-green-10);
-    padding: var(--padding-1) var(--padding-2);
-    border-radius: var(--padding-1);
-    margin: 0 var(--gap-1) var(--gap-1) 0;
+    padding: var(--space-4) var(--space-12);
+    border-radius: var(--space-4);
+    margin: 0 var(--space-8) var(--space-8) 0;
     opacity: 0;
     transition: opacity var(--time-fade-in) ease;
 }

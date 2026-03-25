@@ -15,7 +15,7 @@
 
     position: absolute;
     top: auto;
-    bottom: var(--padding-3);
+    bottom: var(--space-20);
 
     left: 50%;
     overflow: visible;

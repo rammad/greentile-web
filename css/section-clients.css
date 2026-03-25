@@ -3,10 +3,10 @@
 .clients-section {
     min-height: auto;
     width: 100%;
-    padding: var(--padding-4) var(--padding-3);
+    padding: var(--space-40) var(--space-20);
     display: flex;
     flex-direction: column;
-    gap: var(--gap-5);
+    gap: var(--space-120);
 }
 
 /* ── previous clients block ── */
@@ -14,12 +14,12 @@
 .clients-previous {
     display: flex;
     align-items: center;
-    gap: var(--gap-3);
+    gap: var(--space-40);
     width: 50%;
     align-self: center;
 
     opacity: 0;
-    transform: translateY(var(--padding-3));
+    transform: translateY(var(--space-20));
     transition:
         opacity var(--time-fade-in) var(--ease-standard),
         transform var(--time-fade-in) var(--ease-standard);
@@ -45,8 +45,8 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--gap-1);
-    padding: var(--padding-3) 0;
+    gap: var(--space-32);
+    padding: var(--space-20) 0;
     text-align: center;
 }
 
@@ -67,7 +67,7 @@
     width: 100%;
 
     opacity: 0;
-    transform: translateY(var(--padding-3));
+    transform: translateY(var(--space-20));
     transition:
         opacity var(--time-fade-in) var(--ease-standard),
         transform var(--time-fade-in) var(--ease-standard);

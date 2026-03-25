@@ -2,9 +2,9 @@
 
 .sticky-nav {
     position: fixed;
-    top: var(--padding-2);
-    left: var(--padding-3);
-    right: var(--padding-3);
+    top: var(--space-12);
+    left: var(--space-20);
+    right: var(--space-20);
     
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -17,6 +17,7 @@
 .nav-center,
 .nav-right {
     background: rgba(255, 255, 255, 0.3);
+    /* background: var(--color-placeholder); */
     backdrop-filter: blur(12px);           /* fixed — blur does not scale */
     -webkit-backdrop-filter: blur(12px);
     border-radius: 100px;                  /* intentional pill — not scaled */
@@ -26,14 +27,15 @@
     display: flex;
     justify-self: center;
     justify-content: center;
-    gap: var(--gap-4);
+    gap: var(--space-32);
     align-items: center;
-    padding: var(--padding-1) var(--padding-3) 0; /* drop slightly for better alignment */
+    padding: var(--space-12) var(--space-24) calc(var(--space-12) - var(--space-4)); /* drop slightly for better alignment */
 }
 
 
 .nav-left {
     justify-self: start;
+    padding: var(--space-12) var(--space-20);
 }
 
 .nav-right {
@@ -59,9 +61,9 @@
 .nav-active-wrap::after {
     content: '';
     position: absolute;
-    bottom: calc(-2 / 1920 * 100vw);
+    bottom: calc(-1 * var(--space-4));
     left: 50%;
-    width: var(--padding-3);
+    width: var(--space-20);
     height: 1.5px;                         /* intentional hair line — not scaled */
     background: var(--c-dark-green);
     transform: translateX(-50%);

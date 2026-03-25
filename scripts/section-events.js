@@ -12,7 +12,8 @@
         const titleWrap = section.querySelector('.events-title-wrap');
         const grid = section.querySelector('.events-grid');
         const cards = section.querySelectorAll('.event-card');
-        const btn = section.querySelector('.cta-btn');
+        const ctaSection = document.querySelector('.events-cta-section');
+        const btn = ctaSection ? ctaSection.querySelector('.cta-btn') : null;
 
         if (grid && cards.length) {
             grid.style.setProperty('--poster-count', cards.length);
@@ -78,7 +79,6 @@
 
         // card i starts moving at this scroll progress value
         const cardStarts = Array.from(cards, (_, i) => readingBuffer + i * stepSize);
-        const btnThreshold = cardStarts[n - 1] + travelDuration; // after last card fully arrives
 
         // cached layout values, recalculated after fonts/layout settle
         let phase2Start = 0;
@@ -109,17 +109,16 @@
                 card.style.opacity   = '1';
             });
 
-            if (btn && transitionCta) {
-                if (progress >= btnThreshold && !btn.classList.contains('is-visible')) {
-                    transitionCta(btn, 'enter');
-                } else if (progress < btnThreshold && btn.classList.contains('is-visible')) {
-                    transitionCta(btn, 'exit');
-                }
-            }
         };
 
         window.addEventListener('lenis-scroll', ({ detail }) => {
             applyPositions(detail.scroll);
         }, { passive: true });
+
+        if (btn && observeElementInOut) {
+            observeElementInOut(btn, {
+                onEnter() { if (transitionCta) transitionCta(btn, 'enter'); }
+            });
+        }
     });
 })();

@@ -6,19 +6,19 @@
     min-height: 100vh;
     height: auto !important; 
     overflow: visible !important;
-    padding-top: var(--padding-5); 
-    padding-bottom: var(--padding-5);
-    padding-left: var(--padding-3);
-    padding-right: var(--padding-3);
+    padding-top: var(--space-80); 
+    padding-bottom: var(--space-80);
+    padding-left: var(--space-20);
+    padding-right: var(--space-20);
 }
 
 .archives-page.is-active { opacity: 1; }
 
 .archives-header {
     text-align: center;
-    margin-bottom: var(--gap-4);
+    margin-bottom: var(--space-64);
     position: relative;
-    padding: 0 var(--padding-4);
+    padding: 0 var(--space-40);
     overflow: hidden;
 }
 
@@ -32,18 +32,22 @@
     margin: 0;
 }
 
+.archives-page .grid-card {
+    background: transparent;
+}
+
 .archives-page .grid-card-poster {
-    filter: grayscale(100%);
+    filter: grayscale(100%) sepia(40%) hue-rotate(90deg);
     opacity: 0.5;
 }
 
 .archives-page .grid-card:hover .grid-card-poster {
-    filter: grayscale(0%);
+    filter: none;
     opacity: 1;
 }
 
 .load-more-container {
-    margin-top: var(--gap-5);
+    margin-top: var(--space-120);
     display: flex;
     justify-content: center;
     width: 100%;

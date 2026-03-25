@@ -6,27 +6,29 @@
 }
 
 .about-inner {
-    padding: 15vh var(--padding-3) 15vh;
+    padding: 15vh var(--space-20) 15vh;
     width: 70%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--gap-4);
+    gap: var(--space-64);
 }
 
 /* text block — full width so JS line measurements are stable */
 .about-text.type-h1 {
     width: 100%;
-    line-height: var(--lh-single);
+    line-height: var(--lh-tight);
     text-align: center;
     text-box: normal;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-3);
 }
 
-/* each measured line is a block so IntersectionObserver gets a real layout box */
+/* after JS splits text into lines, margin controls inter-line spacing
+   (flex-column can't be used here — it breaks pre-split inline flow) */
+.about .animate-line + .animate-line {
+    margin-top: var(--space-40);
+}
+
 .about .animate-line {
     display: block;
     opacity: 0;
@@ -43,8 +45,8 @@
 /* Default: inline-block during JS probe phase (images must be in flow for accurate measurement) */
 .about-inline-img {
     display: inline-block;
-    height: 1.4em;
-    width: calc(1.4em * 1.25);
+    height: 1.1em;
+    width: calc(1.1em * 1.25);
     object-fit: cover;
     border-radius: var(--poster-radius);
     vertical-align: middle;
@@ -59,8 +61,8 @@
 .about-img-wrap {
     display: inline-block;
     vertical-align: middle;
-    width: calc(1.4em * 1.25);
-    height: 0.85em;
+    width: calc(1.1em * 1.25);
+    height: 0.67em;
     overflow: visible;
     position: relative;
     top: -0.1em;
@@ -75,7 +77,7 @@
     top: 50%;
     transform: translateY(-50%);
     width: 100%;
-    height: 1.4em;
+    height: 1.1em;
     margin: 0;
 }
 
@@ -87,11 +89,11 @@
 @media (max-width: 768px) {
     .about-inner {
         width: 90%;
-        padding: 10vh var(--padding-3) 10vh;
+        padding: 10vh var(--space-20) 10vh;
         gap: 40px;
     }
 
-    .about-text.type-h1 {
-        gap: var(--gap-2);
+    .about .animate-line + .animate-line {
+        margin-top: var(--space-20);
     }
 }

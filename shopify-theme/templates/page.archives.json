@@ -1,9 +1,0 @@
-{
-  "sections": {
-    "archives": {
-      "type": "archives",
-      "settings": {}
-    }
-  },
-  "order": ["archives"]
-}

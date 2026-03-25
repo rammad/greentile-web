@@ -19,9 +19,9 @@
 .featured-bg-img {
     position: absolute;
     top: -20%;
-    left: calc(-1 * var(--padding-5));
-    right: calc(-1 * var(--padding-5));
-    width: calc(100% + 2 * var(--padding-5));
+    left: calc(-1 * var(--space-80));
+    right: calc(-1 * var(--space-80));
+    width: calc(100% + 2 * var(--space-80));
     height: 140%;
     object-fit: cover;
     object-position: center;
@@ -59,7 +59,7 @@
 
 .featured-marquee-track {
     display: flex;
-    gap: var(--gap-3);
+    gap: var(--space-40);
     white-space: nowrap;
     animation: featured-scroll 90s linear infinite;
     will-change: transform;

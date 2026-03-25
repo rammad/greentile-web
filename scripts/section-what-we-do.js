@@ -5,25 +5,31 @@
 
     // ── scatter images ────────────────────────────────────────────────────────
 
-    const MOBILE_BREAKPOINT      = 768;
-    const STEP_Y_MOBILE          = 180;
-    const STEP_Y_DESKTOP         = 180;
-    const COL_LEFT_X_MIN         = -5;
-    const COL_LEFT_X_MAX         = 12;
-    const COL_RIGHT_X_MIN        = 75;
-    const COL_RIGHT_X_MAX        = 95;
-    const IMG_WIDTH_MOBILE_MIN   = 40;
-    const IMG_WIDTH_MOBILE_MAX   = 55;
-    const IMG_WIDTH_DESKTOP_MIN  = 7;
-    const IMG_WIDTH_DESKTOP_MAX  = 15;
-    const IMG_JITTER_RANGE       = 120;
-    const IMG_Z_INDEX_MAX        = 20;
-    const IMG_VARIATION_MIN_DIFF = 0.2;
-    const IMG_SCALE_MIN          = 1.0;
-    const IMG_SCALE_MAX          = 1.0;
-    const IMG_DEPTH_PARALLAX_STRENGTH = 0.5;
-    const IMG_SPEED_FACTOR_MIN   = 0.8;
-    const IMG_SPEED_FACTOR_MAX   = 1.2;
+    const MOBILE_BREAKPOINT           = 768;
+    const STEP_Y_MOBILE               = 180;
+    const STEP_Y_DESKTOP              = 200;
+    const COL_LEFT_X_MIN              = -5;
+    const COL_LEFT_X_MAX              = 12;
+    const COL_RIGHT_X_MIN             = 75;
+    const COL_RIGHT_X_MAX             = 95;
+    const IMG_WIDTH_MOBILE_MIN        = 40;
+    const IMG_WIDTH_MOBILE_MAX        = 55;
+    const IMG_WIDTH_DESKTOP_MIN       = 7;
+    const IMG_WIDTH_DESKTOP_MAX       = 15;
+    const IMG_JITTER_RANGE            = 80;
+    const IMG_Z_INDEX_MAX             = 20;
+    const IMG_VARIATION_MIN_DIFF      = 0.2;
+    const IMG_SCALE_MIN               = 1.0;
+    const IMG_SCALE_MAX               = 1.0;
+    const IMG_DEPTH_PARALLAX_STRENGTH = 0.28;
+    const IMG_SPEED_FACTOR_MIN        = 0.90;
+    const IMG_SPEED_FACTOR_MAX        = 1.10;
+    // How much same-column images may overlap (px) before the resolver pushes them apart.
+    // Negative = overlap is allowed; the resolver only kicks in beyond this threshold.
+    const IMG_OVERLAP_MIN_GAP         = -50;
+    // Parallax convergence safety multiplier (× vpH). Keeps images from hiding each
+    // other *due to parallax* even when natural overlap is permitted.
+    const IMG_PARALLAX_SAFETY_DEPTH   = 0.7; // × vpH
 
     function getVariedRandom(min, max, previousValue = null, minDiff = IMG_VARIATION_MIN_DIFF) {
         if (previousValue === null) return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -45,10 +51,17 @@
         function initLayout() {
             const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
             const stepY    = isMobile ? STEP_Y_MOBILE : STEP_Y_DESKTOP;
+            const vpW      = window.innerWidth;
+            const vpH      = window.innerHeight;
+            const minW     = isMobile ? IMG_WIDTH_MOBILE_MIN  : IMG_WIDTH_DESKTOP_MIN;
+            const maxW     = isMobile ? IMG_WIDTH_MOBILE_MAX  : IMG_WIDTH_DESKTOP_MAX;
+
             let currentY   = 0;
             const prevLeft  = { x: null, w: null };
             const prevRight = { x: null, w: null };
 
+            // ── first pass: assign initial positions ──────────────────────────
+            const imageData = [];
             images.forEach((img, index) => {
                 const isLeft = index % 2 === 0;
                 const prev   = isLeft ? prevLeft : prevRight;
@@ -56,30 +69,63 @@
                 const minX    = isLeft ? COL_LEFT_X_MIN  : COL_RIGHT_X_MIN;
                 const maxX    = isLeft ? COL_LEFT_X_MAX  : COL_RIGHT_X_MAX;
                 const randomX = getVariedRandom(minX, maxX, prev.x);
-
-                const minW    = isMobile ? IMG_WIDTH_MOBILE_MIN  : IMG_WIDTH_DESKTOP_MIN;
-                const maxW    = isMobile ? IMG_WIDTH_MOBILE_MAX  : IMG_WIDTH_DESKTOP_MAX;
                 const randomW = getVariedRandom(minW, maxW, prev.w);
 
                 const jitter     = Math.floor(Math.random() * IMG_JITTER_RANGE) - IMG_JITTER_RANGE / 2;
                 const naturalTop = currentY + jitter;
-                img.style.width  = `${randomW}vw`;
-                img.style.left   = `${randomX}%`;
-                img.style.top    = `${naturalTop}px`;
-                img.dataset.naturalTop = String(naturalTop);
 
                 const normalizedSize = (randomW - minW) / Math.max(1, maxW - minW);
-                img.style.zIndex     = 1 + Math.round(normalizedSize * (IMG_Z_INDEX_MAX - 1));
-                img.dataset.speedFactor = (
+                const speedFactor    = parseFloat((
                     IMG_SPEED_FACTOR_MIN + normalizedSize * (IMG_SPEED_FACTOR_MAX - IMG_SPEED_FACTOR_MIN)
-                ).toFixed(3);
+                ).toFixed(3));
+
+                imageData.push({ img, naturalTop, widthVw: randomW, x: randomX, normalizedSize, speedFactor });
 
                 prev.x = randomX;
                 prev.w = randomW;
                 currentY += stepY;
             });
 
-            state.trackHeight = currentY;
+            // ── second pass: resolve same-column overlaps ─────────────────────
+            // Use a practical depth estimate (1.5 × vpH) rather than the theoretical
+            // maximum to avoid wildly inflating the track height. This covers the range
+            // where convergence is actually visible.
+            const speedRange     = IMG_SPEED_FACTOR_MAX - IMG_SPEED_FACTOR_MIN;
+            const parallaxBuffer = vpH * IMG_PARALLAX_SAFETY_DEPTH * speedRange * IMG_DEPTH_PARALLAX_STRENGTH;
+
+            for (let i = 2; i < imageData.length; i++) {
+                const prev = imageData[i - 2]; // same column (step 2)
+                const curr = imageData[i];
+
+                const prevWidthPx  = (prev.widthVw / 100) * vpW;
+                const prevHeightPx = prevWidthPx * (5 / 4); // aspect-ratio 4:5
+
+                const minRequiredTop = prev.naturalTop + prevHeightPx + parallaxBuffer + IMG_OVERLAP_MIN_GAP;
+
+                if (curr.naturalTop < minRequiredTop) {
+                    const delta = minRequiredTop - curr.naturalTop;
+                    // Propagate push to all subsequent same-column images
+                    for (let j = i; j < imageData.length; j += 2) {
+                        imageData[j].naturalTop += delta;
+                    }
+                }
+            }
+
+            // ── apply final positions ─────────────────────────────────────────
+            let maxBottom = 0;
+            imageData.forEach(({ img, naturalTop, widthVw, x, normalizedSize, speedFactor }) => {
+                img.style.width            = `${widthVw}vw`;
+                img.style.left             = `${x}%`;
+                img.style.top              = `${naturalTop}px`;
+                img.dataset.naturalTop     = String(naturalTop);
+                img.style.zIndex           = 1 + Math.round(normalizedSize * (IMG_Z_INDEX_MAX - 1));
+                img.dataset.speedFactor    = String(speedFactor);
+
+                const heightPx = (widthVw / 100) * vpW * (5 / 4);
+                maxBottom      = Math.max(maxBottom, naturalTop + heightPx);
+            });
+
+            state.trackHeight = maxBottom + stepY;
             if (track) track.style.height = `${state.trackHeight}px`;
         }
 

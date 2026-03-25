@@ -25,16 +25,23 @@
             });
         }
 
-        if (body) {
-            observeElementInOut(body, {
-                onEnter() { setTimeout(() => body.classList.add('is-visible'), stagger); }
-            });
+        // body animates only after the first poster's entrance transition completes
+        const firstPoster = posters[0];
+        let bodyRevealed = false;
+        function revealBodyAfterFirstPoster() {
+            if (bodyRevealed || !body) return;
+            bodyRevealed = true;
+            // 1200ms matches the transform transition on .team-poster-wrap
+            setTimeout(() => body.classList.add('is-visible'), 1200);
         }
 
         posters.forEach((wrap, i) => {
             wrap.style.transitionDelay = `${i * 80}ms`;
             observeElementInOut(wrap, {
-                onEnter: () => wrap.classList.add('is-visible'),
+                onEnter: () => {
+                    wrap.classList.add('is-visible');
+                    if (wrap === firstPoster) revealBodyAfterFirstPoster();
+                },
             });
         });
     });
