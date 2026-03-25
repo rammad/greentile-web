@@ -16,11 +16,20 @@
 .nav-left,
 .nav-center,
 .nav-right {
-    background: rgba(255, 255, 255, 0.3);
     /* background: var(--color-placeholder); */
-    backdrop-filter: blur(12px);           /* fixed — blur does not scale */
+
+    /* background: var(--c-dark-green); */
+
+    /* background: var(--c-off-white); */
+
+    /* border: 1px solid var(--c-dark-green); */
+
+
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-radius: 100px;                  /* intentional pill — not scaled */
+
+    border-radius: 100px;
     pointer-events: auto;
     transition: background 0.3s ease;
 
@@ -31,6 +40,12 @@
     align-items: center;
     padding: var(--space-12) var(--space-24) calc(var(--space-12) - var(--space-4)); /* drop slightly for better alignment */
 }
+
+/* .nav-left .type-subRegular1,
+.nav-center .type-subRegular1,
+.nav-right .type-subRegular1 {
+    color: var(--c-off-white);
+} */
 
 
 .nav-left {
