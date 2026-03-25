@@ -51,13 +51,27 @@
     --c-off-white: #FFFCFA;
     --c-bright-green: #30FA30;
     --c-mid-green: #23AA21;
-    --c-bright-green-10: #EAFFEA; /* 10% bright green over white */
-    --c-bright-green-20: #D6FED6; /* 20% bright green over white */
-    --c-lighter-green: #EAFFEA; /* alias for 10% — lighter gradient sections */
+    /* bright green tints — x% of #30FA30 over white */
+    --c-bright-green-10: #EAFFEA;
+    --c-bright-green-20: #D6FED6;
+    --c-bright-green-30: #C1FEC1; /* current color for light gradient */
+    --c-bright-green-40: #ACFDAC;
+    --c-bright-green-50: #98FD98;
+    --c-bright-green-60: #83FC83;
+    --c-bright-green-70: #6EFC6E;
+    --c-bright-green-80: #59FB59;
+    --c-bright-green-90: #45FB45;
     --c-dark-green: #0E4A0E;
-    --c-dark-green-10: #E7EDE7; /* 10% of dark green */
-    --c-dark-green-20: #CFDBCF; /* 20% of dark green */
-    --c-dark-green-50: #87A587; /* 50% of dark green */
+    /* dark green tints — x% of #0E4A0E over white */
+    --c-dark-green-10: #E7EDE7;
+    --c-dark-green-20: #CFDBCF;
+    --c-dark-green-30: #B7C9B7;
+    --c-dark-green-40: #9FB79F;
+    --c-dark-green-50: #87A587;
+    --c-dark-green-60: #6E926E;
+    --c-dark-green-70: #568056;
+    --c-dark-green-80: #3E6E3E;
+    --c-dark-green-90: #265C26;
     --c-black: #000000;
     /* --c-light-grey: #EDEDED; */
     --c-light-grey: #E2DEDB;
@@ -550,11 +564,11 @@ section {
     background: var(--c-off-white);
     z-index: 9500;
     transform: translateY(0);
-    pointer-events: none;
     will-change: transform;
 }
 #page-curtain.is-open {
     transform: translateY(-100%);
+    pointer-events: none;
 }
 
 /* curtain mahjong tiles */
@@ -578,72 +592,49 @@ section {
     will-change: transform, opacity;
 }
 
-/* mahjong call label above snapped tiles */
-.curtain-label {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    white-space: nowrap;
-    will-change: transform, opacity;
-}
-
-/* label + comic action lines — flex row: lines | word | lines */
+/* action lines — vertical strokes above tiles, like a click impact */
 .curtain-label-wrap {
     position: absolute;
     top: 50%;
     left: 50%;
-    display: flex;
-    align-items: center;
-    gap: calc(10 / 1920 * 100vw); /* 10px */
-    white-space: nowrap;
     will-change: transform, opacity;
     pointer-events: none;
 }
 
 .curtain-action-lines {
     display: flex;
-    flex-direction: column;
-    gap: calc(6 / 1920 * 100vw); /* 6px */
-    flex-shrink: 0;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: var(--space-8);
 }
-.curtain-action-lines--left  { align-items: flex-end; }
-.curtain-action-lines--right { align-items: flex-start; }
 
 .curtain-action-line {
-    height: calc(3 / 1920 * 100vw);        /* 3px */
-    background: currentColor;
-    border-radius: calc(2 / 1920 * 100vw); /* 2px */
+    width: calc(2 / 1920 * 100vw);
+    background: var(--c-bright-green);
+    border-radius: calc(2 / 1920 * 100vw);
     opacity: 0;
-    transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1), opacity 0.07s ease;
+    transition: transform 0.05s cubic-bezier(0, 0, 0.2, 1), opacity 0.03s ease;
 }
 
-/* widths: flanks shorter, middle longest */
+/* heights: middle tallest, flanks shorter */
 .curtain-action-line:nth-child(1),
-.curtain-action-line:nth-child(3) { width: calc(14 / 1920 * 100vw); } /* 14px */
-.curtain-action-line:nth-child(2) { width: calc(22 / 1920 * 100vw); } /* 22px */
+.curtain-action-line:nth-child(3) { height: calc(14 / 1920 * 100vw); }
+.curtain-action-line:nth-child(2) { height: calc(22 / 1920 * 100vw); }
 
-/* radiating fan — lines hidden, each carrying its resting angle */
-.curtain-action-lines--left .curtain-action-line:nth-child(1) { transform: rotate(18deg) scaleX(0); transform-origin: right center; }
-.curtain-action-lines--left .curtain-action-line:nth-child(2) { transform: rotate(0deg)   scaleX(0); transform-origin: right center; }
-.curtain-action-lines--left .curtain-action-line:nth-child(3) { transform: rotate(-18deg)  scaleX(0); transform-origin: right center; }
-
-.curtain-action-lines--right .curtain-action-line:nth-child(1) { transform: rotate(-18deg)  scaleX(0); transform-origin: left center; }
-.curtain-action-lines--right .curtain-action-line:nth-child(2) { transform: rotate(0deg)   scaleX(0); transform-origin: left center; }
-.curtain-action-lines--right .curtain-action-line:nth-child(3) { transform: rotate(18deg) scaleX(0); transform-origin: left center; }
+/* resting — scaled to zero, growing upward; flanks angled outward */
+.curtain-action-line:nth-child(1) { transform: rotate(-40deg) scaleY(0); transform-origin: center bottom; }
+.curtain-action-line:nth-child(2) { transform: rotate(0deg)   scaleY(0); transform-origin: center bottom; }
+.curtain-action-line:nth-child(3) { transform: rotate(40deg)  scaleY(0); transform-origin: center bottom; }
 
 /* stagger: middle fires first, flanks follow */
-.curtain-label-wrap.lines-active .curtain-action-line:nth-child(1) { transition-delay: 20ms; }
 .curtain-label-wrap.lines-active .curtain-action-line:nth-child(2) { transition-delay: 0ms; }
-.curtain-label-wrap.lines-active .curtain-action-line:nth-child(3) { transition-delay: 20ms; }
+.curtain-label-wrap.lines-active .curtain-action-line:nth-child(1),
+.curtain-label-wrap.lines-active .curtain-action-line:nth-child(3) { transition-delay: 10ms; }
 
-/* active — same rotation as resting state, only scaleX changes */
-.curtain-label-wrap.lines-active .curtain-action-lines--left .curtain-action-line:nth-child(1) { transform: rotate(18deg)  scaleX(1); opacity: 1; }
-.curtain-label-wrap.lines-active .curtain-action-lines--left .curtain-action-line:nth-child(2) { transform: rotate(0deg)   scaleX(1); opacity: 1; }
-.curtain-label-wrap.lines-active .curtain-action-lines--left .curtain-action-line:nth-child(3) { transform: rotate(-18deg) scaleX(1); opacity: 1; }
-
-.curtain-label-wrap.lines-active .curtain-action-lines--right .curtain-action-line:nth-child(1) { transform: rotate(-18deg) scaleX(1); opacity: 1; }
-.curtain-label-wrap.lines-active .curtain-action-lines--right .curtain-action-line:nth-child(2) { transform: rotate(0deg)   scaleX(1); opacity: 1; }
-.curtain-label-wrap.lines-active .curtain-action-lines--right .curtain-action-line:nth-child(3) { transform: rotate(18deg)  scaleX(1); opacity: 1; }
+/* active — burst upward, preserving rotation */
+.curtain-label-wrap.lines-active .curtain-action-line:nth-child(1) { transform: rotate(-40deg) scaleY(1); opacity: 1; }
+.curtain-label-wrap.lines-active .curtain-action-line:nth-child(2) { transform: rotate(0deg)   scaleY(1); opacity: 1; }
+.curtain-label-wrap.lines-active .curtain-action-line:nth-child(3) { transform: rotate(40deg)  scaleY(1); opacity: 1; }
 
 /* grain overlay */
 body::after {
@@ -663,11 +654,18 @@ body::after {
 .back-arrow {
     position: absolute;
     display: flex;
+    align-items: center;
+    justify-content: center;
     top: 0;
     left: 0;
+    padding: var(--space-20);
+    transform: scale(-100%);
+    cursor: pointer;
+}
+
+.back-arrow img {
     height: calc(7 / 1920 * 100vw); /* 7px */
     width: auto;
-    transform: scale(-100%);
 }
 
 @media (max-width: 768px) {

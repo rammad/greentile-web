@@ -26,7 +26,7 @@
     transition: opacity 0.8s ease;
 }
 
-.mission-section.is-active {
+.mission-section.is-revealed {
     opacity: 1;
     pointer-events: auto;
 }

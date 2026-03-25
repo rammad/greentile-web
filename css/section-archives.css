@@ -15,11 +15,20 @@
 .archives-page.is-active { opacity: 1; }
 
 .archives-header {
-    text-align: center;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-20);
     margin-bottom: var(--space-40);
     position: relative;
     padding: 0 var(--space-40);
     overflow: hidden;
+}
+
+.archives-header .back-arrow {
+    position: static;
+    flex-shrink: 0;
+    padding-bottom: 0;
 }
 
 .archives-title {

@@ -9,8 +9,8 @@
 }
 
 .pdp-sticky-wrapper .back-arrow {
-    top: var(--space-40);
-    left: var(--space-20);
+    top: var(--space-20);
+    left: 0;
 }
 
 .pdp-sticky-wrapper {
@@ -237,7 +237,7 @@
     transition: opacity var(--time-fade-in) ease, visibility var(--time-fade-in) ease;
     pointer-events: none;
     z-index: 1;
-    color: var(--c-dark-green-20);
+    color: var(--c-dark-green-50);
 }
 
 .max-qty-label.is-visible {
@@ -250,22 +250,24 @@
     align-items: center;
     justify-content: space-between;
     background-color: var(--c-dark-green-10);
-    border-radius: 100px;                  /* intentional pill — not scaled */
-    padding: 0 var(--space-20);
+    border-radius: 100px;
+    padding: calc(14 / 1920 * 100vw) var(--space-20) calc(10 / 1920 * 100vw);
     min-width: calc(140 / 1920 * 100vw);
-    height: 100%;
+    box-sizing: border-box;
 }
 
 .qty-btn {
     background: none; border: none;
     cursor: pointer;
-    padding: 0 var(--space-4);
+    padding: 0;
     color: var(--c-dark-green);
+    line-height: var(--lh-single);
 }
 
 .qty-val {
     min-width: calc(24 / 1920 * 100vw); text-align: center;
     color: var(--c-dark-green);
+    line-height: var(--lh-single);
 }
 
 .buy-btn-override {
@@ -275,14 +277,14 @@
 .pdp-tag {
     display: inline-block;
     background-color: var(--c-dark-green-10);
-    padding: var(--space-4) var(--space-12);
+    padding: var(--space-4) var(--space-8) calc(var(--space-4) / 2);
     border-radius: var(--space-4);
     margin: 0 var(--space-8) var(--space-8) 0;
     opacity: 0;
     transition: opacity var(--time-fade-in) ease;
 }
 
-.pdp-tag .type-subRegular2{
+.pdp-tag .type-subRegular2,.pdp-tag .type-subRegular1{
     color: var(--c-dark-green-50);
 }
 

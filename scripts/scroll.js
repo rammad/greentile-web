@@ -54,7 +54,7 @@
                 sections.forEach((s) => s.classList.remove('is-active'));
                 if (activeSection) activeSection.classList.add('is-active');
             },
-            { root: viewport, threshold: [0, 0.05, 0.1, 0.15, 0.2, 0.5, 0.8, 1] }
+            { root: viewport, threshold: Array.from({ length: 21 }, (_, i) => i * 0.05) }
         );
         sections.forEach((s) => observer.observe(s));
         sections[0]?.classList.add('is-active');

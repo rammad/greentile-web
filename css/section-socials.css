@@ -9,19 +9,16 @@
     min-height: 100vh;
     width: 100%;
     position: relative;
+    padding-top: var(--section-spacing);
     margin-bottom: var(--space-120);
 }
 
 .socials-header {
-    padding: 20vh var(--space-20);
+    padding: var(--space-120) var(--space-20) var(--space-80);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-40);
-}
-
-.socials-header .type-body1, .socials-header .type-body2 {
-    max-width: 60%;
 }
 
 .socials-icons {
@@ -41,8 +38,8 @@
 }
 
 .icon-circle {
-    width: calc(64 / 1920 * 100vw);
-    height: calc(64 / 1920 * 100vw);
+    width: calc(52 / 1920 * 100vw);
+    height: calc(52 / 1920 * 100vw);
     background-color: var(--c-dark-green-20);
     mask-size: contain;
     mask-repeat: no-repeat;
@@ -91,7 +88,7 @@
     border-radius: var(--poster-radius);
 
     opacity: 0;
-    transform: translateY(calc(-4 / 1920 * 100vw));
+    transform: translateY(calc(64 / 1920 * 100vw));
     transition:
         opacity var(--time-fade-in) var(--ease-standard),
         transform var(--time-fade-in) var(--ease-standard);
@@ -99,11 +96,11 @@
 
 .social-img.is-visible {
     opacity: 1;
-    transform: translateY(calc(-64 / 1920 * 100vw));
+    transform: translateY(var(--space-40));
 }
 
 .social-img.push-down {
-    transform: translateY(calc(60 / 1920 * 100vw));
+    transform: translateY(var(--space-64));
 }
 
 .social-img.push-down.is-visible {

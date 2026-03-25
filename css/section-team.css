@@ -33,12 +33,17 @@
 .team-images-col {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: var(--space-40);
 }
 
 .team-poster-wrap {
-    width: 100%;
+    height: var(--poster-full-height);
+    aspect-ratio: 4 / 5;
+    max-width: 100%;
     overflow: hidden;
+    border-radius: var(--poster-radius);
+    flex-shrink: 0;
     opacity: 0;
     transform: translateY(calc(32 / 1920 * 100vw));
     transition:
@@ -53,10 +58,9 @@
 
 .team-poster {
     width: 100%;
-    aspect-ratio: 4 / 5;
+    height: 100%;
     object-fit: cover;
     display: block;
-    border-radius: var(--poster-radius);
 }
 
 .team-text-col {
@@ -127,6 +131,8 @@
     }
 
     .team-poster-wrap {
+        height: auto;
+        width: 100%;
         opacity: 1;
         transform: none;
     }

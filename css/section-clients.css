@@ -15,7 +15,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-40);
-    width: 50%;
+    width: 35%;
     align-self: center;
 
     opacity: 0;
@@ -33,7 +33,7 @@
 .clients-paren {
     font-size: var(--size-display-xl);
     font-family: var(--font-subheader);
-    font-weight: 200;
+    font-weight: 80;
     font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
     line-height: var(--lh-single);
@@ -46,14 +46,13 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-32);
-    padding: var(--space-20) 0;
+    padding: var(--space-12) 0 var(--space-20) 0;
     text-align: center;
 }
 
 .clients-previous-inner p {
     opacity: 1;
     filter: none;
-    max-width: 60%;
     align-self: center;
 }
 
@@ -65,6 +64,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    padding: 0 var(--space-160);
 
     opacity: 0;
     transform: translateY(var(--space-20));

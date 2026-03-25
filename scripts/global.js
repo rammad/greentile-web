@@ -426,7 +426,7 @@ function createCurtainTiles(curtain, combo) {
     return wrap;
 }
 
-async function playTileAnimation(wrap, combo) {
+async function playTileAnimation(wrap) {
     const tiles    = wrap.querySelectorAll('.curtain-tile');
 
     const stagger  = 65;
@@ -463,40 +463,30 @@ async function playTileAnimation(wrap, combo) {
         tile.style.transform  = `translate(${snapX[i]}px, 0px) rotate(0deg)`;
     });
 
-    // phase 3: label + action lines — start during the snap so it arrives right at the click
+    // phase 3: action lines above tiles
     setTimeout(() => {
-        const labelWrap = document.createElement('div');
-        labelWrap.className = 'curtain-label-wrap type-subBold1';
-        const labelOffsetPx = Math.round(vwPx(110));
-        labelWrap.style.cssText = `transform: translate(-50%, -${labelOffsetPx}px) scale(0.82); opacity: 0; transition: none;`;
+        const linesWrap = document.createElement('div');
+        linesWrap.className = 'curtain-label-wrap';
+        const offsetPx = Math.round(vwPx(100));
+        linesWrap.style.cssText = `transform: translate(-50%, -${offsetPx}px) scale(0.82); opacity: 0; transition: none;`;
 
-        const makeLines = (side) => {
-            const div = document.createElement('div');
-            div.className = `curtain-action-lines curtain-action-lines--${side}`;
-            for (let i = 0; i < 3; i++) {
-                const line = document.createElement('div');
-                line.className = 'curtain-action-line';
-                div.appendChild(line);
-            }
-            return div;
-        };
+        const lines = document.createElement('div');
+        lines.className = 'curtain-action-lines';
+        for (let i = 0; i < 3; i++) {
+            const line = document.createElement('div');
+            line.className = 'curtain-action-line';
+            lines.appendChild(line);
+        }
+        linesWrap.appendChild(lines);
+        wrap.appendChild(linesWrap);
 
-        const text = document.createElement('span');
-        text.textContent = combo.type;
+        linesWrap.getBoundingClientRect();
+        linesWrap.style.transition = `transform ${labelMs}ms cubic-bezier(0, 0, 0.2, 1), opacity ${labelMs}ms cubic-bezier(0, 0, 0.2, 1)`;
+        linesWrap.style.transform  = `translate(-50%, -${offsetPx}px) scale(1)`;
+        linesWrap.style.opacity    = '1';
 
-        labelWrap.appendChild(makeLines('left'));
-        labelWrap.appendChild(text);
-        labelWrap.appendChild(makeLines('right'));
-        wrap.appendChild(labelWrap);
-
-        labelWrap.getBoundingClientRect(); // force layout
-        labelWrap.style.transition = `transform ${labelMs}ms cubic-bezier(0, 0, 0.2, 1), opacity ${labelMs}ms cubic-bezier(0, 0, 0.2, 1)`;
-        labelWrap.style.transform  = `translate(-50%, -${labelOffsetPx}px) scale(1)`;
-        labelWrap.style.opacity    = '1';
-
-        // action lines burst in just after the label starts
-        setTimeout(() => labelWrap.classList.add('lines-active'), 25);
-    }, Math.round(snapMs * 0.70));
+        setTimeout(() => linesWrap.classList.add('lines-active'), 25);
+    }, Math.round(snapMs * 0.5));
 
     // curtain rises right at the end of the click — no long hold
     await wait(snapMs + holdMs);
@@ -512,17 +502,21 @@ function initPageTransition() {
     let resolvePageReady;
     window.pageReady = new Promise(resolve => { resolvePageReady = resolve; });
 
+    // lock scroll while curtain covers the page
+    document.body.style.overflow = 'hidden';
+
     // entry: tile animation plays while curtain covers, then curtain lifts
     const entryCombo = CURTAIN_COMBOS[Math.floor(Math.random() * CURTAIN_COMBOS.length)];
     const entryWrap  = createCurtainTiles(curtain, entryCombo);
     requestAnimationFrame(() => {
         requestAnimationFrame(async () => {
             await preloadComboImages(entryCombo);
-            await playTileAnimation(entryWrap, entryCombo);
-            resolvePageReady(); // unblock section animations — they play during the reveal
+            await playTileAnimation(entryWrap);
+            resolvePageReady();
+            document.body.style.overflow = '';
             curtain.style.transition = 'transform 0.85s cubic-bezier(0.16, 1, 0.3, 1)';
             curtain.classList.add('is-open');
-            setTimeout(() => entryWrap.remove(), 900); // let tiles + label ride up with curtain
+            setTimeout(() => entryWrap.remove(), 900);
         });
     });
 
@@ -538,6 +532,7 @@ function initPageTransition() {
 
         e.preventDefault();
         navigating = true;
+        document.body.style.overflow = 'hidden';
 
         curtain.style.transition = 'transform 0.6s cubic-bezier(0.76, 0, 0.24, 1)';
         curtain.classList.remove('is-open');
