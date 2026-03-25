@@ -26,7 +26,8 @@ function randomPick(arr) {
 
 function buildBadgeHTML(type) {
     const assets = STICKER_ASSETS[type];
-    return `<img class="badge-layer badge-layer-blank" src="${randomPick(assets.blanks)}" alt="">` +
+    const blankSrc = randomPick(assets.blanks);
+    return `<div class="badge-layer badge-layer-blank" style="-webkit-mask-image:url('${blankSrc}');mask-image:url('${blankSrc}')"></div>` +
            `<img class="badge-layer badge-layer-text" src="${assets.text}" alt="">`;
 }
 
@@ -290,14 +291,14 @@ function initRowPacker() {
         const rowEl = document.createElement('div');
         rowEl.className = 'packed-row';
 
-        rowData.chunks.forEach(chunk => {
+        rowData.chunks.forEach((chunk, chunkIdx) => {
             const chunkEl = document.createElement('div');
             chunkEl.className = `packed-chunk span-${chunk.span}`;
 
             const header = document.createElement('div');
             header.className = 'month-header';
             header.classList.add('type-subBold2');
-            if (chunk.isContinuation) {
+            if (chunk.isContinuation && chunkIdx > 0) {
                 header.innerHTML = '<span class="spacer-line"></span>';
                 header.classList.add('continuation-header');
             } else {

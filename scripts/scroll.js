@@ -36,22 +36,25 @@
     function initGradientSectionObserver(viewport) {
         const sections = document.querySelectorAll('section[data-colors]');
         if (!sections.length) return;
-        const ratios = new Map();
+        const coverages = new Map();
         const observer = new IntersectionObserver(
             (entries) => {
-                entries.forEach((e) => ratios.set(e.target, e.intersectionRatio));
-                let maxRatio = 0;
+                entries.forEach((e) => {
+                    const vpH = e.rootBounds?.height || window.innerHeight;
+                    coverages.set(e.target, e.intersectionRect.height / vpH);
+                });
+                let maxCoverage = 0;
                 let activeSection = null;
-                ratios.forEach((r, el) => {
-                    if (r > maxRatio && r > 0.2) {
-                        maxRatio = r;
+                coverages.forEach((c, el) => {
+                    if (c > maxCoverage && c > 0.05) {
+                        maxCoverage = c;
                         activeSection = el;
                     }
                 });
                 sections.forEach((s) => s.classList.remove('is-active'));
                 if (activeSection) activeSection.classList.add('is-active');
             },
-            { root: viewport, threshold: [0, 0.2, 0.5, 0.8, 1] }
+            { root: viewport, threshold: [0, 0.05, 0.1, 0.15, 0.2, 0.5, 0.8, 1] }
         );
         sections.forEach((s) => observer.observe(s));
         sections[0]?.classList.add('is-active');

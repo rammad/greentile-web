@@ -6,8 +6,8 @@
     // ── scatter images ────────────────────────────────────────────────────────
 
     const MOBILE_BREAKPOINT           = 768;
-    const STEP_Y_MOBILE               = 180;
-    const STEP_Y_DESKTOP              = 200;
+    const STEP_Y_MOBILE               = 150;
+    const STEP_Y_DESKTOP              = 160;
     const COL_LEFT_X_MIN              = -5;
     const COL_LEFT_X_MAX              = 12;
     const COL_RIGHT_X_MIN             = 75;
@@ -26,7 +26,7 @@
     const IMG_SPEED_FACTOR_MAX        = 1.10;
     // How much same-column images may overlap (px) before the resolver pushes them apart.
     // Negative = overlap is allowed; the resolver only kicks in beyond this threshold.
-    const IMG_OVERLAP_MIN_GAP         = -50;
+    const IMG_OVERLAP_MIN_GAP         = -130;
     // Parallax convergence safety multiplier (× vpH). Keeps images from hiding each
     // other *due to parallax* even when natural overlap is permitted.
     const IMG_PARALLAX_SAFETY_DEPTH   = 0.7; // × vpH
@@ -203,9 +203,10 @@
 
         // ── build: fixed body text container + scroll track slides ────────────
 
-        let bodyEl    = null;
-        let activeIdx = 0;
-        let wasPinned = false;
+        let bodyEl         = null;
+        let activeIdx      = 0;
+        let wasPinned      = false;
+        let menuIsRevealed = false;
 
         function buildLayout() {
             const stickyContent = section.querySelector('.about-sticky-content');
@@ -310,6 +311,15 @@
             return menuNaturalTop <= pinVH * vpH && secRect.bottom >= vpH;
         }
 
+        function calcShouldRevealMenu(vpRect, secRect, isPinned) {
+            if (isPinned) return true;
+            const isMobile       = window.innerWidth < 768;
+            const offsetVH       = isMobile ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP;
+            const vpH            = vpRect.height;
+            const menuNaturalTop = secRect.top + offsetVH * vpH;
+            return menuNaturalTop < vpH * 0.55 && secRect.bottom > vpH * 0.5;
+        }
+
         function updateActiveSlide() {
             const vpRect  = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
             const secRect = section.getBoundingClientRect();
@@ -317,6 +327,15 @@
             const isPinned           = calcIsPinned(vpRect, secRect);
             const justBecamePinned   = isPinned && !wasPinned;
             const justBecameUnpinned = !isPinned && wasPinned;
+
+            const shouldReveal = calcShouldRevealMenu(vpRect, secRect, isPinned);
+            if (shouldReveal && !menuIsRevealed) {
+                revealMenuItems();
+                menuIsRevealed = true;
+            } else if (!shouldReveal && menuIsRevealed) {
+                hideMenuItems();
+                menuIsRevealed = false;
+            }
 
             if (menuEl) menuEl.classList.toggle('is-pinned', isPinned);
 
@@ -329,13 +348,11 @@
 
             if (justBecamePinned) {
                 if (menuEl) menuEl.style.top = '';
-                revealMenuItems();
                 showBlock(blocks[activeIdx]);
                 if (scrollHasFired) showCtas(blocks[activeIdx]);
             }
 
             if (justBecameUnpinned) {
-                hideMenuItems();
                 if (menuEl) {
                     const isMobile = window.innerWidth < 768;
                     const pinPx    = (isMobile ? MENU_PIN_VH_MOBILE : MENU_PIN_VH_DESKTOP) * vpRect.height;
@@ -381,7 +398,9 @@
             if (menuEl) menuEl.classList.toggle('is-pinned', isPinned);
             menuItems.forEach((item) => item.classList.remove('is-active'));
             wasPinned = isPinned;
-            if (isPinned) {
+            const shouldReveal = calcShouldRevealMenu(vpRect, secRect, isPinned);
+            if (shouldReveal) {
+                menuIsRevealed = true;
                 window.pageReady.then(() => revealMenuItems());
             }
         })();

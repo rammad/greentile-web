@@ -12,8 +12,17 @@
         const titleWrap = section.querySelector('.events-title-wrap');
         const grid = section.querySelector('.events-grid');
         const cards = section.querySelectorAll('.event-card');
-        const ctaSection = document.querySelector('.events-cta-section');
-        const btn = ctaSection ? ctaSection.querySelector('.cta-btn') : null;
+        const btn = section.querySelector('.cta-btn');
+        const ctaFooter = section.querySelector('.events-content-footer');
+        const stickyInner = section.querySelector('.events-sticky-inner');
+        const content = section.querySelector('.events-content');
+
+        const CTA_MIN_SPACE = 240;
+        let ctaSpacer = null;
+        if (ctaFooter) {
+            ctaSpacer = document.createElement('div');
+            section.after(ctaSpacer);
+        }
 
         if (grid && cards.length) {
             grid.style.setProperty('--poster-count', cards.length);
@@ -33,15 +42,11 @@
             let wantsReveal = false;
 
             document.fonts.ready.then(() => {
-                fitTextToWidth(title);
+                if (fitTextToWidth) fitTextToWidth(title);
                 title.classList.add('animate-cascade');
                 if (window.initCascadeReveal) window.initCascadeReveal();
                 fontsReady = true;
                 if (wantsReveal && transitionHeader) transitionHeader(title, 'enter');
-            });
-
-            window.addEventListener('resize', () => {
-                if (fitTextToWidth) fitTextToWidth(title);
             });
 
             if (observeElementInOut) {
@@ -79,6 +84,7 @@
 
         // card i starts moving at this scroll progress value
         const cardStarts = Array.from(cards, (_, i) => readingBuffer + i * stepSize);
+        const btnThreshold = cardStarts[n - 1] + travelDuration;
 
         // cached layout values, recalculated after fonts/layout settle
         let phase2Start = 0;
@@ -94,31 +100,51 @@
             phase2Len = ih * 1; // fixed animation range — decoupled from section height
             startOffset = ih; // start fully off the bottom of the screen
             applyPositions(window.lenis ? window.lenis.scroll : 0);
+
+            if (ctaFooter && content && stickyInner) {
+                const posterBottom = content.offsetTop + content.offsetHeight;
+                const viewportH = stickyInner.clientHeight;
+                const btnH = ctaFooter.offsetHeight;
+                const naturalGap = viewportH - posterBottom;
+
+                if (naturalGap >= CTA_MIN_SPACE) {
+                    ctaFooter.style.top = posterBottom + (naturalGap - btnH) / 2 + 'px';
+                    if (ctaSpacer) ctaSpacer.style.height = '0';
+                } else {
+                    ctaFooter.style.top = posterBottom + (CTA_MIN_SPACE - btnH) / 2 + 'px';
+                    if (ctaSpacer) ctaSpacer.style.height = Math.max(0, CTA_MIN_SPACE - naturalGap) + 'px';
+                }
+                ctaFooter.style.bottom = 'auto';
+            }
         };
 
         document.fonts.ready.then(recalcLayout);
-        window.addEventListener('resize', recalcLayout);
+        window.addEventListener('resize', () => {
+            if (title && fitTextToWidth) fitTextToWidth(title);
+            recalcLayout();
+        });
 
         const applyPositions = scrollY => {
             const progress = Math.max(0, Math.min(1, (scrollY - phase2Start) / phase2Len));
 
             cards.forEach((card, i) => {
-                // localP: 0 = not yet started, 1 = fully arrived. same duration for all cards.
                 const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
                 card.style.transform = `translateY(${startOffset * (1 - localP)}px)`;
                 card.style.opacity   = '1';
             });
 
+            if (btn && transitionCta) {
+                if (progress >= btnThreshold && !btn.classList.contains('is-visible')) {
+                    transitionCta(btn, 'enter');
+                } else if (progress < btnThreshold && btn.classList.contains('is-visible')) {
+                    transitionCta(btn, 'exit');
+                }
+            }
         };
 
         window.addEventListener('lenis-scroll', ({ detail }) => {
             applyPositions(detail.scroll);
         }, { passive: true });
 
-        if (btn && observeElementInOut) {
-            observeElementInOut(btn, {
-                onEnter() { if (transitionCta) transitionCta(btn, 'enter'); }
-            });
-        }
     });
 })();

@@ -94,14 +94,14 @@
             const rowEl = document.createElement('div');
             rowEl.className = 'packed-row';
             
-            rowData.chunks.forEach(chunk => {
+            rowData.chunks.forEach((chunk, chunkIdx) => {
                 const chunkEl = document.createElement('div');
                 chunkEl.className = `packed-chunk span-${chunk.span}`;
                 
                 const header = document.createElement('div');
                 header.className = 'month-header';
-                header.classList.add('type-subBold2')
-                if (chunk.isContinuation) {
+                header.classList.add('type-subBold2');
+                if (chunk.isContinuation && chunkIdx > 0) {
                     header.innerHTML = '<span class="spacer-line"></span>';
                     header.classList.add('continuation-header');
                 } else {

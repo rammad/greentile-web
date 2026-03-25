@@ -22,9 +22,10 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: stretch;
     gap: var(--space-64);
-    padding: var(--space-80) 0;
+    padding-top: var(--space-40);
     box-sizing: border-box;
 }
 
@@ -38,10 +39,9 @@
 }
 
 .events-title-wrap #event-title {
+    /* font-size set at runtime by fitTextToWidth() */
     display: block;
     width: 100%;
-    text-align: center;
-    /* font-size set at runtime by fitTextToWidth() */
 }
 
 .events-content {
@@ -80,12 +80,13 @@
     border-radius: var(--poster-radius);
 }
 
-.events-cta-section {
+.events-content-footer {
+    position: absolute;
+    bottom: var(--space-80);
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: auto;
-    padding: var(--space-80) var(--space-20);
 }
 
 @media (max-width: 768px) {

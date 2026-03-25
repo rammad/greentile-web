@@ -13,7 +13,7 @@
 }
 
 .calendar-header {
-    padding: 0 0 var(--space-20) 0;
+    padding: 0;
     flex-shrink: 0;
     width: 100%;
     opacity: 1;
@@ -23,6 +23,7 @@
 .calendar-header .type-display-hero {
     font-size: 9.1vw;
     margin: 0;
+    padding-top: var(--space-8);
     line-height: var(--lh-tight);
     overflow: visible;
 }
@@ -31,12 +32,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center; 
-    margin: var(--space-20) var(--space-20) 0;
-    padding: var(--space-4) 0;
+    margin: var(--space-48) var(--space-40) 0;
+    padding: 0;
     overflow: visible;
 }
 .filters-list { display: flex; gap: var(--space-20); align-items: center; }
-.view-controls { display: flex; align-items: center; }
 
 .filter-btn, .view-btn {
     background: none; border: none;
@@ -64,7 +64,13 @@
     transform: translateX(-50%) scaleX(1);
 }
 
-.divider { color: var(--color-text-main); margin: 0 var(--space-8); display: inline-block; line-height: var(--lh-single); }
+.divider { 
+    color: var(--color-text-main); 
+    margin: 0; 
+    padding-bottom: var(--space-8); 
+    display: inline-block; 
+    line-height: var(--lh-single); 
+}
 
 .calendar-body {
     position: relative;
@@ -72,7 +78,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding: 0 var(--space-20) var(--space-40);
+    padding: var(--space-40) var(--space-20) var(--space-40);
     overflow: hidden;
 }
 
@@ -183,7 +189,7 @@
 .span-6 { grid-column: span 6; }
 
 .month-header {
-    color: var(--c-dark-green);
+    color: var(--c-dark-green-20);
     display: flex;
     align-items: center;
     white-space: nowrap;
@@ -191,7 +197,7 @@
     min-height: var(--size-subBold1);
 }
 .month-header::after, .spacer-line::after {
-    content: ''; display: block; flex-grow: 1; height: 1px; background-color: var(--c-dark-green);
+    content: ''; display: block; flex-grow: 1; height: 1px; background-color: var(--c-dark-green-20);
 }
 .month-header:not(.continuation-header)::after { margin-left: var(--space-20); }
 .continuation-header { width: 100%; display: flex; }
@@ -264,10 +270,23 @@
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    object-fit: contain;
 }
 
-.badge-layer-blank { animation: spin-cw 90s linear infinite; }
+.badge-layer-text { object-fit: contain; }
+
+.badge-layer-blank {
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    animation: spin-cw 90s linear infinite;
+}
+
+.badge-soon .badge-layer-blank { background-color: var(--c-light-yellow); }
+.badge-sold .badge-layer-blank { background-color: var(--c-red); }
+
 .badge-layer-text  { animation: spin-ccw 90s linear infinite; }
 
 .badge-sold .badge-layer-blank,

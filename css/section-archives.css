@@ -16,7 +16,7 @@
 
 .archives-header {
     text-align: center;
-    margin-bottom: var(--space-64);
+    margin-bottom: var(--space-40);
     position: relative;
     padding: 0 var(--space-40);
     overflow: hidden;
