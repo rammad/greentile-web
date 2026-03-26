@@ -78,7 +78,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding: var(--space-40) var(--space-20) var(--space-40);
+    padding: var(--space-40) var(--space-20) var(--space-20);
     overflow: hidden;
 }
 
@@ -118,6 +118,7 @@
     flex-direction: column;
     justify-content: flex-start;
     padding-top: var(--space-40);
+    padding-bottom: var(--space-20);
 }
 .calendar-list::-webkit-scrollbar { display: none; }
 
@@ -173,7 +174,7 @@
 .packed-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    column-gap: var(--space-12);
+    column-gap: var(--poster-gap);
     width: 100%;
     margin: 0 auto;
     animation: fadeIn var(--time-fade-in) ease forwards;
@@ -199,10 +200,10 @@
 .month-header::after, .spacer-line::after {
     content: ''; display: block; flex-grow: 1; height: 1px; background-color: var(--c-dark-green-30);
 }
-.month-header:not(.continuation-header)::after { margin-left: var(--space-12); }
+.month-header:not(.continuation-header)::after { margin-left: var(--poster-gap); }
 .continuation-header { width: 100%; display: flex; }
 
-.chunk-grid { display: grid; gap: var(--space-8); }
+.chunk-grid { display: grid; gap: var(--poster-gap); }
 .cols-1 { grid-template-columns: repeat(1, 1fr); }
 .cols-2 { grid-template-columns: repeat(2, 1fr); }
 .cols-3 { grid-template-columns: repeat(3, 1fr); }

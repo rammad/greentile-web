@@ -87,7 +87,7 @@
 
 .socials-track {
     display: flex;
-    gap: var(--space-12);
+    gap: var(--poster-gap);
     width: max-content;
     align-items: center;
 }

@@ -105,7 +105,7 @@
             const ih = window.innerHeight;
             const vw = window.innerWidth;
 
-            const sectionSpacingPx = vw * 200 / 1920;
+            const sectionSpacingPx = vw * 400 / 1920; // double the section spacing
             const s80 = vw * 80 / 1920;
             const s20 = vw * 20 / 1920;
 
