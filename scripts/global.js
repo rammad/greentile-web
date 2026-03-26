@@ -332,23 +332,21 @@ class MarqueeManager {
             }
             const measureDiv = document.createElement('div');
             const trackStyle = window.getComputedStyle(track);
-            measureDiv.style.cssText = `display: flex; width: max-content; visibility: hidden; position: absolute; gap: ${trackStyle.gap || trackStyle.columnGap}; fontFamily: ${trackStyle.fontFamily}; fontSize: ${trackStyle.fontSize}; fontWeight: ${trackStyle.fontWeight}; letterSpacing: ${trackStyle.letterSpacing}; textTransform: ${trackStyle.textTransform};`;
+            measureDiv.style.cssText = `display:flex;width:max-content;visibility:hidden;position:absolute;gap:${trackStyle.gap || trackStyle.columnGap};font-family:${trackStyle.fontFamily};font-size:${trackStyle.fontSize};font-weight:${trackStyle.fontWeight};letter-spacing:${trackStyle.letterSpacing};text-transform:${trackStyle.textTransform};`;
             originalContent.forEach(child => measureDiv.appendChild(child.cloneNode(true)));
             document.body.appendChild(measureDiv);
-            const singleSetWidth = measureDiv.getBoundingClientRect().width;
-            const gap = parseFloat(trackStyle.gap || trackStyle.columnGap) || 0;
+            const patternWidth = measureDiv.getBoundingClientRect().width;
             document.body.removeChild(measureDiv);
             const screenWidth = window.innerWidth;
-            const setsNeeded = Math.ceil(screenWidth / (singleSetWidth + gap)) + 1;
+            const patternsPerHalf = Math.ceil(screenWidth / patternWidth) + 1;
             track.innerHTML = '';
             const fragment = document.createDocumentFragment();
-            for (let i = 0; i <= setsNeeded; i++) {
+            for (let i = 0; i < patternsPerHalf * 2; i++) {
                 originalContent.forEach(child => fragment.appendChild(child.cloneNode(true)));
             }
             track.appendChild(fragment);
-            const moveDistance = singleSetWidth + gap;
-            track.style.setProperty('--marquee-end', `-${moveDistance}px`);
-            const duration = moveDistance / this.speed; 
+            const halfWidth = patternsPerHalf * patternWidth;
+            const duration = halfWidth / this.speed;
             track.style.setProperty('--marquee-duration', `${duration}s`);
             track.classList.add('has-seamless-animation');
             track.classList.add('is-initialized');

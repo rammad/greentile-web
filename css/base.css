@@ -149,7 +149,8 @@
     --size-subRegular1:   calc(14  / 1920 * 100vw); /* 14px  — nav and buttons */
     --size-subRegular2:   calc(10  / 1920 * 100vw); /* 10px  — badges (pdp meta) */
     --size-body1:         calc(14  / 1920 * 100vw); /* 14px  */
-    --size-body2:         calc(20  / 1920 * 100vw); /* 36px  */
+    --size-body2:         calc(20  / 1920 * 100vw); /* 20px  */
+    --size-body3:         calc(32  / 1920 * 100vw); /* 32px  */
 
     /* mobile type sizes — addressed in mobile pass, kept as px */
     --size-display-hero-mobile: 15vw;
@@ -160,6 +161,7 @@
     --size-sub2-mobile: 14px;
     --size-body1-mobile: 14px;
     --size-body2-mobile: 24px;
+    --size-body3-mobile: 28px;
 
     --section-spacing: var(--space-200);
 
@@ -364,6 +366,18 @@ section {
     transition: opacity var(--time-fade-in) ease, filter var(--time-fade-in) ease;
 }
 .type-body2.is-visible { opacity: 1; filter: blur(0); }
+
+.type-body3 {
+    font-family: var(--font-body);
+    font-size: var(--size-body3);
+    font-weight: 300;
+    line-height: var(--lh-body);
+
+    opacity: 0;
+    filter: blur(var(--blur-standard));
+    transition: opacity var(--time-fade-in) ease, filter var(--time-fade-in) ease;
+}
+.type-body3.is-visible { opacity: 1; filter: blur(0); }
 
 .standard-margins { padding: var(--space-80) var(--space-20) var(--space-20); }
 .section-spacer { padding-top: var(--section-spacing); }
@@ -698,6 +712,7 @@ body::after {
     .type-subRegular2 { font-size: var(--size-subRegular2); }
     .type-body1 { font-size: var(--size-body1-mobile); }
     .type-body2 { font-size: var(--size-body2-mobile); }
+    .type-body3 { font-size: var(--size-body3-mobile); }
     .standard-margins { padding: var(--section-padding-mobile); }
     .section-standard { padding: var(--section-padding-mobile); }
     .section-spacer { padding-top: var(--section-spacing-mobile); }

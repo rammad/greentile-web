@@ -9,6 +9,7 @@
     min-height: auto;
     width: 100%;
     position: relative;
+    margin-top: var(--section-spacing);
     padding-bottom: var(--space-80);
 }
 

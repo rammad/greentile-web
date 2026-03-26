@@ -1,0 +1,123 @@
+/* about-alt section — scatter images + Doppler-scrolling body blocks (no menu) */
+
+/* ── scatter image track ────────────────────────────────────────────────── */
+
+.about-alt .about-image-track {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+    min-height: 100vh;
+}
+
+.about-alt .about-image-track-positioned {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    z-index: 0;
+}
+
+.about-alt .scatter-img {
+    position: absolute;
+    top: 0; left: 0;
+    display: block;
+    width: 22vw;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--poster-radius);
+    opacity: 1;
+    transform: scale(1);
+    transition: transform 0.1s linear;
+    will-change: transform;
+}
+
+/* ── section container ──────────────────────────────────────────────────── */
+
+.about-alt {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    margin-top: var(--section-spacing);
+    background-color: transparent;
+}
+
+/* scroll-track slides — invisible spacers that define scroll distance per block */
+.about-alt-slides {
+    position: relative;
+    width: 100%;
+    z-index: 0;
+}
+
+.about-alt-slide {
+    position: relative;
+    width: 100%;
+}
+
+/* ── fixed Doppler-scroll body container ─────────────────────────────── */
+/* Lives outside #scroll-content (appended by JS) so Lenis transform
+   context doesn't affect fixed positioning. */
+
+.about-alt-body {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    z-index: 50;
+    pointer-events: none;
+}
+
+/* all blocks occupy the same grid cell — stacked, individually positioned by JS */
+.about-alt-body .about-alt-block {
+    grid-area: 1 / 1;
+    width: 100%;
+    max-width: calc(600 / 1920 * 100vw);
+    padding: 0 var(--space-20);
+    text-align: center;
+    will-change: transform, opacity, filter;
+    pointer-events: none;
+}
+
+.about-alt-body .about-alt-block.is-readable {
+    pointer-events: auto;
+}
+
+/* reset base.css opacity:0 on child type elements — parent block controls visibility */
+.about-alt-body .type-body1,
+.about-alt-body .type-body2,
+.about-alt-body .type-body3,
+.about-alt-body p {
+    opacity: 1 !important;
+    filter: none !important;
+    transition: none !important;
+}
+
+.about-alt-body .about-content {
+    position: relative;
+    width: 100%;
+    max-width: calc(600 / 1920 * 100vw);
+    text-align: center;
+}
+
+.about-alt-body .about-content .cta-btn {
+    position: absolute;
+    top: calc(100% + var(--space-40));
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .about-alt-body .about-alt-block {
+        max-width: 90vw;
+    }
+
+    .about-alt-body .about-content {
+        max-width: 90vw;
+    }
+}

@@ -69,28 +69,20 @@
             }
         }
 
-        // scroll-driven card positions
-        //
-        // phase 1 (1× innerHeight): section enters, title scrolls to centre. no cards yet.
-        // phase 2 (section.offsetHeight − innerHeight): cards animate in sequentially.
-        //
-        // All cards travel at identical speed (same travelDuration in progress-space).
-        // The cascade is created by delaying each card's start by a fixed stepSize,
-        // NOT by varying speed. Cards arrive in order 0, 1, 2 …
-        //
-        // Available progress range after readingBuffer is split 20/80:
-        //   20% → stagger delays  (stepSize × n gaps)
-        //   80% → travel distance (same for every card)
+        // ── TUNING ────────────────────────────────────────────────
+        const SECTION_VH     = 2.0;   // section height in viewports (bigger = slower overall scroll)
+        const ENTRANCE_DELAY = -0.75;  // 0–1, fraction of scroll before first card appears
+        const STAGGER_SPLIT  = 0.35;  // 0–1, how much of the remaining range is card-to-card delay
+        // ──────────────────────────────────────────────────────────
 
-        const readingBuffer  = 0;
         const n              = cards.length;
-        const availableRange = 1 - readingBuffer;
-        const totalDelay     = availableRange * 0.2;
-        const travelDuration = availableRange * 0.8;
+        const availableRange = 1 - ENTRANCE_DELAY;
+        const totalDelay     = availableRange * STAGGER_SPLIT;
+        const travelDuration = availableRange * (1 - STAGGER_SPLIT);
         const stepSize       = n > 1 ? totalDelay / (n - 1) : 0;
 
         // card i starts moving at this scroll progress value
-        const cardStarts = Array.from(cards, (_, i) => readingBuffer + i * stepSize);
+        const cardStarts = Array.from(cards, (_, i) => ENTRANCE_DELAY + i * stepSize);
         const btnThreshold = cardStarts[n - 1] + travelDuration;
 
         // cached layout values, recalculated after fonts/layout settle
@@ -137,10 +129,10 @@
             const adjustedPT   = Math.max(0, sectionSpacingPx - centerOffset);
 
             section.style.paddingTop = adjustedPT + 'px';
-            section.style.minHeight  = (1.6 * ih + adjustedPT) + 'px';
+            section.style.minHeight  = (SECTION_VH * ih) + 'px';
 
-            phase2Start = section.offsetTop - ih * 0.6;
-            phase2Len   = ih * 1;
+            phase2Start = section.offsetTop;
+            phase2Len   = section.offsetHeight - ih;
             startOffset = ih;
 
             applyPositions(window.lenis ? window.lenis.scroll : 0);
@@ -152,11 +144,7 @@
                 ctaFooter.style.top    = ctaTop + 'px';
                 ctaFooter.style.bottom = 'auto';
 
-                // if the CTA spills below the viewport, push the next section
-                // down so it doesn't overlap; otherwise clear any previous margin
-                const ctaBottom = ctaTop + ctaFooter.offsetHeight;
-                const overflow  = ctaBottom - ih;
-                section.style.marginBottom = overflow > 0 ? overflow + 'px' : '';
+                section.style.marginBottom = '';
             }
         };
 

@@ -61,6 +61,11 @@
     width: calc(30 / 1920 * 100vw);
     height: calc(30 / 1920 * 100vw);
     display: block;
+    transition: transform 0.3s ease;
+}
+
+.nav-logo:hover {
+    transform: rotate(15deg);
 }
 
 .sticky-nav a {

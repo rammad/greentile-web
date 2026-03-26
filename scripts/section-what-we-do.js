@@ -1,189 +1,8 @@
-/* what we do section (about-us.html) — scatter images + fixed body text + persistent menu */
+/* what we do section (about-us.html) — scatter images + fixed body text + persistent menu
+   Image scatter layout is now handled by the shared scatter-images.js module. */
 
 (function () {
     const { staggerTime } = window.AnimationUtils || {};
-
-    // ── scatter images ────────────────────────────────────────────────────────
-
-    const MOBILE_BREAKPOINT           = 768;
-    const STEP_Y_MOBILE               = 150;
-    const STEP_Y_DESKTOP              = 130;
-    const COL_LEFT_X_MIN              = -5;
-    const COL_LEFT_X_MAX              = 12;
-    const COL_RIGHT_X_MIN             = 75;
-    const COL_RIGHT_X_MAX             = 95;
-    const IMG_WIDTH_MOBILE_MIN        = 40;
-    const IMG_WIDTH_MOBILE_MAX        = 55;
-    const IMG_WIDTH_DESKTOP_MIN       = 7;
-    const IMG_WIDTH_DESKTOP_MAX       = 15;
-    const IMG_JITTER_RANGE            = 80;
-    const IMG_Z_INDEX_MAX             = 20;
-    const IMG_VARIATION_MIN_DIFF      = 0.2;
-    const IMG_SCALE_MIN               = 1.0;
-    const IMG_SCALE_MAX               = 1.0;
-    const IMG_DEPTH_PARALLAX_STRENGTH = 0.28;
-    const IMG_SPEED_FACTOR_MIN        = 0.90;
-    const IMG_SPEED_FACTOR_MAX        = 1.10;
-    // How much same-column images may overlap (px) before the resolver pushes them apart.
-    // Negative = overlap is allowed; the resolver only kicks in beyond this threshold.
-    const IMG_OVERLAP_MIN_GAP         = -250;
-    // Parallax convergence safety multiplier (× vpH). Keeps images from hiding each
-    // other *due to parallax* even when natural overlap is permitted.
-    const IMG_PARALLAX_SAFETY_DEPTH   = 0.35; // × vpH
-
-    // section height is explicit — images are normalized to fill it
-    const SLIDE_HEIGHT_VH_DESKTOP     = 0.75;
-    const SLIDE_HEIGHT_VH_MOBILE      = 0.90;
-    const NUM_SLIDES                  = 4;
-
-    function getVariedRandom(min, max, previousValue = null, minDiff = IMG_VARIATION_MIN_DIFF) {
-        if (previousValue === null) return Math.floor(Math.random() * (max - min + 1)) + min;
-        const range       = max - min;
-        const minDistance = range * minDiff;
-        let attempts = 0, value;
-        do {
-            value = Math.floor(Math.random() * (max - min + 1)) + min;
-            attempts++;
-        } while (Math.abs(value - previousValue) < minDistance && attempts < 10);
-        return value;
-    }
-
-    function initScatter(section, viewport) {
-        const track  = section.querySelector('.about-image-track');
-        const images = track ? Array.from(track.querySelectorAll('.scatter-img')) : [];
-        const state  = { trackHeight: 0, fullHeight: 0 };
-
-        function initLayout() {
-            const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
-            const stepY    = isMobile ? STEP_Y_MOBILE : STEP_Y_DESKTOP;
-            const vpW      = window.innerWidth;
-            const vpH      = window.innerHeight;
-            const minW     = isMobile ? IMG_WIDTH_MOBILE_MIN  : IMG_WIDTH_DESKTOP_MIN;
-            const maxW     = isMobile ? IMG_WIDTH_MOBILE_MAX  : IMG_WIDTH_DESKTOP_MAX;
-
-            // explicit section height — images will be normalized to fill this
-            const slideHeightVH     = isMobile ? SLIDE_HEIGHT_VH_MOBILE : SLIDE_HEIGHT_VH_DESKTOP;
-            const totalSlideHeight  = NUM_SLIDES * slideHeightVH * vpH;
-            const sectionPadding    = parseFloat(getComputedStyle(section).paddingTop) || 0;
-            const fullSectionHeight = sectionPadding + totalSlideHeight;
-
-            let currentY   = 0;
-            const prevLeft  = { x: null, w: null };
-            const prevRight = { x: null, w: null };
-
-            // ── first pass: assign initial positions ──────────────────────────
-            const imageData = [];
-            images.forEach((img, index) => {
-                const isLeft = index % 2 === 0;
-                const prev   = isLeft ? prevLeft : prevRight;
-
-                const minX    = isLeft ? COL_LEFT_X_MIN  : COL_RIGHT_X_MIN;
-                const maxX    = isLeft ? COL_LEFT_X_MAX  : COL_RIGHT_X_MAX;
-                const randomX = getVariedRandom(minX, maxX, prev.x);
-                const randomW = getVariedRandom(minW, maxW, prev.w);
-
-                const jitter     = Math.floor(Math.random() * IMG_JITTER_RANGE) - IMG_JITTER_RANGE / 2;
-                const naturalTop = currentY + jitter;
-
-                const normalizedSize = (randomW - minW) / Math.max(1, maxW - minW);
-                const speedFactor    = parseFloat((
-                    IMG_SPEED_FACTOR_MIN + normalizedSize * (IMG_SPEED_FACTOR_MAX - IMG_SPEED_FACTOR_MIN)
-                ).toFixed(3));
-
-                imageData.push({ img, naturalTop, widthVw: randomW, x: randomX, normalizedSize, speedFactor });
-
-                prev.x = randomX;
-                prev.w = randomW;
-                currentY += stepY;
-            });
-
-            // ── second pass: resolve same-column overlaps ─────────────────────
-            // Use a practical depth estimate (1.5 × vpH) rather than the theoretical
-            // maximum to avoid wildly inflating the track height. This covers the range
-            // where convergence is actually visible.
-            const speedRange     = IMG_SPEED_FACTOR_MAX - IMG_SPEED_FACTOR_MIN;
-            const parallaxBuffer = vpH * IMG_PARALLAX_SAFETY_DEPTH * speedRange * IMG_DEPTH_PARALLAX_STRENGTH;
-
-            for (let i = 2; i < imageData.length; i++) {
-                const prev = imageData[i - 2]; // same column (step 2)
-                const curr = imageData[i];
-
-                const prevWidthPx  = (prev.widthVw / 100) * vpW;
-                const prevHeightPx = prevWidthPx * (5 / 4); // aspect-ratio 4:5
-
-                const minRequiredTop = prev.naturalTop + prevHeightPx + parallaxBuffer + IMG_OVERLAP_MIN_GAP;
-
-                if (curr.naturalTop < minRequiredTop) {
-                    const delta = minRequiredTop - curr.naturalTop;
-                    // Propagate push to all subsequent same-column images
-                    for (let j = i; j < imageData.length; j += 2) {
-                        imageData[j].naturalTop += delta;
-                    }
-                }
-            }
-
-            // ── third pass: normalize positions to fill section height ─────────
-            let rawMinTop = Infinity, rawMaxBottom = -Infinity, bottomImgH = 0;
-            imageData.forEach(d => {
-                const h = (d.widthVw / 100) * vpW * (5 / 4);
-                if (d.naturalTop < rawMinTop) rawMinTop = d.naturalTop;
-                if (d.naturalTop + h > rawMaxBottom) { rawMaxBottom = d.naturalTop + h; bottomImgH = h; }
-            });
-            const srcRange = (rawMaxBottom - bottomImgH) - rawMinTop;
-            const dstRange = fullSectionHeight - bottomImgH;
-            if (srcRange > 0 && dstRange > 0) {
-                imageData.forEach(d => {
-                    d.naturalTop = ((d.naturalTop - rawMinTop) / srcRange) * dstRange;
-                });
-            }
-
-            // ── apply final positions ─────────────────────────────────────────
-            imageData.forEach(({ img, naturalTop, widthVw, x, normalizedSize, speedFactor }) => {
-                img.style.width            = `${widthVw}vw`;
-                img.style.left             = `${x}%`;
-                img.style.top              = `${naturalTop}px`;
-                img.dataset.naturalTop     = String(naturalTop);
-                img.style.zIndex           = 1 + Math.round(normalizedSize * (IMG_Z_INDEX_MAX - 1));
-                img.dataset.speedFactor    = String(speedFactor);
-            });
-
-            state.trackHeight = totalSlideHeight;
-            state.fullHeight  = fullSectionHeight;
-            if (track) track.style.height = `${state.fullHeight}px`;
-        }
-
-        function updateImageScales() {
-            if (!viewport) return;
-            const viewportRect    = viewport.getBoundingClientRect();
-            const viewportCenterY = viewportRect.height / 2;
-            const sectionTop      = section.getBoundingClientRect().top;
-            const depthOffset     = Math.max(0, viewportRect.height - sectionTop);
-
-            images.forEach((img) => {
-                const imgRect    = img.getBoundingClientRect();
-                const imgCenterY = imgRect.top + imgRect.height / 2 - viewportRect.top;
-                const dist       = Math.abs(imgCenterY - viewportCenterY);
-                const proximity  = 1 - Math.min(dist / (viewportRect.height / 2), 1);
-                const scale      = IMG_SCALE_MIN + (IMG_SCALE_MAX - IMG_SCALE_MIN) * proximity;
-
-                const speedFactor = parseFloat(img.dataset.speedFactor ?? '1');
-                const parallaxY   = depthOffset * (1 - speedFactor) * IMG_DEPTH_PARALLAX_STRENGTH;
-
-                const naturalTop  = parseFloat(img.dataset.naturalTop ?? '0');
-                const imgH        = img.offsetHeight;
-                const minParallax = -naturalTop;
-                const maxParallax = state.fullHeight - naturalTop - imgH;
-                const clampedY    = Math.max(minParallax, Math.min(maxParallax, parallaxY));
-
-                img.style.transform = `translateY(${clampedY.toFixed(2)}px) scale(${scale})`;
-            });
-        }
-
-        initLayout();
-        if (track) track.classList.add('about-image-track-positioned');
-
-        return { state, initLayout, updateImageScales };
-    }
 
     // ── section logic ─────────────────────────────────────────────────────────
 
@@ -196,8 +15,11 @@
         const section = document.getElementById('about');
         if (!section) return;
 
-        const viewport = document.getElementById('scroll-viewport') || null;
-        const scatter  = initScatter(section, viewport);
+        const viewport   = document.getElementById('scroll-viewport') || null;
+        const textBlocks = Array.from(section.querySelectorAll('.about-text-block'));
+        const numSlides  = textBlocks.length || 4;
+
+        const scatter = window.ScatterImages.init(section, viewport, numSlides);
 
         // ── persistent menu ───────────────────────────────────────────────────
 
@@ -234,23 +56,23 @@
 
         function buildLayout() {
             const stickyContent = section.querySelector('.about-sticky-content');
-            const textBlocks    = Array.from(section.querySelectorAll('.about-text-block'));
-            if (!stickyContent || textBlocks.length === 0) return;
+            const blocks        = Array.from(section.querySelectorAll('.about-text-block'));
+            if (!stickyContent || blocks.length === 0) return;
             if (scatter.state.trackHeight <= 0) return;
 
             bodyEl = document.createElement('div');
             bodyEl.className = 'what-we-do-body';
-            textBlocks.forEach((block) => bodyEl.appendChild(block));
+            blocks.forEach((block) => bodyEl.appendChild(block));
 
             const scrollViewport = document.getElementById('scroll-viewport');
             (scrollViewport || document.body).appendChild(bodyEl);
 
             stickyContent.remove();
 
-            const slideHeight = scatter.state.trackHeight / textBlocks.length;
+            const slideHeight = scatter.state.trackHeight / blocks.length;
             const slidesWrap  = document.createElement('div');
             slidesWrap.className = 'about-slides';
-            textBlocks.forEach(() => {
+            blocks.forEach(() => {
                 const slide = document.createElement('div');
                 slide.className = 'about-slide';
                 slide.style.height = `${slideHeight}px`;
@@ -371,7 +193,6 @@
             if (justBecamePinned) {
                 exitedBottom = false;
                 if (menuEl) {
-                    // place at pre-switch position, then ease into the CSS pin target
                     menuEl.style.transition = 'none';
                     menuEl.style.top = `${menuScreenTop}px`;
                     void menuEl.offsetHeight;
@@ -406,7 +227,6 @@
 
             wasPinned = isPinned;
 
-            // after bottom exit, keep body tracking the menu so it scrolls away naturally
             if (exitedBottom && !isPinned && bodyEl && menuEl) {
                 const gap = vpRect.height * BODY_GAP_VH;
                 bodyEl.style.top = `${menuEl.getBoundingClientRect().bottom + gap}px`;

@@ -67,6 +67,7 @@
         // Remove fixed — elements revert to position:sticky via CSS.
         // Called after the entrance animation completes while the section is still stuck,
         // so there is no visual jump.
+        let handedOff = false;
         function removeFixed() {
             if (!pinned) return;
             els.forEach(el => {
@@ -77,6 +78,7 @@
                 el.style.height   = '';
             });
             pinned = false;
+            handedOff = true;
         }
 
         applyFixed();
@@ -84,7 +86,9 @@
         let resizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(applyFixed, 50);
+            resizeTimer = setTimeout(() => {
+                if (!handedOff) applyFixed();
+            }, 50);
         });
 
         // Hand off from fixed → sticky only once the image is truly at the top,

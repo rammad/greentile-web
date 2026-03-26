@@ -4,9 +4,8 @@
     position: relative;
     width: 100%;
     padding: 0;
-    /* base height: 100vh for viewport + 60vh for card scroll animation.
-       JS adds padding-top to create the section gap — see section-events.js. */
-    min-height: 160vh;
+    /* JS overrides this — see SECTION_VH in section-events.js */
+    min-height: 250vh;
 }
 
 .events-sticky {

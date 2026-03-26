@@ -50,6 +50,7 @@
     position: relative;
     width: 100%;
     min-height: 100vh;
+    padding-top: var(--section-spacing);
     background-color: transparent;
 }
 
