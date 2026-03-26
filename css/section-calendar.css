@@ -36,7 +36,7 @@
     padding: 0;
     overflow: visible;
 }
-.filters-list { display: flex; gap: var(--space-20); align-items: center; }
+.filters-list { display: flex; gap: var(--space-20); align-items: baseline; }
 
 .filter-btn, .view-btn {
     background: none; border: none;
@@ -127,7 +127,7 @@
     align-items: baseline;
     cursor: pointer;
     text-decoration: none;
-    color: var(--c-dark-green-20);
+    color: var(--c-dark-green-30);
     
     opacity: 0;
     filter: blur(10px);                    /* fixed — blur does not scale */
@@ -173,7 +173,7 @@
 .packed-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    column-gap: var(--space-20);
+    column-gap: var(--space-8);
     width: 100%;
     margin: 0 auto;
     animation: fadeIn var(--time-fade-in) ease forwards;
@@ -189,7 +189,7 @@
 .span-6 { grid-column: span 6; }
 
 .month-header {
-    color: var(--c-dark-green-20);
+    color: var(--c-dark-green-30);
     display: flex;
     align-items: center;
     white-space: nowrap;
@@ -197,12 +197,12 @@
     min-height: var(--size-subBold1);
 }
 .month-header::after, .spacer-line::after {
-    content: ''; display: block; flex-grow: 1; height: 1px; background-color: var(--c-dark-green-20);
+    content: ''; display: block; flex-grow: 1; height: 1px; background-color: var(--c-dark-green-30);
 }
 .month-header:not(.continuation-header)::after { margin-left: var(--space-20); }
 .continuation-header { width: 100%; display: flex; }
 
-.chunk-grid { display: grid; gap: var(--space-20); row-gap: var(--space-20); }
+.chunk-grid { display: grid; gap: var(--space-8); }
 .cols-1 { grid-template-columns: repeat(1, 1fr); }
 .cols-2 { grid-template-columns: repeat(2, 1fr); }
 .cols-3 { grid-template-columns: repeat(3, 1fr); }
@@ -405,7 +405,7 @@
     .chunk-grid {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 15px;
+        gap: 8px;
     }
 
     .grid-card {

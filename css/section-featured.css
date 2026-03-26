@@ -2,6 +2,7 @@
 
 .featured-section {
     position: relative;
+    padding-top: var(--section-spacing);
     width: 100%;
     min-height: 120vh;
 }
@@ -10,6 +11,7 @@
 .featured-bg-wrap {
     position: absolute;
     inset: 0;
+    top: var(--section-spacing);
     overflow: hidden;
     z-index: 0;
     pointer-events: none;

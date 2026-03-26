@@ -7,13 +7,20 @@
         const section = document.querySelector('.socials-section');
         if (!section) return;
 
-        const title = section.querySelector('.animate-cascade');
+        const subhead = section.querySelector('.socials-subhead');
+        const title = section.querySelector('.type-h1.animate-cascade');
         const subtitle = section.querySelector('.text-mask');
         const body = section.querySelector('.type-body2, .type-body1');
         const icons = section.querySelector('.socials-icons');
         const gallery = section.querySelector('.socials-track');
 
         const stagger = staggerTime;
+
+        if (subhead) {
+            observeElementInOut(subhead, {
+                onEnter() { subhead.classList.add('is-visible'); }
+            });
+        }
 
         if (subtitle) {
             observeElementInOut(subtitle, {

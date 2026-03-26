@@ -6,13 +6,18 @@
 }
 
 .about-inner {
-    padding: 15vh var(--space-20) 15vh;
+    padding: 0 var(--space-20);
     width: 70%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-64);
+}
+
+/* subheader label above the manifesto text */
+.about-subhead {
+    margin-bottom: calc(var(--space-40) - var(--space-64));
 }
 
 /* text block — full width so JS line measurements are stable */

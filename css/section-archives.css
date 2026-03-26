@@ -16,9 +16,9 @@
 
 .archives-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    gap: var(--space-20);
+    gap: var(--space-80);
     margin-bottom: var(--space-40);
     position: relative;
     padding: 0 var(--space-40);
@@ -79,7 +79,7 @@
     .chunk-grid {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 15px;
+        gap: 8px;
     }
 
     .grid-card {

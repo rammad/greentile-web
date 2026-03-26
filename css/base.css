@@ -126,6 +126,7 @@
     --space-120: calc(120 / 1920 * 100vw);
     --space-160: calc(160 / 1920 * 100vw);
     --space-200: calc(200 / 1920 * 100vw);
+    --space-400: calc(400 / 1920 * 100vw);
 
     --poster-radius: 8% / 6.4%; /* 8% * 4/5 = %6.4 */
     --poster-full-height: calc(100vh - 2 * var(--space-80));
@@ -159,7 +160,7 @@
     --size-body1-mobile: 14px;
     --size-body2-mobile: 24px;
 
-    --section-spacing: var(--space-200);
+    --section-spacing: var(--space-400);
 
     /* mobile spacing — addressed in mobile pass, kept as px */
     --section-spacing-mobile: 80px;
@@ -364,7 +365,7 @@ section {
 .type-body2.is-visible { opacity: 1; filter: blur(0); }
 
 .standard-margins { padding: var(--space-80) var(--space-20) var(--space-20); }
-.section-spacer { margin-top: var(--section-spacing); margin-bottom: var(--section-spacing); }
+.section-spacer { padding-top: var(--section-spacing); }
 
 .section-standard {
     position: relative;
@@ -640,11 +641,12 @@ section {
 body::after {
     content: '';
     position: fixed;
-    inset: -200%;
+    inset: -100px;
     pointer-events: none;
     z-index: 9999;
-    opacity: .9;
-    mix-blend-mode: soft-light;
+    opacity: .3;
+    mix-blend-mode: overlay;
+    will-change: transform;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 400px 400px;
@@ -652,17 +654,17 @@ body::after {
 }
 
 @keyframes grain {
-    0%   { transform: translate(0, 0); }
-    10%  { transform: translate(-5%, -10%); }
-    20%  { transform: translate(-15%, 5%); }
-    30%  { transform: translate(7%, -25%); }
-    40%  { transform: translate(-5%, 25%); }
-    50%  { transform: translate(-15%, 10%); }
-    60%  { transform: translate(15%, 0%); }
-    70%  { transform: translate(0%, 15%); }
-    80%  { transform: translate(3%, 35%); }
-    90%  { transform: translate(-10%, 10%); }
-    100% { transform: translate(0, 0); }
+    0%   { transform: translate3d(0, 0, 0); }
+    10%  { transform: translate3d(-40px, -60px, 0); }
+    20%  { transform: translate3d(-80px, 30px, 0); }
+    30%  { transform: translate3d(50px, -90px, 0); }
+    40%  { transform: translate3d(-30px, 70px, 0); }
+    50%  { transform: translate3d(-60px, 40px, 0); }
+    60%  { transform: translate3d(80px, -20px, 0); }
+    70%  { transform: translate3d(20px, 60px, 0); }
+    80%  { transform: translate3d(-50px, 90px, 0); }
+    90%  { transform: translate3d(40px, -40px, 0); }
+    100% { transform: translate3d(0, 0, 0); }
 }
 
 /* back btn */
@@ -681,6 +683,7 @@ body::after {
 .back-arrow img {
     height: calc(7 / 1920 * 100vw); /* 7px */
     width: auto;
+    filter: brightness(0) saturate(100%) invert(22%) sepia(50%) saturate(800%) hue-rotate(80deg) brightness(88%);
 }
 
 @media (max-width: 768px) {
@@ -696,5 +699,5 @@ body::after {
     .type-body2 { font-size: var(--size-body2-mobile); }
     .standard-margins { padding: var(--section-padding-mobile); }
     .section-standard { padding: var(--section-padding-mobile); }
-    .section-spacer { padding-top: var(--section-spacing-mobile); padding-bottom: var(--section-spacing-mobile); }
+    .section-spacer { padding-top: var(--section-spacing-mobile); }
 }

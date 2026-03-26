@@ -17,13 +17,6 @@
         const stickyInner = section.querySelector('.events-sticky-inner');
         const content = section.querySelector('.events-content');
 
-        const CTA_MIN_SPACE = 240;
-        let ctaSpacer = null;
-        if (ctaFooter) {
-            ctaSpacer = document.createElement('div');
-            section.after(ctaSpacer);
-        }
-
         if (grid && cards.length) {
             grid.style.setProperty('--poster-count', cards.length);
         }
@@ -37,12 +30,26 @@
             card.style.setProperty('--hover-rotate', `${deg.toFixed(1)}deg`);
         });
 
+        // match font-size to the hero title's fitted size so both read as the same
+        // visual weight — called after fonts load and on every resize
+        const updateTitleSize = () => {
+            if (!title) return;
+            const heroTitle = document.querySelector('.hero .type-display-hero');
+            if (heroTitle) {
+                if (fitTextToWidth) fitTextToWidth(heroTitle); // idempotent
+                title.style.fontSize = window.getComputedStyle(heroTitle).fontSize;
+            } else if (fitTextToWidth) {
+                fitTextToWidth(title);
+            }
+        };
+
         if (title) {
             let fontsReady  = false;
             let wantsReveal = false;
 
             document.fonts.ready.then(() => {
-                if (fitTextToWidth) fitTextToWidth(title);
+                updateTitleSize();
+                title.classList.add('is-initialized');
                 title.classList.add('animate-cascade');
                 if (window.initCascadeReveal) window.initCascadeReveal();
                 fontsReady = true;
@@ -96,31 +103,66 @@
 
         const recalcLayout = () => {
             const ih = window.innerHeight;
-            phase2Start = section.offsetTop - ih * 0.4; // begin before section fully sticks
-            phase2Len = ih * 1; // fixed animation range — decoupled from section height
-            startOffset = ih; // start fully off the bottom of the screen
+            const vw = window.innerWidth;
+
+            const sectionSpacingPx = vw * 400 / 1920;
+            const s80 = vw * 80 / 1920;
+            const s20 = vw * 20 / 1920;
+
+            // nav bottom edge — used for visual centering and poster cap
+            const nav = document.querySelector('.sticky-nav');
+            const navInset = nav
+                ? (parseFloat(getComputedStyle(nav).top) || 0) + nav.offsetHeight
+                : 0;
+
+            // push the flex center below the nav so content is optically
+            // centered in the viewport space the user actually sees
+            stickyInner.style.paddingTop = navInset + 'px';
+
+            // cap poster size: content must fit between nav bottom and 20 from viewport bottom
+            const flexGap    = parseFloat(getComputedStyle(stickyInner).rowGap) || 0;
+            const maxPosterH = ih - navInset - titleWrap.offsetHeight - flexGap - s20;
+            const maxPosterW = maxPosterH * 4 / 5;
+            const gridColGap = parseFloat(getComputedStyle(grid).columnGap) || 0;
+            const gridPad    = parseFloat(getComputedStyle(grid).paddingLeft)
+                             + parseFloat(getComputedStyle(grid).paddingRight);
+            grid.style.maxWidth = Math.max(0, n * maxPosterW + (n - 1) * gridColGap + gridPad) + 'px';
+
+            // measure content after constraints are applied
+            const contentH = titleWrap.offsetHeight + flexGap + content.offsetHeight;
+
+            // where justify-content:center now places the title (below nav padding)
+            const usableH      = ih - navInset;
+            const centerOffset = navInset + Math.max(0, (usableH - contentH) / 2);
+            const adjustedPT   = Math.max(0, sectionSpacingPx - centerOffset);
+
+            section.style.paddingTop = adjustedPT + 'px';
+            section.style.minHeight  = (1.6 * ih + adjustedPT) + 'px';
+
+            phase2Start = section.offsetTop - ih * 0.4;
+            phase2Len   = ih * 1;
+            startOffset = ih;
+
             applyPositions(window.lenis ? window.lenis.scroll : 0);
 
-            if (ctaFooter && content && stickyInner) {
+            // CTA: fixed --space-80 below posters
+            if (ctaFooter) {
                 const posterBottom = content.offsetTop + content.offsetHeight;
-                const viewportH = stickyInner.clientHeight;
-                const btnH = ctaFooter.offsetHeight;
-                const naturalGap = viewportH - posterBottom;
-
-                if (naturalGap >= CTA_MIN_SPACE) {
-                    ctaFooter.style.top = posterBottom + (naturalGap - btnH) / 2 + 'px';
-                    if (ctaSpacer) ctaSpacer.style.height = '0';
-                } else {
-                    ctaFooter.style.top = posterBottom + (CTA_MIN_SPACE - btnH) / 2 + 'px';
-                    if (ctaSpacer) ctaSpacer.style.height = Math.max(0, CTA_MIN_SPACE - naturalGap) + 'px';
-                }
+                const ctaTop = posterBottom + s80;
+                ctaFooter.style.top    = ctaTop + 'px';
                 ctaFooter.style.bottom = 'auto';
+
+                // if the CTA spills below the viewport, push the next section
+                // down so it doesn't overlap; otherwise clear any previous margin
+                const ctaBottom = ctaTop + ctaFooter.offsetHeight;
+                const overflow  = ctaBottom - ih;
+                section.style.marginBottom = overflow > 0 ? overflow + 'px' : '';
             }
         };
 
         document.fonts.ready.then(recalcLayout);
         window.addEventListener('resize', () => {
-            if (title && fitTextToWidth) fitTextToWidth(title);
+            updateTitleSize();
             recalcLayout();
         });
 

@@ -1,48 +1,59 @@
 /* team section */
 
 (function () {
-    const { observeElementInOut, staggerTime } = window.AnimationUtils || {};
+    const { observeElementInOut } = window.AnimationUtils || {};
+
+    const LINE_STAGGER_MS = 80;
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('team');
         if (!section) return;
 
-        const title    = section.querySelector('.animate-line');
-        const body     = section.querySelector('.type-body1, .type-body2');
-        const posters  = section.querySelectorAll('.team-poster-wrap');
-        const stagger  = staggerTime || 120;
+        const titleLines = [...section.querySelectorAll('.team-title-text.animate-line')];
+        const body       = section.querySelector('.team-names.animate-line');
+        const posters    = section.querySelectorAll('.team-poster-wrap');
 
         if (!observeElementInOut) {
-            if (title) title.classList.add('is-visible');
+            titleLines.forEach(l => l.classList.add('is-visible'));
             if (body) body.classList.add('is-visible');
             posters.forEach(w => w.classList.add('is-visible'));
             return;
         }
 
-        if (title) {
-            observeElementInOut(title, {
-                onEnter() { title.classList.add('is-visible'); }
-            });
-        }
-
-        // body animates only after the first poster's entrance transition completes
-        const firstPoster = posters[0];
-        let bodyRevealed = false;
-        function revealBodyAfterFirstPoster() {
-            if (bodyRevealed || !body) return;
-            bodyRevealed = true;
-            // 1200ms matches the transform transition on .team-poster-wrap
-            setTimeout(() => body.classList.add('is-visible'), 1200);
-        }
-
         posters.forEach((wrap, i) => {
             wrap.style.transitionDelay = `${i * 80}ms`;
             observeElementInOut(wrap, {
-                onEnter: () => {
-                    wrap.classList.add('is-visible');
-                    if (wrap === firstPoster) revealBodyAfterFirstPoster();
-                },
+                onEnter: () => wrap.classList.add('is-visible'),
             });
         });
+
+        const firstPoster = posters[0];
+        if (!firstPoster) return;
+
+        const root = document.getElementById('scroll-viewport') || null;
+        let stuck = false;
+
+        const stickObserver = new IntersectionObserver((entries) => {
+            if (stuck) return;
+            for (const entry of entries) {
+                if (entry.isIntersecting) {
+                    stuck = true;
+                    stickObserver.disconnect();
+                    window.pageReady.then(() => {
+                        titleLines.forEach((line, i) => {
+                            setTimeout(() => line.classList.add('is-visible'), i * LINE_STAGGER_MS);
+                        });
+                        if (body) body.classList.add('is-visible');
+                    });
+                    break;
+                }
+            }
+        }, {
+            root,
+            rootMargin: '0px 0px -90% 0px',
+            threshold: 0,
+        });
+
+        stickObserver.observe(firstPoster);
     });
 })();

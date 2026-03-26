@@ -4,7 +4,8 @@
     position: relative;
     width: 100%;
     min-height: 100vh;
-    padding-top: 10%;
+    margin-top: calc(var(--section-spacing) / 2);
+    padding-top: calc(var(--section-spacing) / 2); /* fix for auto height */
     background-color: transparent;
     display: flex;
     flex-direction: column;

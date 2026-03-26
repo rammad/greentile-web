@@ -5,20 +5,32 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+    justify-content: flex-start;
+    min-height: auto;
     width: 100%;
     position: relative;
-    padding-top: var(--section-spacing);
-    margin-bottom: var(--space-120);
+    padding-bottom: var(--space-80);
 }
 
 .socials-header {
-    padding: var(--space-120) var(--space-20) var(--space-80);
+    padding: 0 var(--space-20) var(--space-80);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-40);
+}
+
+.socials-subhead {
+    opacity: 0;
+    transform: translateY(var(--space-20));
+    transition:
+        opacity var(--time-fade-in) var(--ease-standard),
+        transform var(--time-fade-in) var(--ease-standard);
+}
+
+.socials-subhead.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .socials-icons {
@@ -40,7 +52,7 @@
 .icon-circle {
     width: calc(52 / 1920 * 100vw);
     height: calc(52 / 1920 * 100vw);
-    background-color: var(--c-dark-green-20);
+    background-color: var(--c-dark-green-30);
     mask-size: contain;
     mask-repeat: no-repeat;
     mask-position: center;
@@ -88,7 +100,7 @@
     border-radius: var(--poster-radius);
 
     opacity: 0;
-    transform: translateY(calc(64 / 1920 * 100vw));
+    transform: translateY(calc(var(--space-80) + var(--space-40)));
     transition:
         opacity var(--time-fade-in) var(--ease-standard),
         transform var(--time-fade-in) var(--ease-standard);
@@ -96,7 +108,7 @@
 
 .social-img.is-visible {
     opacity: 1;
-    transform: translateY(var(--space-40));
+    transform: translateY(var(--space-80));
 }
 
 .social-img.push-down {

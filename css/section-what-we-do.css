@@ -121,7 +121,7 @@
 
 .about-menu-persistent {
     position: absolute;
-    top: 8vh;
+    top: 20vh;
     left: 0;
     width: 100%;
     display: flex;
@@ -148,7 +148,7 @@
 }
 
 .about-menu-persistent .menu-item {
-    color: var(--c-dark-green-20);
+    color: var(--c-dark-green-30);
     opacity: 0;
     cursor: pointer;
     transition: color var(--time-fade-out) ease, opacity var(--time-fade-out) ease;

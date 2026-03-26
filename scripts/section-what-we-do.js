@@ -7,7 +7,7 @@
 
     const MOBILE_BREAKPOINT           = 768;
     const STEP_Y_MOBILE               = 150;
-    const STEP_Y_DESKTOP              = 160;
+    const STEP_Y_DESKTOP              = 130;
     const COL_LEFT_X_MIN              = -5;
     const COL_LEFT_X_MAX              = 12;
     const COL_RIGHT_X_MIN             = 75;
@@ -26,10 +26,15 @@
     const IMG_SPEED_FACTOR_MAX        = 1.10;
     // How much same-column images may overlap (px) before the resolver pushes them apart.
     // Negative = overlap is allowed; the resolver only kicks in beyond this threshold.
-    const IMG_OVERLAP_MIN_GAP         = -130;
+    const IMG_OVERLAP_MIN_GAP         = -250;
     // Parallax convergence safety multiplier (× vpH). Keeps images from hiding each
     // other *due to parallax* even when natural overlap is permitted.
-    const IMG_PARALLAX_SAFETY_DEPTH   = 0.7; // × vpH
+    const IMG_PARALLAX_SAFETY_DEPTH   = 0.35; // × vpH
+
+    // section height is explicit — images are normalized to fill it
+    const SLIDE_HEIGHT_VH_DESKTOP     = 0.65;
+    const SLIDE_HEIGHT_VH_MOBILE      = 0.80;
+    const NUM_SLIDES                  = 4;
 
     function getVariedRandom(min, max, previousValue = null, minDiff = IMG_VARIATION_MIN_DIFF) {
         if (previousValue === null) return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -46,7 +51,7 @@
     function initScatter(section, viewport) {
         const track  = section.querySelector('.about-image-track');
         const images = track ? Array.from(track.querySelectorAll('.scatter-img')) : [];
-        const state  = { trackHeight: 0 };
+        const state  = { trackHeight: 0, fullHeight: 0 };
 
         function initLayout() {
             const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
@@ -55,6 +60,12 @@
             const vpH      = window.innerHeight;
             const minW     = isMobile ? IMG_WIDTH_MOBILE_MIN  : IMG_WIDTH_DESKTOP_MIN;
             const maxW     = isMobile ? IMG_WIDTH_MOBILE_MAX  : IMG_WIDTH_DESKTOP_MAX;
+
+            // explicit section height — images will be normalized to fill this
+            const slideHeightVH     = isMobile ? SLIDE_HEIGHT_VH_MOBILE : SLIDE_HEIGHT_VH_DESKTOP;
+            const totalSlideHeight  = NUM_SLIDES * slideHeightVH * vpH;
+            const sectionPadding    = parseFloat(getComputedStyle(section).paddingTop) || 0;
+            const fullSectionHeight = sectionPadding + totalSlideHeight;
 
             let currentY   = 0;
             const prevLeft  = { x: null, w: null };
@@ -111,8 +122,22 @@
                 }
             }
 
+            // ── third pass: normalize positions to fill section height ─────────
+            let rawMinTop = Infinity, rawMaxBottom = -Infinity, bottomImgH = 0;
+            imageData.forEach(d => {
+                const h = (d.widthVw / 100) * vpW * (5 / 4);
+                if (d.naturalTop < rawMinTop) rawMinTop = d.naturalTop;
+                if (d.naturalTop + h > rawMaxBottom) { rawMaxBottom = d.naturalTop + h; bottomImgH = h; }
+            });
+            const srcRange = (rawMaxBottom - bottomImgH) - rawMinTop;
+            const dstRange = fullSectionHeight - bottomImgH;
+            if (srcRange > 0 && dstRange > 0) {
+                imageData.forEach(d => {
+                    d.naturalTop = ((d.naturalTop - rawMinTop) / srcRange) * dstRange;
+                });
+            }
+
             // ── apply final positions ─────────────────────────────────────────
-            let maxBottom = 0;
             imageData.forEach(({ img, naturalTop, widthVw, x, normalizedSize, speedFactor }) => {
                 img.style.width            = `${widthVw}vw`;
                 img.style.left             = `${x}%`;
@@ -120,13 +145,11 @@
                 img.dataset.naturalTop     = String(naturalTop);
                 img.style.zIndex           = 1 + Math.round(normalizedSize * (IMG_Z_INDEX_MAX - 1));
                 img.dataset.speedFactor    = String(speedFactor);
-
-                const heightPx = (widthVw / 100) * vpW * (5 / 4);
-                maxBottom      = Math.max(maxBottom, naturalTop + heightPx);
             });
 
-            state.trackHeight = maxBottom + stepY;
-            if (track) track.style.height = `${state.trackHeight}px`;
+            state.trackHeight = totalSlideHeight;
+            state.fullHeight  = fullSectionHeight;
+            if (track) track.style.height = `${state.fullHeight}px`;
         }
 
         function updateImageScales() {
@@ -149,7 +172,7 @@
                 const naturalTop  = parseFloat(img.dataset.naturalTop ?? '0');
                 const imgH        = img.offsetHeight;
                 const minParallax = -naturalTop;
-                const maxParallax = state.trackHeight - naturalTop - imgH;
+                const maxParallax = state.fullHeight - naturalTop - imgH;
                 const clampedY    = Math.max(minParallax, Math.min(maxParallax, parallaxY));
 
                 img.style.transform = `translateY(${clampedY.toFixed(2)}px) scale(${scale})`;
@@ -207,6 +230,7 @@
         let activeIdx      = 0;
         let wasPinned      = false;
         let menuIsRevealed = false;
+        let exitedBottom   = false;
 
         function buildLayout() {
             const stickyContent = section.querySelector('.about-sticky-content');
@@ -297,7 +321,7 @@
 
         let scrollHasFired = false;
 
-        const MENU_OFFSET_VH_DESKTOP = 0.08;
+        const MENU_OFFSET_VH_DESKTOP = 0.20;
         const MENU_PIN_VH_DESKTOP    = 0.28;
         const MENU_OFFSET_VH_MOBILE  = 0.05;
         const MENU_PIN_VH_MOBILE     = 0.15;
@@ -317,7 +341,7 @@
             const offsetVH       = isMobile ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP;
             const vpH            = vpRect.height;
             const menuNaturalTop = secRect.top + offsetVH * vpH;
-            return menuNaturalTop < vpH * 0.55 && secRect.bottom > vpH * 0.5;
+            return menuNaturalTop < vpH * 0.50 && secRect.bottom > vpH * 0.5;
         }
 
         function updateActiveSlide() {
@@ -332,41 +356,68 @@
             if (shouldReveal && !menuIsRevealed) {
                 revealMenuItems();
                 menuIsRevealed = true;
-            } else if (!shouldReveal && menuIsRevealed) {
+            } else if (!shouldReveal && menuIsRevealed && !exitedBottom) {
                 hideMenuItems();
                 menuIsRevealed = false;
             }
 
+            // snapshot before the absolute → fixed switch changes the coordinate system
+            const menuScreenTop = menuEl ? menuEl.getBoundingClientRect().top : 0;
+
             if (menuEl) menuEl.classList.toggle('is-pinned', isPinned);
+
+            const blocks = bodyEl ? Array.from(bodyEl.querySelectorAll('.about-text-block')) : [];
+
+            if (justBecamePinned) {
+                exitedBottom = false;
+                if (menuEl) {
+                    // place at pre-switch position, then ease into the CSS pin target
+                    menuEl.style.transition = 'none';
+                    menuEl.style.top = `${menuScreenTop}px`;
+                    void menuEl.offsetHeight;
+                    menuEl.style.transition = 'top 0.35s cubic-bezier(0.19, 1, 0.22, 1)';
+                    menuEl.style.top = '';
+                }
+                showBlock(blocks[activeIdx]);
+                if (scrollHasFired) showCtas(blocks[activeIdx]);
+            }
 
             if (bodyEl && menuEl && isPinned) {
                 const gap = vpRect.height * BODY_GAP_VH;
                 bodyEl.style.top = `${menuEl.getBoundingClientRect().bottom + gap}px`;
             }
 
-            const blocks = bodyEl ? Array.from(bodyEl.querySelectorAll('.about-text-block')) : [];
-
-            if (justBecamePinned) {
-                if (menuEl) menuEl.style.top = '';
-                showBlock(blocks[activeIdx]);
-                if (scrollHasFired) showCtas(blocks[activeIdx]);
-            }
-
             if (justBecameUnpinned) {
+                const isBottomExit = secRect.bottom < vpRect.height;
+
                 if (menuEl) {
+                    menuEl.style.transition = '';
                     const isMobile = window.innerWidth < 768;
                     const pinPx    = (isMobile ? MENU_PIN_VH_MOBILE : MENU_PIN_VH_DESKTOP) * vpRect.height;
                     menuEl.style.top = `${pinPx - secRect.top}px`;
                 }
-                blocks.forEach((b) => { hideBlock(b); hideCtas(b); });
+
+                if (isBottomExit) {
+                    exitedBottom = true;
+                } else {
+                    blocks.forEach((b) => { hideBlock(b); hideCtas(b); });
+                }
             }
 
             wasPinned = isPinned;
 
-            if (!isPinned) {
+            // after bottom exit, keep body tracking the menu so it scrolls away naturally
+            if (exitedBottom && !isPinned && bodyEl && menuEl) {
+                const gap = vpRect.height * BODY_GAP_VH;
+                bodyEl.style.top = `${menuEl.getBoundingClientRect().bottom + gap}px`;
+            }
+
+            if (!isPinned && !exitedBottom) {
                 menuItems.forEach((item) => item.classList.remove('is-active'));
                 return;
             }
+
+            if (!isPinned) return;
 
             const isMobileCalc = window.innerWidth < 768;
             const offsetPx     = (isMobileCalc ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP) * vpRect.height;
