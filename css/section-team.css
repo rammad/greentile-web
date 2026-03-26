@@ -33,7 +33,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-8);
+    gap: var(--space-12);
 }
 
 .team-poster-wrap {
@@ -71,6 +71,10 @@
     position: sticky;
     top: calc(var(--space-80) + var(--space-20));
     height: calc(100vh - var(--space-80) - var(--space-40));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: var(--space-20);
 }
 
 .team-title-text {

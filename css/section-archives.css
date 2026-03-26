@@ -18,7 +18,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-80);
+    gap: var(--space-40);
     margin-bottom: var(--space-40);
     position: relative;
     padding: 0 var(--space-40);

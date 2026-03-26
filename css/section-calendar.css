@@ -32,7 +32,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center; 
-    margin: var(--space-48) var(--space-40) 0;
+    margin: var(--space-32) var(--space-20) 0;
     padding: 0;
     overflow: visible;
 }
@@ -173,7 +173,7 @@
 .packed-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    column-gap: var(--space-8);
+    column-gap: var(--space-12);
     width: 100%;
     margin: 0 auto;
     animation: fadeIn var(--time-fade-in) ease forwards;
@@ -199,7 +199,7 @@
 .month-header::after, .spacer-line::after {
     content: ''; display: block; flex-grow: 1; height: 1px; background-color: var(--c-dark-green-30);
 }
-.month-header:not(.continuation-header)::after { margin-left: var(--space-20); }
+.month-header:not(.continuation-header)::after { margin-left: var(--space-12); }
 .continuation-header { width: 100%; display: flex; }
 
 .chunk-grid { display: grid; gap: var(--space-8); }
@@ -284,7 +284,7 @@
     animation: spin-cw 90s linear infinite;
 }
 
-.badge-soon .badge-layer-blank { background-color: var(--c-light-yellow); }
+.badge-soon .badge-layer-blank { background-color: var(--c-bright-green); }
 .badge-sold .badge-layer-blank { background-color: var(--c-red); }
 
 .badge-layer-text  { animation: spin-ccw 90s linear infinite; }

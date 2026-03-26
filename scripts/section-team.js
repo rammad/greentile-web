@@ -31,29 +31,31 @@
         if (!firstPoster) return;
 
         const root = document.getElementById('scroll-viewport') || null;
-        let stuck = false;
 
-        const stickObserver = new IntersectionObserver((entries) => {
-            if (stuck) return;
-            for (const entry of entries) {
-                if (entry.isIntersecting) {
-                    stuck = true;
-                    stickObserver.disconnect();
-                    window.pageReady.then(() => {
-                        titleLines.forEach((line, i) => {
-                            setTimeout(() => line.classList.add('is-visible'), i * LINE_STAGGER_MS);
-                        });
-                        if (body) body.classList.add('is-visible');
-                    });
-                    break;
+        function makeStickObserver(margin, callback) {
+            let fired = false;
+            const obs = new IntersectionObserver((entries) => {
+                if (fired) return;
+                for (const entry of entries) {
+                    if (entry.isIntersecting) {
+                        fired = true;
+                        obs.disconnect();
+                        window.pageReady.then(callback);
+                        break;
+                    }
                 }
-            }
-        }, {
-            root,
-            rootMargin: '0px 0px -90% 0px',
-            threshold: 0,
+            }, { root, rootMargin: margin, threshold: 0 });
+            obs.observe(firstPoster);
+        }
+
+        makeStickObserver('0px 0px -50% 0px', () => {
+            titleLines.forEach((line, i) => {
+                setTimeout(() => line.classList.add('is-visible'), i * LINE_STAGGER_MS);
+            });
         });
 
-        stickObserver.observe(firstPoster);
+        makeStickObserver('0px 0px -90% 0px', () => {
+            if (body) body.classList.add('is-visible');
+        });
     });
 })();

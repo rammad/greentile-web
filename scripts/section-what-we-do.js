@@ -32,9 +32,10 @@
     const IMG_PARALLAX_SAFETY_DEPTH   = 0.35; // × vpH
 
     // section height is explicit — images are normalized to fill it
-    const SLIDE_HEIGHT_VH_DESKTOP     = 0.65;
-    const SLIDE_HEIGHT_VH_MOBILE      = 0.80;
+    const SLIDE_HEIGHT_VH_DESKTOP     = 0.75;
+    const SLIDE_HEIGHT_VH_MOBILE      = 0.90;
     const NUM_SLIDES                  = 4;
+    const IMG_BLEED                   = 80; // px images can extend beyond section top/bottom
 
     function getVariedRandom(min, max, previousValue = null, minDiff = IMG_VARIATION_MIN_DIFF) {
         if (previousValue === null) return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -123,6 +124,7 @@
             }
 
             // ── third pass: normalize positions to fill section height ─────────
+            // IMG_BLEED lets images overshoot the section edges for a looser feel
             let rawMinTop = Infinity, rawMaxBottom = -Infinity, bottomImgH = 0;
             imageData.forEach(d => {
                 const h = (d.widthVw / 100) * vpW * (5 / 4);
@@ -130,10 +132,10 @@
                 if (d.naturalTop + h > rawMaxBottom) { rawMaxBottom = d.naturalTop + h; bottomImgH = h; }
             });
             const srcRange = (rawMaxBottom - bottomImgH) - rawMinTop;
-            const dstRange = fullSectionHeight - bottomImgH;
+            const dstRange = (fullSectionHeight + IMG_BLEED * 2) - bottomImgH;
             if (srcRange > 0 && dstRange > 0) {
                 imageData.forEach(d => {
-                    d.naturalTop = ((d.naturalTop - rawMinTop) / srcRange) * dstRange;
+                    d.naturalTop = ((d.naturalTop - rawMinTop) / srcRange) * dstRange - IMG_BLEED;
                 });
             }
 

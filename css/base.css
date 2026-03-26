@@ -160,7 +160,7 @@
     --size-body1-mobile: 14px;
     --size-body2-mobile: 24px;
 
-    --section-spacing: var(--space-400);
+    --section-spacing: var(--space-200);
 
     /* mobile spacing — addressed in mobile pass, kept as px */
     --section-spacing-mobile: 80px;
@@ -675,7 +675,7 @@ body::after {
     justify-content: center;
     top: 0;
     left: 0;
-    padding: var(--space-20);
+    padding: var(--space-20) 0;
     transform: scale(-100%);
     cursor: pointer;
 }

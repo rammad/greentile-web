@@ -1,6 +1,7 @@
 /* about section (index.html) — natural scroll, large text, procedural inline images */
 
 .about {
+    padding-top: calc(var(--section-spacing) * 2);
     position: relative;
     width: 100%;
 }

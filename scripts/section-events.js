@@ -105,7 +105,7 @@
             const ih = window.innerHeight;
             const vw = window.innerWidth;
 
-            const sectionSpacingPx = vw * 400 / 1920;
+            const sectionSpacingPx = vw * 200 / 1920;
             const s80 = vw * 80 / 1920;
             const s20 = vw * 20 / 1920;
 
@@ -139,7 +139,7 @@
             section.style.paddingTop = adjustedPT + 'px';
             section.style.minHeight  = (1.6 * ih + adjustedPT) + 'px';
 
-            phase2Start = section.offsetTop - ih * 0.4;
+            phase2Start = section.offsetTop - ih * 0.6;
             phase2Len   = ih * 1;
             startOffset = ih;
 
