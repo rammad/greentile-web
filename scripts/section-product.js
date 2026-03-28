@@ -1,19 +1,27 @@
 /* product page */
 
 (() => {
-    const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils;
+    const { wait, transitionCta, transitionHeader, staggerTime, observeElementInOut } = window.AnimationUtils;
+    const MOBILE_BREAKPOINT = 1024;
 
     document.addEventListener('DOMContentLoaded', () => {
-        initProductPage();
+        const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+
+        const section = document.querySelector('.pdp-section');
+        if (section) section.classList.add('is-active');
+
+        if (isMobile) {
+            initMobileAnimations(section);
+        } else {
+            initDesktopAnimations(section);
+        }
+
         initImageScroll();
         initDescFade();
         updateQty(0);
     });
 
-    async function initProductPage() {
-        const section = document.querySelector('.pdp-section');
-        if (section) section.classList.add('is-active');
-
+    async function initDesktopAnimations(section) {
         const title = document.querySelector('.animate-cascade');
         if (title) {
             const checkInit = setInterval(async () => {
@@ -50,8 +58,87 @@
         if (cta) transitionCta(cta, 'enter');
     }
 
+    function initMobileAnimations(section) {
+        const title = document.querySelector('.pdp-hero-title');
+        const ticketActions = document.querySelector('.ticket-actions');
+        const cta = document.querySelector('.cta-btn');
+
+        // images: fade in when the carousel enters the viewport
+        const imageCol = document.querySelector('.pdp-image-col');
+        observeElementInOut(imageCol, {
+            root: null,
+            enterThreshold: 0.1,
+            onEnter: () => {
+                document.querySelectorAll('.pdp-poster').forEach(p => p.classList.add('is-visible'));
+            }
+        });
+
+        // title + subtitles + tags: animate when the info block scrolls into view
+        const infoBlock = document.querySelector('.pdp-info');
+        const waitForCascade = () => new Promise(resolve => {
+            const el = document.querySelector('.animate-cascade');
+            if (!el) { resolve(); return; }
+            if (el.classList.contains('is-initialized') && window.playCascade) { resolve(); return; }
+            const poll = setInterval(() => {
+                if (el.classList.contains('is-initialized') && window.playCascade) {
+                    clearInterval(poll);
+                    resolve();
+                }
+            }, 50);
+        });
+
+        observeElementInOut(infoBlock, {
+            root: null,
+            enterThreshold: 0.05,
+            onEnter: async () => {
+                await waitForCascade();
+                const cascadeEl = document.querySelector('.animate-cascade');
+                if (cascadeEl) transitionHeader(cascadeEl, 'enter');
+
+                await wait(staggerTime);
+
+                const subtitles = document.querySelectorAll('.text-mask');
+                for (const sub of subtitles) {
+                    sub.classList.add('is-visible');
+                    await wait(staggerTime);
+                }
+
+                const tags = section.querySelectorAll('.pdp-tag');
+                for (const tag of tags) {
+                    if (!tag.classList.contains('max-qty-label')) tag.classList.add('is-visible');
+                }
+            }
+        });
+
+        // description body text
+        const descWrapper = document.querySelector('.pdp-desc-wrapper');
+        observeElementInOut(descWrapper, {
+            root: null,
+            enterThreshold: 0.05,
+            onEnter: () => {
+                document.querySelectorAll('.type-body1, .type-body2').forEach(el => el.classList.add('is-visible'));
+            }
+        });
+
+        // sticky purchase bar: slides up after the title enters the viewport, then stays
+        if (title && ticketActions) {
+            if (cta) {
+                cta.classList.add('is-visible');
+                const roll = cta.querySelector('.ui-roll');
+                if (roll) roll.classList.add('is-visible');
+            }
+
+            observeElementInOut(descWrapper, {
+                root: null,
+                enterThreshold: 0.05,
+                onEnter: () => {
+                    ticketActions.classList.add('is-sticky-visible');
+                }
+            });
+        }
+    }
+
     function initImageScroll() {
-        const MOBILE_BREAKPOINT = 1024;
         if (window.innerWidth <= MOBILE_BREAKPOINT) return;
 
         const col     = document.querySelector('.pdp-image-col');

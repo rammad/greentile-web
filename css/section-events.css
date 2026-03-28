@@ -33,7 +33,7 @@
     display: flex;
     align-items: flex-start;
     pointer-events: none;
-    padding: 0 var(--space-20);
+    padding: 0 var(--space-12);
 }
 
 .events-title-wrap #event-title {
@@ -54,7 +54,7 @@
     display: grid;
     grid-template-columns: repeat(var(--poster-count, 4), 1fr);
     gap: var(--space-12);
-    padding: 0 var(--space-20);
+    padding: 0 var(--space-12);
     width: 100%;
     margin: 0 auto;
     box-sizing: border-box;
@@ -89,13 +89,11 @@
 }
 
 @media (max-width: 768px) {
-    .events-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .events-title-wrap #event-title {
+        white-space: normal;
     }
 
-    /* override inline styles from scroll js — show immediately on mobile */
-    .event-card {
-        opacity: 1 !important;
-        transform: none !important;
+    .events-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

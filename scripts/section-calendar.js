@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initRowPacker();
     animateEntrance();
     initMobileScrollSpy();
+    initControlsClamping();
 });
 
 function initEventInteractions() {
@@ -322,4 +323,29 @@ function initRowPacker() {
         const deg  = sign * (2 + Math.random() * 2);
         card.style.setProperty('--hover-rotate', `${deg.toFixed(1)}deg`);
     });
+}
+
+function initControlsClamping() {
+    if (window.innerWidth > 768) return;
+
+    const page = document.getElementById('cal-page-container');
+    const controls = document.querySelector('.calendar-controls');
+    if (!page || !controls) return;
+
+    const navBottom = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--space-80')
+    );
+
+    const pageRect = page.getBoundingClientRect();
+    const controlsRect = controls.getBoundingClientRect();
+    const controlsFlowTop = controlsRect.top - pageRect.top + page.scrollTop;
+
+    page.addEventListener('scroll', () => {
+        const visualTop = controlsFlowTop - page.scrollTop;
+        if (visualTop < navBottom) {
+            controls.style.transform = `translateY(${navBottom - visualTop}px)`;
+        } else {
+            controls.style.transform = '';
+        }
+    }, { passive: true });
 }

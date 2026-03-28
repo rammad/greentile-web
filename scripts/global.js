@@ -41,15 +41,73 @@ function fitTextToWidth(element, options = {}) {
     element.style.width      = savedWidth;
 }
 
+// sizes a group of sibling .fit-text elements to match the longest line
+function fitTextGroupToWidth(elements, options = {}) {
+    if (!elements.length) return;
+    const { padding = 0 } = options;
+    const container = elements[0].parentElement || document.body;
+    const cs = getComputedStyle(container);
+    const containerPadding = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    const targetWidth = container.clientWidth - containerPadding - padding * 2;
+    if (targetWidth <= 0) return;
+
+    const saved = elements.map(el => {
+        const s = { ws: el.style.whiteSpace, w: el.style.width };
+        el.style.whiteSpace = 'nowrap';
+        el.style.width      = 'max-content';
+        el.style.fontSize   = '100px';
+        return s;
+    });
+
+    let maxWidth = 0;
+    elements.forEach(el => {
+        maxWidth = Math.max(maxWidth, el.getBoundingClientRect().width);
+    });
+
+    if (maxWidth === 0) {
+        elements.forEach((el, i) => {
+            el.style.whiteSpace = saved[i].ws;
+            el.style.width      = saved[i].w;
+        });
+        return;
+    }
+
+    const fontSize = `${(targetWidth / maxWidth) * 100}px`;
+    elements.forEach((el, i) => {
+        el.style.fontSize   = fontSize;
+        el.style.whiteSpace = saved[i].ws;
+        el.style.width      = saved[i].w;
+    });
+}
+
 // init fit-text on all .fit-text elements + resize listener
+// sibling .fit-text elements share the font-size of the longest line
 // elements with data-fit-managed get font-size only; their section script handles visibility
 function initFitText() {
     const elements = document.querySelectorAll('.fit-text');
     if (!elements.length) return;
 
-    document.fonts.ready.then(() => {
+    // group siblings that share a parent
+    function buildGroups() {
+        const groups = new Map();
         elements.forEach(el => {
-            fitTextToWidth(el);
+            const parent = el.parentElement;
+            if (!groups.has(parent)) groups.set(parent, []);
+            groups.get(parent).push(el);
+        });
+        return groups;
+    }
+
+    function runFit() {
+        buildGroups().forEach(siblings => {
+            if (siblings.length > 1) fitTextGroupToWidth(siblings);
+            else fitTextToWidth(siblings[0]);
+        });
+    }
+
+    document.fonts.ready.then(() => {
+        runFit();
+        elements.forEach(el => {
             if (!el.dataset.fitManaged && !el.classList.contains('is-initialized')) {
                 el.classList.add('is-initialized');
             }
@@ -59,9 +117,7 @@ function initFitText() {
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            elements.forEach(el => fitTextToWidth(el));
-        }, 50);
+        resizeTimer = setTimeout(runFit, 50);
     });
 }
 
@@ -392,8 +448,8 @@ const CURTAIN_TILE_SCATTER = {
     ],
 };
 
-// scales a design-width pixel value (based on 1920px) to match the CSS vw units
-function vwPx(px) { return px * (window.innerWidth / 1920); }
+// returns a fixed pixel value (breakpoint system replaced continuous vw scaling)
+function vwPx(px) { return px; }
 
 // tile width 88px + gap 4px = 92px stride; compute a centered row for any count
 function getTileSnapX(count) {
@@ -558,5 +614,30 @@ function initNavbar() {
             link.parentNode.insertBefore(wrap, link);
             wrap.appendChild(link);
         }
+    });
+
+    initMobileMenu(nav);
+}
+
+function initMobileMenu(nav) {
+    const hamburger = nav.querySelector('.nav-hamburger');
+    const menu = document.querySelector('.mobile-menu');
+    if (!hamburger || !menu) return;
+
+    let isOpen = false;
+
+    function toggle() {
+        isOpen = !isOpen;
+        hamburger.classList.toggle('is-active', isOpen);
+        hamburger.setAttribute('aria-expanded', String(isOpen));
+        menu.classList.toggle('is-open', isOpen);
+    }
+
+    hamburger.addEventListener('click', toggle);
+
+    menu.querySelectorAll('.mobile-menu-link').forEach(link => {
+        link.addEventListener('click', () => {
+            if (isOpen) toggle();
+        });
     });
 }

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/section-mission.css?v=12">
     <link rel="stylesheet" href="css/section-what-we-do.css?v=13">
     <link rel="stylesheet" href="css/section-events.css?v=10"> 
-    <link rel="stylesheet" href="css/section-team.css?v=6">
+    <link rel="stylesheet" href="css/section-team.css?v=9">
     <link rel="stylesheet" href="css/section-socials.css?v=11">
     <link rel="stylesheet" href="css/section-clients.css?v=12">
     <link rel="stylesheet" href="css/footer.css?v=10">
@@ -48,7 +48,19 @@
                 <span class="ui-roll-layer ui-roll-hidden">SAY HI</span>
             </a>
         </div>
+        <button class="nav-hamburger" aria-label="Menu" aria-expanded="false">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
     </nav>
+
+    <div class="mobile-menu">
+        <div class="mobile-menu-inner">
+            <a href="events.html" class="type-subBold1 mobile-menu-link">Play With Us</a>
+            <a href="about-us.html" class="type-subBold1 mobile-menu-link">Work With Us</a>
+            <a href="#" class="type-subBold1 mobile-menu-link">Say Hi</a>
+        </div>
+    </div>
 
     <div id="scroll-viewport" class="scroll-viewport">
         <div id="scroll-content" class="scroll-content">
@@ -59,12 +71,25 @@
             <span class="type-subBold1 text-reveal-inner">mission</span>
         </div>
         
-        <h1 class="type-display-hero animate-line">Since day one,</h1>
-        <h1 class="type-display-hero animate-line">we've been about</h1>
-        <h1 class="type-display-hero animate-line">creating Asian American</h1>
-        <h1 class="type-display-hero animate-line">spaces + experiences</h1>
-        <h1 class="type-display-hero animate-line">that center and celebrate</h1>
-        <h1 class="type-display-hero animate-line">our joy.</h1>
+        <div class="mission-lines desktop-only">
+            <h1 class="type-display-hero animate-line">Since day one,</h1>
+            <h1 class="type-display-hero animate-line">we've been about</h1>
+            <h1 class="type-display-hero animate-line">creating Asian American</h1>
+            <h1 class="type-display-hero animate-line">spaces + experiences</h1>
+            <h1 class="type-display-hero animate-line">that center and celebrate</h1>
+            <h1 class="type-display-hero animate-line">our joy.</h1>
+        </div>
+
+        <div class="mission-lines mobile-only">
+            <h1 class="type-display-hero animate-line">Since day</h1>
+            <h1 class="type-display-hero animate-line">one,</h1>
+            <h1 class="type-display-hero animate-line">we've been about</h1>
+            <h1 class="type-display-hero animate-line">creating Asian</h1>
+            <h1 class="type-display-hero animate-line">American spaces</h1>
+            <h1 class="type-display-hero animate-line">+ experiences that</h1>
+            <h1 class="type-display-hero animate-line">center and celebrate</h1>
+            <h1 class="type-display-hero animate-line">our joy.</h1>
+        </div>
 
     </section>
 
@@ -181,26 +206,35 @@
                 </div>
             </div>
 
-            <!-- Center: images -->
+            <!-- Center: images (each indexed) -->
             <div class="team-images-col">
-                <div class="team-poster-wrap">
+                <div class="team-poster-wrap" data-index="0">
                     <img class="team-poster" src="images/team/team-0.jpg" alt="Team Member">
                 </div>
-                <div class="team-poster-wrap">
+                <div class="team-poster-wrap" data-index="1">
                     <img class="team-poster" src="images/team/team-1.jpg" alt="Team Member">
                 </div>
-                <div class="team-poster-wrap">
+                <div class="team-poster-wrap" data-index="2">
                     <img class="team-poster" src="images/team/team-2.jpg" alt="Team Member">
                 </div>
-                <div class="team-poster-wrap">
+                <div class="team-poster-wrap" data-index="3">
                     <img class="team-poster" src="images/team/team-3.jpg" alt="Team Member">
                 </div>
             </div>
 
-            <!-- Right: names paragraph (sticky) -->
+            <!-- Right: body text (sticky on desktop, inline on mobile) -->
+            <!-- Only images with a matching data-for-index get new text;
+                 others inherit the previous visible body. -->
             <div class="team-text-col">
                 <div class="team-text-sticky">
-                    <p class="team-names type-body2 animate-line">Marcus Okafor, Priya Nair, Tyler Kowalski, Fatima Al-Rashid, Jordan Beaumont, Yuki Tanaka, Carmen Reyes, Elijah Brooks, Sofia Andersen, Dev Patel, Naomi Fletcher, Rami Khalil, Ingrid Svensson, Kwame Asante, Lucia Ferretti, Tobias Müller, Aaliyah Johnson, Sebastián Cruz, Mei-Ling Cho, Finn O'Sullivan, Zara Osei, Nikolai Petrov, Amara Diallo, Blake Harrington, Hana Mizrahi, Olusegun Adeyemi, Valentina Moreau, Isaac Nakamura, Celine Dubois, Andre Simmons</p>
+                    <div class="team-body-sizer">
+                        <div class="team-body" data-for-index="0">
+                            <p class="team-names type-body2">Marcus Okafor, Priya Nair, Tyler Kowalski, Fatima Al-Rashid, Jordan Beaumont, Yuki Tanaka, Carmen Reyes, Elijah Brooks, Sofia Andersen, Dev Patel, Naomi Fletcher, Rami Khalil, Ingrid Svensson, Kwame Asante, Lucia Ferretti, Tobias Müller, Aaliyah Johnson, Sebastián Cruz, Mei-Ling Cho, Finn O'Sullivan, Zara Osei, Nikolai Petrov, Amara Diallo, Blake Harrington</p>
+                        </div>
+                        <div class="team-body" data-for-index="1">
+                            <p class="team-names type-body2">Hana Mizrahi, Olusegun Adeyemi, Valentina Moreau, Isaac Nakamura, Celine Dubois, Andre Simmons</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -298,14 +332,17 @@
                     </a>
                 </div>
                 <div class="type-display-hero animate-cascade fit-text">
-                    <span>Green Tile Social Club</span>
+                    <span>Green</span>
+                    <span>Tile</span>
+                    <span>Social</span>
+                    <span>Club</span>
                 </div>
             </div>
     </footer>
 
     <script src="scripts/section-mission.js?v=4" defer></script>
     <script src="scripts/section-what-we-do.js?v=27" defer></script>
-    <script src="scripts/section-team.js?v=4" defer></script>
+    <script src="scripts/section-team.js?v=9" defer></script>
     <script src="scripts/section-socials.js?v=7" defer></script>
     <script src="scripts/section-clients.js?v=6" defer></script>
     <script src="scripts/footer.js?v=7" defer></script>

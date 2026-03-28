@@ -21,7 +21,7 @@
     right: 0;
     width: 100%;
     height: calc(100vh - var(--space-80));
-    padding: var(--space-40) var(--space-20);
+    padding: var(--space-40) var(--space-12);
     box-sizing: border-box;
 }
 
@@ -62,7 +62,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    height: calc(60 / 1920 * 100vw);
+    height: 60px;
     pointer-events: none;
     z-index: 2;
 }
@@ -146,71 +146,6 @@
 }
 
 
-/* mobile: native stacking layout, no scroll swipe animation */
-@media (max-width: 1024px) {
-    .pdp-section {
-        height: auto !important;
-        min-height: 100vh;
-    }
-
-    .pdp-sticky-wrapper {
-        position: relative;
-        top: unset;
-        left: unset;
-        right: unset;
-        height: auto;
-        padding: 100px 20px 80px;
-        box-sizing: border-box;
-    }
-
-    .pdp-grid {
-        height: auto;
-        display: flex;
-        flex-direction: column-reverse;
-        gap: 40px;
-        overflow: visible;
-    }
-
-    .pdp-image-col,
-    .pdp-info {
-        width: 100%;
-        height: auto;
-        overflow: visible;
-    }
-
-    .pdp-image-col {
-        overflow: visible;
-    }
-
-    .pdp-image-track {
-        transform: none !important;
-    }
-
-    .pdp-poster {
-        display: block;
-        width: 100%;
-        height: auto;
-    }
-
-    .pdp-desc {
-        flex: none;
-        min-height: unset;
-        overflow-y: visible;
-    }
-
-    .pdp-desc-wrapper {
-        flex: none;
-        min-height: unset;
-        margin-bottom: var(--space-20);
-    }
-
-    .pdp-desc-wrapper::before,
-    .pdp-desc-wrapper::after {
-        display: none;
-    }
-}
-
-
 .ticket-actions {
     position: relative;
     display: flex;
@@ -252,8 +187,8 @@
     justify-content: space-between;
     background-color: var(--c-dark-green-30);
     border-radius: 100px;
-    padding: calc(14 / 1920 * 100vw) var(--space-20) calc(10 / 1920 * 100vw);
-    min-width: calc(140 / 1920 * 100vw);
+    padding: 14px var(--space-20) 10px;
+    min-width: 140px;
     box-sizing: border-box;
 }
 
@@ -266,7 +201,7 @@
 }
 
 .qty-val {
-    min-width: calc(24 / 1920 * 100vw); text-align: center;
+    min-width: 24px; text-align: center;
     color: var(--c-dark-green);
     line-height: var(--lh-single);
 }
@@ -291,4 +226,110 @@
 
 .pdp-tag.is-visible{
     opacity: 1;
+}
+
+
+/* mobile: native stacking layout, no scroll swipe animation */
+@media (max-width: 1024px) {
+    .pdp-section {
+        height: auto !important;
+        min-height: 100vh;
+    }
+
+    .pdp-sticky-wrapper {
+        position: relative;
+        top: unset;
+        left: unset;
+        right: unset;
+        height: auto;
+        padding: 140px 12px 80px;
+        box-sizing: border-box;
+    }
+
+    .pdp-grid {
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+        overflow: visible;
+    }
+
+    .pdp-image-col,
+    .pdp-info {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    .pdp-image-col {
+        overflow: visible;
+    }
+
+    .pdp-image-col .back-arrow {
+        right: auto;
+        left: 0;
+        top: calc(-60px);
+    }
+
+    .pdp-image-track {
+        transform: none !important;
+        display: flex;
+        gap: var(--space-8);
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .pdp-image-track::-webkit-scrollbar {
+        display: none;
+    }
+
+    .pdp-poster {
+        display: block;
+        width: 85%;
+        height: auto;
+        flex: 0 0 85%;
+        scroll-snap-align: center;
+        margin-bottom: 0;
+    }
+
+    .pdp-desc {
+        flex: none;
+        min-height: unset;
+        overflow-y: visible;
+    }
+
+    .pdp-desc-wrapper {
+        flex: none;
+        min-height: unset;
+        margin-bottom: var(--space-20);
+    }
+
+    .pdp-desc-wrapper::before,
+    .pdp-desc-wrapper::after {
+        display: none;
+    }
+
+    .pdp-info {
+        padding-bottom: 80px;
+    }
+
+    .ticket-actions {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background-color: var(--color-bg);
+        padding: var(--space-12) var(--space-12);
+        padding-bottom: calc(var(--space-12) + env(safe-area-inset-bottom, 0px));
+        transform: translateY(100%);
+        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .ticket-actions.is-sticky-visible {
+        transform: translateY(0);
+    }
 }

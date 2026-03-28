@@ -85,8 +85,8 @@
 .what-we-do-body .about-text-block {
     grid-area: 1 / 1;
     width: 100%;
-    max-width: calc(600 / 1920 * 100vw);
-    padding: 0 var(--space-20);
+    max-width: 600px;
+    padding: 0 var(--space-12);
     text-align: center;
     position: relative;
     /* opacity, filter, and transition are driven entirely by JS inline styles */
@@ -106,7 +106,7 @@
 .what-we-do-body .about-content {
     position: relative;
     width: 100%;
-    max-width: calc(600 / 1920 * 100vw);
+    max-width: 600px;
     text-align: center;
 }
 
@@ -178,8 +178,8 @@
 }
 
 @media (max-width: 768px) {
-    .about-menu-persistent            { top: 5vh; }
+    .about-menu-persistent            { top: 15vh; }
     .about-menu-persistent .menu-item { font-size: 40px; margin-bottom: 4px; }
 
-    .what-we-do .about-menu-persistent.is-pinned { top: 15vh; padding-top: 0; }
+    .what-we-do .about-menu-persistent.is-pinned { top: 25vh; padding-top: 0; }
 }

@@ -76,8 +76,8 @@
 .about-alt-body .about-alt-block {
     grid-area: 1 / 1;
     width: 100%;
-    max-width: calc(600 / 1920 * 100vw);
-    padding: 0 var(--space-20);
+    max-width: 600px;
+    padding: 0 var(--space-12);
     text-align: center;
     will-change: transform, opacity, filter;
     pointer-events: none;
@@ -100,7 +100,7 @@
 .about-alt-body .about-content {
     position: relative;
     width: 100%;
-    max-width: calc(600 / 1920 * 100vw);
+    max-width: 600px;
     text-align: center;
 }
 

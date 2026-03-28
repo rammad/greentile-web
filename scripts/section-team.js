@@ -3,7 +3,7 @@
 (function () {
     const { observeElementInOut } = window.AnimationUtils || {};
     const LINE_STAGGER_MS = 80;
-    const ANIM_MS = 700; // matches CSS transition duration
+    const MOBILE_BP = 768;
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('team');
@@ -11,31 +11,109 @@
 
         const titleInner = section.querySelector('.team-title-inner');
         const textSticky = section.querySelector('.team-text-sticky');
+        const titleCol   = section.querySelector('.team-title-col');
         const titleLines = [...section.querySelectorAll('.team-title-text.animate-line')];
-        const body       = section.querySelector('.team-names.animate-line');
-        const posters    = section.querySelectorAll('.team-poster-wrap');
+        const posters    = [...section.querySelectorAll('.team-poster-wrap[data-index]')];
+        const bodies     = [...section.querySelectorAll('.team-body[data-for-index]')];
+
+        const bodySizer = section.querySelector('.team-body-sizer');
+        const bodyMap = {};
+        bodies.forEach(b => { bodyMap[b.dataset.forIndex] = b; });
+
+        let activeBody = null;
+        let isMobile = window.innerWidth <= MOBILE_BP;
+
+        /* ── fallback ── */
 
         if (!observeElementInOut) {
             titleLines.forEach(l => l.classList.add('is-visible'));
-            if (body) body.classList.add('is-visible');
             posters.forEach(w => w.classList.add('is-visible'));
+            bodies.forEach(b => b.classList.add('is-active'));
+            if (bodySizer && bodies[0]) bodySizer.style.height = bodies[0].scrollHeight + 'px';
             return;
         }
 
-        // Poster scroll-in animations (unchanged)
-        posters.forEach((wrap, i) => {
-            wrap.style.transitionDelay = `${i * 80}ms`;
-            observeElementInOut(wrap, { onEnter: () => wrap.classList.add('is-visible') });
-        });
+        /* ── helpers ── */
 
+        function resolveBodyForIndex(idx) {
+            if (bodyMap[idx]) return idx;
+            const sorted = Object.keys(bodyMap).map(Number).sort((a, b) => a - b);
+            let best = sorted[0];
+            for (const k of sorted) {
+                if (k <= Number(idx)) best = k;
+                else break;
+            }
+            return String(best);
+        }
+
+        function activateBodyDesktop(posterEl) {
+            const resolved = resolveBodyForIndex(posterEl.dataset.index);
+            const body = bodyMap[resolved];
+            if (!body || body === activeBody) return;
+            if (activeBody) activeBody.classList.remove('is-active');
+            body.classList.add('is-active');
+            activeBody = body;
+            if (bodySizer) bodySizer.style.height = body.scrollHeight + 'px';
+        }
+
+        function revealBodyMobile(posterEl) {
+            const resolved = resolveBodyForIndex(posterEl.dataset.index);
+            const body = bodyMap[resolved];
+            if (!body || body.classList.contains('is-active')) return;
+            body.classList.add('is-active');
+        }
+
+        const root = document.getElementById('scroll-viewport') || null;
         const firstPoster = posters[0];
         if (!firstPoster) return;
 
-        const root = document.getElementById('scroll-viewport') || null;
-        const els  = [titleInner, textSticky];
+        /* ── poster scroll-in (desktop visual slide-up) ── */
+
+        posters.forEach((wrap, i) => {
+            wrap.style.transitionDelay = `${i * 80}ms`;
+            observeElementInOut(wrap, {
+                onEnter: () => wrap.classList.add('is-visible'),
+            });
+        });
+
+        /* ── desktop: body activates when image > 50% visible ── */
+
+        const desktopBodyObs = new IntersectionObserver((entries) => {
+            if (isMobile) return;
+            for (const entry of entries) {
+                if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                    window.pageReady.then(() => activateBodyDesktop(entry.target));
+                }
+            }
+        }, { root, threshold: [0, 0.5] });
+
+        posters.forEach(p => desktopBodyObs.observe(p));
+
+        /* ── mobile: title + body animate in with observer ── */
+
+        observeElementInOut(titleCol, {
+            onEnter: () => {
+                if (!isMobile) return;
+                titleLines.forEach((line, i) => {
+                    setTimeout(() => line.classList.add('is-visible'), i * LINE_STAGGER_MS);
+                });
+            },
+        });
+
+        posters.forEach(poster => {
+            observeElementInOut(poster, {
+                onEnter: () => {
+                    if (!isMobile) return;
+                    revealBodyMobile(poster);
+                },
+            });
+        });
+
+        /* ── fixed→sticky hand-off (desktop only) ── */
+
+        const els = [titleInner, textSticky];
         let pinned = false;
 
-        // Resolve a CSS expression to pixels by applying it to a throw-away element
         function pxVar(expression) {
             const tmp = document.createElement('div');
             tmp.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;height:${expression}`;
@@ -45,11 +123,8 @@
             return val;
         }
 
-        // Pin both panels as position:fixed at the exact screen coords they occupy when stuck.
-        // Horizontal position is measured from the element itself (stable across scroll).
-        // Vertical position comes from the CSS sticky-top value.
         function applyFixed() {
-            if (window.innerWidth <= 768) { removeFixed(); return; }
+            if (window.innerWidth <= MOBILE_BP) { removeFixed(); return; }
             const top = pxVar('calc(var(--space-80) + var(--space-20))');
             els.forEach(el => {
                 const rect = el.getBoundingClientRect();
@@ -64,9 +139,6 @@
             pinned = true;
         }
 
-        // Remove fixed — elements revert to position:sticky via CSS.
-        // Called after the entrance animation completes while the section is still stuck,
-        // so there is no visual jump.
         let handedOff = false;
         function removeFixed() {
             if (!pinned) return;
@@ -83,43 +155,65 @@
 
         applyFixed();
 
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                if (!handedOff) applyFixed();
-            }, 50);
-        });
-
-        // Hand off from fixed → sticky only once the image is truly at the top,
-        // so fixed and sticky positions are identical and there's no jump.
         function waitForStickThenUnpin() {
             const stickyTop = pxVar('calc(var(--space-80) + var(--space-20))');
-
             function check() {
                 if (firstPoster.getBoundingClientRect().top <= stickyTop + 1) {
                     removeFixed();
                     window.removeEventListener('lenis-scroll', check);
                 }
             }
-
             window.addEventListener('lenis-scroll', check);
-            check(); // in case we're already past the threshold
+            check();
         }
 
-        // Trigger: when first poster crosses 75% of viewport height
-        let fired = false;
-        const obs = new IntersectionObserver((entries) => {
-            if (fired) return;
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (!handedOff) applyFixed();
+                updateLayout();
+            }, 50);
+        });
+
+        /* ── mobile ↔ desktop layout switching ── */
+
+        function arrangeForMobile() {
+            const imagesCol = section.querySelector('.team-images-col');
+            bodies.forEach(body => {
+                const idx = body.dataset.forIndex;
+                const poster = imagesCol.querySelector(`.team-poster-wrap[data-index="${idx}"]`);
+                if (poster) poster.after(body);
+            });
+        }
+
+        function arrangeForDesktop() {
+            bodies.forEach(body => bodySizer.appendChild(body));
+        }
+
+        function updateLayout() {
+            const nowMobile = window.innerWidth <= MOBILE_BP;
+            if (nowMobile === isMobile) return;
+            isMobile = nowMobile;
+            if (isMobile) arrangeForMobile();
+            else arrangeForDesktop();
+        }
+
+        if (isMobile) arrangeForMobile();
+
+        /* ── desktop: title entrance trigger ── */
+
+        let titleFired = false;
+        const titleObs = new IntersectionObserver((entries) => {
+            if (titleFired || isMobile) return;
             for (const entry of entries) {
                 if (entry.isIntersecting) {
-                    fired = true;
-                    obs.disconnect();
+                    titleFired = true;
+                    titleObs.disconnect();
                     window.pageReady.then(() => {
                         titleLines.forEach((line, i) => {
                             setTimeout(() => line.classList.add('is-visible'), i * LINE_STAGGER_MS);
                         });
-                        if (body) body.classList.add('is-visible');
                         waitForStickThenUnpin();
                     });
                     break;
@@ -127,6 +221,6 @@
             }
         }, { root, rootMargin: '0px 0px -75% 0px', threshold: 0 });
 
-        obs.observe(firstPoster);
+        titleObs.observe(firstPoster);
     });
 })();

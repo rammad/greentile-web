@@ -95,11 +95,11 @@
 
         const recalcLayout = () => {
             const ih = window.innerHeight;
-            const vw = window.innerWidth;
 
-            const sectionSpacingPx = vw * 400 / 1920; // double the section spacing
-            const s80 = vw * 80 / 1920;
-            const s20 = vw * 20 / 1920;
+            const rootStyle = getComputedStyle(document.documentElement);
+            const sectionSpacingPx = parseFloat(rootStyle.getPropertyValue('--space-400'));
+            const s80 = parseFloat(rootStyle.getPropertyValue('--space-80'));
+            const s20 = parseFloat(rootStyle.getPropertyValue('--space-20'));
 
             // nav bottom edge — used for visual centering and poster cap
             const nav = document.querySelector('.sticky-nav');
@@ -111,14 +111,26 @@
             // centered in the viewport space the user actually sees
             stickyInner.style.paddingTop = navInset + 'px';
 
-            // cap poster size: content must fit between nav bottom and 20 from viewport bottom
+            // cap poster size: content must fit between nav bottom and viewport bottom
             const flexGap    = parseFloat(getComputedStyle(stickyInner).rowGap) || 0;
-            const maxPosterH = ih - navInset - titleWrap.offsetHeight - flexGap - s20;
-            const maxPosterW = maxPosterH * 4 / 5;
             const gridColGap = parseFloat(getComputedStyle(grid).columnGap) || 0;
             const gridPad    = parseFloat(getComputedStyle(grid).paddingLeft)
                              + parseFloat(getComputedStyle(grid).paddingRight);
-            grid.style.maxWidth = Math.max(0, n * maxPosterW + (n - 1) * gridColGap + gridPad) + 'px';
+            const isMobile   = window.matchMedia('(max-width: 768px)').matches;
+
+            if (isMobile) {
+                const numCols    = 2;
+                const numRows    = Math.ceil(n / numCols);
+                const gridRowGap = parseFloat(getComputedStyle(grid).rowGap) || 0;
+                const availableH = ih - navInset - titleWrap.offsetHeight - flexGap - s20;
+                const maxPosterH = (availableH - (numRows - 1) * gridRowGap) / numRows;
+                const maxPosterW = maxPosterH * 4 / 5;
+                grid.style.maxWidth = Math.max(0, numCols * maxPosterW + (numCols - 1) * gridColGap + gridPad) + 'px';
+            } else {
+                const maxPosterH = ih - navInset - titleWrap.offsetHeight - flexGap - s20;
+                const maxPosterW = maxPosterH * 4 / 5;
+                grid.style.maxWidth = Math.max(0, n * maxPosterW + (n - 1) * gridColGap + gridPad) + 'px';
+            }
 
             // measure content after constraints are applied
             const contentH = titleWrap.offsetHeight + flexGap + content.offsetHeight;

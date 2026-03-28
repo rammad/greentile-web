@@ -1,4 +1,4 @@
-/* team section — three-column layout: title (left), images (center, wider), names (right) */
+/* team section — three-column layout: title (left), images (center, wider), body text (right) */
 
 .team-section {
     position: relative;
@@ -12,7 +12,7 @@
     grid-template-columns: 1fr 1.4fr 1fr;
     column-gap: var(--space-40);
     align-items: stretch;
-    padding: 0 var(--space-20);
+    padding: 0 var(--space-12);
     box-sizing: border-box;
 }
 
@@ -45,7 +45,7 @@
     border-radius: var(--poster-radius);
     flex-shrink: 0;
     opacity: 0;
-    transform: translateY(calc(32 / 1920 * 100vw));
+    transform: translateY(32px);
     transition:
         opacity 0.8s ease,
         transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
@@ -78,6 +78,27 @@
     padding-bottom: var(--space-40);
 }
 
+.team-body-sizer {
+    position: relative;
+    /* overflow: hidden; */
+    transition: height 0.5s ease;
+}
+
+.team-body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.team-body.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .team-title-text {
     line-height: var(--lh-single);
 }
@@ -96,8 +117,16 @@
     opacity: 1;
     transform: translateY(0);
 }
+
 .team-names {
     color: var(--c-dark-green-50);
+}
+
+/* type-body2 starts at opacity:0 / blur globally;
+   inside .team-body the wrapper handles fade, so reset the child */
+.team-body .type-body2 {
+    opacity: 1;
+    filter: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -132,10 +161,23 @@
         height: auto;
     }
 
+    /* desktop text column hidden — bodies are relocated into the images column by JS */
+    .team-text-col {
+        display: none;
+    }
+
     .team-text-sticky {
         position: relative;
         top: 0;
         height: auto;
+    }
+
+    /* bodies become normal flow elements when placed after their image */
+    .team-body {
+        position: relative;
+        bottom: auto;
+        width: auto;
+        padding: var(--space-20) 0 var(--space-40);
     }
 
     .team-poster-wrap {

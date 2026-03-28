@@ -3,7 +3,7 @@
 .clients-section {
     min-height: auto;
     width: 100%;
-    padding: var(--section-spacing) var(--space-20) var(--space-40);
+    padding: var(--section-spacing) var(--space-12) var(--space-40);
     display: flex;
     flex-direction: column;
     gap: var(--space-120);
@@ -79,9 +79,9 @@
 }
 
 .client-logo {
-    height: calc(48 / 1920 * 100vw);
+    height: 48px;
     width: auto;
-    max-width: calc(140 / 1920 * 100vw);
+    max-width: 140px;
     object-fit: contain;
     opacity: 0.4;
     transition: opacity 0.3s ease;
@@ -93,7 +93,7 @@
 
 @media (max-width: 768px) {
     .clients-section {
-        padding: 60px 20px;
+        padding: 60px 12px;
         gap: 48px;
     }
 

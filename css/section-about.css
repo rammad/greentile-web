@@ -7,7 +7,6 @@
 }
 
 .about-inner {
-    padding: 0 var(--space-20);
     width: 70%;
     margin: 0 auto;
     display: flex;
@@ -93,9 +92,12 @@
 }
 
 @media (max-width: 768px) {
+    .about {
+        padding-top: var(--section-spacing);
+    }
+
     .about-inner {
         width: 90%;
-        padding: 10vh var(--space-20) 10vh;
         gap: 40px;
     }
 

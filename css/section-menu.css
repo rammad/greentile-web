@@ -71,9 +71,9 @@
     flex-direction: column; 
     align-items: center;
     gap: var(--space-40);
-    max-width: calc(1000 / 1920 * 100vw);
+    max-width: 1000px;
     width: 100%;
-    padding: 0 var(--space-20);
+    padding: 0 var(--space-12);
 }
 
 .menu-label {
@@ -105,7 +105,7 @@
 }
 
 .cta-container {
-    position: relative; width: 100%; max-width: calc(600 / 1920 * 100vw); height: calc(150 / 1920 * 100vw);
+    position: relative; width: 100%; max-width: 600px; height: 150px;
 }
 
 .cta-block {
@@ -114,7 +114,7 @@
     gap: var(--space-20);
     opacity: 0; 
     pointer-events: none; 
-    transform: translateY(calc(10 / 1920 * 100vw));
+    transform: translateY(10px);
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 

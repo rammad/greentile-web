@@ -19,11 +19,12 @@
         const textBlocks = Array.from(section.querySelectorAll('.about-text-block'));
         const numSlides  = textBlocks.length || 4;
 
+        const menuEl    = section.querySelector('.about-menu-persistent');
+
         const scatter = window.ScatterImages.init(section, viewport, numSlides);
+        if (menuEl) scatter.avoidanceEl = menuEl;
 
         // ── persistent menu ───────────────────────────────────────────────────
-
-        const menuEl    = section.querySelector('.about-menu-persistent');
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
 
         const MENU_ITEM_STAGGER_MS = 120;
@@ -145,8 +146,8 @@
 
         const MENU_OFFSET_VH_DESKTOP = 0.20;
         const MENU_PIN_VH_DESKTOP    = 0.28;
-        const MENU_OFFSET_VH_MOBILE  = 0.05;
-        const MENU_PIN_VH_MOBILE     = 0.15;
+        const MENU_OFFSET_VH_MOBILE  = 0.15;
+        const MENU_PIN_VH_MOBILE     = 0.25;
 
         function calcIsPinned(vpRect, secRect) {
             const isMobile       = window.innerWidth < 768;

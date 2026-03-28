@@ -46,7 +46,7 @@
 } */
 
 /* variables */
-/* design base: 1920px — all calc() values resolve to their px equivalent at 1920px wide */
+/* design base: 1920px — breakpoints at 768 (mobile), 1024 (tablet), 2560 (ultra-wide) */
 :root {
     --c-off-white: #FFFCFA;
     --c-bright-green: #30FA30;
@@ -105,28 +105,28 @@
 
     --blur-standard: 10px; /* fixed — blur does not scale with viewport */
 
-    /* spacing — single unified scale, named by px value at 1920w
+    /* spacing — single unified scale, named by px value at 1920w desktop.
        4px base grid, every 4px from 4–40, then larger jumps.
-       Use for padding, gap, and margin interchangeably. */
-    --space-4:   calc(4   / 1920 * 100vw);
-    --space-8:   calc(8   / 1920 * 100vw);
-    --space-12:  calc(12  / 1920 * 100vw);
-    --space-16:  calc(16  / 1920 * 100vw);
-    --space-20:  calc(20  / 1920 * 100vw);
-    --space-24:  calc(24  / 1920 * 100vw);
-    --space-28:  calc(28  / 1920 * 100vw);
-    --space-32:  calc(32  / 1920 * 100vw);
-    --space-36:  calc(36  / 1920 * 100vw);
-    --space-40:  calc(40  / 1920 * 100vw);
-    --space-48:  calc(48  / 1920 * 100vw);
-    --space-56:  calc(56  / 1920 * 100vw);
-    --space-64:  calc(64  / 1920 * 100vw);
-    --space-80:  calc(80  / 1920 * 100vw);
-    --space-96:  calc(96  / 1920 * 100vw);
-    --space-120: calc(120 / 1920 * 100vw);
-    --space-160: calc(160 / 1920 * 100vw);
-    --space-200: calc(200 / 1920 * 100vw);
-    --space-400: calc(400 / 1920 * 100vw);
+       Overridden per breakpoint below. Use for padding, gap, and margin. */
+    --space-4:   4px;
+    --space-8:   8px;
+    --space-12:  12px;
+    --space-16:  16px;
+    --space-20:  20px;
+    --space-24:  24px;
+    --space-28:  28px;
+    --space-32:  32px;
+    --space-36:  36px;
+    --space-40:  40px;
+    --space-48:  48px;
+    --space-56:  56px;
+    --space-64:  64px;
+    --space-80:  80px;
+    --space-96:  96px;
+    --space-120: 120px;
+    --space-160: 160px;
+    --space-200: 200px;
+    --space-400: 400px;
 
     --poster-gap: var(--space-20);
     --poster-radius: 8% / 6.4%; /* 8% * 4/5 = %6.4 */
@@ -138,36 +138,21 @@
     --lh-body:   1.2;   /* body text */
     --lh-open:   1.4;   /* large multi-line display text */
 
-    /* desktop type sizes */
-    --size-display-hero:   8.6vw;
-    --size-display-xl:    calc(160 / 1920 * 100vw); /* 160px */
-    --size-h1:            calc(96  / 1920 * 100vw); /* 96px  */
-    --size-h2:            calc(64  / 1920 * 100vw); /* 64px  */
-    --size-h3:            calc(48  / 1920 * 100vw); /* 48px  */
-    --size-subBold1:      calc(20  / 1920 * 100vw); /* 20px  — section label headers */
-    --size-subBold2:      calc(14  / 1920 * 100vw); /* 12px  — secondary info (event date, marquee) */
-    --size-subRegular1:   calc(14  / 1920 * 100vw); /* 14px  — nav and buttons */
-    --size-subRegular2:   calc(10  / 1920 * 100vw); /* 10px  — badges (pdp meta) */
-    --size-body1:         calc(14  / 1920 * 100vw); /* 14px  */
-    --size-body2:         calc(20  / 1920 * 100vw); /* 20px  */
-    --size-body3:         calc(32  / 1920 * 100vw); /* 32px  */
-
-    /* mobile type sizes — addressed in mobile pass, kept as px */
-    --size-display-hero-mobile: 15vw;
-    --size-display-xl-mobile: 100px;
-    --size-h1-mobile: 96px;
-    --size-h2-mobile: 40px;
-    --size-sub1-mobile: 24px;
-    --size-sub2-mobile: 14px;
-    --size-body1-mobile: 14px;
-    --size-body2-mobile: 24px;
-    --size-body3-mobile: 28px;
+    /* type sizes — overridden per breakpoint below */
+    --size-display-hero:  165px;
+    --size-display-xl:    160px;
+    --size-h1:            96px;
+    --size-h2:            64px;
+    --size-h3:            48px;
+    --size-subBold1:      20px;  /* section label headers */
+    --size-subBold2:      14px;  /* secondary info (event date, marquee) */
+    --size-subRegular1:   14px;  /* nav and buttons */
+    --size-subRegular2:   10px;  /* badges (pdp meta) */
+    --size-body1:         14px;
+    --size-body2:         20px;
+    --size-body3:         32px;
 
     --section-spacing: var(--space-200);
-
-    /* mobile spacing — addressed in mobile pass, kept as px */
-    --section-spacing-mobile: 80px;
-    --section-padding-mobile: 20px;
 }
 
 /* reset */
@@ -379,20 +364,20 @@ section {
 }
 .type-body3.is-visible { opacity: 1; filter: blur(0); }
 
-.standard-margins { padding: var(--space-80) var(--space-20) var(--space-20); }
+.standard-margins { padding: var(--space-80) var(--space-12) var(--space-20); }
 .section-spacer { padding-top: var(--section-spacing); }
 
 .section-standard {
     position: relative;
     width: 100%;
-    padding: var(--space-80) var(--space-20) var(--space-20);
+    padding: var(--space-80) var(--space-12) var(--space-20);
 }
 
 /* utils */
 .header-hidden {
     opacity: 0 !important;
     filter: blur(var(--blur-standard));
-    transform: translateY(calc(-15 / 1920 * 100vw)); /* -15px */
+    transform: translateY(-15px);
     transition:
         opacity var(--time-fade-out) ease,
         filter var(--time-fade-out) ease,
@@ -500,8 +485,8 @@ section {
 
 .cta-btn.is-visible {
     opacity: 1;
-    max-width: calc(400 / 1920 * 100vw);                       /* 400px */
-    padding: calc(14 / 1920 * 100vw) var(--space-20) calc(10 / 1920 * 100vw); /* optical center — 14/10 are intentional offsets */
+    max-width: 400px;
+    padding: 14px var(--space-20) 10px; /* optical center — 14/10 are intentional offsets */
     color: var(--color-btn-text);
 }
 
@@ -598,13 +583,13 @@ section {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: calc(88  / 1920 * 100vw);                                /* 88px  */
-    height: calc(120 / 1920 * 100vw);                               /* 120px */
-    margin: calc(-60 / 1920 * 100vw) 0 0 calc(-44 / 1920 * 100vw); /* -60px 0 0 -44px */
+    width: 88px;
+    height: 120px;
+    margin: -60px 0 0 -44px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    border-radius: calc(8 / 1920 * 100vw);                          /* 8px   */
+    border-radius: 8px;
     will-change: transform, opacity;
 }
 
@@ -625,17 +610,17 @@ section {
 }
 
 .curtain-action-line {
-    width: calc(2 / 1920 * 100vw);
+    width: 2px;
     background: var(--c-bright-green);
-    border-radius: calc(2 / 1920 * 100vw);
+    border-radius: 2px;
     opacity: 0;
     transition: transform 0.05s cubic-bezier(0, 0, 0.2, 1), opacity 0.03s ease;
 }
 
 /* heights: middle tallest, flanks shorter */
 .curtain-action-line:nth-child(1),
-.curtain-action-line:nth-child(3) { height: calc(14 / 1920 * 100vw); }
-.curtain-action-line:nth-child(2) { height: calc(22 / 1920 * 100vw); }
+.curtain-action-line:nth-child(3) { height: 14px; }
+.curtain-action-line:nth-child(2) { height: 22px; }
 
 /* resting — scaled to zero, growing upward; flanks angled outward */
 .curtain-action-line:nth-child(1) { transform: rotate(-40deg) scaleY(0); transform-origin: center bottom; }
@@ -696,24 +681,113 @@ body::after {
 }
 
 .back-arrow img {
-    height: calc(7 / 1920 * 100vw); /* 7px */
+    height: 7px;
     width: auto;
     filter: brightness(0) saturate(100%) invert(22%) sepia(50%) saturate(800%) hue-rotate(80deg) brightness(88%);
 }
 
+/* ─── BREAKPOINTS ─────────────────────────────────────────────────── */
+
+/* ultra-wide — 2560px+ */
+@media (min-width: 2560px) {
+    /* :root {
+        --space-4:   4px;
+        --space-8:   10px;
+        --space-12:  16px;
+        --space-16:  20px;
+        --space-20:  26px;
+        --space-24:  32px;
+        --space-28:  36px;
+        --space-32:  42px;
+        --space-36:  48px;
+        --space-40:  52px;
+        --space-48:  64px;
+        --space-56:  74px;
+        --space-64:  84px;
+        --space-80:  106px;
+        --space-96:  128px;
+        --space-120: 160px;
+        --space-160: 212px;
+        --space-200: 266px;
+        --space-400: 532px;
+
+        --size-display-hero:  220px;
+        --size-display-xl:    212px;
+        --size-h1:            128px;
+        --size-h2:            84px;
+        --size-h3:            64px;
+        --size-subBold1:      26px;
+        --size-subBold2:      18px;
+        --size-subRegular1:   18px;
+        --size-subRegular2:   14px;
+        --size-body1:         18px;
+        --size-body2:         26px;
+        --size-body3:         42px;
+    } */
+}
+
+/* tablet — 769px–1024px */
+@media (max-width: 1024px) {
+    /* :root {
+        --space-4:   4px;
+        --space-8:   6px;
+        --space-12:  10px;
+        --space-16:  14px;
+        --space-20:  16px;
+        --space-24:  20px;
+        --space-28:  22px;
+        --space-32:  26px;
+        --space-36:  28px;
+        --space-40:  32px;
+        --space-48:  38px;
+        --space-56:  44px;
+        --space-64:  50px;
+        --space-80:  60px;
+        --space-96:  72px;
+        --space-120: 90px;
+        --space-160: 120px;
+        --space-200: 150px;
+        --space-400: 300px;
+
+        --size-display-hero:  120px;
+        --size-display-xl:    120px;
+        --size-h1:            72px;
+        --size-h2:            48px;
+        --size-h3:            36px;
+        --size-subBold1:      18px;
+        --size-subBold2:      13px;
+        --size-subRegular1:   13px;
+        --size-subRegular2:   10px;
+        --size-body1:         14px;
+        --size-body2:         18px;
+        --size-body3:         26px;
+    } */
+}
+
+/* mobile — ≤768px */
 @media (max-width: 768px) {
-    .type-display-hero { font-size: var(--size-display-hero-mobile); }
-    .type-display-xl { font-size: var(--size-display-xl-mobile); }
-    .type-h1 { font-size: var(--size-h1-mobile); }
-    .type-h2 { font-size: var(--size-h2-mobile); }
-    .type-subBold1 { font-size: var(--size-sub1-mobile); }
-    .type-subBold2 { font-size: var(--size-sub2-mobile); }
-    .type-subRegular1 { font-size: var(--size-sub2-mobile); }
-    .type-subRegular2 { font-size: var(--size-subRegular2); }
-    .type-body1 { font-size: var(--size-body1-mobile); }
-    .type-body2 { font-size: var(--size-body2-mobile); }
-    .type-body3 { font-size: var(--size-body3-mobile); }
-    .standard-margins { padding: var(--section-padding-mobile); }
-    .section-standard { padding: var(--section-padding-mobile); }
-    .section-spacer { padding-top: var(--section-spacing-mobile); }
+    :root {
+        --size-display-hero:  80px;
+        --size-display-xl:    80px;
+        --size-h1:            32px;
+        --size-h2:            32px;
+        --size-h3:            20px;
+        --size-subBold1:      16px;
+        --size-subBold2:      14px;
+        --size-subRegular1:   14px;
+        --size-subRegular2:   10px;
+        --size-body1:         12px;
+        --size-body2:         14px;
+        --size-body3:         16px;
+
+        --section-spacing: var(--space-80);
+    }
+}
+
+/* ── responsive visibility utilities ── */
+.mobile-only  { display: none !important; }
+
+@media (max-width: 768px) {
+    .desktop-only { display: none !important; }
+    .mobile-only  { display: block !important; }
 }
