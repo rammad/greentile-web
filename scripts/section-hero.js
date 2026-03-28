@@ -10,7 +10,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const heroTitle = document.querySelector('.type-display-hero');
+        const heroTitle = document.querySelector('#hero .type-display-hero');
         if (!heroTitle) return;
 
         const viewport = document.getElementById('scroll-viewport');

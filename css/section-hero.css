@@ -15,7 +15,7 @@
 
     position: absolute;
     top: auto;
-    bottom: var(--space-20);
+    bottom: 20px;
     left: 50%;
     overflow: visible;
     transform: translateX(-50%);
@@ -31,5 +31,9 @@
     }
     .hero .type-display-hero > span {
         display: block;
+        text-box: trim-both cap alphabetic;
+    }
+    .hero .type-display-hero > span + span {
+        margin-top: var(--gap-display-lines);
     }
 }

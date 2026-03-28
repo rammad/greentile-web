@@ -12,7 +12,7 @@
     width: 100%;
     height: 100vh;
     min-height: 100vh;
-    padding: calc(var(--space-80) - var(--space-20)) 300px 0 300px;
+    padding: calc(var(--space-for-nav) - 20px) 300px 0 300px;
     
     display: flex;
     flex-direction: column;
@@ -40,12 +40,12 @@
 
 .mission-section .type-display-hero {
     width: 100%;
-    margin: 0 auto var(--space-40);
+    margin: 0 auto var(--gap-text);
 }
 
 .mission-section .animate-line {
     opacity: 0;
-    transform: translateY(var(--space-40));
+    transform: translateY(40px);
     transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
@@ -55,15 +55,11 @@
 }
 
 .mission-section .text-mask{
-    margin-bottom: var(--space-40);
+    margin-bottom: var(--gap-text);
 }
 
 @media (max-width: 768px) {
     .mission-section {
-        padding: var(--space-20) var(--space-12);
-    }
-
-    .mission-section .type-display-hero {
-        margin: 0 auto var(--space-20);
+        padding: 20px var(--page-gutter);
     }
 }

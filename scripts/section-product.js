@@ -17,12 +17,13 @@
         }
 
         initImageScroll();
+        initMobileDots();
         initDescFade();
         updateQty(0);
     });
 
     async function initDesktopAnimations(section) {
-        const title = document.querySelector('.animate-cascade');
+        const title = document.querySelector('.pdp-section .animate-cascade');
         if (title) {
             const checkInit = setInterval(async () => {
                 if (title.classList.contains('is-initialized') && window.playCascade) {
@@ -76,7 +77,7 @@
         // title + subtitles + tags: animate when the info block scrolls into view
         const infoBlock = document.querySelector('.pdp-info');
         const waitForCascade = () => new Promise(resolve => {
-            const el = document.querySelector('.animate-cascade');
+            const el = document.querySelector('.pdp-section .animate-cascade');
             if (!el) { resolve(); return; }
             if (el.classList.contains('is-initialized') && window.playCascade) { resolve(); return; }
             const poll = setInterval(() => {
@@ -92,7 +93,7 @@
             enterThreshold: 0.05,
             onEnter: async () => {
                 await waitForCascade();
-                const cascadeEl = document.querySelector('.animate-cascade');
+                const cascadeEl = document.querySelector('.pdp-section .animate-cascade');
                 if (cascadeEl) transitionHeader(cascadeEl, 'enter');
 
                 await wait(staggerTime);
@@ -213,6 +214,35 @@
             currentY = targetY;
             track.style.transform = `translateY(${-currentY}px)`;
         });
+    }
+
+    function initMobileDots() {
+        if (window.innerWidth > MOBILE_BREAKPOINT) return;
+
+        const track = document.querySelector('.pdp-image-track');
+        const container = document.querySelector('.pdp-dots');
+        if (!track || !container) return;
+
+        const posters = track.querySelectorAll('.pdp-poster');
+        if (!posters.length) return;
+
+        posters.forEach((_, i) => {
+            const dot = document.createElement('span');
+            dot.classList.add('pdp-dot');
+            if (i === 0) dot.classList.add('is-active');
+            container.appendChild(dot);
+        });
+
+        const dots = container.querySelectorAll('.pdp-dot');
+
+        track.addEventListener('scroll', () => {
+            const sl = track.scrollLeft;
+            let active = 0;
+            posters.forEach((p, i) => {
+                if (Math.abs(p.offsetLeft - sl) < Math.abs(posters[active].offsetLeft - sl)) active = i;
+            });
+            dots.forEach((d, i) => d.classList.toggle('is-active', i === active));
+        }, { passive: true });
     }
 
     function initDescFade() {

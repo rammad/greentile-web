@@ -10,7 +10,7 @@
         const page = document.querySelector('.archives-page');
         if (page) setTimeout(() => page.classList.add('is-active'), 100);
 
-        const title = document.querySelector('.animate-cascade');
+        const title = document.querySelector('.archives-page .animate-cascade');
         if (title) {
             const checkInit = setInterval(() => {
                 if (title.classList.contains('is-initialized') && window.playCascade) {

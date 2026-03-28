@@ -105,32 +105,9 @@
 
     --blur-standard: 10px; /* fixed — blur does not scale with viewport */
 
-    /* spacing — single unified scale, named by px value at 1920w desktop.
-       4px base grid, every 4px from 4–40, then larger jumps.
-       Overridden per breakpoint below. Use for padding, gap, and margin. */
-    --space-4:   4px;
-    --space-8:   8px;
-    --space-12:  12px;
-    --space-16:  16px;
-    --space-20:  20px;
-    --space-24:  24px;
-    --space-28:  28px;
-    --space-32:  32px;
-    --space-36:  36px;
-    --space-40:  40px;
-    --space-48:  48px;
-    --space-56:  56px;
-    --space-64:  64px;
-    --space-80:  80px;
-    --space-96:  96px;
-    --space-120: 120px;
-    --space-160: 160px;
-    --space-200: 200px;
-    --space-400: 400px;
-
-    --poster-gap: var(--space-20);
+    --poster-gap: 20px;
     --poster-radius: 8% / 6.4%; /* 8% * 4/5 = %6.4 */
-    --poster-full-height: calc(100vh - 2 * var(--space-80));
+    --poster-full-height: calc(100vh - var(--space-for-nav) - 80px);
 
     /* line-height — named so any reader knows the intent */
     --lh-tight:  0.85;  /* all-caps display/header — flush with text-box trim */
@@ -152,7 +129,17 @@
     --size-body2:         20px;
     --size-body3:         32px;
 
-    --section-spacing: var(--space-200);
+    --space-for-nav: 80px;
+
+    --page-gutter: 20px;
+    --gap-text: 40px;
+    --gap-display-lines: 16px;
+    --travel-reveal: 20px;
+    --cta-padding: 14px 20px 10px;
+    --nav-cluster-gap: 32px;
+    --active-indicator-width: 20px;
+
+    --section-spacing: 200px;
 }
 
 /* reset */
@@ -364,13 +351,13 @@ section {
 }
 .type-body3.is-visible { opacity: 1; filter: blur(0); }
 
-.standard-margins { padding: var(--space-80) var(--space-12) var(--space-20); }
+.standard-margins { padding: var(--space-for-nav) var(--page-gutter) 20px; }
 .section-spacer { padding-top: var(--section-spacing); }
 
 .section-standard {
     position: relative;
     width: 100%;
-    padding: var(--space-80) var(--space-12) var(--space-20);
+    padding: var(--space-for-nav) var(--page-gutter) 20px;
 }
 
 /* utils */
@@ -441,7 +428,7 @@ section {
 
 .slide-reveal {
     opacity: 0;
-    transform: translateY(var(--space-20));
+    transform: translateY(var(--travel-reveal));
     transition:
         opacity var(--time-fade-in) var(--ease-standard),
         transform var(--time-fade-in) var(--ease-standard);
@@ -463,9 +450,9 @@ section {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-12);
-    min-width: calc(1em + var(--space-20));
-    max-width: calc(1em + var(--space-20));
+    padding: 12px;
+    min-width: calc(1em + 20px);
+    max-width: calc(1em + 20px);
     border-radius: 100px;                                       /* intentional pill — not scaled */
     background-color: var(--color-accent);
     color: transparent;
@@ -486,7 +473,7 @@ section {
 .cta-btn.is-visible {
     opacity: 1;
     max-width: 400px;
-    padding: 14px var(--space-20) 10px; /* optical center — 14/10 are intentional offsets */
+    padding: var(--cta-padding); /* optical center — 14/10 are intentional offsets */
     color: var(--color-btn-text);
 }
 
@@ -511,7 +498,7 @@ section {
 .cta-btn .ui-roll-layer {
     display: flex;
     align-items: center;
-    gap: var(--space-40);
+    gap: 40px;
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
@@ -606,7 +593,7 @@ section {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
-    gap: var(--space-8);
+    gap: 8px;
 }
 
 .curtain-action-line {
@@ -675,7 +662,7 @@ body::after {
     justify-content: center;
     top: 0;
     left: 0;
-    padding: var(--space-20) 0;
+    padding: 20px 0;
     transform: scale(-100%);
     cursor: pointer;
 }
@@ -690,78 +677,10 @@ body::after {
 
 /* ultra-wide — 2560px+ */
 @media (min-width: 2560px) {
-    /* :root {
-        --space-4:   4px;
-        --space-8:   10px;
-        --space-12:  16px;
-        --space-16:  20px;
-        --space-20:  26px;
-        --space-24:  32px;
-        --space-28:  36px;
-        --space-32:  42px;
-        --space-36:  48px;
-        --space-40:  52px;
-        --space-48:  64px;
-        --space-56:  74px;
-        --space-64:  84px;
-        --space-80:  106px;
-        --space-96:  128px;
-        --space-120: 160px;
-        --space-160: 212px;
-        --space-200: 266px;
-        --space-400: 532px;
-
-        --size-display-hero:  220px;
-        --size-display-xl:    212px;
-        --size-h1:            128px;
-        --size-h2:            84px;
-        --size-h3:            64px;
-        --size-subBold1:      26px;
-        --size-subBold2:      18px;
-        --size-subRegular1:   18px;
-        --size-subRegular2:   14px;
-        --size-body1:         18px;
-        --size-body2:         26px;
-        --size-body3:         42px;
-    } */
 }
 
 /* tablet — 769px–1024px */
 @media (max-width: 1024px) {
-    /* :root {
-        --space-4:   4px;
-        --space-8:   6px;
-        --space-12:  10px;
-        --space-16:  14px;
-        --space-20:  16px;
-        --space-24:  20px;
-        --space-28:  22px;
-        --space-32:  26px;
-        --space-36:  28px;
-        --space-40:  32px;
-        --space-48:  38px;
-        --space-56:  44px;
-        --space-64:  50px;
-        --space-80:  60px;
-        --space-96:  72px;
-        --space-120: 90px;
-        --space-160: 120px;
-        --space-200: 150px;
-        --space-400: 300px;
-
-        --size-display-hero:  120px;
-        --size-display-xl:    120px;
-        --size-h1:            72px;
-        --size-h2:            48px;
-        --size-h3:            36px;
-        --size-subBold1:      18px;
-        --size-subBold2:      13px;
-        --size-subRegular1:   13px;
-        --size-subRegular2:   10px;
-        --size-body1:         14px;
-        --size-body2:         18px;
-        --size-body3:         26px;
-    } */
 }
 
 /* mobile — ≤768px */
@@ -771,16 +690,22 @@ body::after {
         --size-display-xl:    80px;
         --size-h1:            32px;
         --size-h2:            32px;
-        --size-h3:            20px;
+        --size-h3:            28px;
         --size-subBold1:      16px;
         --size-subBold2:      14px;
         --size-subRegular1:   14px;
         --size-subRegular2:   10px;
-        --size-body1:         12px;
+        --size-body1:         14px;
         --size-body2:         14px;
         --size-body3:         16px;
 
-        --section-spacing: var(--space-80);
+        --space-for-nav: 60px;
+
+        --gap-text: 20px;
+        --gap-display-lines: 8px;
+
+        --section-spacing: 80px;
+        --poster-gap: 12px;
     }
 }
 

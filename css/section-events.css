@@ -23,24 +23,34 @@
     flex-direction: column;
     justify-content: center;
     align-items: stretch;
-    gap: var(--space-64);
+    gap: 64px;
     box-sizing: border-box;
 }
 
 /* title: flows at the top inside the column */
 .events-title-wrap {
     flex-shrink: 0;
-    display: flex;
-    align-items: flex-start;
     pointer-events: none;
-    padding: 0 var(--space-12);
+    padding: 0 var(--page-gutter);
+    text-align: center;
 }
 
-.events-title-wrap #event-title {
-    /* font-size matched to hero title at runtime — see section-events.js */
+.events-section .animate-line + .animate-line {
+    margin-top: var(--gap-text);
+}
+
+.events-section .animate-line {
     display: block;
     width: 100%;
     white-space: nowrap;
+    opacity: 0;
+    transform: translateY(0.3em);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.events-section .animate-line.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .events-content {
@@ -53,8 +63,8 @@
 .events-grid {
     display: grid;
     grid-template-columns: repeat(var(--poster-count, 4), 1fr);
-    gap: var(--space-12);
-    padding: 0 var(--space-12);
+    gap: 12px;
+    padding: 0 var(--page-gutter);
     width: 100%;
     margin: 0 auto;
     box-sizing: border-box;
@@ -89,8 +99,8 @@
 }
 
 @media (max-width: 768px) {
-    .events-title-wrap #event-title {
-        white-space: normal;
+    .events-sticky-inner {
+        gap: 40px;
     }
 
     .events-grid {

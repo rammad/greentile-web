@@ -41,7 +41,6 @@
 
         const applyPositions = (scrollY) => {
             const vh = window.innerHeight;
-            // normalised delta: 0 at section centre, ±1 at section edges
             const delta = (scrollY + vh * 0.5 - sectionCenterY) / sectionHeight;
 
             if (bgImg) {

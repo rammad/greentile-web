@@ -21,9 +21,9 @@
 .featured-bg-img {
     position: absolute;
     top: -20%;
-    left: calc(-1 * var(--space-80));
-    right: calc(-1 * var(--space-80));
-    width: calc(100% + 2 * var(--space-80));
+    left: calc(-1 * 80px);
+    right: calc(-1 * 80px);
+    width: calc(100% + 2 * 80px);
     height: 140%;
     object-fit: cover;
     object-position: center;
@@ -61,7 +61,7 @@
 
 .featured-marquee-track {
     display: flex;
-    gap: var(--space-40);
+    gap: 40px;
     white-space: nowrap;
     animation: featured-scroll 90s linear infinite;
     will-change: transform;
@@ -98,9 +98,26 @@
 }
 
 @media (max-width: 768px) {
+    .featured-section {
+        min-height: 100vh;
+    }
+
+    .featured-frame {
+        min-height: 100vh;
+        flex-direction: column;
+        gap: 12vh;
+    }
+
+    .featured-marquee-layer {
+        position: relative;
+        inset: auto;
+        width: 100%;
+    }
+
     .featured-poster-wrap {
         height: auto;
-        width: min(72vw, 300px);
+        width: calc(100% - 2 * var(--page-gutter));
+        max-width: 500px;
         max-height: none;
     }
 

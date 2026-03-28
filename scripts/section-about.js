@@ -1,24 +1,31 @@
-/* about section (index.html) — procedural line detection, image distribution, animate-in */
+/* about section (index.html) — hardcoded image placement, line detection, animate-in */
 (() => {
     const { observeElementInOut } = window.AnimationUtils || {};
 
     // ── build ─────────────────────────────────────────────────────────────────
     //
-    // Iterative approach: images are inserted one at a time. After each
-    // insertion the DOM is re-rendered and lines re-measured, so every
-    // subsequent placement sees the real layout (including the width of
-    // previously inserted images). This prevents images from drifting to
-    // line boundaries.
-    //
-    // Placement alternates: even images → one word in from the FRONT of
-    // their target line; odd images → one word in from the BACK.
+    // Each image carries data-word: the number of words from the start of the
+    // text block after which the image is inserted. This is viewport-agnostic —
+    // lines reflow freely while images stay anchored to the same words.
 
     function buildLines(textEl, originalText, imageEls) {
         const words = originalText.split(/\s+/).filter(Boolean);
-        const M = imageEls.length;
+
+        // ── Insert images into word list at their data-word positions ────────
+        // Sort highest-offset first so splicing doesn't shift later indices.
+        const placements = imageEls
+            .map(el => ({
+                el,
+                after: Math.max(0, Math.min(words.length, parseInt(el.dataset.word, 10) || 0)),
+            }))
+            .sort((a, b) => b.after - a.after);
 
         const items = words.map(w => ({ kind: 'word', text: w }));
+        for (const p of placements) {
+            items.splice(p.after, 0, { kind: 'img', el: p.el });
+        }
 
+        // ── Render with probe spans for line measurement ────────────────────
         function render() {
             textEl.innerHTML = '';
             items.forEach((item, i) => {
@@ -35,42 +42,7 @@
             });
         }
 
-        function measureWordLines() {
-            const lines = [];
-            let lastTop = null;
-            items.forEach((item, idx) => {
-                if (item.kind !== 'word') return;
-                const top = Math.round(item.probeEl.getBoundingClientRect().top);
-                if (lastTop === null || top !== lastTop) {
-                    lines.push([]);
-                    lastTop = top;
-                }
-                lines[lines.length - 1].push(idx);
-            });
-            return lines;
-        }
-
-        // ── Iterative image insertion ───────────────────────────────────────
-        for (let imgIdx = 0; imgIdx < M; imgIdx++) {
-            render();
-            const lines     = measureWordLines();
-            const lineCount = lines.length;
-            const targetLine = Math.round((imgIdx + 1) * lineCount / (M + 1)) - 1;
-            const clamped    = Math.max(0, Math.min(lineCount - 1, targetLine));
-            const lineWordIndices = lines[clamped];
-
-            let insertIdx;
-            if (imgIdx % 2 === 0) {
-                insertIdx = lineWordIndices[0] + 1;
-            } else {
-                const backPos = Math.max(0, lineWordIndices.length - 3);
-                insertIdx = lineWordIndices[backPos] + 1;
-            }
-
-            items.splice(insertIdx, 0, { kind: 'img', el: imageEls[imgIdx] });
-        }
-
-        // ── Final render + measurement ──────────────────────────────────────
+        // ── Measure + assign line indices ───────────────────────────────────
         render();
 
         let lineIdx = 0;

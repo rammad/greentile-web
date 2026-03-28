@@ -1,15 +1,16 @@
 /* events section */
 
 (function () {
-    const { transitionHeader, transitionCta, observeElementInOut } = window.AnimationUtils || {};
-    const { getCurrentSeason, fitTextToWidth } = window.AppUtils || {};
+    const { transitionCta, observeElementInOut } = window.AnimationUtils || {};
+    const { fitTextToWidth } = window.AppUtils || {};
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.querySelector('.events-section');
         if (!section) return;
 
-        const title = document.getElementById('event-title');
         const titleWrap = section.querySelector('.events-title-wrap');
+        const desktopLine = section.querySelector('.events-title-lines.desktop-only .animate-line');
+        const allLines = [...section.querySelectorAll('.events-title-wrap .animate-line')];
         const grid = section.querySelector('.events-grid');
         const cards = section.querySelectorAll('.event-card');
         const btn = section.querySelector('.cta-btn');
@@ -30,43 +31,47 @@
             card.style.setProperty('--hover-rotate', `${deg.toFixed(1)}deg`);
         });
 
-        // match font-size to the hero title's fitted size so both read as the same
-        // visual weight — called after fonts load and on every resize
-        const updateTitleSize = () => {
-            if (!title) return;
+        // on desktop, mirror the hero title's fitted font-size
+        const syncTitleSize = () => {
+            if (!desktopLine) return;
             const heroTitle = document.querySelector('.hero .type-display-hero');
             if (heroTitle) {
-                if (fitTextToWidth) fitTextToWidth(heroTitle); // idempotent
-                title.style.fontSize = window.getComputedStyle(heroTitle).fontSize;
-            } else if (fitTextToWidth) {
-                fitTextToWidth(title);
+                if (fitTextToWidth) fitTextToWidth(heroTitle);
+                desktopLine.style.fontSize = getComputedStyle(heroTitle).fontSize;
             }
         };
 
-        if (title) {
-            let fontsReady  = false;
-            let wantsReveal = false;
+        document.fonts.ready.then(() => {
+            syncTitleSize();
+            allLines.forEach(el => el.classList.add('is-initialized'));
+        });
 
-            document.fonts.ready.then(() => {
-                updateTitleSize();
-                title.classList.add('is-initialized');
-                title.classList.add('animate-cascade');
-                if (window.initCascadeReveal) window.initCascadeReveal();
-                fontsReady = true;
-                if (wantsReveal && transitionHeader) transitionHeader(title, 'enter');
+        const LINE_STAGGER_MS = 80;
+
+        function getVisibleTitleLines() {
+            const groups = [...section.querySelectorAll('.events-title-lines')];
+            const visible = groups.find(g => getComputedStyle(g).display !== 'none');
+            if (visible) return [...visible.querySelectorAll('.animate-line')];
+            return allLines;
+        }
+
+        if (titleWrap && observeElementInOut) {
+            observeElementInOut(titleWrap, {
+                onEnter() {
+                    const lines = getVisibleTitleLines();
+                    lines.forEach((line, i) => {
+                        setTimeout(() => {
+                            line.classList.add('is-visible');
+                            line.addEventListener('transitionend', function settle(e) {
+                                if (e.propertyName !== 'transform') return;
+                                line.removeEventListener('transitionend', settle);
+                                line.style.transition = 'none';
+                                line.style.transform  = 'none';
+                            });
+                        }, i * LINE_STAGGER_MS);
+                    });
+                }
             });
-
-            if (observeElementInOut) {
-                observeElementInOut(title, {
-                    onEnter() {
-                        if (fontsReady) {
-                            if (transitionHeader) transitionHeader(title, 'enter');
-                        } else {
-                            wantsReveal = true;
-                        }
-                    }
-                });
-            }
         }
 
         // ── TUNING ────────────────────────────────────────────────
@@ -89,36 +94,52 @@
         let phase2Start = 0;
         let phase2Len   = 1;
         let startOffset = window.innerHeight;
+        let currentlyMobile = window.matchMedia('(max-width: 768px)').matches;
 
         // disable CSS transitions on the title wrap — it's scroll-driven so lag is unwanted
         if (titleWrap) titleWrap.style.transition = 'none';
+
+        function applyPositions(scrollY) {
+            const progress = Math.max(0, Math.min(1, (scrollY - phase2Start) / phase2Len));
+
+            cards.forEach((card, i) => {
+                const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
+                const y = Math.round(startOffset * (1 - localP));
+                card.style.transform = `translateY(${y}px)`;
+                card.style.opacity   = '1';
+            });
+
+            if (btn && transitionCta) {
+                if (progress >= btnThreshold && !btn.classList.contains('is-visible')) {
+                    transitionCta(btn, 'enter');
+                } else if (progress < btnThreshold && btn.classList.contains('is-visible')) {
+                    transitionCta(btn, 'exit');
+                }
+            }
+        }
 
         const recalcLayout = () => {
             const ih = window.innerHeight;
 
             const rootStyle = getComputedStyle(document.documentElement);
-            const sectionSpacingPx = parseFloat(rootStyle.getPropertyValue('--space-400'));
-            const s80 = parseFloat(rootStyle.getPropertyValue('--space-80'));
-            const s20 = parseFloat(rootStyle.getPropertyValue('--space-20'));
+            const sectionSpacingPx = parseFloat(rootStyle.getPropertyValue('--section-spacing'));
+            const navSpace = parseFloat(rootStyle.getPropertyValue('--space-for-nav'));
+            const s20 = 20;
 
-            // nav bottom edge — used for visual centering and poster cap
             const nav = document.querySelector('.sticky-nav');
             const navInset = nav
                 ? (parseFloat(getComputedStyle(nav).top) || 0) + nav.offsetHeight
                 : 0;
 
-            // push the flex center below the nav so content is optically
-            // centered in the viewport space the user actually sees
             stickyInner.style.paddingTop = navInset + 'px';
 
-            // cap poster size: content must fit between nav bottom and viewport bottom
             const flexGap    = parseFloat(getComputedStyle(stickyInner).rowGap) || 0;
             const gridColGap = parseFloat(getComputedStyle(grid).columnGap) || 0;
             const gridPad    = parseFloat(getComputedStyle(grid).paddingLeft)
                              + parseFloat(getComputedStyle(grid).paddingRight);
-            const isMobile   = window.matchMedia('(max-width: 768px)').matches;
+            currentlyMobile  = window.matchMedia('(max-width: 768px)').matches;
 
-            if (isMobile) {
+            if (currentlyMobile) {
                 const numCols    = 2;
                 const numRows    = Math.ceil(n / numCols);
                 const gridRowGap = parseFloat(getComputedStyle(grid).rowGap) || 0;
@@ -132,10 +153,7 @@
                 grid.style.maxWidth = Math.max(0, n * maxPosterW + (n - 1) * gridColGap + gridPad) + 'px';
             }
 
-            // measure content after constraints are applied
             const contentH = titleWrap.offsetHeight + flexGap + content.offsetHeight;
-
-            // where justify-content:center now places the title (below nav padding)
             const usableH      = ih - navInset;
             const centerOffset = navInset + Math.max(0, (usableH - contentH) / 2);
             const adjustedPT   = Math.max(0, sectionSpacingPx - centerOffset);
@@ -149,40 +167,20 @@
 
             applyPositions(window.lenis ? window.lenis.scroll : 0);
 
-            // CTA: fixed --space-80 below posters
             if (ctaFooter) {
                 const posterBottom = content.offsetTop + content.offsetHeight;
-                const ctaTop = posterBottom + s80;
-                ctaFooter.style.top    = ctaTop + 'px';
+                const ctaGap = currentlyMobile ? flexGap : navSpace;
+                ctaFooter.style.top    = (posterBottom + ctaGap) + 'px';
                 ctaFooter.style.bottom = 'auto';
-
                 section.style.marginBottom = '';
             }
         };
 
         document.fonts.ready.then(recalcLayout);
         window.addEventListener('resize', () => {
-            updateTitleSize();
+            syncTitleSize();
             recalcLayout();
         });
-
-        const applyPositions = scrollY => {
-            const progress = Math.max(0, Math.min(1, (scrollY - phase2Start) / phase2Len));
-
-            cards.forEach((card, i) => {
-                const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
-                card.style.transform = `translateY(${startOffset * (1 - localP)}px)`;
-                card.style.opacity   = '1';
-            });
-
-            if (btn && transitionCta) {
-                if (progress >= btnThreshold && !btn.classList.contains('is-visible')) {
-                    transitionCta(btn, 'enter');
-                } else if (progress < btnThreshold && btn.classList.contains('is-visible')) {
-                    transitionCta(btn, 'exit');
-                }
-            }
-        };
 
         window.addEventListener('lenis-scroll', ({ detail }) => {
             applyPositions(detail.scroll);

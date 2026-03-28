@@ -12,12 +12,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-64);
+    gap: 64px;
 }
 
 /* subheader label above the manifesto text */
 .about-subhead {
-    margin-bottom: calc(var(--space-40) - var(--space-64));
+    margin-bottom: calc(var(--gap-text) - 64px);
 }
 
 /* text block — full width so JS line measurements are stable */
@@ -31,7 +31,7 @@
 /* after JS splits text into lines, margin controls inter-line spacing
    (flex-column can't be used here — it breaks pre-split inline flow) */
 .about .animate-line + .animate-line {
-    margin-top: var(--space-40);
+    margin-top: var(--gap-text);
 }
 
 .about .animate-line {
@@ -98,10 +98,10 @@
 
     .about-inner {
         width: 90%;
-        gap: 40px;
+        gap: var(--gap-text);
     }
 
-    .about .animate-line + .animate-line {
-        margin-top: var(--space-20);
+    .about-subhead {
+        margin-bottom: 0;
     }
 }

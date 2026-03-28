@@ -2,9 +2,9 @@
 
 .sticky-nav {
     position: fixed;
-    top: var(--space-12);
-    left: var(--space-20);
-    right: var(--space-20);
+    top: 12px;
+    left: 20px;
+    right: 20px;
     
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -16,16 +16,6 @@
 .nav-left,
 .nav-center,
 .nav-right {
-    /* background: var(--color-placeholder); */
-
-    /* background: var(--c-dark-green); */
-
-    /* background: var(--c-off-white); */
-
-    /* border: 1px solid var(--c-dark-green); */
-
-
-    background: rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 
@@ -36,21 +26,14 @@
     display: flex;
     justify-self: center;
     justify-content: center;
-    gap: var(--space-32);
+    gap: var(--nav-cluster-gap);
     align-items: center;
-    padding: var(--space-12) var(--space-24) calc(var(--space-12) - var(--space-4)); /* drop slightly for better alignment */
+    padding: 12px 24px calc(12px - 4px); /* drop slightly for better alignment */
 }
-
-/* .nav-left .type-subRegular1,
-.nav-center .type-subRegular1,
-.nav-right .type-subRegular1 {
-    color: var(--c-off-white);
-} */
-
 
 .nav-left {
     justify-self: start;
-    padding: var(--space-12) var(--space-20);
+    padding: 12px 20px;
 }
 
 .nav-right {
@@ -81,9 +64,9 @@
 .nav-active-wrap::after {
     content: '';
     position: absolute;
-    bottom: calc(-1 * var(--space-4));
+    bottom: calc(-1 * 4px);
     left: 50%;
-    width: var(--space-20);
+    width: var(--active-indicator-width);
     height: 1.5px;                         /* intentional hair line — not scaled */
     background: var(--c-dark-green);
     transform: translateX(-50%);
@@ -93,13 +76,13 @@
 .nav-hamburger {
     display: none;
     pointer-events: auto;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 100px;
     border: none;
     cursor: pointer;
-    padding: var(--space-12) var(--space-20);
+    padding: 12px 20px;
     justify-self: end;
     align-self: stretch;
     flex-direction: column;
@@ -153,25 +136,33 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    gap: var(--space-32);
+    gap: 80px;
 }
 
-.mobile-menu-link {
-    color: var(--c-dark-green-30);
-    text-decoration: none;
+.mobile-menu-subhead {
     opacity: 0;
-    transform: translateX(30px);
+    transform: translateY(20px);
     transition: opacity 0.4s ease, transform 0.5s var(--ease-standard);
 }
 
-.mobile-menu.is-open .mobile-menu-link {
+.mobile-menu.is-open .mobile-menu-subhead {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
 }
 
-.mobile-menu.is-open .mobile-menu-link:nth-child(1) { transition-delay: 0.1s; }
-.mobile-menu.is-open .mobile-menu-link:nth-child(2) { transition-delay: 0.18s; }
-.mobile-menu.is-open .mobile-menu-link:nth-child(3) { transition-delay: 0.26s; }
+.mobile-menu .type-display-hero {
+    opacity: 1;
+    text-align: center;
+}
+
+.mobile-menu-link {
+    color: var(--c-dark-green);
+    text-decoration: none;
+}
+
+.mobile-menu-link > span {
+    display: block;
+}
 
 @media (max-width: 768px) {
     .nav-center,
@@ -180,8 +171,8 @@
     }
 
     .sticky-nav {
-        left: var(--space-12);
-        right: var(--space-12);
+        left: var(--page-gutter);
+        right: var(--page-gutter);
         grid-template-columns: 1fr auto;
     }
 

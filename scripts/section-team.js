@@ -125,7 +125,7 @@
 
         function applyFixed() {
             if (window.innerWidth <= MOBILE_BP) { removeFixed(); return; }
-            const top = pxVar('calc(var(--space-80) + var(--space-20))');
+            const top = pxVar('calc(var(--space-for-nav) + 20px)');
             els.forEach(el => {
                 const rect = el.getBoundingClientRect();
                 Object.assign(el.style, {
@@ -133,7 +133,7 @@
                     top:    `${top}px`,
                     left:   `${rect.left}px`,
                     width:  `${rect.width}px`,
-                    height: 'calc(100vh - var(--space-80) - var(--space-40))',
+                    height: 'calc(100vh - var(--space-for-nav) - 40px)',
                 });
             });
             pinned = true;
@@ -156,7 +156,7 @@
         applyFixed();
 
         function waitForStickThenUnpin() {
-            const stickyTop = pxVar('calc(var(--space-80) + var(--space-20))');
+            const stickyTop = pxVar('calc(var(--space-for-nav) + 20px)');
             function check() {
                 if (firstPoster.getBoundingClientRect().top <= stickyTop + 1) {
                     removeFixed();

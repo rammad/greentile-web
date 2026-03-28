@@ -57,9 +57,10 @@
 
     <div class="mobile-menu">
         <div class="mobile-menu-inner">
-            <a href="events.html" class="type-subBold1 mobile-menu-link">Play With Us</a>
-            <a href="about-us.html" class="type-subBold1 mobile-menu-link">Work With Us</a>
-            <a href="#" class="type-subBold1 mobile-menu-link">Say Hi</a>
+            <div class="type-subBold1 mobile-menu-subhead">menu</div>
+            <a href="events.html" class="type-display-hero mobile-menu-link animate-cascade"><span>Play</span><span>with us</span></a>
+            <a href="about-us.html" class="type-display-hero mobile-menu-link animate-cascade"><span>Work</span><span>with us</span></a>
+            <a href="#" class="type-display-hero mobile-menu-link animate-cascade">Say Hi</a>
         </div>
     </div>
 
@@ -80,15 +81,15 @@
             <div class="type-subBold1 about-subhead animate-line">manifesto</div>
             <div class="about-text type-h1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at odio nulla. Suspendisse laoreet suscipit enim et mollis. Nunc condimentum felis ac ligula tincidunt, dictum accumsan purus laoreet. Pellentesque fermentum dapibus aliquet. Mauris lectus nulla, tincidunt vitae suscipit vel, porttitor non quam. Praesent volutpat ut diam ut tincidunt. Phasellus tempus nisl eget malesuada rhoncus.</div>
             <div class="about-images" hidden aria-hidden="true">
-                <img src="images/slide-0/slide-0-1.JPG" class="about-inline-img" alt="">
-                <img src="images/slide-1/slide-1-2.jpg" class="about-inline-img" alt="">
-                <img src="images/slide-0/slide-0-3.jpg" class="about-inline-img" alt="">
-                <img src="images/slide-2/slide-2-1.JPG" class="about-inline-img" alt="">
-                <img src="images/slide-1/slide-1-5.jpeg" class="about-inline-img" alt="">
+                <img src="images/slide-0/slide-0-1.JPG" class="about-inline-img" alt="" data-word="5">
+                <img src="images/slide-1/slide-1-2.jpg" class="about-inline-img" alt="" data-word="15">
+                <img src="images/slide-0/slide-0-3.jpg" class="about-inline-img" alt="" data-word="27">
+                <img src="images/slide-2/slide-2-1.JPG" class="about-inline-img" alt="" data-word="38">
+                <img src="images/slide-1/slide-1-5.jpeg" class="about-inline-img" alt="" data-word="48">
             </div>
         </div>
     </section>
-    <script src="scripts/section-about.js?v=4" defer></script>
+    <script src="scripts/section-about.js?v=6" defer></script>
 <!-- 
     <section id="about" class="about-alt" data-colors="#30FA30, #FFFCFA, #feea4f" data-edge="0">
 
@@ -157,7 +158,13 @@
             <div class="events-sticky-inner">
 
                 <div class="events-title-wrap">
-                    <h2 id="event-title" class="type-display-hero">upcoming events</h2>
+                    <div class="events-title-lines desktop-only">
+                        <div class="type-display-hero animate-line">upcoming events</div>
+                    </div>
+                    <div class="events-title-lines mobile-only">
+                        <div class="type-display-hero animate-line">upcoming</div>
+                        <div class="type-display-hero animate-line">events</div>
+                    </div>
                 </div>
 
                 <div class="events-content">

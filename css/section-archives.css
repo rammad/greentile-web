@@ -6,10 +6,10 @@
     min-height: 100vh;
     height: auto !important; 
     overflow: visible !important;
-    padding-top: var(--space-80); 
-    padding-bottom: var(--space-80);
-    padding-left: var(--space-12);
-    padding-right: var(--space-12);
+    padding-top: var(--space-for-nav); 
+    padding-bottom: 80px;
+    padding-left: var(--page-gutter);
+    padding-right: var(--page-gutter);
 }
 
 .archives-page.is-active { opacity: 1; }
@@ -18,10 +18,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-40);
-    margin-bottom: var(--space-40);
+    gap: 40px;
+    margin-bottom: 40px;
     position: relative;
-    padding: 0 var(--space-40);
+    padding: 0 40px;
     overflow: hidden;
 }
 
@@ -56,7 +56,7 @@
 }
 
 .load-more-container {
-    margin-top: var(--space-120);
+    margin-top: 120px;
     display: flex;
     justify-content: center;
     width: 100%;

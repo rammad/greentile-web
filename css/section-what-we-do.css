@@ -86,7 +86,7 @@
     grid-area: 1 / 1;
     width: 100%;
     max-width: 600px;
-    padding: 0 var(--space-12);
+    padding: 0 var(--page-gutter);
     text-align: center;
     position: relative;
     /* opacity, filter, and transition are driven entirely by JS inline styles */
@@ -112,7 +112,7 @@
 
 .what-we-do-body .about-content .cta-btn {
     position: absolute;
-    top: calc(100% + var(--space-40));
+    top: calc(100% + 40px);
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
@@ -129,7 +129,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-40);
+    gap: var(--gap-text);
     z-index: 50;
     pointer-events: auto;
 }
@@ -141,7 +141,7 @@
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: var(--space-24);
+    gap: 24px;
 }
 
 .about-menu-persistent .menu-label {
@@ -179,7 +179,7 @@
 
 @media (max-width: 768px) {
     .about-menu-persistent            { top: 15vh; }
-    .about-menu-persistent .menu-item { font-size: 40px; margin-bottom: 4px; }
+    .about-menu-persistent .menu-item { font-size: 40px; margin-bottom: 4px; word-spacing: 100vw; line-height: var(--lh-tight); }
 
     .what-we-do .about-menu-persistent.is-pinned { top: 25vh; padding-top: 0; }
 }

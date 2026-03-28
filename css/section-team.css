@@ -4,15 +4,15 @@
     position: relative;
     width: 100%;
     margin-top: var(--section-spacing);
-    padding-bottom: var(--space-40);
+    padding-bottom: 40px;
 }
 
 .team-layout {
     display: grid;
     grid-template-columns: 1fr 1.4fr 1fr;
-    column-gap: var(--space-40);
+    column-gap: 40px;
     align-items: stretch;
-    padding: 0 var(--space-12);
+    padding: 0 var(--page-gutter);
     box-sizing: border-box;
 }
 
@@ -22,12 +22,12 @@
 
 .team-title-inner {
     position: sticky;
-    top: calc(var(--space-80) + var(--space-20));
-    height: calc(100vh - var(--space-80) - var(--space-40));
+    top: calc(var(--space-for-nav) + 20px);
+    height: calc(100vh - var(--space-for-nav) - 40px);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding-bottom: var(--space-20);
+    padding-bottom: 20px;
 }
 
 .team-images-col {
@@ -65,17 +65,17 @@
 
 .team-text-col {
     box-sizing: border-box;
-    padding: 0 var(--space-40);
+    padding: 0 40px;
 }
 
 .team-text-sticky {
     position: sticky;
-    top: calc(var(--space-80) + var(--space-20));
-    height: calc(100vh - var(--space-80) - var(--space-40));
+    top: calc(var(--space-for-nav) + 20px);
+    height: calc(100vh - var(--space-for-nav) - 40px);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding-bottom: var(--space-40);
+    padding-bottom: 40px;
 }
 
 .team-body-sizer {
@@ -100,11 +100,11 @@
 }
 
 .team-title-text {
-    line-height: var(--lh-single);
+    line-height: var(--lh-tight);
 }
 
 .team-title-text + .team-title-text {
-    margin-top: var(--space-40);
+    margin-top: var(--gap-text);
 }
 
 .team-section .animate-line {
@@ -139,12 +139,12 @@
 
 @media (max-width: 768px) {
     .team-section {
-        padding-bottom: var(--space-20);
+        padding-bottom: 20px;
     }
 
     .team-layout {
         grid-template-columns: 1fr;
-        row-gap: var(--space-40);
+        row-gap: 40px;
     }
 
     .team-title-col,
@@ -159,6 +159,11 @@
         position: relative;
         top: 0;
         height: auto;
+        text-align: center;
+    }
+
+    .team-title-text {
+        font-size: var(--size-display-xl);
     }
 
     /* desktop text column hidden — bodies are relocated into the images column by JS */
@@ -177,7 +182,7 @@
         position: relative;
         bottom: auto;
         width: auto;
-        padding: var(--space-20) 0 var(--space-40);
+        padding: var(--poster-gap) 0;
     }
 
     .team-poster-wrap {

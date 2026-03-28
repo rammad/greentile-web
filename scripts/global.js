@@ -340,7 +340,10 @@ window.playCascade = (element, overlap = 0) => {
             char.classList.add('is-visible');
         });
         const lastChar = chars[chars.length - 1];
-        waitForTransition(lastChar, overlap).then(resolve);
+        waitForTransition(lastChar, overlap).then(() => {
+            chars.forEach(c => { c.style.willChange = 'auto'; });
+            resolve();
+        });
     });
 };
 
@@ -625,17 +628,42 @@ function initMobileMenu(nav) {
     if (!hamburger || !menu) return;
 
     let isOpen = false;
+    const links = menu.querySelectorAll('.mobile-menu-link');
+
+    function resetCascades() {
+        links.forEach(link => {
+            link.querySelectorAll('.char-reveal').forEach(c => {
+                c.style.transition = 'none';
+                c.classList.remove('is-visible');
+            });
+        });
+    }
 
     function toggle() {
         isOpen = !isOpen;
         hamburger.classList.toggle('is-active', isOpen);
         hamburger.setAttribute('aria-expanded', String(isOpen));
         menu.classList.toggle('is-open', isOpen);
+
+        if (isOpen) {
+            resetCascades();
+            void menu.offsetWidth;
+            links.forEach((link, i) => {
+                setTimeout(() => {
+                    link.querySelectorAll('.char-reveal').forEach(c => {
+                        c.style.transition = '';
+                    });
+                    if (window.playCascade) window.playCascade(link);
+                }, i * 120);
+            });
+        } else {
+            resetCascades();
+        }
     }
 
     hamburger.addEventListener('click', toggle);
 
-    menu.querySelectorAll('.mobile-menu-link').forEach(link => {
+    links.forEach(link => {
         link.addEventListener('click', () => {
             if (isOpen) toggle();
         });
