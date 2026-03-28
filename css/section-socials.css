@@ -126,6 +126,15 @@
         margin-top: calc(var(--section-spacing) * 2);
     }
 
+    .icon-circle {
+        width: 32px;
+        height: 32px;
+    }
+
+    .socials-track {
+        gap: 8px;
+    }
+
     .social-img {
         width: 220px;
     }
