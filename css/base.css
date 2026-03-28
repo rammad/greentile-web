@@ -700,6 +700,7 @@ body::after {
         --size-body3:         16px;
 
         --space-for-nav: 60px;
+        --page-gutter: 12px;
 
         --gap-text: 20px;
         --gap-display-lines: 8px;

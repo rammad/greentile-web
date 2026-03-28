@@ -143,7 +143,9 @@
                 const numCols    = 2;
                 const numRows    = Math.ceil(n / numCols);
                 const gridRowGap = parseFloat(getComputedStyle(grid).rowGap) || 0;
-                const availableH = ih - navInset - titleWrap.offsetHeight - flexGap - s20;
+                const ctaH       = ctaFooter ? ctaFooter.offsetHeight : 0;
+                const titleH     = titleWrap.offsetHeight;
+                const availableH = ih - navInset - titleH - ctaH - flexGap * 2 - s20;
                 const maxPosterH = (availableH - (numRows - 1) * gridRowGap) / numRows;
                 const maxPosterW = maxPosterH * 4 / 5;
                 grid.style.maxWidth = Math.max(0, numCols * maxPosterW + (numCols - 1) * gridColGap + gridPad) + 'px';
@@ -168,11 +170,14 @@
             applyPositions(window.lenis ? window.lenis.scroll : 0);
 
             if (ctaFooter) {
-                const posterBottom = content.offsetTop + content.offsetHeight;
-                const ctaGap = currentlyMobile ? flexGap : navSpace;
-                ctaFooter.style.top    = (posterBottom + ctaGap) + 'px';
-                ctaFooter.style.bottom = 'auto';
-                section.style.marginBottom = '';
+                if (currentlyMobile) {
+                    ctaFooter.style.top = '';
+                } else {
+                    const posterBottom = content.offsetTop + content.offsetHeight;
+                    ctaFooter.style.top    = (posterBottom + navSpace) + 'px';
+                    ctaFooter.style.bottom = 'auto';
+                    section.style.marginBottom = '';
+                }
             }
         };
 

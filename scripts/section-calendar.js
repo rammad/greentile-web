@@ -282,16 +282,30 @@ function initMobileScrollSpy() {
         item.insertBefore(wrap, calName);
     });
 
-    /* ── sync: dates rail scroll drives poster list proportionally ── */
+    /* ── sync: when centered date changes, lerp poster into place ── */
     let activeIndex = -1;
+    let lerpRaf = 0;
 
-    const syncScroll = () => {
-        const maxDateScroll = datesRail.scrollWidth - datesRail.clientWidth;
-        const maxPosterScroll = list.scrollWidth - list.clientWidth;
-        if (maxDateScroll > 0) {
-            list.scrollLeft = (datesRail.scrollLeft / maxDateScroll) * maxPosterScroll;
-        }
+    const lerpPoster = (idx) => {
+        cancelAnimationFrame(lerpRaf);
+        const target = items[idx].offsetLeft;
+        const start = list.scrollLeft;
+        const dist = target - start;
+        if (Math.abs(dist) < 1) { list.scrollLeft = target; return; }
 
+        const duration = 300;
+        const t0 = performance.now();
+
+        const step = (now) => {
+            const t = Math.min((now - t0) / duration, 1);
+            const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            list.scrollLeft = start + dist * ease;
+            if (t < 1) lerpRaf = requestAnimationFrame(step);
+        };
+        lerpRaf = requestAnimationFrame(step);
+    };
+
+    const onDateScroll = () => {
         const railRect = datesRail.getBoundingClientRect();
         const railCenterX = railRect.left + railRect.width / 2;
         let closestIdx = 0;
@@ -306,39 +320,40 @@ function initMobileScrollSpy() {
         if (closestIdx !== activeIndex) {
             activeIndex = closestIdx;
             dateItems.forEach((d, i) => d.classList.toggle('is-active', i === activeIndex));
+            lerpPoster(activeIndex);
         }
     };
 
-    datesRail.addEventListener('scroll', syncScroll, { passive: true });
+    datesRail.addEventListener('scroll', onDateScroll, { passive: true });
 
-    /* ── touch forwarding: swipe on poster area scrolls dates rail ── */
-    let touchStartX = 0, touchStartY = 0, railScrollAtStart = 0, swipeAxis = null;
-
-    list.addEventListener('touchstart', (e) => {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-        railScrollAtStart = datesRail.scrollLeft;
-        swipeAxis = null;
+    /* ── tap on poster area → navigate to active event ── */
+    let tapX = 0, tapY = 0;
+    datesRail.addEventListener('touchstart', (e) => {
+        tapX = e.touches[0].clientX;
+        tapY = e.touches[0].clientY;
     }, { passive: true });
 
-    list.addEventListener('touchmove', (e) => {
-        const dx = e.touches[0].clientX - touchStartX;
-        const dy = e.touches[0].clientY - touchStartY;
-
-        if (swipeAxis === null && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
-            swipeAxis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    datesRail.addEventListener('touchend', (e) => {
+        const dx = Math.abs(e.changedTouches[0].clientX - tapX);
+        const dy = Math.abs(e.changedTouches[0].clientY - tapY);
+        if (dx < 10 && dy < 10) {
+            const trackBottom = datesTrack.getBoundingClientRect().bottom;
+            if (e.changedTouches[0].clientY > trackBottom && activeIndex >= 0) {
+                window.location.href = items[activeIndex].getAttribute('href');
+            }
         }
-
-        if (swipeAxis === 'x') {
-            e.preventDefault();
-            datesRail.scrollLeft = railScrollAtStart - dx;
-        }
-    }, { passive: false });
+    }, { passive: true });
 
     /* ── initial state ── */
     document.fonts.ready.then(() => {
         requestAnimationFrame(() => {
             setSpacerWidths();
+
+            const wrapperH = wrapper.getBoundingClientRect().height;
+            const listH = list.getBoundingClientRect().height;
+            const dateH = datesTrack.getBoundingClientRect().height;
+            datesTrack.style.marginTop = (wrapperH - listH - dateH - 20) + 'px';
+
             dateItems[0].scrollIntoView({ inline: 'center', block: 'nearest' });
             activeIndex = 0;
             dateItems[0].classList.add('is-active');

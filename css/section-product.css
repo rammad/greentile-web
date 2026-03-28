@@ -346,11 +346,24 @@
         right: 0;
         z-index: 100;
         background-color: var(--color-bg);
-        padding: 12px var(--page-gutter);
+        padding: var(--page-gutter);
         padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
         transform: translateY(100%);
         transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-        justify-content: center;
+    }
+
+    .ticket-actions .qty-wrapper {
+        flex: 1 1 0;
+    }
+
+    .ticket-actions .qty-selector {
+        width: 100%;
+    }
+
+    .ticket-actions .cta-btn,
+    .ticket-actions .cta-btn.is-visible {
+        flex: 1 1 0;
+        max-width: none;
     }
 
     .ticket-actions.is-sticky-visible {

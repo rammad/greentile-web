@@ -106,4 +106,8 @@
     .events-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .events-content-footer {
+        position: static;
+    }
 }

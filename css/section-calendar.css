@@ -372,14 +372,18 @@
         display: none !important;
     }
 
-    /* ── top rail: dates (native scroll + snap) ── */
+    /* ── dates rail covers full wrapper for touch anywhere ── */
     .calendar-dates-rail {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 15;
         overflow-x: auto;
-        overflow-y: visible;
-        scroll-snap-type: x mandatory;
+        overflow-y: hidden;
+        scroll-snap-type: x proximity;
         scrollbar-width: none;
-        flex-shrink: 0;
-        margin-bottom: 20px;
     }
     .calendar-dates-rail::-webkit-scrollbar { display: none; }
 
@@ -423,6 +427,7 @@
         overflow: hidden;
         scrollbar-width: none;
         gap: 0;
+        pointer-events: none;
     }
 
     .calendar-row {
@@ -485,8 +490,7 @@
     .calendar-controls {
         position: relative;
         z-index: 30;
-        margin: 20px auto 0;
-        padding: 0 var(--page-gutter);
+        margin: 20px 0 0;
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
