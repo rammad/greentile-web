@@ -31,6 +31,7 @@
         line-height: var(--lh-single);
         text-box: normal;
     }
+    
     .hero .type-display-hero > span {
         display: block;
     }

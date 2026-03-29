@@ -106,7 +106,7 @@
     --blur-standard: 10px; /* fixed — blur does not scale with viewport */
 
     --poster-gap: 20px;
-    --poster-radius: 8% / 7.2%; /* compromise: near-circular while visually balanced on 4:5 */
+    --poster-radius: 8% / 6.4%; /* circular corners on 4:5 aspect ratio */
     --poster-full-height: calc(100vh - var(--space-for-nav) - 80px);
 
     /* line-height — named so any reader knows the intent */
@@ -143,7 +143,7 @@
 }
 
 /* reset */
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 html, body {
     margin: 0; padding: 0; width: 100%; height: 100%;
@@ -442,8 +442,10 @@ section {
 .ui-roll-hidden { position: absolute; top: 0; left: 0; transform: translateY(100%); }
 
 .ui-roll.is-visible .ui-roll-visible, .nav-loaded .ui-roll-visible { transform: translateY(0%); }
-.ui-roll.roll-hover:hover .ui-roll-visible { transform: translateY(-150%); }
-.ui-roll.roll-hover:hover .ui-roll-hidden { transform: translateY(0%); }
+.ui-roll.roll-hover:hover .ui-roll-visible,
+.ui-roll.is-rolling .ui-roll-visible { transform: translateY(-150%); }
+.ui-roll.roll-hover:hover .ui-roll-hidden,
+.ui-roll.is-rolling .ui-roll-hidden { transform: translateY(0%); }
 
 .cta-btn {
     position: relative;
@@ -703,7 +705,7 @@ body::after {
         --size-subBold1:      16px;
         --size-subBold2:      14px;
         --size-subRegular1:   14px;
-        --size-subRegular2:   10px;
+        --size-subRegular2:   12px;
         --size-body1:         16px;
         --size-body2:         14px;
         --size-body3:         16px;

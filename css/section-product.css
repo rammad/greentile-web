@@ -8,12 +8,6 @@
     z-index: 10;
 }
 
-.pdp-image-col .back-arrow {
-    top: 0;
-    left: auto;
-    right: calc(100% + 40px);
-}
-
 .pdp-sticky-wrapper {
     position: fixed;
     top: var(--space-for-nav);
@@ -21,7 +15,7 @@
     right: 0;
     width: 100%;
     height: calc(100vh - var(--space-for-nav));
-    padding: 40px var(--page-gutter);
+    padding: 0 var(--page-gutter);
     box-sizing: border-box;
 }
 
@@ -196,7 +190,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: var(--c-dark-green-20);
+    background-color: var(--c-dark-green-10);
     border-radius: 100px;
     padding: var(--cta-padding);
     min-width: 140px;
@@ -223,7 +217,7 @@
 
 .pdp-tag {
     display: inline-block;
-    background-color: var(--c-dark-green-20);
+    background-color: var(--c-dark-green-10);
     padding: 4px 8px calc(4px / 2);
     border-radius: 4px;
     margin: 0 8px 8px 0;
@@ -257,7 +251,7 @@
         left: unset;
         right: unset;
         height: auto;
-        padding: 140px 12px 80px;
+        padding: var(--space-for-nav) var(--page-gutter) 80px;
         box-sizing: border-box;
     }
 
@@ -278,12 +272,6 @@
 
     .pdp-image-col {
         overflow: visible;
-    }
-
-    .pdp-image-col .back-arrow {
-        right: auto;
-        left: 0;
-        top: calc(-60px);
     }
 
     .pdp-image-track {
@@ -367,7 +355,12 @@
         padding: var(--page-gutter);
         padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
         transform: translateY(100%);
-        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                    padding-top 0.3s ease;
+    }
+
+    .ticket-actions:has(.max-qty-label.is-visible) {
+        padding-top: calc(var(--page-gutter) + 24px);
     }
 
     .ticket-actions .qty-wrapper {
@@ -389,5 +382,13 @@
 
     .ticket-actions.is-sticky-visible {
         transform: translateY(0);
+    }
+
+    .max-qty-label {
+        position: absolute;
+        top: 8px;
+        bottom: auto;
+        left: var(--page-gutter);
+        margin-bottom: 0;
     }
 }

@@ -539,26 +539,66 @@ function initMobileFilterToggle() {
     controls.appendChild(optionsRow);
 
     filtersToggle.addEventListener('click', () => {
-        controls.classList.toggle('filters-open');
+        const isOpening = controls.classList.toggle('filters-open');
+        if (isOpening) {
+            filtersToggle.classList.add('is-rolling');
+        } else {
+            filtersToggle.classList.remove('is-rolling');
+        }
     });
 
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             controls.classList.remove('filters-open');
+            filtersToggle.classList.remove('is-rolling');
         });
     });
 
     if (btnGrid) {
         const pageContainer = document.getElementById('cal-page-container');
         const newBtnGrid = btnGrid.cloneNode(true);
+        newBtnGrid.classList.remove('roll-hover');
         btnGrid.parentNode.replaceChild(newBtnGrid, btnGrid);
 
+        const rollMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--time-roll')) * 1000 || 1000;
+        let gridRolling = false;
+
         newBtnGrid.addEventListener('click', () => {
+            if (gridRolling) return;
+            gridRolling = true;
+
             const isGrid = pageContainer.classList.toggle('mode-grid');
             const visible = newBtnGrid.querySelector('.ui-roll-visible');
             const hidden = newBtnGrid.querySelector('.ui-roll-hidden');
-            if (visible) visible.textContent = isGrid ? 'List' : 'Grid';
-            if (hidden) hidden.textContent = isGrid ? 'List' : 'Grid';
+            const newLabel = isGrid ? 'List' : 'Grid';
+            const oldLabel = isGrid ? 'Grid' : 'List';
+
+            hidden.textContent = newLabel;
+            const targetWidth = hidden.offsetWidth;
+
+            newBtnGrid.style.width = newBtnGrid.offsetWidth + 'px';
+            newBtnGrid.offsetHeight;
+            newBtnGrid.style.transition = `width ${rollMs}ms var(--ease-standard)`;
+            newBtnGrid.style.width = targetWidth + 'px';
+
+            newBtnGrid.classList.add('is-rolling');
+
+            setTimeout(() => {
+                visible.style.transition = 'none';
+                hidden.style.transition = 'none';
+                newBtnGrid.style.transition = 'none';
+
+                visible.textContent = newLabel;
+                hidden.textContent = oldLabel;
+                newBtnGrid.classList.remove('is-rolling');
+                newBtnGrid.style.width = '';
+
+                newBtnGrid.offsetHeight;
+                visible.style.transition = '';
+                hidden.style.transition = '';
+                newBtnGrid.style.transition = '';
+                gridRolling = false;
+            }, rollMs);
         });
     }
 }

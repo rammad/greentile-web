@@ -126,7 +126,7 @@
 
 @media (max-width: 768px) {
     .footer-section {
-        padding-top: var(--space-for-nav);
+        padding-top: calc(var(--space-for-nav) * 2);
         padding-bottom: 0;
     }
     .footer-links {

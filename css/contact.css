@@ -37,7 +37,7 @@
     display: flex;
     flex-direction: column;
     padding: 80px calc(var(--page-gutter) * 2) 40px;
-    min-height: 100%;
+    height: 100%;
 }
 
 .contact-title {
@@ -59,6 +59,11 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.contact-section:nth-child(2) {
+    flex: 1;
+    min-height: 0;
 }
 
 .contact-label {
@@ -125,15 +130,15 @@
 .contact-textarea {
     border-radius: 16px;
     padding: 16px;
-    min-height: 360px;
-    resize: vertical;
+    flex: 1;
+    min-height: 120px;
+    resize: none;
 }
 
 .contact-submit-row {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-top: auto;
 }
 
 .contact-submit .ui-roll {
@@ -184,9 +189,5 @@ body.contact-is-open .nav-hamburger {
 
     .contact-fields-row {
         grid-template-columns: 1fr 1fr;
-    }
-
-    .contact-textarea {
-        min-height: 280px;
     }
 }

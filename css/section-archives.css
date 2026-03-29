@@ -25,12 +25,6 @@
     overflow: hidden;
 }
 
-.archives-header .back-arrow {
-    position: static;
-    flex-shrink: 0;
-    padding-bottom: 0;
-}
-
 .archives-title {
     font-family: var(--font-header);
     font-size: 8vw; 
@@ -63,6 +57,17 @@
 }
 
 @media (max-width: 768px) {
+    .archives-title-mobile {
+        padding: 0 12px 32px;
+        overflow: visible;
+    }
+
+    .archives-title-mobile .fit-text {
+        padding-top: 0;
+        line-height: var(--lh-single);
+        text-box: normal;
+    }
+
     .packed-row {
         display: flex !important;
         flex-direction: column;

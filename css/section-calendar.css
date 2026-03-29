@@ -93,7 +93,10 @@
 }
 
 .calendar-grid-packed {
-    width: 100%;
+    width: calc(100% + 24px);
+    margin-left: -12px;
+    padding-left: 12px;
+    padding-right: 12px;
     height: 100%;
     overflow-y: auto;
     scrollbar-width: none;
@@ -164,8 +167,7 @@
 }
 
 .calendar-poster-img {
-    height: 100%;
-    padding-bottom: var(--page-gutter);
+    height: calc(100% - var(--page-gutter));
     width: auto;
     object-fit: cover;
     border-radius: var(--poster-radius);
@@ -398,7 +400,7 @@
         z-index: 15;
         overflow-x: auto;
         overflow-y: hidden;
-        scroll-snap-type: x proximity;
+        scroll-snap-type: x mandatory;
         scrollbar-width: none;
         margin-top: auto;
         padding-bottom: 80vh;
@@ -428,6 +430,7 @@
         cursor: pointer;
         white-space: nowrap;
         scroll-snap-align: center;
+        scroll-snap-stop: always;
     }
     .cal-date-item.is-active {
         color: var(--c-dark-green);
@@ -572,6 +575,10 @@
         overflow-y: visible !important;
         height: auto !important;
         margin-bottom: 40px;
+        width: 100%;
+        margin-left: 0;
+        padding-left: 0;
+        padding-right: 0;
     }
 
     .packed-row {

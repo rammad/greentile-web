@@ -122,9 +122,6 @@
 }
 
 @media (max-width: 768px) {
-    .socials-section {
-        margin-top: calc(var(--section-spacing) * 2);
-    }
 
     .icon-circle {
         width: 32px;
