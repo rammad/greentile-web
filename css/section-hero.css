@@ -28,12 +28,10 @@
         transform: translate(-50%, -50%);
         font-size: var(--size-display-hero) !important;
         white-space: normal;
+        line-height: var(--lh-single);
+        text-box: normal;
     }
     .hero .type-display-hero > span {
         display: block;
-        text-box: trim-both cap alphabetic;
-    }
-    .hero .type-display-hero > span + span {
-        margin-top: var(--gap-display-lines);
     }
 }

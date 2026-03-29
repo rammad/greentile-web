@@ -160,6 +160,17 @@
     flex-direction: column;
     align-items: flex-start;
     height: auto;
+    opacity: 0;
+    max-width: 0;
+    overflow: hidden;
+    transition:
+        opacity 0.4s ease,
+        max-width 0.8s ease;
+}
+
+.qty-wrapper.is-visible {
+    opacity: 1;
+    max-width: 200px;
 }
 
 .max-qty-label {
@@ -336,7 +347,14 @@
     }
 
     .pdp-info {
-        padding-bottom: 80px;
+        padding-bottom: 0;
+    }
+    .pdp-info .type-subBold1,
+    .pdp-info .type-subBold2,
+    .pdp-info .type-subRegular1,
+    .pdp-info .type-subRegular2 {
+        text-box: normal;
+        line-height: var(--lh-body);
     }
 
     .ticket-actions {
@@ -353,7 +371,10 @@
     }
 
     .ticket-actions .qty-wrapper {
-        flex: 1 1 0;
+        flex: 0 0 auto;
+        opacity: 1;
+        max-width: none;
+        overflow: visible;
     }
 
     .ticket-actions .qty-selector {

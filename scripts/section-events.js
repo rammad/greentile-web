@@ -99,7 +99,8 @@
 
         // card i starts moving at this scroll progress value
         const cardStarts = Array.from(cards, (_, i) => ENTRANCE_DELAY + i * stepSize);
-        const btnThreshold = cardStarts[n - 1] + travelDuration * 0.85;
+        const btnThresholdDesktop = cardStarts[n - 1] + travelDuration * 0.85;
+        const btnThresholdMobile  = cardStarts[n - 1] + travelDuration * 0.99;
 
         // cached layout values, recalculated after fonts/layout settle
         let phase2Start = 0;
@@ -123,9 +124,10 @@
             });
 
             if (btn && transitionCta) {
-                if (progress >= btnThreshold && !btn.classList.contains('is-visible')) {
+                const thresh = currentlyMobile ? btnThresholdMobile : btnThresholdDesktop;
+                if (progress >= thresh && !btn.classList.contains('is-visible')) {
                     transitionCta(btn, 'enter');
-                } else if (progress < btnThreshold && btn.classList.contains('is-visible')) {
+                } else if (progress < thresh && btn.classList.contains('is-visible')) {
                     transitionCta(btn, 'exit');
                 }
             }

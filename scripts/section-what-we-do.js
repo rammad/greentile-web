@@ -21,7 +21,7 @@
 
         const menuEl    = section.querySelector('.about-menu-persistent');
 
-        const scatter = window.ScatterImages.init(section, viewport, numSlides);
+        const scatter = window.ScatterImages.init(section, viewport, numSlides, {});
         if (menuEl) scatter.avoidanceEl = menuEl;
 
         // ── persistent menu ───────────────────────────────────────────────────
@@ -51,9 +51,8 @@
 
         let bodyEl         = null;
         let activeIdx      = 0;
-        let wasPinned      = false;
+        let wasActive      = false;
         let menuIsRevealed = false;
-        let exitedBottom   = false;
 
         function buildLayout() {
             const stickyContent = section.querySelector('.about-sticky-content');
@@ -102,6 +101,134 @@
 
         initBlockStates();
 
+        // ── mobile edge images ─────────────────────────────────────────────────
+
+        const isMobile = window.innerWidth < 768;
+        let mobileImgContainer = null;
+        let mobileExiting      = false;
+        const mobileGroups = {};
+
+        const MOBILE_IMG_COUNT = 5;
+        const MOBILE_IMG_W_MIN = 60;
+        const MOBILE_IMG_W_MAX = 90;
+        const MOBILE_DRIFT_MIN = 0.3;
+        const MOBILE_DRIFT_MAX = 0.3;
+        let mobileScrollOrigin = 0;
+
+        function generateSlots(count) {
+            var halfL = Math.floor(count / 2);
+            var halfR = count - halfL;
+            if (Math.random() < 0.5) { var t = halfL; halfL = halfR; halfR = t; }
+            var sides = [];
+            for (var s = 0; s < halfL; s++) sides.push(true);
+            for (var s = 0; s < halfR; s++) sides.push(false);
+            for (var si = sides.length - 1; si > 0; si--) {
+                var sj = Math.floor(Math.random() * (si + 1));
+                var st = sides[si]; sides[si] = sides[sj]; sides[sj] = st;
+            }
+
+            var bands = [];
+            for (var b = 0; b < count; b++) bands.push(b);
+            for (var j = bands.length - 1; j > 0; j--) {
+                var k = Math.floor(Math.random() * (j + 1));
+                var tmp = bands[j]; bands[j] = bands[k]; bands[k] = tmp;
+            }
+
+            var bandH = 100 / count;
+            var slots = [];
+            for (var i = 0; i < count; i++) {
+                var band = bands[i];
+                var isLeft = sides[i];
+                var vMin = bandH * band + 1;
+                var vMax = bandH * (band + 1) - 14;
+                var top = vMin + Math.random() * Math.max(0, vMax - vMin);
+                var edge = -20 + Math.floor(Math.random() * 16);
+                var width = MOBILE_IMG_W_MIN + Math.floor(Math.random() * (MOBILE_IMG_W_MAX - MOBILE_IMG_W_MIN + 1));
+                var drift = -(MOBILE_DRIFT_MIN + Math.random() * (MOBILE_DRIFT_MAX - MOBILE_DRIFT_MIN));
+                var slot = { top: top + 'vh', width: width, drift: drift };
+                if (isLeft) slot.left = edge + 'px';
+                else        slot.right = edge + 'px';
+                slots.push(slot);
+            }
+            return slots;
+        }
+
+        function buildMobileImages() {
+            if (!isMobile) return;
+            const track = section.querySelector('.about-image-track');
+            if (!track) return;
+
+            const srcImgs = Array.from(track.querySelectorAll('.scatter-img'));
+            const groups = {};
+            srcImgs.forEach(img => {
+                const g = img.dataset.group;
+                if (!groups[g]) groups[g] = [];
+                groups[g].push(img.src);
+            });
+
+            mobileImgContainer = document.createElement('div');
+            mobileImgContainer.className = 'wwd-mobile-images';
+
+            Object.keys(groups).forEach(gIdx => {
+                const slots = generateSlots(Math.min(groups[gIdx].length, MOBILE_IMG_COUNT));
+                groups[gIdx].forEach((src, i) => {
+                    if (i >= slots.length) return;
+                    const slot = slots[i];
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.className = 'wwd-mobile-img';
+                    img.dataset.group = gIdx;
+                    img.style.width = slot.width + 'px';
+                    img.dataset.drift = String(slot.drift);
+                    img.style.top = slot.top;
+                    if (slot.left !== undefined)  img.style.left  = slot.left;
+                    if (slot.right !== undefined) img.style.right = slot.right;
+                    mobileImgContainer.appendChild(img);
+                    if (!mobileGroups[gIdx]) mobileGroups[gIdx] = [];
+                    mobileGroups[gIdx].push(img);
+                });
+            });
+
+            const scrollViewport = document.getElementById('scroll-viewport');
+            (scrollViewport || document.body).appendChild(mobileImgContainer);
+        }
+
+        buildMobileImages();
+
+        function showMobileGroup(idx, secRect) {
+            const imgs = mobileGroups[idx];
+            if (!imgs) return;
+            if (secRect) mobileScrollOrigin = -secRect.top;
+            imgs.forEach((img, i) => {
+                img.style.transform = 'translateY(0px)';
+                img.style.transition = 'opacity 0.5s ease ' + (i * 0.07) + 's';
+                img.style.opacity = '1';
+            });
+        }
+
+        function hideMobileGroup(idx) {
+            const imgs = mobileGroups[idx];
+            if (!imgs) return;
+            imgs.forEach(img => {
+                img.style.transition = 'opacity 0.3s ease';
+                img.style.opacity = '0';
+            });
+        }
+
+        function hideAllMobileGroups() {
+            Object.keys(mobileGroups).forEach(g => hideMobileGroup(g));
+        }
+
+        function updateMobileDrift(secRect, idx) {
+            const imgs = mobileGroups[idx];
+            if (!imgs) return;
+            const delta = -secRect.top - mobileScrollOrigin;
+            imgs.forEach(img => {
+                const drift = parseFloat(img.dataset.drift || '0');
+                img.style.transform = 'translateY(' + (delta * drift).toFixed(1) + 'px)';
+            });
+        }
+
         // ── block show / hide ─────────────────────────────────────────────────
 
         function showBlock(block) {
@@ -144,108 +271,64 @@
 
         let scrollHasFired = false;
 
-        const MENU_OFFSET_VH_DESKTOP = 0.20;
-        const MENU_PIN_VH_DESKTOP    = 0.28;
-        const MENU_OFFSET_VH_MOBILE  = 0.15;
-        const MENU_PIN_VH_MOBILE     = 0.25;
-
-        function calcIsPinned(vpRect, secRect) {
-            const isMobile       = window.innerWidth < 768;
-            const offsetVH       = isMobile ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP;
-            const pinVH          = isMobile ? MENU_PIN_VH_MOBILE    : MENU_PIN_VH_DESKTOP;
-            const vpH            = vpRect.height;
-            const menuNaturalTop = secRect.top + offsetVH * vpH;
-            return menuNaturalTop <= pinVH * vpH && secRect.bottom >= vpH;
-        }
-
-        function calcShouldRevealMenu(vpRect, secRect, isPinned) {
-            if (isPinned) return true;
-            const isMobile       = window.innerWidth < 768;
-            const offsetVH       = isMobile ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP;
-            const vpH            = vpRect.height;
-            const menuNaturalTop = secRect.top + offsetVH * vpH;
-            return menuNaturalTop < vpH * 0.50 && secRect.bottom > vpH * 0.5;
-        }
+        const MENU_REVEAL_VH_DESKTOP = 0.42;
+        const MENU_REVEAL_VH_MOBILE  = 0.40;
 
         function updateActiveSlide() {
-            const vpRect  = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
-            const secRect = section.getBoundingClientRect();
+            const vpRect    = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
+            const secRect   = section.getBoundingClientRect();
+            const vpH       = vpRect.height;
+            const blocks    = bodyEl ? Array.from(bodyEl.querySelectorAll('.about-text-block')) : [];
+            const revealVH  = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
 
-            const isPinned           = calcIsPinned(vpRect, secRect);
-            const justBecamePinned   = isPinned && !wasPinned;
-            const justBecameUnpinned = !isPinned && wasPinned;
+            const isActive           = secRect.top <= revealVH * vpH && secRect.bottom > 0;
+            const justBecameActive   = isActive && !wasActive;
+            const justBecameInactive = !isActive && wasActive;
 
-            const shouldReveal = calcShouldRevealMenu(vpRect, secRect, isPinned);
-            if (shouldReveal && !menuIsRevealed) {
+            if (isActive && !menuIsRevealed) {
                 revealMenuItems();
                 menuIsRevealed = true;
-            } else if (!shouldReveal && menuIsRevealed && !exitedBottom) {
+            } else if (!isActive && menuIsRevealed) {
                 hideMenuItems();
                 menuIsRevealed = false;
             }
 
-            // snapshot before the absolute → fixed switch changes the coordinate system
-            const menuScreenTop = menuEl ? menuEl.getBoundingClientRect().top : 0;
-
-            if (menuEl) menuEl.classList.toggle('is-pinned', isPinned);
-
-            const blocks = bodyEl ? Array.from(bodyEl.querySelectorAll('.about-text-block')) : [];
-
-            if (justBecamePinned) {
-                exitedBottom = false;
-                if (menuEl) {
-                    menuEl.style.transition = 'none';
-                    menuEl.style.top = `${menuScreenTop}px`;
-                    void menuEl.offsetHeight;
-                    menuEl.style.transition = 'top 0.35s cubic-bezier(0.19, 1, 0.22, 1)';
-                    menuEl.style.top = '';
-                }
+            if (justBecameActive) {
                 showBlock(blocks[activeIdx]);
                 if (scrollHasFired) showCtas(blocks[activeIdx]);
+                if (isMobile) showMobileGroup(activeIdx, secRect);
             }
 
-            if (bodyEl && menuEl && isPinned) {
-                const gap = vpRect.height * BODY_GAP_VH;
+            if (justBecameInactive) {
+                blocks.forEach(b => { hideBlock(b); hideCtas(b); });
+                if (isMobile) hideAllMobileGroups();
+            }
+
+            if (secRect.bottom < vpH) {
+                if (menuEl) menuEl.style.transform = `translateY(${secRect.bottom - vpH}px)`;
+                if (isMobile && !mobileExiting) { hideAllMobileGroups(); mobileExiting = true; }
+            } else {
+                if (menuEl) menuEl.style.transform = '';
+                if (isMobile && mobileExiting) { showMobileGroup(activeIdx, secRect); mobileExiting = false; }
+            }
+
+            if (bodyEl && menuEl && isActive) {
+                const gap = vpH * BODY_GAP_VH;
                 bodyEl.style.top = `${menuEl.getBoundingClientRect().bottom + gap}px`;
             }
 
-            if (justBecameUnpinned) {
-                const isBottomExit = secRect.bottom < vpRect.height;
+            if (isMobile && isActive) updateMobileDrift(secRect, activeIdx);
 
-                if (menuEl) {
-                    menuEl.style.transition = '';
-                    const isMobile = window.innerWidth < 768;
-                    const pinPx    = (isMobile ? MENU_PIN_VH_MOBILE : MENU_PIN_VH_DESKTOP) * vpRect.height;
-                    menuEl.style.top = `${pinPx - secRect.top}px`;
-                }
+            wasActive = isActive;
 
-                if (isBottomExit) {
-                    exitedBottom = true;
-                } else {
-                    blocks.forEach((b) => { hideBlock(b); hideCtas(b); });
-                }
-            }
-
-            wasPinned = isPinned;
-
-            if (exitedBottom && !isPinned && bodyEl && menuEl) {
-                const gap = vpRect.height * BODY_GAP_VH;
-                bodyEl.style.top = `${menuEl.getBoundingClientRect().bottom + gap}px`;
-            }
-
-            if (!isPinned && !exitedBottom) {
-                menuItems.forEach((item) => item.classList.remove('is-active'));
+            if (!isActive) {
+                menuItems.forEach(item => item.classList.remove('is-active'));
                 return;
             }
 
-            if (!isPinned) return;
-
-            const isMobileCalc = window.innerWidth < 768;
-            const offsetPx     = (isMobileCalc ? MENU_OFFSET_VH_MOBILE : MENU_OFFSET_VH_DESKTOP) * vpRect.height;
-            const pinPx        = (isMobileCalc ? MENU_PIN_VH_MOBILE    : MENU_PIN_VH_DESKTOP)    * vpRect.height;
-            const scrollStart  = pinPx - offsetPx;
-            const scrollEnd    = vpRect.height - secRect.height;
-            const scrollRange  = scrollStart - scrollEnd;
+            const scrollStart = revealVH * vpH;
+            const scrollEnd   = vpH - secRect.height;
+            const scrollRange = scrollStart - scrollEnd;
 
             const progress   = scrollRange > 0
                 ? Math.max(0, Math.min(1, (scrollStart - secRect.top) / scrollRange))
@@ -257,31 +340,32 @@
             if (closestIdx !== activeIdx) {
                 hideCtas(blocks[activeIdx]);
                 hideBlock(blocks[activeIdx]);
+                if (isMobile) hideMobileGroup(activeIdx);
                 showBlock(blocks[closestIdx]);
                 if (scrollHasFired) showCtas(blocks[closestIdx]);
+                if (isMobile) showMobileGroup(closestIdx, secRect);
                 activeIdx = closestIdx;
             }
         }
 
         (function initMenuState() {
-            const vpRect   = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
-            const secRect  = section.getBoundingClientRect();
-            const isPinned = calcIsPinned(vpRect, secRect);
-            if (menuEl) menuEl.classList.toggle('is-pinned', isPinned);
-            menuItems.forEach((item) => item.classList.remove('is-active'));
-            wasPinned = isPinned;
-            const shouldReveal = calcShouldRevealMenu(vpRect, secRect, isPinned);
-            if (shouldReveal) {
+            const vpRect  = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
+            const secRect = section.getBoundingClientRect();
+            const revealVH = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
+            const isActive = secRect.top <= revealVH * vpRect.height && secRect.bottom > 0;
+            menuItems.forEach(item => item.classList.remove('is-active'));
+            wasActive = isActive;
+            if (isActive) {
                 menuIsRevealed = true;
                 window.pageReady.then(() => revealMenuItems());
             }
         })();
 
-        scatter.updateImageScales();
+        if (!isMobile) scatter.updateImageScales();
 
         window.addEventListener('lenis-scroll', () => {
             scrollHasFired = true;
-            scatter.updateImageScales();
+            if (!isMobile) scatter.updateImageScales();
             updateActiveSlide();
         });
 

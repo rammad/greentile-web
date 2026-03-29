@@ -29,12 +29,24 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 20px;
-    padding: 0 80px;
+    gap: var(--gap-text);
+    padding: 0 120px;
 }
 
-.clients-col .type-subBold2 {
-    line-height: var(--lh-body);
+.clients-col .type-subBold2,
+.clients-col .type-subRegular1 {
+    line-height: 2;
+    word-spacing: 0.15em;
+}
+
+.clients-col a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity var(--time-hover) var(--ease-standard);
+}
+
+.clients-col a:hover {
+    opacity: 0.55;
 }
 
 .clients-divider {

@@ -24,8 +24,8 @@
         colRightXMax:           95,
         colLeftXMobile:         0,
         colRightXMobile:        80,
-        imgWidthMobilePxMin:    120,
-        imgWidthMobilePxMax:    140,
+        imgWidthMobilePxMin:    100,
+        imgWidthMobilePxMax:    120,
         imgWidthDesktopMin:     7,
         imgWidthDesktopMax:     15,
         jitterRange:            80,
@@ -39,9 +39,12 @@
         overlapMinGap:          -250,
         parallaxSafetyDepth:    0.35,
         slideHeightVhDesktop:   0.75,
-        slideHeightVhMobile:    0.90,
-        textAvoidancePx:        120,
-        textAvoidanceZone:      0.40
+        slideHeightVhMobile:    0.60,
+        textAvoidancePx:        60,
+        textAvoidanceZone:      0.40,
+        frameCount:             0,
+        frameInsetPct:          20,
+        overhangTopVh:          0
     };
 
     function merge(defaults, overrides) {
@@ -98,7 +101,8 @@
             var slideVH            = isMobile ? C.slideHeightVhMobile : C.slideHeightVhDesktop;
             var totalSlideHeight   = numSlides * slideVH * vpH;
             var sectionPadding     = parseFloat(getComputedStyle(section).paddingTop) || 0;
-            var fullSectionHeight  = sectionPadding + totalSlideHeight;
+            var overhangPx         = isMobile ? 0 : C.overhangTopVh * vpH;
+            var fullSectionHeight  = overhangPx + sectionPadding + totalSlideHeight;
 
             var currentY  = 0;
             var prevLeft  = { x: null, w: null };
@@ -110,8 +114,11 @@
                 var isLeft = index % 2 === 0;
                 var prev   = isLeft ? prevLeft : prevRight;
 
-                var minX    = isLeft ? colLXMin : colRXMin;
-                var maxX    = isLeft ? colLXMax : colRXMax;
+                var isFrame = C.frameCount > 0 && !isMobile &&
+                    (index < C.frameCount * 2 || index >= images.length - C.frameCount * 2);
+                var inset   = isFrame ? C.frameInsetPct : 0;
+                var minX    = isLeft ? colLXMin + inset : colRXMin - inset;
+                var maxX    = isLeft ? colLXMax + inset : colRXMax - inset;
                 var randomX = getVariedRandom(minX, maxX, prev.x, C.variationMinDiff);
                 var randomW = getVariedRandom(minWPx, maxWPx, prev.w, C.variationMinDiff);
 

@@ -3,6 +3,7 @@
 .events-section {
     position: relative;
     width: 100%;
+    margin-top: var(--section-spacing);
     padding: 0;
     /* JS overrides this — see SECTION_VH in section-events.js */
     min-height: 250vh;
@@ -102,7 +103,16 @@
     .events-section {
         margin-top: calc(var(--section-spacing) * 2);
     }
-    
+
+    .events-section .animate-line + .animate-line {
+        margin-top: 0;
+    }
+
+    .events-title-wrap .type-display-hero {
+        line-height: var(--lh-single);
+        text-box: normal;
+    }
+
     .events-sticky-inner {
         gap: 40px;
     }

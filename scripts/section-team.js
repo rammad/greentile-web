@@ -89,6 +89,29 @@
 
         posters.forEach(p => desktopBodyObs.observe(p));
 
+        /* ── desktop: deactivate body when section leaves viewport ── */
+
+        const CLEANUP_RATIO = 0.15;
+        const sectionCleanupObs = new IntersectionObserver((entries) => {
+            if (isMobile) return;
+            for (const entry of entries) {
+                if (entry.intersectionRatio < CLEANUP_RATIO) {
+                    if (activeBody) {
+                        activeBody.classList.remove('is-active');
+                        activeBody = null;
+                        if (bodySizer) bodySizer.style.height = '';
+                    }
+                    if (titleFired) {
+                        titleLines.forEach(l => l.classList.remove('is-visible'));
+                        titleFired = false;
+                        titleObs.observe(firstPoster);
+                    }
+                }
+            }
+        }, { root, threshold: [0, CLEANUP_RATIO] });
+
+        sectionCleanupObs.observe(section);
+
         /* ── mobile: title + body animate in with observer ── */
 
         observeElementInOut(titleCol, {

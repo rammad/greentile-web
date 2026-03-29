@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/base.css?v=14">
     <link rel="stylesheet" href="css/nav.css?v=4">
     <link rel="stylesheet" href="css/section-product.css?v=10">
+    <link rel="stylesheet" href="css/contact.css?v=1">
 
     <style>
         html {
@@ -70,6 +71,40 @@
             <a href="#" class="type-display-hero mobile-menu-link animate-cascade">Say Hi</a>
         </div>
     </div>
+
+    <div class="contact-panel">
+        <div class="contact-panel-inner">
+            <h2 class="contact-title type-display-hero">SAY HELLO!</h2>
+            <form class="contact-form" id="contact-form">
+                <div class="contact-section">
+                    <label class="type-subRegular1 contact-label">What is your question about?</label>
+                    <div class="contact-topics">
+                        <button type="button" class="contact-topic-btn cta-btn is-visible type-subRegular1 active" data-topic="general">General Inquiry</button>
+                        <button type="button" class="contact-topic-btn cta-btn is-visible type-subRegular1" data-topic="collaboration">Collaboration</button>
+                        <button type="button" class="contact-topic-btn cta-btn is-visible type-subRegular1" data-topic="sponsorship">Sponsorship</button>
+                    </div>
+                </div>
+                <div class="contact-section">
+                    <label class="type-subRegular1 contact-label">Your Information</label>
+                    <div class="contact-fields-row">
+                        <input type="text" class="contact-input type-subRegular1" name="name" placeholder="NAME" required>
+                        <input type="email" class="contact-input type-subRegular1" name="email" placeholder="EMAIL" required>
+                    </div>
+                    <textarea class="contact-textarea type-subRegular1" name="message" placeholder="WRITE YOUR MESSAGE HERE" required></textarea>
+                </div>
+                <div class="contact-submit-row">
+                    <button type="submit" class="contact-submit cta-btn is-visible">
+                        <div class="ui-roll roll-hover">
+                            <span class="type-subRegular1 ui-roll-layer ui-roll-visible">Send Message</span>
+                            <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">Send Message</span>
+                        </div>
+                    </button>
+                    <span class="contact-status type-subRegular1"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="contact-backdrop"></div>
 
     <section class="pdp-section">
         <div class="pdp-sticky-wrapper">
@@ -191,6 +226,7 @@
 
     <script src="scripts/global.js?v=12"></script>
     <script src="scripts/section-product.js?v=8"></script>
+    <script src="scripts/contact.js?v=1"></script>
 
 </body>
 </html>

@@ -16,7 +16,10 @@
             duration: opts.lenisDuration ?? 0.4,
             wheelMultiplier: opts.lenisWheelMultiplier ?? 1.2,
             easing: (t) => 1 - Math.pow(1 - t, 4),
-            smoothWheel: true
+            // smoothWheel: true,
+            // syncTouch: true,
+            // syncTouchLerp: 0.1,
+            // touchMultiplier: 1,
         });
 
         lenis.on('scroll', () => {

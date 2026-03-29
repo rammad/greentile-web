@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="css/section-socials.css?v=11">
     <link rel="stylesheet" href="css/section-clients.css?v=12">
     <link rel="stylesheet" href="css/footer.css?v=10">
+    <link rel="stylesheet" href="css/contact.css?v=1">
 </head>
 <body>
     <div id="page-curtain"></div>
@@ -63,6 +64,40 @@
         </div>
     </div>
 
+    <div class="contact-panel">
+        <div class="contact-panel-inner">
+            <h2 class="contact-title type-display-hero">SAY HELLO!</h2>
+            <form class="contact-form" id="contact-form">
+                <div class="contact-section">
+                    <label class="type-subRegular1 contact-label">What is your question about?</label>
+                    <div class="contact-topics">
+                        <button type="button" class="contact-topic-btn cta-btn is-visible type-subRegular1 active" data-topic="general">General Inquiry</button>
+                        <button type="button" class="contact-topic-btn cta-btn is-visible type-subRegular1" data-topic="collaboration">Collaboration</button>
+                        <button type="button" class="contact-topic-btn cta-btn is-visible type-subRegular1" data-topic="sponsorship">Sponsorship</button>
+                    </div>
+                </div>
+                <div class="contact-section">
+                    <label class="type-subRegular1 contact-label">Your Information</label>
+                    <div class="contact-fields-row">
+                        <input type="text" class="contact-input type-subRegular1" name="name" placeholder="NAME" required>
+                        <input type="email" class="contact-input type-subRegular1" name="email" placeholder="EMAIL" required>
+                    </div>
+                    <textarea class="contact-textarea type-subRegular1" name="message" placeholder="WRITE YOUR MESSAGE HERE" required></textarea>
+                </div>
+                <div class="contact-submit-row">
+                    <button type="submit" class="contact-submit cta-btn is-visible">
+                        <div class="ui-roll roll-hover">
+                            <span class="type-subRegular1 ui-roll-layer ui-roll-visible">Send Message</span>
+                            <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">Send Message</span>
+                        </div>
+                    </button>
+                    <span class="contact-status type-subRegular1"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="contact-backdrop"></div>
+
     <div id="scroll-viewport" class="scroll-viewport">
         <div id="scroll-content" class="scroll-content">
 
@@ -92,7 +127,7 @@
             <ul>
                 <li class="menu-item type-h2" data-index="0">Community Events</li>
                 <li class="menu-item type-h2" data-index="1">Brand Partnerships</li>
-                <li class="menu-item type-h2" data-index="2">Corporate & Private Events</li>
+                <li class="menu-item type-h2" data-index="2">Corporate <span class="ws-normal">&amp; Private</span> Events</li>
                 <li class="menu-item type-h2" data-index="3">Special Projects</li>
             </ul>
         </div>
@@ -163,25 +198,23 @@
             <img src="images/community-events/community-events-3.jpg" class="scatter-img" data-group="0">
             <img src="images/community-events/community-events-4.jpg" class="scatter-img" data-group="0">
             <img src="images/community-events/community-events-5.jpg" class="scatter-img" data-group="0">
-            <!-- <img src="images/community-events/community-events-6.jpg" class="scatter-img" data-group="0"> -->
+            <img src="images/community-events/community-events-6.jpg" class="scatter-img" data-group="0">
             <img src="images/brand-partnerships/brand-partnerships-1.jpg" class="scatter-img" data-group="1">
             <img src="images/brand-partnerships/brand-partnerships-2.jpg" class="scatter-img" data-group="1">
             <img src="images/brand-partnerships/brand-partnerships-3.jpg" class="scatter-img" data-group="1">
             <img src="images/brand-partnerships/brand-partnerships-4.jpg" class="scatter-img" data-group="1">
             <img src="images/brand-partnerships/brand-partnerships-5.jpg" class="scatter-img" data-group="1">
-            <!-- <img src="images/brand-partnerships/brand-partnerships-6.jpg" class="scatter-img" data-group="1"> -->
             <img src="images/private-events/private-events-1.JPG" class="scatter-img" data-group="2">
             <img src="images/private-events/private-events-2.JPG" class="scatter-img" data-group="2">
             <img src="images/private-events/private-events-3.JPG" class="scatter-img" data-group="2">
             <img src="images/private-events/private-events-4.JPG" class="scatter-img" data-group="2">
             <img src="images/private-events/private-events-5.JPG" class="scatter-img" data-group="2">
-            <!-- <img src="images/private-events/private-events-6.JPG" class="scatter-img" data-group="2"> -->
             <img src="images/extras/extras-10.JPG" class="scatter-img" data-group="3">
             <img src="images/extras/extras-11.JPG" class="scatter-img" data-group="3">
             <img src="images/extras/extras-12.JPG" class="scatter-img" data-group="3">
             <img src="images/extras/extras-13.jpg" class="scatter-img" data-group="3">
             <img src="images/extras/extras-14.jpg" class="scatter-img" data-group="3">
-            <!-- <img src="images/extras/extras-15.jpg" class="scatter-img" data-group="3"> -->
+            <img src="images/extras/extras-15.jpg" class="scatter-img" data-group="3">
         </div>
 
     </section>
@@ -235,17 +268,17 @@
         <div class="clients-columns">
 
             <div class="clients-col">
-                <span class="type-subBold1">our work</span>
-                <h2 class="type-h3">Previous Clients</h2>
-                <p class="type-subRegular1">Anheuser-Busch, Boston Consulting Group, Brookfield, Citi, Chelsea Piers, Deloitte, Holwell, Shuster &amp; Goldberg, Jefferies, Meta, Prose, Publicis, Ralph Lauren, Reddit, Schroders, Soho Grand, Stripe, Visa</p>
+                <span class="type-subBold1">previous</span>
+                <h2 class="type-h3">Clients</h2>
+                <p class="type-subRegular1"><a href="https://www.anheuser-busch.com" target="_blank">Anheuser-Busch</a>, <a href="https://www.bcg.com" target="_blank">Boston Consulting Group</a>, <a href="https://www.brookfield.com" target="_blank">Brookfield</a>, <a href="https://www.citi.com" target="_blank">Citi</a>, <a href="https://www.chelseapiers.com" target="_blank">Chelsea Piers</a>, <a href="https://www.deloitte.com" target="_blank">Deloitte</a>, Holwell, Shuster &amp; Goldberg, <a href="https://www.jefferies.com" target="_blank">Jefferies</a>, <a href="https://about.meta.com" target="_blank">Meta</a>, <a href="https://www.prose.com" target="_blank">Prose</a>, <a href="https://www.publicisgroupe.com" target="_blank">Publicis</a>, <a href="https://www.ralphlauren.com" target="_blank">Ralph Lauren</a>, <a href="https://www.reddit.com" target="_blank">Reddit</a>, <a href="https://www.schroders.com" target="_blank">Schroders</a>, <a href="https://www.sohogrand.com" target="_blank">Soho Grand</a>, <a href="https://www.stripe.com" target="_blank">Stripe</a>, <a href="https://www.visa.com" target="_blank">Visa</a></p>
             </div>
 
             <div class="clients-divider"></div>
 
             <div class="clients-col">
-                <span class="type-subBold1">in the news</span>
+                <span class="type-subBold1">featured</span>
                 <h2 class="type-h3">Press</h2>
-                <p class="type-subRegular1">Eater, TimeOut New York, Thrillist, Gothamist, The Infatuation, New York Magazine, Bon Appétit</p>
+                <p class="type-subRegular1"><a href="https://www.eater.com" target="_blank">Eater</a>, <a href="https://www.timeout.com/newyork" target="_blank">TimeOut New York</a>, <a href="https://www.thrillist.com" target="_blank">Thrillist</a>, <a href="https://www.gothamist.com" target="_blank">Gothamist</a>, <a href="https://www.theinfatuation.com" target="_blank">The Infatuation</a>, <a href="https://www.nymag.com" target="_blank">New York Magazine</a>, <a href="https://www.bonappetit.com" target="_blank">Bon Appétit</a></p>
             </div>
 
         </div>
@@ -333,5 +366,6 @@
     <script src="scripts/section-socials.js?v=7" defer></script>
     <script src="scripts/section-clients.js?v=6" defer></script>
     <script src="scripts/footer.js?v=7" defer></script>
+    <script src="scripts/contact.js?v=1" defer></script>
 </body>
 </html>

@@ -98,10 +98,31 @@
 
     .about-inner {
         width: 90%;
-        gap: var(--gap-text);
+        /* gap: var(--gap-text); */
+    }
+
+    .about-text.type-h1 {
+        line-height: var(--lh-open);
+    }
+    .about .animate-line + .animate-line {
+        margin-top: 0;
     }
 
     .about-subhead {
         margin-bottom: 0;
+    }
+
+    .about-inline-img {
+        height: 1.6em;
+        width: calc(1.6em * 1.25);
+    }
+
+    .about-img-wrap {
+        width: calc(1.6em * 1.25);
+        height: 0.97em;
+    }
+
+    .about-img-wrap .about-inline-img {
+        height: 1.6em;
     }
 }

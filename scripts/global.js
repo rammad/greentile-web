@@ -141,6 +141,7 @@ function observeElementInOut(element, options = {}) {
     if (!element) return () => {};
     const {
         onEnter,
+        onExit,
         enterThreshold = ENTER_THRESHOLD,
         repeat = false,
         root = document.getElementById('scroll-viewport') || null
@@ -158,8 +159,9 @@ function observeElementInOut(element, options = {}) {
                         // gate first-entry animations behind the curtain lifting
                         window.pageReady.then(() => onEnter(entry.target));
                     }
-                } else if (!visible && repeat) {
-                    didEnter = false;
+                } else if (!visible && didEnter) {
+                    if (onExit) onExit(entry.target);
+                    if (repeat) didEnter = false;
                 }
             });
         },
@@ -437,7 +439,7 @@ const CURTAIN_COMBOS = [
 ];
 
 // scattered landing positions per hand size (x, y, rotation) relative to tile center
-const CURTAIN_TILE_SCATTER = {
+const CURTAIN_TILE_SCATTER_DESKTOP = {
     3: [
         { x: -108, y: 22,  r: -20 },
         { x:    8, y: 32,  r:  12 },
@@ -450,13 +452,28 @@ const CURTAIN_TILE_SCATTER = {
         { x:  148, y: 28,  r:  18 },
     ],
 };
+const CURTAIN_TILE_SCATTER_MOBILE = {
+    3: [
+        { x: -93, y: 19,  r: -20 },
+        { x:   7, y: 28,  r:  12 },
+        { x:  88, y:  8,  r:  -8 },
+    ],
+    4: [
+        { x: -128, y: 16,  r: -22 },
+        { x:  -28, y: 33,  r:  16 },
+        { x:   48, y: 10,  r:  -8 },
+        { x:  128, y: 24,  r:  18 },
+    ],
+};
+const CURTAIN_TILE_SCATTER = window.innerWidth < 768 ? CURTAIN_TILE_SCATTER_MOBILE : CURTAIN_TILE_SCATTER_DESKTOP;
 
 // returns a fixed pixel value (breakpoint system replaced continuous vw scaling)
 function vwPx(px) { return px; }
 
-// tile width 88px + gap 4px = 92px stride; compute a centered row for any count
+// tile width + gap 4px = stride; compute a centered row for any count
 function getTileSnapX(count) {
-    const stride = vwPx(92);
+    const tileW  = window.innerWidth < 768 ? 76 : 88;
+    const stride = vwPx(tileW + 4);
     const start  = -((count - 1) / 2) * stride;
     return Array.from({ length: count }, (_, i) => Math.round(start + i * stride));
 }
@@ -664,8 +681,6 @@ function initMobileMenu(nav) {
     hamburger.addEventListener('click', toggle);
 
     links.forEach(link => {
-        link.addEventListener('click', () => {
-            if (isOpen) toggle();
-        });
+        link.addEventListener('click', () => {});
     });
 }

@@ -106,7 +106,7 @@
     --blur-standard: 10px; /* fixed — blur does not scale with viewport */
 
     --poster-gap: 20px;
-    --poster-radius: 8% / 6.4%; /* 8% * 4/5 = %6.4 */
+    --poster-radius: 8% / 7.2%; /* compromise: near-circular while visually balanced on 4:5 */
     --poster-full-height: calc(100vh - var(--space-for-nav) - 80px);
 
     /* line-height — named so any reader knows the intent */
@@ -482,7 +482,7 @@ section {
     display: block;
     position: relative;
     overflow: hidden;
-    line-height: 1; /* roll math depends on this */
+    line-height: 1.2;
     transform: translateY(150%);
     opacity: 0;
     transition:
@@ -578,6 +578,15 @@ section {
     background-position: center;
     border-radius: 8px;
     will-change: transform, opacity;
+}
+
+@media (max-width: 767px) {
+    .curtain-tile {
+        width: 76px;
+        height: 104px;
+        margin: -52px 0 0 -38px;
+        border-radius: 7px;
+    }
 }
 
 /* action lines — vertical strokes above tiles, like a click impact */
@@ -695,9 +704,14 @@ body::after {
         --size-subBold2:      14px;
         --size-subRegular1:   14px;
         --size-subRegular2:   10px;
-        --size-body1:         14px;
+        --size-body1:         16px;
         --size-body2:         14px;
         --size-body3:         16px;
+
+        --lh-tight:  0.85;
+        --lh-single: 0.9;
+        --lh-body:   1.2;
+        --lh-open:   1.4;
 
         --space-for-nav: 60px;
         --page-gutter: 12px;
@@ -707,6 +721,19 @@ body::after {
 
         --section-spacing: 80px;
         --poster-gap: 12px;
+        --cta-padding: 12px 16px 8px;
+    }
+
+    .cta-btn .ui-roll-layer {
+        gap: 20px;
+    }
+
+    .cta-btn .ui-roll {
+        overflow: visible;
+    }
+
+    .cta-btn .ui-roll-hidden {
+        display: none;
     }
 }
 

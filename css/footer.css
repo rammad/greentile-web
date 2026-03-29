@@ -127,6 +127,7 @@
 @media (max-width: 768px) {
     .footer-section {
         padding-top: var(--space-for-nav);
+        padding-bottom: 0;
     }
     .footer-links {
         height: auto;
@@ -139,13 +140,12 @@
     }
     .footer-main .type-display-hero {
         text-align: center;
+        line-height: var(--lh-single);
+        text-box: normal;
+        padding-bottom: 0;
     }
     .footer-main .type-display-hero > span {
         display: block;
-        text-box: trim-both cap alphabetic;
-    }
-    .footer-main .type-display-hero > span + span {
-        margin-top: var(--gap-display-lines);
     }
     .footer-main .type-display-hero > span .char-reveal {
         display: inline-block;

@@ -55,14 +55,21 @@
 
         document.querySelectorAll('.type-body1, .type-body2').forEach(el => el.classList.add('is-visible'));
 
-        const cta = document.querySelector('.cta-btn');
+        const qtyWrapper = section.querySelector('.qty-wrapper');
+        if (qtyWrapper) {
+            void qtyWrapper.offsetWidth;
+            qtyWrapper.classList.add('is-visible');
+            await wait(150);
+        }
+
+        const cta = section.querySelector('.cta-btn');
         if (cta) transitionCta(cta, 'enter');
     }
 
     function initMobileAnimations(section) {
         const title = document.querySelector('.pdp-hero-title');
         const ticketActions = document.querySelector('.ticket-actions');
-        const cta = document.querySelector('.cta-btn');
+        const cta = section.querySelector('.cta-btn');
 
         // images: fade in when the carousel enters the viewport
         const imageCol = document.querySelector('.pdp-image-col');
@@ -132,8 +139,12 @@
             observeElementInOut(descWrapper, {
                 root: null,
                 enterThreshold: 0.05,
+                repeat: true,
                 onEnter: () => {
                     ticketActions.classList.add('is-sticky-visible');
+                },
+                onExit: () => {
+                    ticketActions.classList.remove('is-sticky-visible');
                 }
             });
         }

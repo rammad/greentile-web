@@ -24,20 +24,16 @@ function randomPick(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function buildBadgeHTML(type, title) {
+function buildBadgeHTML(type) {
     const assets = STICKER_ASSETS[type];
     const blankSrc = randomPick(assets.blanks);
-    let html = `<div class="badge-layer badge-layer-blank" style="-webkit-mask-image:url('${blankSrc}');mask-image:url('${blankSrc}')"></div>` +
-               `<img class="badge-layer badge-layer-text" src="${assets.text}" alt="">`;
-    if (type === 'coming-soon' && title) {
-        html += `<span class="badge-title">${title}</span>`;
-    }
-    return html;
+    return `<div class="badge-layer badge-layer-blank" style="-webkit-mask-image:url('${blankSrc}');mask-image:url('${blankSrc}')"></div>` +
+           `<img class="badge-layer badge-layer-text" src="${assets.text}" alt="">`;
 }
 
-function populateBadge(el, type, title) {
+function populateBadge(el, type) {
     if (!el) return;
-    el.innerHTML = buildBadgeHTML(type, title);
+    el.innerHTML = buildBadgeHTML(type);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -148,7 +144,7 @@ function initEventInteractions() {
 
                     if (status === 'coming-soon') {
                         if (statusSoon) {
-                            populateBadge(statusSoon, 'coming-soon', row.getAttribute('data-title'));
+                            populateBadge(statusSoon, 'coming-soon');
                             statusSoon.style.opacity = '1';
                         }
                         posterImg.style.opacity = '0';
@@ -266,26 +262,25 @@ function initMobileScrollSpy() {
         const wrap = document.createElement('div');
         wrap.className = 'cal-poster-wrap';
 
-        if (imgUrl) {
+        if (status === 'coming-soon') {
+            const badge = document.createElement('div');
+            badge.className = 'status-badge badge-soon';
+            badge.innerHTML = buildBadgeHTML('coming-soon');
+            Object.assign(badge.style, {
+                top: '50%', left: '50%', width: '90%', height: '90%',
+                transform: 'translate(-50%, -50%)', opacity: '1'
+            });
+            wrap.appendChild(badge);
+        } else if (imgUrl) {
             const img = document.createElement('img');
             img.src = imgUrl;
             img.alt = item.getAttribute('data-title') || '';
             img.className = 'cal-poster-inline';
             if (status === 'sold-out') img.classList.add('is-sold-out');
-            if (status === 'coming-soon') img.style.opacity = '0';
             wrap.appendChild(img);
         }
 
-        if (status === 'coming-soon') {
-            const badge = document.createElement('div');
-            badge.className = 'status-badge badge-soon';
-            badge.innerHTML = buildBadgeHTML('coming-soon', item.getAttribute('data-title'));
-            Object.assign(badge.style, {
-                top: '50%', left: '50%', width: '100%', height: '100%',
-                transform: 'translate(-50%, -50%)', opacity: '1'
-            });
-            wrap.appendChild(badge);
-        } else if (status === 'sold-out') {
+        if (status === 'sold-out') {
             const badge = document.createElement('div');
             badge.className = 'status-badge badge-sold';
             badge.innerHTML = buildBadgeHTML('sold-out');
@@ -343,61 +338,24 @@ function initMobileScrollSpy() {
 
     datesRail.addEventListener('scroll', onDateScroll, { passive: true });
 
-    /* ── forward poster-area swipes to dates rail ── */
-    let swipeStartX = 0;
-    let swipeStartY = 0;
-    let swipeStartScroll = 0;
-    let isSwiping = false;
-    let swipePrevented = false;
-
-    list.addEventListener('touchstart', (e) => {
-        swipeStartX = e.touches[0].clientX;
-        swipeStartY = e.touches[0].clientY;
-        swipeStartScroll = datesRail.scrollLeft;
-        isSwiping = false;
-        swipePrevented = false;
+    /* ── forward taps from the rail's extended touch area to poster links ── */
+    let railTouchScroll = 0;
+    datesRail.addEventListener('touchstart', () => {
+        railTouchScroll = datesRail.scrollLeft;
     }, { passive: true });
 
-    list.addEventListener('touchmove', (e) => {
-        const dx = e.touches[0].clientX - swipeStartX;
-        const dy = e.touches[0].clientY - swipeStartY;
-
-        if (!isSwiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 5) {
-            isSwiping = true;
+    datesRail.addEventListener('click', (e) => {
+        const trackRect = datesTrack.getBoundingClientRect();
+        if (e.clientY <= trackRect.bottom) return;
+        if (Math.abs(datesRail.scrollLeft - railTouchScroll) > 5) return;
+        datesRail.style.pointerEvents = 'none';
+        const below = document.elementFromPoint(e.clientX, e.clientY);
+        datesRail.style.pointerEvents = '';
+        if (below) {
+            const link = below.closest('a');
+            if (link) link.click();
         }
-
-        if (isSwiping) {
-            e.preventDefault();
-            datesRail.scrollLeft = swipeStartScroll - dx;
-        }
-    }, { passive: false });
-
-    list.addEventListener('touchend', () => {
-        if (isSwiping) {
-            swipePrevented = true;
-
-            const railRect = datesRail.getBoundingClientRect();
-            const center = railRect.left + railRect.width / 2;
-            let nearest = dateItems[0];
-            let minDist = Infinity;
-
-            dateItems.forEach(d => {
-                const r = d.getBoundingClientRect();
-                const dist = Math.abs(r.left + r.width / 2 - center);
-                if (dist < minDist) { minDist = dist; nearest = d; }
-            });
-
-            nearest.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-            setTimeout(() => { swipePrevented = false; }, 400);
-        }
-    }, { passive: true });
-
-    list.addEventListener('click', (e) => {
-        if (swipePrevented) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    }, true);
+    });
 
     /* ── initial state ── */
     document.fonts.ready.then(() => {
@@ -446,11 +404,21 @@ function initRowPacker() {
         const card = document.createElement('a');
         card.href = href;
         card.className = 'grid-card' + (status ? ` grid-${status}` : '');
-        card.innerHTML = `
-            <img src="${imgUrl}" class="grid-card-poster" ${status === 'coming-soon' ? 'style="opacity: 0;">' : '>'}
-            ${status === 'coming-soon' ? `<div class="status-badge badge-soon">${buildBadgeHTML('coming-soon', row.getAttribute('data-title'))}</div>` : ''}
-            ${status === 'sold-out' ? `<div class="status-badge badge-sold">${buildBadgeHTML('sold-out')}</div>` : ''}
-        `;
+        if (status === 'coming-soon') {
+            const ox = Math.round((Math.random() - 0.5) * 80);
+            const oy = Math.round((Math.random() - 0.5) * 80 - 30);
+            card.innerHTML = `
+                <div class="grid-card-placeholder">
+                    <div class="status-badge badge-soon" style="left:calc(50% + ${ox}px);top:calc(40% + ${oy}px);transform:translate(-50%,-50%)">${buildBadgeHTML('coming-soon')}</div>
+                    <span class="grid-card-label type-subBold1">${row.getAttribute('data-title') || ''}</span>
+                </div>
+            `;
+        } else {
+            card.innerHTML = `
+                <img src="${imgUrl}" class="grid-card-poster">
+                ${status === 'sold-out' ? `<div class="status-badge badge-sold">${buildBadgeHTML('sold-out')}</div>` : ''}
+            `;
+        }
 
         currentGroup.items.push(card);
     });
@@ -549,18 +517,19 @@ function initMobileFilterToggle() {
         '<span class="ui-roll-layer ui-roll-hidden">Filters</span>';
     topRow.appendChild(filtersToggle);
 
-    const viewGroup = document.createElement('div');
-    viewGroup.className = 'mobile-view-group';
+    const divider1 = document.createElement('span');
+    divider1.className = 'mobile-divider type-subRegular1';
+    divider1.textContent = '/';
+    topRow.appendChild(divider1);
 
-    if (btnGrid) viewGroup.appendChild(btnGrid);
+    if (btnGrid) topRow.appendChild(btnGrid);
 
-    const divider = document.createElement('span');
-    divider.className = 'divider type-subRegular1';
-    divider.textContent = '/';
-    viewGroup.appendChild(divider);
+    const divider2 = document.createElement('span');
+    divider2.className = 'mobile-divider type-subRegular1';
+    divider2.textContent = '/';
+    topRow.appendChild(divider2);
 
-    if (archivesLink) viewGroup.appendChild(archivesLink);
-    topRow.appendChild(viewGroup);
+    if (archivesLink) topRow.appendChild(archivesLink);
 
     const optionsRow = document.createElement('div');
     optionsRow.className = 'mobile-filter-options';

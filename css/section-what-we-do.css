@@ -50,7 +50,7 @@
     position: relative;
     width: 100%;
     min-height: 100vh;
-    padding-top: var(--section-spacing);
+    padding-top: 0;
     background-color: transparent;
 }
 
@@ -129,7 +129,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--gap-text);
+    gap: 24px;
     z-index: 50;
     pointer-events: auto;
 }
@@ -165,8 +165,8 @@
     transition: color var(--time-fade-in) ease, opacity 0.5s ease;
 }
 
-/* menu switches to fixed when its natural scroll position reaches the target */
-.what-we-do .about-menu-persistent.is-pinned {
+/* menu is always fixed — JS controls visibility and translateY for scroll-out */
+.what-we-do .about-menu-persistent {
     position: fixed;
     top: 28vh;
     left: 0;
@@ -178,8 +178,32 @@
 }
 
 @media (max-width: 768px) {
-    .about-menu-persistent            { top: 15vh; }
-    .about-menu-persistent .menu-item { font-size: 40px; margin-bottom: 4px; word-spacing: 100vw; line-height: var(--lh-tight); }
+    .about-image-track { display: none !important; }
 
-    .what-we-do .about-menu-persistent.is-pinned { top: 25vh; padding-top: 0; }
+    .what-we-do .about-menu-persistent { top: 18vh; }
+    .about-menu-persistent .menu-item { font-size: 40px; word-spacing: 100vw; line-height: var(--lh-single); }
+    .about-menu-persistent .menu-item .ws-normal { word-spacing: normal; }
+
+    .what-we-do-body .about-text-block { max-width: 280px; }
+}
+
+/* ── mobile edge images (created by JS on small viewports) ──────────── */
+
+.wwd-mobile-images {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 40;
+    overflow: hidden;
+}
+
+.wwd-mobile-img {
+    position: absolute;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--poster-radius);
+    opacity: 0;
+    will-change: opacity, transform;
+    pointer-events: none;
 }
