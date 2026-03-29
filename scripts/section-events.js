@@ -31,13 +31,20 @@
             card.style.setProperty('--hover-rotate', `${deg.toFixed(1)}deg`);
         });
 
-        // on desktop, mirror the hero title's fitted font-size
+        const mobileLines = [...section.querySelectorAll('.events-title-lines.mobile-only .animate-line')];
+
         const syncTitleSize = () => {
-            if (!desktopLine) return;
-            const heroTitle = document.querySelector('.hero .type-display-hero');
-            if (heroTitle) {
-                if (fitTextToWidth) fitTextToWidth(heroTitle);
-                desktopLine.style.fontSize = getComputedStyle(heroTitle).fontSize;
+            if (desktopLine) {
+                const heroTitle = document.querySelector('.hero .type-display-hero');
+                if (heroTitle) {
+                    if (fitTextToWidth) fitTextToWidth(heroTitle);
+                    desktopLine.style.fontSize = getComputedStyle(heroTitle).fontSize;
+                }
+            }
+            if (fitTextToWidth && mobileLines.length) {
+                mobileLines.forEach(line => { line.style.fontSize = ''; fitTextToWidth(line); });
+                const minSize = Math.min(...mobileLines.map(l => parseFloat(l.style.fontSize)));
+                mobileLines.forEach(line => line.style.fontSize = `${minSize}px`);
             }
         };
 
@@ -75,9 +82,13 @@
         }
 
         // ── TUNING ────────────────────────────────────────────────
-        const SECTION_VH     = 2.0;   // section height in viewports (bigger = slower overall scroll)
-        const ENTRANCE_DELAY = -0.75;  // 0–1, fraction of scroll before first card appears
-        const STAGGER_SPLIT  = 0.35;  // 0–1, how much of the remaining range is card-to-card delay
+        const SECTION_VH         = 1.5;   // section height in viewports (bigger = slower overall scroll)
+        const SECTION_VH_MOBILE  = 1.2;   // shorter on mobile so post-stick cards feel as fast as pre-stick
+        const ENTRANCE_DELAY = -2.5;   // negative = cards start moving before progress reaches 0
+        const STAGGER_SPLIT  = 0.2;  // 0–1, how much of the remaining range is card-to-card delay
+        const FADE_Y_HI       = 0.30;  // card invisible when y > this × startOffset (travel distance)
+        const FADE_Y_LO       = 0.10;  // card fully opaque when y < this × startOffset
+        const MOBILE_EARLY   = 0.30;  // on mobile, start animation this many vh before sticky kicks in
         // ──────────────────────────────────────────────────────────
 
         const n              = cards.length;
@@ -88,7 +99,7 @@
 
         // card i starts moving at this scroll progress value
         const cardStarts = Array.from(cards, (_, i) => ENTRANCE_DELAY + i * stepSize);
-        const btnThreshold = cardStarts[n - 1] + travelDuration;
+        const btnThreshold = cardStarts[n - 1] + travelDuration * 0.85;
 
         // cached layout values, recalculated after fonts/layout settle
         let phase2Start = 0;
@@ -100,13 +111,15 @@
         if (titleWrap) titleWrap.style.transition = 'none';
 
         function applyPositions(scrollY) {
-            const progress = Math.max(0, Math.min(1, (scrollY - phase2Start) / phase2Len));
+            const progress = Math.min(1, (scrollY - phase2Start) / phase2Len);
 
             cards.forEach((card, i) => {
                 const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
                 const y = Math.round(startOffset * (1 - localP));
                 card.style.transform = `translateY(${y}px)`;
-                card.style.opacity   = '1';
+                const hi = startOffset * FADE_Y_HI;
+                const lo = startOffset * FADE_Y_LO;
+                card.style.opacity = y >= hi ? 0 : y <= lo ? 1 : 1 - (y - lo) / (hi - lo);
             });
 
             if (btn && transitionCta) {
@@ -161,10 +174,12 @@
             const adjustedPT   = Math.max(0, sectionSpacingPx - centerOffset);
 
             section.style.paddingTop = adjustedPT + 'px';
-            section.style.minHeight  = (SECTION_VH * ih) + 'px';
+            const sectionVh = currentlyMobile ? SECTION_VH_MOBILE : SECTION_VH;
+            section.style.minHeight  = (sectionVh * ih) + 'px';
 
-            phase2Start = section.offsetTop;
-            phase2Len   = section.offsetHeight - ih;
+            const earlyPx = currentlyMobile ? ih * MOBILE_EARLY : 0;
+            phase2Start = section.offsetTop - earlyPx;
+            phase2Len   = section.offsetHeight - ih + earlyPx;
             startOffset = ih;
 
             applyPositions(window.lenis ? window.lenis.scroll : 0);

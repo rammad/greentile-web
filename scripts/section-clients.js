@@ -6,15 +6,12 @@
         const section = document.querySelector('.clients-section');
         if (!section) return;
 
-        const previous = section.querySelector('.clients-previous');
-        const pressLogos = section.querySelector('.press-logos');
+        const columns = section.querySelector('.clients-columns');
 
-        [previous, pressLogos].forEach(el => {
-            if (el && observeElementInOut) {
-                observeElementInOut(el, {
-                    onEnter: () => el.classList.add('is-visible')
-                });
-            }
-        });
+        if (columns && observeElementInOut) {
+            observeElementInOut(columns, {
+                onEnter: () => columns.classList.add('is-visible')
+            });
+        }
     });
 })();

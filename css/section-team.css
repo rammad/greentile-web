@@ -3,7 +3,7 @@
 .team-section {
     position: relative;
     width: 100%;
-    margin-top: var(--section-spacing);
+    margin-top: calc(var(--section-spacing) * 2);
     padding-bottom: 40px;
 }
 

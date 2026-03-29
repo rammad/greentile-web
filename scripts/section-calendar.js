@@ -45,15 +45,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const animateEntrance = async () => {
         const title = document.querySelector('#cal-page-container .animate-cascade');
+        const mobileTitleLines = document.querySelectorAll('.calendar-title-mobile .fit-text');
+        const isMobile = window.innerWidth <= 768;
         const subtitle = document.querySelector('.text-mask');
         const filters = document.querySelectorAll('.ui-roll');
         const rows = document.querySelectorAll('.calendar-row');
 
-        while (!title.classList.contains('is-initialized')) {
-            await wait(50);
+        if (isMobile && mobileTitleLines.length) {
+            const { fitTextToWidth } = window.AppUtils || {};
+            await document.fonts.ready;
+            if (fitTextToWidth) {
+                const lines = Array.from(mobileTitleLines);
+                lines.forEach(line => { line.style.fontSize = ''; fitTextToWidth(line); });
+                const minSize = Math.min(...lines.map(l => parseFloat(l.style.fontSize)));
+                lines.forEach(line => { line.style.fontSize = `${minSize}px`; });
+            }
+            for (let i = 0; i < mobileTitleLines.length; i++) {
+                mobileTitleLines[i].classList.add('is-initialized');
+                await wait(staggerTime * 0.3);
+            }
+        } else {
+            while (!title.classList.contains('is-initialized')) {
+                await wait(50);
+            }
+            if (title) await transitionHeader(title, 'enter');
         }
-
-        if (title) await transitionHeader(title, 'enter');
 
         await wait(staggerTime);
 
@@ -78,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     initEventInteractions();
+    initMobileFilterToggle();
     initRowPacker();
     animateEntrance();
     initMobileScrollSpy();
@@ -326,34 +343,66 @@ function initMobileScrollSpy() {
 
     datesRail.addEventListener('scroll', onDateScroll, { passive: true });
 
-    /* ── tap on poster area → navigate to active event ── */
-    let tapX = 0, tapY = 0;
-    datesRail.addEventListener('touchstart', (e) => {
-        tapX = e.touches[0].clientX;
-        tapY = e.touches[0].clientY;
+    /* ── forward poster-area swipes to dates rail ── */
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+    let swipeStartScroll = 0;
+    let isSwiping = false;
+    let swipePrevented = false;
+
+    list.addEventListener('touchstart', (e) => {
+        swipeStartX = e.touches[0].clientX;
+        swipeStartY = e.touches[0].clientY;
+        swipeStartScroll = datesRail.scrollLeft;
+        isSwiping = false;
+        swipePrevented = false;
     }, { passive: true });
 
-    datesRail.addEventListener('touchend', (e) => {
-        const dx = Math.abs(e.changedTouches[0].clientX - tapX);
-        const dy = Math.abs(e.changedTouches[0].clientY - tapY);
-        if (dx < 10 && dy < 10) {
-            const trackBottom = datesTrack.getBoundingClientRect().bottom;
-            if (e.changedTouches[0].clientY > trackBottom && activeIndex >= 0) {
-                window.location.href = items[activeIndex].getAttribute('href');
-            }
+    list.addEventListener('touchmove', (e) => {
+        const dx = e.touches[0].clientX - swipeStartX;
+        const dy = e.touches[0].clientY - swipeStartY;
+
+        if (!isSwiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 5) {
+            isSwiping = true;
+        }
+
+        if (isSwiping) {
+            e.preventDefault();
+            datesRail.scrollLeft = swipeStartScroll - dx;
+        }
+    }, { passive: false });
+
+    list.addEventListener('touchend', () => {
+        if (isSwiping) {
+            swipePrevented = true;
+
+            const railRect = datesRail.getBoundingClientRect();
+            const center = railRect.left + railRect.width / 2;
+            let nearest = dateItems[0];
+            let minDist = Infinity;
+
+            dateItems.forEach(d => {
+                const r = d.getBoundingClientRect();
+                const dist = Math.abs(r.left + r.width / 2 - center);
+                if (dist < minDist) { minDist = dist; nearest = d; }
+            });
+
+            nearest.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            setTimeout(() => { swipePrevented = false; }, 400);
         }
     }, { passive: true });
+
+    list.addEventListener('click', (e) => {
+        if (swipePrevented) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, true);
 
     /* ── initial state ── */
     document.fonts.ready.then(() => {
         requestAnimationFrame(() => {
             setSpacerWidths();
-
-            const wrapperH = wrapper.getBoundingClientRect().height;
-            const listH = list.getBoundingClientRect().height;
-            const dateH = datesTrack.getBoundingClientRect().height;
-            datesTrack.style.marginTop = (wrapperH - listH - dateH - 20) + 'px';
-
             dateItems[0].scrollIntoView({ inline: 'center', block: 'nearest' });
             activeIndex = 0;
             dateItems[0].classList.add('is-active');
@@ -472,6 +521,79 @@ function initRowPacker() {
     });
 }
 
+function initMobileFilterToggle() {
+    if (window.innerWidth > 768) return;
+
+    const controls = document.querySelector('.calendar-controls');
+    if (!controls) return;
+
+    const filtersLists = controls.querySelectorAll('.filters-list');
+    if (filtersLists.length < 2) return;
+
+    const filtersList1 = filtersLists[0];
+    const filtersList2 = filtersLists[1];
+    const filterBtns = Array.from(filtersList1.querySelectorAll('.filter-btn'));
+    const btnGrid = document.getElementById('btn-grid');
+    const archivesLink = filtersList2.querySelector('a.filter-btn');
+
+    filtersList1.style.display = 'none';
+    filtersList2.style.display = 'none';
+
+    const topRow = document.createElement('div');
+    topRow.className = 'mobile-controls-top';
+
+    const filtersToggle = document.createElement('button');
+    filtersToggle.className = 'filters-toggle type-subRegular1 ui-roll';
+    filtersToggle.innerHTML =
+        '<span class="ui-roll-layer ui-roll-visible">Filters</span>' +
+        '<span class="ui-roll-layer ui-roll-hidden">Filters</span>';
+    topRow.appendChild(filtersToggle);
+
+    const viewGroup = document.createElement('div');
+    viewGroup.className = 'mobile-view-group';
+
+    if (btnGrid) viewGroup.appendChild(btnGrid);
+
+    const divider = document.createElement('span');
+    divider.className = 'divider type-subRegular1';
+    divider.textContent = '/';
+    viewGroup.appendChild(divider);
+
+    if (archivesLink) viewGroup.appendChild(archivesLink);
+    topRow.appendChild(viewGroup);
+
+    const optionsRow = document.createElement('div');
+    optionsRow.className = 'mobile-filter-options';
+    filterBtns.forEach(btn => optionsRow.appendChild(btn));
+
+    controls.appendChild(topRow);
+    controls.appendChild(optionsRow);
+
+    filtersToggle.addEventListener('click', () => {
+        controls.classList.toggle('filters-open');
+    });
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            controls.classList.remove('filters-open');
+        });
+    });
+
+    if (btnGrid) {
+        const pageContainer = document.getElementById('cal-page-container');
+        const newBtnGrid = btnGrid.cloneNode(true);
+        btnGrid.parentNode.replaceChild(newBtnGrid, btnGrid);
+
+        newBtnGrid.addEventListener('click', () => {
+            const isGrid = pageContainer.classList.toggle('mode-grid');
+            const visible = newBtnGrid.querySelector('.ui-roll-visible');
+            const hidden = newBtnGrid.querySelector('.ui-roll-hidden');
+            if (visible) visible.textContent = isGrid ? 'List' : 'Grid';
+            if (hidden) hidden.textContent = isGrid ? 'List' : 'Grid';
+        });
+    }
+}
+
 function initControlsClamping() {
     if (window.innerWidth > 768) return;
 
@@ -496,3 +618,4 @@ function initControlsClamping() {
         }
     }, { passive: true });
 }
+

@@ -62,4 +62,10 @@
     .mission-section {
         padding: 20px var(--page-gutter);
     }
+    .mission-lines {
+        width: 80%;
+    }
+    .mission-section .type-display-hero {
+        font-size: 42px !important;
+    }
 }

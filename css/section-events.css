@@ -99,6 +99,10 @@
 }
 
 @media (max-width: 768px) {
+    .events-section {
+        margin-top: calc(var(--section-spacing) * 2);
+    }
+    
     .events-sticky-inner {
         gap: 40px;
     }

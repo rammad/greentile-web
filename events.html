@@ -51,12 +51,19 @@
         </div>
     </div>
 
+    <div id="scroll-viewport" class="scroll-viewport">
+        <div id="scroll-content" class="scroll-content">
     <section class="calendar-page" id="cal-page-container" data-colors="#FFFCFA, #D6FED6, #FFFCFA" data-edge="0">
         
         <div class="calendar-header">
-            <h1 class="type-display-hero animate-cascade">
+            <h1 class="type-display-hero animate-cascade desktop-only">
                 Spring Calendar 2025
             </h1>
+            <div class="calendar-title-mobile mobile-only">
+                <div class="type-display-hero fit-text" data-fit-managed>Spring</div>
+                <div class="type-display-hero fit-text" data-fit-managed>Calendar</div>
+                <div class="type-display-hero fit-text" data-fit-managed>2025</div>
+            </div>
 
             <div class="calendar-controls">
                 <div class="filters-list">
@@ -137,11 +144,15 @@
         </div>
 
     </section>
+        </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.0.43/dist/lenis.min.js"></script>
 
     <script src="scripts/global.js?v=12" defer></script>
     <script src="scripts/background-gradient.js?v=4" defer></script>
+    <script src="scripts/scroll.js?v=8" defer></script>
     <script src="scripts/section-calendar.js?v=7"></script>
 
 </body>
