@@ -186,17 +186,8 @@ function randomizeGridStickers() {
 }
 
 function randomizeSticker(element) {
-    const side = Math.floor(Math.random() * 4);
-    const offset = Math.random() * 75 + 10;
-
-    let top, left;
-
-    switch (side) {
-        case 0: top = 10; left = offset; break;
-        case 1: top = offset; left = 80; break;
-        case 2: top = 80; left = offset; break;
-        case 3: top = offset; left = 10; break;
-    }
+    const top = Math.random() * 75 + 10;
+    const left = 80;
 
     element.style.top = `${top}%`;
     element.style.left = `${left}%`;

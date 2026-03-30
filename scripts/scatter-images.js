@@ -1,185 +1,279 @@
-/* scatter-images.js — shared image scatter layout + depth parallax
+/* scatter-images.js — column-based image layout with depth layers
    ─────────────────────────────────────────────────────────────────
-   Used by section-what-we-do.js, section-about-alt.js, and any
-   future section that needs the scattered-photo-wall treatment.
-   
-   Usage:
-     var scatter = ScatterImages.init(sectionEl, viewportEl, numSlides, {
-         colLeftXMax:  22,          // override any default
-         colRightXMin: 62,
-         slideHeightVhDesktop: 1.4
-     });
+   Images are placed into fixed vertical columns rather than being
+   randomly scattered.  Front columns sit on the left/right edges
+   with full opacity; back columns sit closer to center with blur
+   and reduced opacity for atmospheric depth.
+
+   Back-layer images are cloned from the front-layer source images
+   automatically — no extra assets needed.
+
+   Responsive tiers:
+     desktop  (≥1200):  4 front + 4 back  = 8 columns
+     tablet   (768–1199): 2 front + 2 back = 4 columns
+     mobile   (<768):    2 front + 2 back  = 4 columns
+
+   Usage (same API as the previous scatter module):
+     var scatter = ScatterImages.init(sectionEl, viewportEl, numSlides, {});
      scatter.initLayout();          // call again on resize
      scatter.updateImageScales();   // call on every scroll frame          */
 
 (function () {
 
-    var DEFAULTS = {
-        mobileBreakpoint:       768,
-        stepYMobile:            150,
-        stepYDesktop:           130,
-        colLeftXMin:            -5,
-        colLeftXMax:            12,
-        colRightXMin:           75,
-        colRightXMax:           95,
-        colLeftXMobile:         0,
-        colRightXMobile:        80,
-        imgWidthMobilePxMin:    100,
-        imgWidthMobilePxMax:    120,
-        imgWidthDesktopMin:     7,
-        imgWidthDesktopMax:     15,
-        jitterRange:            80,
-        zIndexMax:              20,
-        variationMinDiff:       0.2,
-        scaleMin:               1.0,
-        scaleMax:               1.0,
-        depthParallaxStrength:  0.28,
-        speedFactorMin:         0.90,
-        speedFactorMax:         1.10,
-        overlapMinGap:          -250,
-        parallaxSafetyDepth:    0.35,
-        slideHeightVhDesktop:   0.75,
-        slideHeightVhMobile:    0.60,
-        textAvoidancePx:        60,
-        textAvoidanceZone:      0.40,
-        frameCount:             0,
-        frameInsetPct:          20,
-        overhangTopVh:          0
+    // ── column definitions per breakpoint ─────────────────────────────────
+
+    var COLUMNS = {
+        desktop: [
+            //        x       layer    stagger (centered around 0)
+            // Left side — back-outer nestles between the two front columns
+            { id: 'fol', x: -2,  layer: 'front', stagger:  0.08 },
+            { id: 'bol', x: 6,   layer: 'back',  stagger: -0.10 },
+            { id: 'fil', x: 14,  layer: 'front', stagger: -0.25, frameInset: 8  },
+            { id: 'bil', x: 26,  layer: 'back',  stagger: -0.20, frameInset: 8  },
+            // Right side — mirror
+            { id: 'bir', x: 66,  layer: 'back',  stagger: -0.20, frameInset: -8 },
+            { id: 'fir', x: 76,  layer: 'front', stagger: -0.25, frameInset: -8 },
+            { id: 'bor', x: 84,  layer: 'back',  stagger: -0.10 },
+            { id: 'for', x: 91,  layer: 'front', stagger:  0.08 }
+        ],
+        tablet: [
+            { id: 'fl',  x: 0,   layer: 'front', stagger: -0.20 },
+            { id: 'bl',  x: 12,  layer: 'back',  stagger:  0.20 },
+            { id: 'br',  x: 76,  layer: 'back',  stagger:  0.20 },
+            { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20 }
+        ],
+        mobile: [
+            { id: 'fl',  x: -3,  layer: 'front', stagger: -0.20 },
+            { id: 'bl',  x: 16,  layer: 'back',  stagger:  0.20 },
+            { id: 'br',  x: 60,  layer: 'back',  stagger:  0.20 },
+            { id: 'fr',  x: 78,  layer: 'front', stagger: -0.20 }
+        ]
     };
 
-    function merge(defaults, overrides) {
+    var DEFAULTS = {
+        // ── breakpoints ────────────────────────────────────────────────────
+        mobileBreakpoint:       768,   // px — below this = mobile layout
+        tabletBreakpoint:       1200,  // px — below this = tablet, above = desktop
+
+        // ── section height ─────────────────────────────────────────────────
+        slideHeightVhDesktop:   0.75,  // vh per slide — controls total section height (desktop)
+        slideHeightVhMobile:    0.60,  // vh per slide — same for mobile
+
+        // ── image sizing (desktop/tablet) ──────────────────────────────────
+        frontWidthMinVw:        8,     // vw — smallest front image width
+        frontWidthMaxVw:        12,    // vw — largest front image width
+        backWidthMinVw:         6,     // vw — smallest back image width
+        backWidthMaxVw:         9,     // vw — largest back image width
+
+        // ── image sizing (mobile) ──────────────────────────────────────────
+        mobileFrontWidthMinPx:  65,    // px — smallest front image width on mobile
+        mobileFrontWidthMaxPx:  95,    // px — largest front image width on mobile
+        mobileBackWidthMinPx:   50,    // px — smallest back image width on mobile
+        mobileBackWidthMaxPx:   70,    // px — largest back image width on mobile
+
+        // ── vertical & horizontal scatter ──────────────────────────────────
+        verticalJitter:         0.12,  // 0–1 — random vertical offset per image (fraction of spacing)
+        horizontalJitterPct:    1.5,   // % — random horizontal offset per image within its column
+
+        // ── parallax ───────────────────────────────────────────────────────
+        frontSpeedMin:          0.94,  // parallax speed range for front images (1.0 = natural scroll)
+        frontSpeedMax:          1.06,
+        backSpeedMin:           0.55,  // parallax speed range for back images (lower = more parallax)
+        backSpeedMax:           0.70,
+        depthParallaxStrength:  0.50,  // multiplier — overall parallax intensity
+
+        // ── image counts & layout ──────────────────────────────────────────
+        backImagesPerCol:       3,     // cloned back images per back column
+        maxImagesPerColMobile:  6,     // max front images per column on mobile
+        frameCount:             1,     // images at the top of inner front columns to inset toward center
+
+        // ── spacing ────────────────────────────────────────────────────────
+        edgePadding:            0,     // 0–1 — fraction of section height reserved at top and bottom edges
+
+        overhangTopVh:          0      // vh — extra height above the section (desktop only)
+    };
+
+    // ── utilities ─────────────────────────────────────────────────────────
+
+    function mergeConfig(defaults, overrides) {
         var out = {};
         for (var k in defaults) {
             if (defaults.hasOwnProperty(k)) {
-                out[k] = (overrides && overrides.hasOwnProperty(k)) ? overrides[k] : defaults[k];
+                out[k] = (overrides && overrides.hasOwnProperty(k))
+                    ? overrides[k] : defaults[k];
             }
         }
         return out;
     }
 
-    function getVariedRandom(min, max, prev, minDiff) {
-        if (prev === null || prev === undefined)
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        var range   = max - min;
-        var minDist = range * minDiff;
-        var attempts = 0, value;
-        do {
-            value = Math.floor(Math.random() * (max - min + 1)) + min;
-            attempts++;
-        } while (Math.abs(value - prev) < minDist && attempts < 10);
-        return value;
+    function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
     }
 
-    // ── public API ─────────────────────────────────────────────────────────
+    function randRange(min, max) {
+        return min + Math.random() * (max - min);
+    }
+
+    // ── public API ────────────────────────────────────────────────────────
 
     function init(section, viewport, numSlides, config) {
-        var C      = merge(DEFAULTS, config);
+        var C      = mergeConfig(DEFAULTS, config);
         var track  = section.querySelector('.about-image-track');
-        var images = track ? Array.from(track.querySelectorAll('.scatter-img')) : [];
-        var state  = { trackHeight: 0, fullHeight: 0 };
+        var sourceImages = track
+            ? Array.from(track.querySelectorAll('.scatter-img:not(.back-layer)'))
+            : [];
+        var allElements = [];
+        var backClones  = [];
+        var state       = { trackHeight: 0, fullHeight: 0 };
+
+        function getBreakpoint() {
+            var w = window.innerWidth;
+            if (w < C.mobileBreakpoint)  return 'mobile';
+            if (w < C.tabletBreakpoint)  return 'tablet';
+            return 'desktop';
+        }
+
+        // ── layout ────────────────────────────────────────────────────────
 
         function initLayout() {
-            var isMobile = window.innerWidth < C.mobileBreakpoint;
-            var stepY    = isMobile ? C.stepYMobile : C.stepYDesktop;
+            backClones.forEach(function (el) { el.remove(); });
+            backClones  = [];
+            allElements = [];
+
+            var bp       = getBreakpoint();
+            var isMobile = bp === 'mobile';
             var vpW      = window.innerWidth;
             var vpH      = window.innerHeight;
+            var columns  = COLUMNS[bp];
 
-            var minWPx, maxWPx;
-            if (isMobile) {
-                minWPx = C.imgWidthMobilePxMin;
-                maxWPx = C.imgWidthMobilePxMax;
-            } else {
-                minWPx = Math.round((C.imgWidthDesktopMin / 100) * vpW);
-                maxWPx = Math.round((C.imgWidthDesktopMax / 100) * vpW);
-            }
+            var slideVH          = isMobile ? C.slideHeightVhMobile : C.slideHeightVhDesktop;
+            var totalSlideHeight = numSlides * slideVH * vpH;
+            var sectionPadding   = parseFloat(getComputedStyle(section).paddingTop) || 0;
+            var overhangPx       = isMobile ? 0 : C.overhangTopVh * vpH;
+            var fullSectionHeight = overhangPx + sectionPadding + totalSlideHeight;
 
-            var colLXMin = isMobile ? C.colLeftXMobile   : C.colLeftXMin;
-            var colLXMax = isMobile ? C.colLeftXMobile   : C.colLeftXMax;
-            var colRXMin = isMobile ? C.colRightXMobile  : C.colRightXMin;
-            var colRXMax = isMobile ? C.colRightXMobile  : C.colRightXMax;
+            var frontCols = columns.filter(function (c) { return c.layer === 'front'; });
+            var backCols  = columns.filter(function (c) { return c.layer === 'back';  });
 
-            var slideVH            = isMobile ? C.slideHeightVhMobile : C.slideHeightVhDesktop;
-            var totalSlideHeight   = numSlides * slideVH * vpH;
-            var sectionPadding     = parseFloat(getComputedStyle(section).paddingTop) || 0;
-            var overhangPx         = isMobile ? 0 : C.overhangTopVh * vpH;
-            var fullSectionHeight  = overhangPx + sectionPadding + totalSlideHeight;
+            // ── distribute source images into front columns (round-robin) ──
 
-            var currentY  = 0;
-            var prevLeft  = { x: null, w: null };
-            var prevRight = { x: null, w: null };
+            var frontBuckets = {};
+            frontCols.forEach(function (c) { frontBuckets[c.id] = []; });
 
-            // first pass — assign initial positions
-            var imageData = [];
-            images.forEach(function (img, index) {
-                var isLeft = index % 2 === 0;
-                var prev   = isLeft ? prevLeft : prevRight;
+            var maxPerCol = isMobile ? C.maxImagesPerColMobile : 999;
 
-                var isFrame = C.frameCount > 0 && !isMobile &&
-                    (index < C.frameCount * 2 || index >= images.length - C.frameCount * 2);
-                var inset   = isFrame ? C.frameInsetPct : 0;
-                var minX    = isLeft ? colLXMin + inset : colRXMin - inset;
-                var maxX    = isLeft ? colLXMax + inset : colRXMax - inset;
-                var randomX = getVariedRandom(minX, maxX, prev.x, C.variationMinDiff);
-                var randomW = getVariedRandom(minWPx, maxWPx, prev.w, C.variationMinDiff);
-
-                var jitter     = Math.floor(Math.random() * C.jitterRange) - C.jitterRange / 2;
-                var naturalTop = currentY + jitter;
-
-                var normalizedSize = (randomW - minWPx) / Math.max(1, maxWPx - minWPx);
-                var speedFactor    = parseFloat((
-                    C.speedFactorMin + normalizedSize * (C.speedFactorMax - C.speedFactorMin)
-                ).toFixed(3));
-
-                imageData.push({
-                    img: img, naturalTop: naturalTop, widthPx: randomW,
-                    x: randomX, normalizedSize: normalizedSize, speedFactor: speedFactor
-                });
-                prev.x = randomX;
-                prev.w = randomW;
-                currentY += stepY;
-            });
-
-            // second pass — resolve same-column overlaps
-            var speedRange     = C.speedFactorMax - C.speedFactorMin;
-            var parallaxBuffer = vpH * C.parallaxSafetyDepth * speedRange * C.depthParallaxStrength;
-
-            for (var i = 2; i < imageData.length; i++) {
-                var prevD = imageData[i - 2];
-                var curr  = imageData[i];
-                var prevHeightPx = prevD.widthPx * (5 / 4);
-                var minRequiredTop = prevD.naturalTop + prevHeightPx + parallaxBuffer + C.overlapMinGap;
-                if (curr.naturalTop < minRequiredTop) {
-                    var delta = minRequiredTop - curr.naturalTop;
-                    for (var j = i; j < imageData.length; j += 2) {
-                        imageData[j].naturalTop += delta;
-                    }
+            sourceImages.forEach(function (img, i) {
+                var col = frontCols[i % frontCols.length];
+                if (frontBuckets[col.id].length < maxPerCol) {
+                    frontBuckets[col.id].push(img);
                 }
-            }
-
-            // third pass — normalize positions to fill section height
-            var rawMinTop = Infinity, rawMaxBottom = -Infinity, bottomImgH = 0;
-            imageData.forEach(function (d) {
-                var h = d.widthPx * (5 / 4);
-                if (d.naturalTop < rawMinTop) rawMinTop = d.naturalTop;
-                if (d.naturalTop + h > rawMaxBottom) { rawMaxBottom = d.naturalTop + h; bottomImgH = h; }
             });
-            var srcRange = (rawMaxBottom - bottomImgH) - rawMinTop;
-            var dstRange = fullSectionHeight - bottomImgH;
-            if (srcRange > 0 && dstRange > 0) {
-                imageData.forEach(function (d) {
-                    d.naturalTop = ((d.naturalTop - rawMinTop) / srcRange) * dstRange;
+
+            // track which source images are placed so we can hide the rest
+            var usedIdx = {};
+            frontCols.forEach(function (c) {
+                frontBuckets[c.id].forEach(function (img) {
+                    usedIdx[sourceImages.indexOf(img)] = true;
+                });
+            });
+            sourceImages.forEach(function (img, idx) {
+                img.style.display = usedIdx[idx] ? '' : 'none';
+            });
+
+            // ── create back-layer clones ───────────────────────────────────
+
+            var backBuckets = {};
+            backCols.forEach(function (c) { backBuckets[c.id] = []; });
+
+            if (backCols.length > 0 && sourceImages.length > 0) {
+                var srcPool = shuffle(sourceImages.map(function (img) { return img.src; }));
+                var poolIdx = 0;
+                backCols.forEach(function (col) {
+                    for (var i = 0; i < C.backImagesPerCol; i++) {
+                        var clone = document.createElement('img');
+                        clone.src = srcPool[poolIdx % srcPool.length];
+                        clone.className = 'scatter-img back-layer';
+                        clone.setAttribute('aria-hidden', 'true');
+                        track.appendChild(clone);
+                        backClones.push(clone);
+                        backBuckets[col.id].push(clone);
+                        poolIdx++;
+                    }
                 });
             }
 
-            // apply final positions
-            imageData.forEach(function (d, index) {
-                d.img.style.width         = d.widthPx + 'px';
-                d.img.style.left          = d.x + '%';
-                d.img.style.top           = d.naturalTop + 'px';
-                d.img.dataset.naturalTop  = String(d.naturalTop);
-                d.img.style.zIndex        = 1 + Math.round(d.normalizedSize * (C.zIndexMax - 1));
-                d.img.dataset.speedFactor = String(d.speedFactor);
-                d.img.dataset.isLeft      = index % 2 === 0 ? '1' : '0';
+            // ── size ranges ────────────────────────────────────────────────
+
+            var frontMinW, frontMaxW, backMinW, backMaxW;
+            if (isMobile) {
+                frontMinW = C.mobileFrontWidthMinPx;
+                frontMaxW = C.mobileFrontWidthMaxPx;
+                backMinW  = C.mobileBackWidthMinPx;
+                backMaxW  = C.mobileBackWidthMaxPx;
+            } else {
+                frontMinW = Math.round((C.frontWidthMinVw / 100) * vpW);
+                frontMaxW = Math.round((C.frontWidthMaxVw / 100) * vpW);
+                backMinW  = Math.round((C.backWidthMinVw  / 100) * vpW);
+                backMaxW  = Math.round((C.backWidthMaxVw  / 100) * vpW);
+            }
+
+            // ── position each column's images ──────────────────────────────
+
+            function positionColumn(colDef, images, minW, maxW, isBack) {
+                var count = images.length;
+                if (count === 0) return;
+
+                var edgeTop    = fullSectionHeight * C.edgePadding;
+                var usable     = fullSectionHeight * (1 - 2 * C.edgePadding);
+                var spacing    = usable / Math.max(1, count);
+                var staggerPx  = (colDef.stagger || 0) * spacing;
+                var jitterAmt  = spacing * C.verticalJitter;
+                var frameInset = colDef.frameInset || 0;
+                var frameN     = frameInset ? C.frameCount : 0;
+
+                images.forEach(function (img, i) {
+                    var baseTop = edgeTop + spacing * (i + 0.5) + staggerPx;
+                    var jitter  = (Math.random() - 0.5) * 2 * jitterAmt;
+                    var imgW    = Math.round(randRange(minW, maxW));
+                    var imgH    = imgW * (5 / 4);
+                    var top     = Math.max(0, Math.min(fullSectionHeight - imgH, baseTop + jitter));
+
+                    var speed = isBack
+                        ? randRange(C.backSpeedMin, C.backSpeedMax)
+                        : randRange(C.frontSpeedMin, C.frontSpeedMax);
+
+                    if (isBack) {
+                        var midDepth = (vpH + fullSectionHeight) * 0.5;
+                        top -= midDepth * (1 - speed) * C.depthParallaxStrength;
+                        top = Math.max(0, Math.min(fullSectionHeight - imgH, top));
+                    }
+
+                    var xJitter = (Math.random() - 0.5) * 2 * C.horizontalJitterPct;
+                    var insetX  = (frameN > 0 && i < frameN)
+                        ? frameInset : 0;
+
+                    img.style.position = 'absolute';
+                    img.style.width    = imgW + 'px';
+                    img.style.left     = (colDef.x + xJitter + insetX) + '%';
+                    img.style.top      = top + 'px';
+                    img.style.zIndex   = isBack ? 2 : 10;
+                    img.dataset.naturalTop  = String(top);
+                    img.dataset.speedFactor = speed.toFixed(3);
+
+                    allElements.push(img);
+                });
+            }
+
+            frontCols.forEach(function (col) {
+                positionColumn(col, frontBuckets[col.id], frontMinW, frontMaxW, false);
+            });
+            backCols.forEach(function (col) {
+                positionColumn(col, backBuckets[col.id], backMinW, backMaxW, true);
             });
 
             state.trackHeight = totalSlideHeight;
@@ -187,56 +281,34 @@
             if (track) track.style.height = state.fullHeight + 'px';
         }
 
+        // ── parallax on scroll ────────────────────────────────────────────
+
         function updateImageScales() {
             if (!viewport) return;
-            var viewportRect    = viewport.getBoundingClientRect();
-            var viewportCenterY = viewportRect.height / 2;
-            var sectionTop      = section.getBoundingClientRect().top;
-            var depthOffset     = Math.max(0, viewportRect.height - sectionTop);
-            var isMobile        = window.innerWidth < C.mobileBreakpoint;
+            var vpRect     = viewport.getBoundingClientRect();
+            var sectionTop = section.getBoundingClientRect().top;
+            var depth      = Math.max(0, vpRect.height - sectionTop);
 
-            images.forEach(function (img) {
-                var imgRect    = img.getBoundingClientRect();
-                var imgCenterY = imgRect.top + imgRect.height / 2 - viewportRect.top;
-                var dist       = Math.abs(imgCenterY - viewportCenterY);
-                var proximity  = 1 - Math.min(dist / (viewportRect.height / 2), 1);
-                var scale      = C.scaleMin + (C.scaleMax - C.scaleMin) * proximity;
+            allElements.forEach(function (img) {
+                var speed      = parseFloat(img.dataset.speedFactor || '1');
+                var parallaxY  = depth * (1 - speed) * C.depthParallaxStrength;
+                var naturalTop = parseFloat(img.dataset.naturalTop || '0');
+                var imgH       = img.offsetHeight || 0;
+                var minP       = -naturalTop;
+                var maxP       = state.fullHeight - naturalTop - imgH;
+                var clamped    = Math.max(minP, Math.min(maxP, parallaxY));
 
-                var speedFactor = parseFloat(img.dataset.speedFactor || '1');
-                var parallaxY   = depthOffset * (1 - speedFactor) * C.depthParallaxStrength;
-
-                var naturalTop  = parseFloat(img.dataset.naturalTop || '0');
-                var imgH        = img.offsetHeight;
-                var minParallax = -naturalTop;
-                var maxParallax = state.fullHeight - naturalTop - imgH;
-                var clampedY    = Math.max(minParallax, Math.min(maxParallax, parallaxY));
-
-                var pushX = 0;
-                if (isMobile && C.textAvoidancePx > 0) {
-                    var avoidCenterY = viewportCenterY;
-                    if (api.avoidanceEl) {
-                        var elRect = api.avoidanceEl.getBoundingClientRect();
-                        avoidCenterY = elRect.top + elRect.height / 2 - viewportRect.top;
-                    }
-                    var avoidDist = Math.abs(imgCenterY - avoidCenterY);
-                    var zone = viewportRect.height * C.textAvoidanceZone;
-                    if (avoidDist < zone) {
-                        var t = 1 - (avoidDist / zone);
-                        var strength = t * t * (3 - 2 * t); // smoothstep
-                        var isLeft = img.dataset.isLeft === '1';
-                        pushX = strength * C.textAvoidancePx * (isLeft ? -1 : 1);
-                    }
-                }
-
-                img.style.transform = 'translate(' + pushX.toFixed(2) + 'px, ' + clampedY.toFixed(2) + 'px) scale(' + scale + ')';
+                img.style.transform = 'translateY(' + clamped.toFixed(2) + 'px)';
             });
         }
 
+        // ── expose ────────────────────────────────────────────────────────
+
         var api = {
-            state: state,
-            initLayout: initLayout,
+            state:             state,
+            initLayout:        initLayout,
             updateImageScales: updateImageScales,
-            avoidanceEl: null
+            avoidanceEl:       null
         };
 
         initLayout();

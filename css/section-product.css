@@ -15,7 +15,7 @@
     right: 0;
     width: 100%;
     height: calc(100vh - var(--space-for-nav));
-    padding: 0 var(--page-gutter);
+    padding: 40px var(--page-gutter);
     box-sizing: border-box;
 }
 
@@ -220,7 +220,7 @@
     background-color: var(--c-dark-green-10);
     padding: 4px 8px calc(4px / 2);
     border-radius: 4px;
-    margin: 0 8px 8px 0;
+    margin: 0 4px 8px 0;
     opacity: 0;
     transition: opacity var(--time-fade-in) ease;
 }
