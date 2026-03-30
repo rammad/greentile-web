@@ -13,15 +13,25 @@
     const BODY_BLUR_PX        = 8;     // px — blur on hidden body text blocks
     const BODY_GAP_VH         = 0.05;  // vh — gap between menu bottom and body text top
 
-    // ── menu entrance ──────────────────────────────────────────────────────
-    const MENU_START_VH       = 0.3;   // vh — how far below resting position the menu starts
-    const MENU_SCROLL_RATE    = 0.75;  // 0–1 — menu speed as fraction of scroll during linear phase
-    const MENU_EASE_PX        = 500;   // px — scroll distance for deceleration into resting position
+    // ── menu entrance (desktop) ──────────────────────────────────────────
+    const MENU_START_VH           = 0.3;
+    const MENU_SCROLL_RATE        = 0.75;
+    const MENU_EASE_PX            = 500;
 
-    // ── menu exit ──────────────────────────────────────────────────────────
-    const MENU_EXIT_START     = 100;     // px — offset from viewport bottom where exit begins (0 = at edge)
-    const MENU_EXIT_RATE      = 0.75;  // 0–1 — exit drift speed as fraction of scroll
-    const MENU_EXIT_EASE_PX   = 300;   // px — scroll distance to accelerate from standstill to exit rate
+    // ── menu entrance (mobile) ───────────────────────────────────────────
+    const MENU_START_VH_MOBILE    = 0.4;
+    const MENU_SCROLL_RATE_MOBILE = 0.85;
+    const MENU_EASE_PX_MOBILE     = 200;
+
+    // ── menu exit (desktop) ──────────────────────────────────────────────
+    const MENU_EXIT_START         = 100;
+    const MENU_EXIT_RATE          = 0.75;
+    const MENU_EXIT_EASE_PX       = 300;
+
+    // ── menu exit (mobile) ───────────────────────────────────────────────
+    const MENU_EXIT_START_MOBILE  = 140;
+    const MENU_EXIT_RATE_MOBILE   = 0.85;
+    const MENU_EXIT_EASE_PX_MOBILE = 300;
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('about');
@@ -187,26 +197,33 @@
             }
 
             if (menuEl) {
-                const startPx = MENU_START_VH * vpH;
+                const mStartVH  = isMobile ? MENU_START_VH_MOBILE    : MENU_START_VH;
+                const mRate     = isMobile ? MENU_SCROLL_RATE_MOBILE : MENU_SCROLL_RATE;
+                const mEase     = isMobile ? MENU_EASE_PX_MOBILE     : MENU_EASE_PX;
+                const mExStart  = isMobile ? MENU_EXIT_START_MOBILE  : MENU_EXIT_START;
+                const mExRate   = isMobile ? MENU_EXIT_RATE_MOBILE   : MENU_EXIT_RATE;
+                const mExEase   = isMobile ? MENU_EXIT_EASE_PX_MOBILE : MENU_EXIT_EASE_PX;
+
+                const startPx = mStartVH * vpH;
 
                 const scrollPast = revealVH * vpH - secRect.top;
-                const brakeDist  = MENU_SCROLL_RATE * MENU_EASE_PX / 2;
+                const brakeDist  = mRate * mEase / 2;
 
                 let menuTravel = 0;
                 if (scrollPast > 0) {
                     if (brakeDist < startPx) {
                         const linearDist   = startPx - brakeDist;
-                        const linearScroll = linearDist / MENU_SCROLL_RATE;
+                        const linearScroll = linearDist / mRate;
                         if (scrollPast <= linearScroll) {
-                            menuTravel = scrollPast * MENU_SCROLL_RATE;
+                            menuTravel = scrollPast * mRate;
                         } else {
-                            const t = Math.min(1, (scrollPast - linearScroll) / MENU_EASE_PX);
-                            menuTravel = linearDist + MENU_SCROLL_RATE * MENU_EASE_PX * (t - t * t / 2);
+                            const t = Math.min(1, (scrollPast - linearScroll) / mEase);
+                            menuTravel = linearDist + mRate * mEase * (t - t * t / 2);
                         }
                     } else {
-                        const v0 = 2 * startPx / MENU_EASE_PX;
-                        const t  = Math.min(1, scrollPast / MENU_EASE_PX);
-                        menuTravel = v0 * MENU_EASE_PX * (t - t * t / 2);
+                        const v0 = 2 * startPx / mEase;
+                        const t  = Math.min(1, scrollPast / mEase);
+                        menuTravel = v0 * mEase * (t - t * t / 2);
                     }
                 }
 
@@ -216,14 +233,14 @@
 
                 let exitY = 0;
                 const distToBottom = secRect.bottom - vpH;
-                const exitScroll   = Math.max(0, MENU_EXIT_START - distToBottom);
+                const exitScroll   = Math.max(0, mExStart - distToBottom);
                 if (exitScroll > 0) {
-                    if (exitScroll <= MENU_EXIT_EASE_PX) {
-                        const t = exitScroll / MENU_EXIT_EASE_PX;
-                        exitY = -(MENU_EXIT_RATE * MENU_EXIT_EASE_PX * t * t / 2);
+                    if (exitScroll <= mExEase) {
+                        const t = exitScroll / mExEase;
+                        exitY = -(mExRate * mExEase * t * t / 2);
                     } else {
-                        const easeDist = MENU_EXIT_RATE * MENU_EXIT_EASE_PX / 2;
-                        exitY = -(easeDist + MENU_EXIT_RATE * (exitScroll - MENU_EXIT_EASE_PX));
+                        const easeDist = mExRate * mExEase / 2;
+                        exitY = -(easeDist + mExRate * (exitScroll - mExEase));
                     }
                 }
 

@@ -66,9 +66,14 @@
         width: 80%;
     }
     .mission-section .type-display-hero {
-        font-size: 28px !important;
+        font-size: 32px !important;
         line-height: var(--lh-single);
         text-box: normal;
         margin-bottom: 0;
+    }
+
+    .mission-section .text-mask{
+        line-height: var(--lh-single);
+        padding-top: 4px;
     }
 }

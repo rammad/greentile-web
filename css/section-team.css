@@ -138,10 +138,6 @@
 }
 
 @media (max-width: 768px) {
-    .team-section {
-        padding-bottom: 20px;
-    }
-
     .team-layout {
         grid-template-columns: 1fr;
         row-gap: 40px;

@@ -172,8 +172,17 @@
 
 @media (max-width: 768px) {
     .what-we-do .about-menu-persistent { top: 18vh; }
-    .about-menu-persistent .menu-item { font-size: 40px; word-spacing: 100vw; line-height: var(--lh-single); }
+    .about-menu-persistent .menu-item { word-spacing: 100vw; line-height: var(--lh-single); }
     .about-menu-persistent .menu-item .ws-normal { word-spacing: normal; }
 
-    .what-we-do-body .about-text-block { max-width: 280px; }
+    .about-menu-persistent .menu-label {
+        line-height: var(--lh-tight);
+        text-box: trim-both cap alphabetic;
+    }
+
+    .about-menu-persistent ul {
+        gap: var(--gap-text);
+    }
+
+    .what-we-do-body .about-text-block { max-width: 240px; }
 }

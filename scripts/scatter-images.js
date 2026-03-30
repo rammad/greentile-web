@@ -43,10 +43,10 @@
             { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20 }
         ],
         mobile: [
-            { id: 'fl',  x: -3,  layer: 'front', stagger: -0.20 },
-            { id: 'bl',  x: 16,  layer: 'back',  stagger:  0.20 },
-            { id: 'br',  x: 60,  layer: 'back',  stagger:  0.20 },
-            { id: 'fr',  x: 78,  layer: 'front', stagger: -0.20 }
+            { id: 'fl',  x: -4, layer: 'front', stagger: -0.20, frameInset: 8 },
+            { id: 'bl',  x: 16,   layer: 'back',  stagger: -0.15, frameInset: 8 },
+            { id: 'br',  x: 68,  layer: 'back',  stagger: -0.15, frameInset: -8 },
+            { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20, frameInset: -8 }
         ]
     };
 
@@ -57,23 +57,31 @@
 
         // ── section height ─────────────────────────────────────────────────
         slideHeightVhDesktop:   0.75,  // vh per slide — controls total section height (desktop)
-        slideHeightVhMobile:    0.60,  // vh per slide — same for mobile
+        slideHeightVhMobile:    0.85,  // vh per slide — same for mobile
 
-        // ── image sizing (desktop/tablet) ──────────────────────────────────
-        frontWidthMinVw:        7,     // vw — smallest front image width
-        frontWidthMaxVw:        14,    // vw — largest front image width
-        backWidthMinVw:         6,     // vw — smallest back image width
-        backWidthMaxVw:         9,     // vw — largest back image width
+        // ── image sizing (desktop) ────────────────────────────────────────
+        desktopFrontMinPx:      120,   // px — smallest front image width on desktop
+        desktopFrontMaxPx:      180,   // px — largest front image width on desktop
+        desktopBackMinPx:       80,    // px — smallest back image width on desktop
+        desktopBackMaxPx:       120,   // px — largest back image width on desktop
 
-        // ── image sizing (mobile) ──────────────────────────────────────────
-        mobileFrontWidthMinPx:  65,    // px — smallest front image width on mobile
-        mobileFrontWidthMaxPx:  95,    // px — largest front image width on mobile
-        mobileBackWidthMinPx:   50,    // px — smallest back image width on mobile
-        mobileBackWidthMaxPx:   70,    // px — largest back image width on mobile
+        // ── image sizing (tablet) ─────────────────────────────────────────
+        tabletFrontMinPx:       90,    // px — smallest front image width on tablet
+        tabletFrontMaxPx:       140,   // px — largest front image width on tablet
+        tabletBackMinPx:        60,    // px — smallest back image width on tablet
+        tabletBackMaxPx:        90,    // px — largest back image width on tablet
+
+        // ── image sizing (mobile) ─────────────────────────────────────────
+        mobileFrontMinPx:       80,    // px — smallest front image width on mobile
+        mobileFrontMaxPx:       120,   // px — largest front image width on mobile
+        mobileBackMinPx:        50,    // px — smallest back image width on mobile
+        mobileBackMaxPx:        70,    // px — largest back image width on mobile
 
         // ── vertical & horizontal scatter ──────────────────────────────────
         verticalJitter:         0.12,  // 0–1 — random vertical offset for front images (fraction of spacing)
         backVerticalJitter:     0.30,  // 0–1 — random vertical offset for back images (fraction of spacing)
+        mobileVerticalJitter:   0.30,  // 0–1 — front vertical jitter on mobile
+        mobileBackVerticalJitter: 0.40, // 0–1 — back vertical jitter on mobile
         horizontalJitterPct:    1.5,   // % — random horizontal offset per image within its column
 
         // ── parallax ───────────────────────────────────────────────────────
@@ -85,8 +93,10 @@
 
         // ── image counts & layout ──────────────────────────────────────────
         backImagesPerCol:       5,     // cloned back images per back column
-        maxImagesPerColMobile:  6,     // max front images per column on mobile
-        frameCount:             1,     // images at the top of inner front columns to inset toward center
+        mobileBackImagesPerCol: 8,     // cloned back images per back column on mobile
+        maxImagesPerColMobile:  10,    // max front images per column on mobile
+        frameCount:             1,     // images at top and bottom of each inner column to inset toward center (desktop)
+        mobileFrameCount:       1,     // same but for mobile (more images per column so needs more)
 
         // ── spacing ────────────────────────────────────────────────────────
         edgePadding:            0,     // 0–1 — fraction of section height reserved at top and bottom edges
@@ -194,8 +204,9 @@
             if (backCols.length > 0 && sourceImages.length > 0) {
                 var srcPool = shuffle(sourceImages.map(function (img) { return img.src; }));
                 var poolIdx = 0;
+                var backPerCol = isMobile ? C.mobileBackImagesPerCol : C.backImagesPerCol;
                 backCols.forEach(function (col) {
-                    for (var i = 0; i < C.backImagesPerCol; i++) {
+                    for (var i = 0; i < backPerCol; i++) {
                         var clone = document.createElement('img');
                         clone.src = srcPool[poolIdx % srcPool.length];
                         clone.className = 'scatter-img back-layer';
@@ -212,15 +223,20 @@
 
             var frontMinW, frontMaxW, backMinW, backMaxW;
             if (isMobile) {
-                frontMinW = C.mobileFrontWidthMinPx;
-                frontMaxW = C.mobileFrontWidthMaxPx;
-                backMinW  = C.mobileBackWidthMinPx;
-                backMaxW  = C.mobileBackWidthMaxPx;
+                frontMinW = C.mobileFrontMinPx;
+                frontMaxW = C.mobileFrontMaxPx;
+                backMinW  = C.mobileBackMinPx;
+                backMaxW  = C.mobileBackMaxPx;
+            } else if (bp === 'tablet') {
+                frontMinW = C.tabletFrontMinPx;
+                frontMaxW = C.tabletFrontMaxPx;
+                backMinW  = C.tabletBackMinPx;
+                backMaxW  = C.tabletBackMaxPx;
             } else {
-                frontMinW = Math.round((C.frontWidthMinVw / 100) * vpW);
-                frontMaxW = Math.round((C.frontWidthMaxVw / 100) * vpW);
-                backMinW  = Math.round((C.backWidthMinVw  / 100) * vpW);
-                backMaxW  = Math.round((C.backWidthMaxVw  / 100) * vpW);
+                frontMinW = C.desktopFrontMinPx;
+                frontMaxW = C.desktopFrontMaxPx;
+                backMinW  = C.desktopBackMinPx;
+                backMaxW  = C.desktopBackMaxPx;
             }
 
             // ── position each column's images ──────────────────────────────
@@ -233,9 +249,12 @@
                 var usable     = fullSectionHeight * (1 - 2 * C.edgePadding);
                 var spacing    = usable / Math.max(1, count);
                 var staggerPx  = (colDef.stagger || 0) * spacing;
-                var jitterAmt  = spacing * (isBack ? C.backVerticalJitter : C.verticalJitter);
+                var jitterVal  = isMobile
+                    ? (isBack ? C.mobileBackVerticalJitter : C.mobileVerticalJitter)
+                    : (isBack ? C.backVerticalJitter : C.verticalJitter);
+                var jitterAmt  = spacing * jitterVal;
                 var frameInset = colDef.frameInset || 0;
-                var frameN     = frameInset ? C.frameCount : 0;
+                var frameN     = frameInset ? (isMobile ? C.mobileFrameCount : C.frameCount) : 0;
 
                 images.forEach(function (img, i) {
                     var baseTop = edgeTop + spacing * (i + 0.5) + staggerPx;
@@ -251,7 +270,7 @@
                         : randRange(C.frontSpeedMin, C.frontSpeedMax);
 
                     var xJitter = (Math.random() - 0.5) * 2 * C.horizontalJitterPct;
-                    var insetX  = (frameN > 0 && i < frameN)
+                    var insetX  = (frameN > 0 && (i < frameN || i >= count - frameN))
                         ? frameInset : 0;
 
                     img.style.display  = (isBack && i === count - 1) ? 'none' : '';
@@ -284,12 +303,27 @@
         function updateImageScales() {
             if (!viewport) return;
             var vpRect     = viewport.getBoundingClientRect();
+            var vpH        = vpRect.height;
             var sectionTop = section.getBoundingClientRect().top;
-            var depth      = Math.max(0, vpRect.height - sectionTop);
+            var depth      = Math.max(0, vpH - sectionTop);
+
+            // Entrance easing: constant deceleration over the last 10% of
+            // each image's parallax displacement.  Because parallax is linear
+            // in depth, easing depth directly achieves per-image easing.
+            // Deceleration zone = 0.2·vpH of scroll to cover the final 10%.
+            var easeStart  = vpH * 0.9;
+            var easeLen    = vpH * 0.2;
+            var easedDepth;
+            if (depth <= easeStart) {
+                easedDepth = depth;
+            } else {
+                var u = Math.min(depth - easeStart, easeLen);
+                easedDepth = easeStart + u - (u * u) / (2 * easeLen);
+            }
 
             allElements.forEach(function (img) {
                 var speed      = parseFloat(img.dataset.speedFactor || '1');
-                var parallaxY  = depth * (1 - speed) * C.depthParallaxStrength;
+                var parallaxY  = easedDepth * (1 - speed) * C.depthParallaxStrength;
                 var naturalTop = parseFloat(img.dataset.naturalTop || '0');
                 var imgH       = img.offsetHeight || 0;
                 var isBack     = img.classList.contains('back-layer');

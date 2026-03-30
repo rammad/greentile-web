@@ -673,9 +673,9 @@ body::after {
         --size-display-hero:  80px;
         --size-display-xl:    80px;
         --size-h1:            32px;
-        --size-h2:            32px;
+        --size-h2:            28px;
         --size-h3:            28px;
-        --size-subBold1:      16px;
+        --size-subBold1:      14px;
         --size-subBold2:      14px;
         --size-subRegular1:   14px;
         --size-subRegular2:   12px;
@@ -691,7 +691,7 @@ body::after {
         --space-for-nav: 70px;
         --page-gutter: 12px;
 
-        --gap-text: 20px;
+        --gap-text: 24px;
         --gap-display-lines: 8px;
 
         --section-spacing: 80px;

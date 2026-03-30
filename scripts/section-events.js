@@ -89,6 +89,7 @@
         const FADE_Y_HI       = 0.30;  // card invisible when y > this × startOffset (travel distance)
         const FADE_Y_LO       = 0.10;  // card fully opaque when y < this × startOffset
         const MOBILE_EARLY   = 0.30;  // on mobile, start animation this many vh before sticky kicks in
+        const STICK_EASE     = 0.35;  // fraction of stick zone for entry/exit deceleration
         // ──────────────────────────────────────────────────────────
 
         const n              = cards.length;
@@ -107,16 +108,41 @@
         let phase2Len   = 1;
         let startOffset = window.innerHeight;
         let currentlyMobile = window.matchMedia('(max-width: 768px)').matches;
+        let stickProgress = 0;
 
         // disable CSS transitions on the title wrap — it's scroll-driven so lag is unwanted
         if (titleWrap) titleWrap.style.transition = 'none';
 
+        const DECEL_START = 0.9;
+        const DECEL_LEN   = 1 - DECEL_START;
+        const DECEL_V0    = 1 / (DECEL_START + DECEL_LEN / 2);
+
+        function easeDecel(t) {
+            if (t <= DECEL_START) return DECEL_V0 * t;
+            const s = (t - DECEL_START) / DECEL_LEN;
+            return DECEL_V0 * DECEL_START + DECEL_V0 * DECEL_LEN * (s - s * s / 2);
+        }
+
         function applyPositions(scrollY) {
             const progress = Math.min(1, (scrollY - phase2Start) / phase2Len);
 
+            const stickLen    = 1 - stickProgress;
+            const easeLen     = STICK_EASE * stickLen;
+            const stickyMax   = easeLen * phase2Len / 2;
+            const entryEnd    = stickProgress + easeLen;
+            const exitStart   = 1 - easeLen;
+            const p           = Math.max(stickProgress, Math.min(1, progress));
+            let stickyOff     = 0;
+            if (p < entryEnd) {
+                stickyOff = stickyMax * (1 - (p - stickProgress) / easeLen);
+            } else if (p > exitStart) {
+                stickyOff = -stickyMax * ((p - exitStart) / easeLen);
+            }
+            stickyInner.style.transform = `translateY(${Math.round(stickyOff)}px)`;
+
             cards.forEach((card, i) => {
                 const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
-                const y = Math.round(startOffset * (1 - localP));
+                const y = Math.round(startOffset * (1 - easeDecel(localP)));
                 card.style.transform = `translateY(${y}px)`;
                 const hi = startOffset * FADE_Y_HI;
                 const lo = startOffset * FADE_Y_LO;
@@ -182,6 +208,7 @@
             const earlyPx = currentlyMobile ? ih * MOBILE_EARLY : 0;
             phase2Start = section.offsetTop - earlyPx;
             phase2Len   = section.offsetHeight - ih + earlyPx;
+            stickProgress = phase2Len > 0 ? earlyPx / phase2Len : 0;
             startOffset = ih;
 
             applyPositions(window.lenis ? window.lenis.scroll : 0);
