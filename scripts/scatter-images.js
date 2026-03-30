@@ -60,8 +60,8 @@
         slideHeightVhMobile:    0.60,  // vh per slide — same for mobile
 
         // ── image sizing (desktop/tablet) ──────────────────────────────────
-        frontWidthMinVw:        8,     // vw — smallest front image width
-        frontWidthMaxVw:        12,    // vw — largest front image width
+        frontWidthMinVw:        7,     // vw — smallest front image width
+        frontWidthMaxVw:        14,    // vw — largest front image width
         backWidthMinVw:         6,     // vw — smallest back image width
         backWidthMaxVw:         9,     // vw — largest back image width
 
@@ -72,7 +72,8 @@
         mobileBackWidthMaxPx:   70,    // px — largest back image width on mobile
 
         // ── vertical & horizontal scatter ──────────────────────────────────
-        verticalJitter:         0.12,  // 0–1 — random vertical offset per image (fraction of spacing)
+        verticalJitter:         0.12,  // 0–1 — random vertical offset for front images (fraction of spacing)
+        backVerticalJitter:     0.30,  // 0–1 — random vertical offset for back images (fraction of spacing)
         horizontalJitterPct:    1.5,   // % — random horizontal offset per image within its column
 
         // ── parallax ───────────────────────────────────────────────────────
@@ -83,7 +84,7 @@
         depthParallaxStrength:  0.50,  // multiplier — overall parallax intensity
 
         // ── image counts & layout ──────────────────────────────────────────
-        backImagesPerCol:       3,     // cloned back images per back column
+        backImagesPerCol:       5,     // cloned back images per back column
         maxImagesPerColMobile:  6,     // max front images per column on mobile
         frameCount:             1,     // images at the top of inner front columns to inset toward center
 
@@ -232,7 +233,7 @@
                 var usable     = fullSectionHeight * (1 - 2 * C.edgePadding);
                 var spacing    = usable / Math.max(1, count);
                 var staggerPx  = (colDef.stagger || 0) * spacing;
-                var jitterAmt  = spacing * C.verticalJitter;
+                var jitterAmt  = spacing * (isBack ? C.backVerticalJitter : C.verticalJitter);
                 var frameInset = colDef.frameInset || 0;
                 var frameN     = frameInset ? C.frameCount : 0;
 
@@ -241,22 +242,19 @@
                     var jitter  = (Math.random() - 0.5) * 2 * jitterAmt;
                     var imgW    = Math.round(randRange(minW, maxW));
                     var imgH    = imgW * (5 / 4);
-                    var top     = Math.max(0, Math.min(fullSectionHeight - imgH, baseTop + jitter));
+                    var rawTop  = baseTop + jitter;
+
+                    var top = Math.max(0, Math.min(fullSectionHeight - imgH, rawTop));
 
                     var speed = isBack
                         ? randRange(C.backSpeedMin, C.backSpeedMax)
                         : randRange(C.frontSpeedMin, C.frontSpeedMax);
 
-                    if (isBack) {
-                        var midDepth = (vpH + fullSectionHeight) * 0.5;
-                        top -= midDepth * (1 - speed) * C.depthParallaxStrength;
-                        top = Math.max(0, Math.min(fullSectionHeight - imgH, top));
-                    }
-
                     var xJitter = (Math.random() - 0.5) * 2 * C.horizontalJitterPct;
                     var insetX  = (frameN > 0 && i < frameN)
                         ? frameInset : 0;
 
+                    img.style.display  = (isBack && i === count - 1) ? 'none' : '';
                     img.style.position = 'absolute';
                     img.style.width    = imgW + 'px';
                     img.style.left     = (colDef.x + xJitter + insetX) + '%';
@@ -294,8 +292,9 @@
                 var parallaxY  = depth * (1 - speed) * C.depthParallaxStrength;
                 var naturalTop = parseFloat(img.dataset.naturalTop || '0');
                 var imgH       = img.offsetHeight || 0;
+                var isBack     = img.classList.contains('back-layer');
                 var minP       = -naturalTop;
-                var maxP       = state.fullHeight - naturalTop - imgH;
+                var maxP       = isBack ? Infinity : state.fullHeight - naturalTop - imgH;
                 var clamped    = Math.max(minP, Math.min(maxP, parallaxY));
 
                 img.style.transform = 'translateY(' + clamped.toFixed(2) + 'px)';

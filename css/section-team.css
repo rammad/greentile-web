@@ -4,7 +4,7 @@
     position: relative;
     width: 100%;
     margin-top: calc(var(--section-spacing) * 2);
-    padding-bottom: 40px;
+    /* padding-bottom: 40px; */
 }
 
 .team-layout {

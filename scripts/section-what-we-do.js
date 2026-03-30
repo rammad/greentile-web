@@ -19,7 +19,7 @@
     const MENU_EASE_PX        = 500;   // px — scroll distance for deceleration into resting position
 
     // ── menu exit ──────────────────────────────────────────────────────────
-    const MENU_EXIT_START     = -100;     // px — offset from viewport bottom where exit begins (0 = at edge)
+    const MENU_EXIT_START     = 100;     // px — offset from viewport bottom where exit begins (0 = at edge)
     const MENU_EXIT_RATE      = 0.75;  // 0–1 — exit drift speed as fraction of scroll
     const MENU_EXIT_EASE_PX   = 300;   // px — scroll distance to accelerate from standstill to exit rate
 

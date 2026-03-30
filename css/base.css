@@ -1,3 +1,5 @@
+@import url('https://use.typekit.net/fbu0ukm.css');
+
 /* fonts */
 @font-face {
     font-family: 'OT Jubilee Golden';
@@ -6,8 +8,6 @@
     font-style: normal;
 }
 
-@import url("https://use.typekit.net/fbu0ukm.css");
-
 @font-face {
     font-family: 'Obviously Sans';
     src: url('../fonts/ObviouslyVariable.ttf') format('truetype');
@@ -15,35 +15,6 @@
     font-stretch: 25% 400%;
     font-style: normal;
 }
-
-/* @font-face {
-    font-family: 'OT Jubilee Ruby';
-    src: url('../fonts/OTJubilee-RubyExtrabold.otf') format('opentype');
-    font-weight: 800;
-    font-style: normal;
-} */
-
-/* @font-face {
-    font-family: 'Arizona Flare Light';
-    src: url('../fonts/ABCArizonaFlare-Light-Trial.otf') format('opentype');
-    font-weight: 100 900;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Arizona Sans Bold';
-    src: url('../fonts/ABCArizonaSans-Bold-Trial.otf') format('opentype');
-    font-weight: 100 900;
-    font-style: normal;
-} */
-
-/* variable font — not loaded yet, keeping for later
-@font-face {
-    font-family: 'ABC Arizona Plus Variable';
-    src: url('../fonts/ABCArizonaPlusVariable-Trial.woff2') format('woff2');
-    font-weight: 100 900;
-    font-style: normal;
-} */
 
 /* variables */
 /* design base: 1920px — breakpoints at 768 (mobile), 1024 (tablet), 2560 (ultra-wide) */
@@ -92,6 +63,7 @@
     --font-display: 'OT Jubilee Golden', serif;
     --font-header: 'OT Jubilee Golden', serif;
     --font-body: 'angie-sans', normal;
+    /* --font-body: 'thermal-variable', normal; */
     --font-subheader: 'Obviously Sans', normal;
 
     --time-fade-in: 0.6s;
@@ -318,7 +290,7 @@ section {
     font-size: var(--size-body1);
     font-weight: 300;
     line-height: var(--lh-body);
-    /* font-variation-settings: 'SRFF' 25; */
+    font-variation-settings: "opsz" 100, "wght" 100;
 
     opacity: 0;
     filter: blur(var(--blur-standard));
@@ -331,7 +303,7 @@ section {
     font-size: var(--size-body2);
     font-weight: 300;
     line-height: var(--lh-body);
-    /* font-variation-settings: 'SRFF' 25; */
+    font-variation-settings: "opsz" 100, "wght" 100;
 
     opacity: 0;
     filter: blur(var(--blur-standard));
@@ -344,6 +316,7 @@ section {
     font-size: var(--size-body3);
     font-weight: 300;
     line-height: var(--lh-body);
+    font-variation-settings: "opsz" 100, "wght" 100;
 
     opacity: 0;
     filter: blur(var(--blur-standard));

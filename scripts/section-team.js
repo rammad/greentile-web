@@ -92,6 +92,7 @@
         /* ── desktop: deactivate body when section leaves viewport ── */
 
         const CLEANUP_RATIO = 0.15;
+        let titleCleaned = false;
         const sectionCleanupObs = new IntersectionObserver((entries) => {
             if (isMobile) return;
             for (const entry of entries) {
@@ -104,8 +105,14 @@
                     if (titleFired) {
                         titleLines.forEach(l => l.classList.remove('is-visible'));
                         titleFired = false;
-                        titleObs.observe(firstPoster);
+                        titleCleaned = true;
                     }
+                } else if (titleCleaned && !titleFired) {
+                    titleFired = true;
+                    titleCleaned = false;
+                    titleLines.forEach((line, i) => {
+                        setTimeout(() => line.classList.add('is-visible'), i * LINE_STAGGER_MS);
+                    });
                 }
             }
         }, { root, threshold: [0, CLEANUP_RATIO] });
