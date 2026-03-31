@@ -83,6 +83,8 @@
 }
 
 .marquee-item.arrow{
+    display: inline-block;
+    width: 14px;
     height: 7px;
     -webkit-mask-image: url('../images/graphics/arrow-right.png');
     mask-image: url('../images/graphics/arrow-right.png');
@@ -132,7 +134,7 @@
     line-height: var(--lh-single); 
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .footer-section {
         height: 100vh;
         margin-top: 0;

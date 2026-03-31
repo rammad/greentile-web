@@ -465,14 +465,14 @@ const CURTAIN_TILE_SCATTER_MOBILE = {
         { x:  94, y: 18,  r:  18 },
     ],
 };
-const CURTAIN_TILE_SCATTER = window.innerWidth < 768 ? CURTAIN_TILE_SCATTER_MOBILE : CURTAIN_TILE_SCATTER_DESKTOP;
+const CURTAIN_TILE_SCATTER = window.innerWidth <= 1024 ? CURTAIN_TILE_SCATTER_MOBILE : CURTAIN_TILE_SCATTER_DESKTOP;
 
 // returns a fixed pixel value (breakpoint system replaced continuous vw scaling)
 function vwPx(px) { return px; }
 
 // tile width + gap 4px = stride; compute a centered row for any count
 function getTileSnapX(count) {
-    const tileW  = window.innerWidth < 768 ? 56 : 88;
+    const tileW  = window.innerWidth <= 768 ? 56 : 88;
     const stride = vwPx(tileW + 4);
     const start  = -((count - 1) / 2) * stride;
     return Array.from({ length: count }, (_, i) => Math.round(start + i * stride));

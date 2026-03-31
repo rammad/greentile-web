@@ -34,7 +34,7 @@
     var BLUR_END             = 1.20;
     var READABLE_THRESHOLD  = 0.40;
 
-    var MOBILE_BREAKPOINT   = 768;
+    var MOBILE_BREAKPOINT   = 1024;
 
     // ── helpers ────────────────────────────────────────────────────────────
 

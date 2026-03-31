@@ -62,7 +62,7 @@
     opacity: 0.25;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .clients-section {
         width: 100%;
         min-height: auto;

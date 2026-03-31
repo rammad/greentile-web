@@ -3,7 +3,7 @@
 (function () {
     const { observeElementInOut } = window.AnimationUtils || {};
     const LINE_STAGGER_MS = 80;
-    const MOBILE_BP = 768;
+    const MOBILE_BP = 1024;
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('team');
@@ -178,13 +178,22 @@
         function hideTitle() {
             if (!titleShown) return;
             titleAnimId++;
-            titleLines.forEach(l => l.classList.remove('is-visible'));
+            titleLines.forEach(l => {
+                l.style.transition = 'opacity 0.18s ease, transform 0.22s ease';
+                l.classList.remove('is-visible');
+            });
+            setTimeout(() => {
+                titleLines.forEach(l => { l.style.transition = ''; });
+            }, 250);
             titleShown = false;
         }
 
         function hideBody() {
             if (!activeBody) return;
-            activeBody.classList.remove('is-active');
+            const prev = activeBody;
+            prev.style.transition = 'opacity 0.18s ease';
+            prev.classList.remove('is-active');
+            setTimeout(() => { prev.style.transition = ''; }, 200);
             activeBody = null;
             if (bodySizer) bodySizer.style.height = '';
         }

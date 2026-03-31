@@ -15,7 +15,7 @@
 }
 
 .socials-header {
-    padding: 0 var(--page-gutter) 180px;
+    padding: 0 var(--page-gutter) 140px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -125,7 +125,7 @@
     transform: translateY(0);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
 
     .socials-section {
         margin-top: calc(var(--section-spacing) * 2);

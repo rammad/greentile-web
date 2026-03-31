@@ -4,7 +4,7 @@
     const { observeElementInOut, staggerTime, scrollSpeed } = window.AnimationUtils || {};
 
     function constrainFooterTitle() {
-        if (window.innerWidth > 768) return;
+        if (window.innerWidth > 1024) return;
 
         const main = document.querySelector('.footer-main');
         const title = main?.querySelector('.type-display-hero');

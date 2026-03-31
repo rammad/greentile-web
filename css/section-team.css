@@ -110,12 +110,13 @@
 .team-section .animate-line {
     opacity: 0;
     transform: translateY(0.3em);
-    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 0.2s,transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .team-section .animate-line.is-visible {
     opacity: 1;
     transform: translateY(0);
+    transition: opacity 0.7s ease;
 }
 /* 
 .team-names {
@@ -137,7 +138,7 @@
     }
 } */
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .team-layout {
         grid-template-columns: 1fr;
         row-gap: 60px;

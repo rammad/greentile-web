@@ -180,7 +180,7 @@
     color: var(--c-dark-green);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .nav-center,
     .nav-right {
         display: none;
@@ -202,6 +202,11 @@
         padding: 12px 14px;
     }
 
+    .nav-logo {
+        width: 20px;
+        height: 20px;
+    }
+
     .nav-hamburger {
         display: flex;
         padding: 12px 14px;
@@ -210,6 +215,11 @@
 
     .mobile-menu {
         display: block;
+    }
+
+    .nav-subpage .nav-left,
+    .nav-subpage .nav-right {
+        min-height: 44px;
     }
 
     .nav-subpage .nav-left {

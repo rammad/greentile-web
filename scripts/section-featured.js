@@ -33,7 +33,7 @@
         let sectionHeight  = 1;
         let cachedVH = window.innerHeight;
         let lastWidth = window.innerWidth;
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const isMobile = window.matchMedia('(max-width: 1024px)').matches;
 
         const recalcLayout = () => {
             lastWidth = window.innerWidth;

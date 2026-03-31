@@ -9,9 +9,9 @@
    automatically — no extra assets needed.
 
    Responsive tiers:
-     desktop  (≥1200):  4 front + 4 back  = 8 columns
-     tablet   (768–1199): 2 front + 2 back = 4 columns
-     mobile   (<768):    2 front + 2 back  = 4 columns
+     desktop  (≥1200):   4 front + 4 back  = 8 columns
+     tablet   (1024–1199): 2 front + 2 back = 4 columns
+     mobile   (<1024):   2 front + 2 back  = 4 columns
 
    Usage (same API as the previous scatter module):
      var scatter = ScatterImages.init(sectionEl, viewportEl, numSlides, {});
@@ -43,7 +43,7 @@
             { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20 }
         ],
         mobile: [
-            { id: 'fl',  x: -6, layer: 'front', stagger: -0.20, flushTop: true },
+            { id: 'fl',  x: -10, layer: 'front', stagger: -0.20, flushTop: true },
             { id: 'bl',  x: 13,   layer: 'back',  stagger: -0.15, frameInset: 5 },
             { id: 'br',  x: 71,  layer: 'back',  stagger: -0.15, frameInset: -5 },
             { id: 'fr',  x: 86,  layer: 'front', stagger: 0.08 }
@@ -52,11 +52,11 @@
 
     var DEFAULTS = {
         // ── breakpoints ────────────────────────────────────────────────────
-        mobileBreakpoint:       768,   // px — below this = mobile layout
+        mobileBreakpoint:       1024,  // px — below this = mobile layout
         tabletBreakpoint:       1200,  // px — below this = tablet, above = desktop
 
         // ── section height ─────────────────────────────────────────────────
-        slideHeightVhDesktop:   0.75,  // vh per slide — controls total section height (desktop)
+        slideHeightVhDesktop:   0.85,  // vh per slide — controls total section height (desktop)
         slideHeightVhMobile:    0.85,  // vh per slide — same for mobile
 
         // ── image sizing (desktop) ────────────────────────────────────────

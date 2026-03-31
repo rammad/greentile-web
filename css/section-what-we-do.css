@@ -40,7 +40,7 @@
     aspect-ratio: 4 / 5;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1025px) {
     .scatter-img.back-layer {
         filter: grayscale(1);
     }
@@ -185,7 +185,7 @@
     will-change: transform;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .about-image-track { overflow-x: clip; }
     .what-we-do .about-menu-persistent { top: 18vh; }
     .about-menu-persistent .menu-item { word-spacing: 100vw; line-height: var(--lh-display); }

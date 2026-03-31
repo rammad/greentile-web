@@ -12,7 +12,7 @@
     const TIME_FADE_OUT       = 0.25;  // seconds — body text fade-out duration
     const BODY_BLUR_PX        = 8;     // px — blur on hidden body text blocks
     const BODY_GAP_VH         = 0.05;  // vh — gap between menu bottom and body text top
-    const _wwd_isMobile       = window.innerWidth < 768;
+    const _wwd_isMobile       = window.innerWidth <= 1024;
 
     // ── desktop menu animation sequence (progress 0–100) ───────────────
     //   ①  revealAt          — menu items fade in (stagger)
@@ -28,12 +28,13 @@
         enterStart:   -20,     // begin sliding up from below
         enterEnd:     25,      // arrive at pinned position
         enterTravel:  75,      // vh below pinned position at start
-        slidesStart:  -0,      // first item selected
+        slidesStart:  0,      // first item selected
         slidesEnd:    85,      // last item selected
         exitStart:    75,      // begin sliding upward off screen
         exitEnd:      130,     // fully offscreen
         exitTravel:   80,      // vh above pinned position at end
         hideAt:       130,     // menu items fade out
+        edgeWeight:   0.80,   // edge items get 80% of equal share (compensates enter/exit bonus)
     };
 
     function easeOutCubic(t) { return 1 - (1 - t) * (1 - t) * (1 - t); }
@@ -45,12 +46,13 @@
         enterStart:   -20,     // begin sliding up from below
         enterEnd:     20,      // arrive at pinned position
         enterTravel:  75,      // vh below pinned position at start
-        slidesStart:  -15,      // first item selected
+        slidesStart:  0,      // first item selected
         slidesEnd:    100,      // last item selected
         exitStart:    80,      // begin sliding upward off screen
         exitEnd:      130,     // fully offscreen
         exitTravel:   120,      // vh above pinned position at end
         hideAt:       120,     // menu items fade out
+        edgeWeight:   0.80,   // edge items get 80% of equal share (compensates enter/exit bonus)
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -61,7 +63,7 @@
         const textBlocks = Array.from(section.querySelectorAll('.about-text-block'));
         const numSlides  = textBlocks.length || 4;
         const menuEl     = section.querySelector('.about-menu-persistent');
-        const isMobile   = window.innerWidth < 768;
+        const isMobile   = window.innerWidth <= 1024;
 
         const scatter = window.ScatterImages.init(section, viewport, numSlides, {});
 
@@ -258,7 +260,21 @@
             const sp = (cfg.slidesEnd > cfg.slidesStart)
                 ? Math.max(0, Math.min(1, (sectionProg - cfg.slidesStart) / (cfg.slidesEnd - cfg.slidesStart)))
                 : 0;
-            const closestIdx = Math.min(menuItems.length - 1, Math.floor(sp * menuItems.length));
+
+            const n  = menuItems.length;
+            const ew = cfg.edgeWeight ?? 1;
+            let closestIdx = n - 1;
+            if (n > 2 && ew < 1) {
+                const edge = ew / n;
+                const mid  = (1 - 2 * edge) / (n - 2);
+                let acc = 0;
+                for (let i = 0; i < n; i++) {
+                    acc += (i === 0 || i === n - 1) ? edge : mid;
+                    if (sp < acc) { closestIdx = i; break; }
+                }
+            } else {
+                closestIdx = Math.min(n - 1, Math.floor(sp * n));
+            }
 
             menuItems.forEach((item, i) => item.classList.toggle('is-active', i === closestIdx));
 

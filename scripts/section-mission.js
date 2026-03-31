@@ -4,7 +4,7 @@
     const { fitTextToWidth } = window.AppUtils || {};
 
     const LINE_STAGGER_MS = 80;
-    const mobileQuery = window.matchMedia('(max-width: 768px)');
+    const mobileQuery = window.matchMedia('(max-width: 1024px)');
     let originalTexts = null;
 
     function measureNaturalLines(group, fullText) {

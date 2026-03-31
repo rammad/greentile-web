@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const animateEntrance = async () => {
         const title = document.querySelector('#cal-page-container .animate-cascade');
         const mobileTitleLines = document.querySelectorAll('.calendar-title-mobile .fit-text');
-        const isMobile = window.innerWidth <= 768;
+        const isMobile = window.innerWidth <= 1024;
         const subtitle = document.querySelector('.text-mask');
         const filters = document.querySelectorAll('.ui-roll');
         const rows = document.querySelectorAll('.calendar-row');
@@ -128,7 +128,7 @@ function initEventInteractions() {
     if (rows.length > 0 && posterWrapper && posterImg) {
         rows.forEach(row => {
             row.addEventListener('mouseenter', () => {
-                if (window.innerWidth > 768 && !pageContainer.classList.contains('mode-grid')) {
+                if (window.innerWidth > 1024 && !pageContainer.classList.contains('mode-grid')) {
                     const imgUrl = row.getAttribute('data-img');
                     const status = row.getAttribute('data-status');
 
@@ -161,14 +161,14 @@ function initEventInteractions() {
             });
 
             row.addEventListener('mouseleave', () => {
-                if (window.innerWidth > 768) {
+                if (window.innerWidth > 1024) {
                     posterWrapper.classList.remove('active');
                     posterImg.classList.remove('is-sold-out');
                 }
             });
 
             row.addEventListener('click', (e) => {
-                if (window.innerWidth > 768) {
+                if (window.innerWidth > 1024) {
                     window.location.href = row.getAttribute('href');
                 }
             });
@@ -198,7 +198,7 @@ function randomizeSticker(element) {
 
 /* mobile: two-rail layout — date strip on top, poster+title carousel below */
 function initMobileScrollSpy() {
-    if (window.innerWidth > 768) return;
+    if (window.innerWidth > 1024) return;
 
     const wrapper = document.querySelector('.calendar-interface-wrapper');
     const list = document.querySelector('.calendar-list');
@@ -546,7 +546,7 @@ function initRowPacker() {
 }
 
 function initMobileFilterToggle() {
-    if (window.innerWidth > 768) return;
+    if (window.innerWidth > 1024) return;
 
     const controls = document.querySelector('.calendar-controls');
     if (!controls) return;
@@ -651,7 +651,7 @@ function initMobileFilterToggle() {
 }
 
 function initControlsClamping() {
-    if (window.innerWidth > 768) return;
+    if (window.innerWidth > 1024) return;
 
     const page = document.getElementById('cal-page-container');
     const controls = document.querySelector('.calendar-controls');

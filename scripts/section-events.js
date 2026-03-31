@@ -119,7 +119,7 @@
         let phase2Start = 0;
         let phase2Len   = 1;
         let startOffset = window.innerHeight;
-        let currentlyMobile = window.matchMedia('(max-width: 768px)').matches;
+        let currentlyMobile = window.matchMedia('(max-width: 1024px)').matches;
         let stickProgress = 0;
 
         // disable CSS transitions on the title wrap — it's scroll-driven so lag is unwanted
@@ -188,7 +188,7 @@
                 ? (parseFloat(getComputedStyle(nav).top) || 0) + nav.offsetHeight
                 : 0;
 
-            currentlyMobile  = window.matchMedia('(max-width: 768px)').matches;
+            currentlyMobile  = window.matchMedia('(max-width: 1024px)').matches;
             syncCardTiming();
 
             const flexGap    = parseFloat(getComputedStyle(stickyInner).rowGap) || 0;
@@ -249,7 +249,7 @@
             const stickyH = stickyInner.offsetHeight;
             const rs = getComputedStyle(document.documentElement);
             const spacing = parseFloat(rs.getPropertyValue('--section-spacing'));
-            const mobile = window.matchMedia('(max-width: 768px)').matches;
+            const mobile = window.matchMedia('(max-width: 1024px)').matches;
             const desired = mobile ? spacing * 1.5 : spacing;
             const ctaBottom = ctaFooter.offsetTop + ctaFooter.offsetHeight;
             const nextPad = nextSection ? parseFloat(getComputedStyle(nextSection).paddingTop) || 0 : 0;

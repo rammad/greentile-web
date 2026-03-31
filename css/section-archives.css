@@ -58,7 +58,7 @@
     width: 100%;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .archives-page {
         padding-bottom: 0;
     }

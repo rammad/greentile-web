@@ -58,7 +58,7 @@
     margin-bottom: var(--gap-text);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .mission-section {
         padding: 20px var(--page-gutter);
     }

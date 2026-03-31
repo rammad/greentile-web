@@ -176,19 +176,13 @@ body.contact-is-open .nav-hamburger {
     display: flex;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1025px) {
     body.contact-is-open .nav-hamburger {
         transform: scale(0.75);
     }
 }
 
 @media (max-width: 1024px) {
-    .contact-panel {
-        width: 50%;
-    }
-}
-
-@media (max-width: 768px) {
     .contact-form {
         gap: 40px;
         margin-top: 40px;

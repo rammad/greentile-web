@@ -21,7 +21,7 @@
     transform: translateX(-50%);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .hero .type-display-hero {
         top: calc(48% + var(--space-for-nav) / 2);
         bottom: auto;

@@ -251,13 +251,13 @@ class GradientEngine {
             antialias: true 
         });
         this.renderer.setSize(width, height, false);
-        const isMobile = window.innerWidth < 768;
+        const isMobile = window.innerWidth <= 1024;
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
         this._lastWidth = width;
         this._lastHeight = height;
 
         this.clock = new THREE.Clock();
-        this._throttle = window.innerWidth < 768;
+        this._throttle = window.innerWidth <= 1024;
         this._skipFrame = false;
         window.addEventListener('resize', () => this.onResize());
 
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageSectionColors = pageSection
         ? pageSection.getAttribute('data-colors').split(',').map(s => s.trim())
         : ['#47ff54', '#f1ffe8', '#f0fd7c'];
-    const mobileGpu = window.innerWidth < 768;
+    const mobileGpu = window.innerWidth <= 1024;
 
     new GradientEngine('gradient-canvas', {
         colors: pageSectionColors,

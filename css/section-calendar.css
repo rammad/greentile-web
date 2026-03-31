@@ -345,7 +345,7 @@
 
 .grid-card .badge-sold { top: 10%; right: 10%; width: 120px; height: 120px; transform: rotate(-15deg); }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .calendar-page {
         position: relative;
         height: auto;
