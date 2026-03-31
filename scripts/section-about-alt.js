@@ -62,6 +62,7 @@
         var numSlides = textBlocks.length || 1;
 
         var scatter = window.ScatterImages.init(section, viewport, numSlides, SCATTER_CONFIG);
+        if (window.innerWidth < 768) scatter.setSmooth(0.12);
 
         // ── build: fixed body container + scroll-track slides ──────────────
 
@@ -201,7 +202,10 @@
         // ── resize ─────────────────────────────────────────────────────────
 
         var resizeTimer;
+        var lastResizeWidth = window.innerWidth;
         window.addEventListener('resize', function () {
+            if (window.innerWidth === lastResizeWidth) return;
+            lastResizeWidth = window.innerWidth;
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(function () {
                 scatter.initLayout();

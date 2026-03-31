@@ -88,8 +88,9 @@
         const FADE_Y_HI       = 0.30;  // card invisible when y > this × startOffset (travel distance)
         const FADE_Y_LO       = 0.10;  // card fully opaque when y < this × startOffset
         const STICK_EASE     = 0.35;  // fraction of stick zone for entry/exit deceleration
-        // mobile flow-through: no sticky, cards settle as section enters viewport
-        const ENTRANCE_DELAY_MOBILE = 0;
+        // mobile sticky — same mechanic as desktop, stretched out
+        const SECTION_VH_MOBILE     = 1.5;  // section height in viewports (bigger = slower card animation)
+        const ENTRANCE_DELAY_MOBILE = -2.5;
         const STAGGER_SPLIT_MOBILE  = 0.15;
         const MOBILE_START_RATIO    = 0.5;  // startOffset = vh × this
         // ──────────────────────────────────────────────────────────
@@ -196,13 +197,13 @@
                              + parseFloat(getComputedStyle(grid).paddingRight);
 
             if (currentlyMobile) {
-                stickyInner.style.paddingTop = '';
+                stickyInner.style.paddingTop = (navInset + s20) + 'px';
                 grid.style.maxWidth = '';
                 section.style.paddingTop = '';
-                section.style.minHeight  = '';
+                section.style.minHeight  = (SECTION_VH_MOBILE * ih) + 'px';
 
-                phase2Start   = section.offsetTop - ih;
-                phase2Len     = ih;
+                phase2Start   = section.offsetTop;
+                phase2Len     = section.offsetHeight - ih;
                 stickProgress = 0;
                 startOffset   = ih * MOBILE_START_RATIO;
             } else {

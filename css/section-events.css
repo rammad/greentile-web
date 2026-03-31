@@ -107,11 +107,6 @@
         min-height: 0;
     }
 
-    .events-sticky {
-        position: relative;
-        height: auto;
-    }
-
     .events-section .animate-line + .animate-line {
         margin-top: 0;
     }

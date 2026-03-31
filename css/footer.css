@@ -116,7 +116,7 @@
     left: auto;
     transform: none;
     overflow: visible;
-    padding-bottom: 20px;
+    padding-bottom: var(--page-gutter);
 }
 
 .footer-links {
@@ -136,8 +136,6 @@
     .footer-section {
         height: 100vh;
         margin-top: 0;
-        padding-top: var(--section-spacing);
-        padding-bottom: 0;
     }
     .footer-main {
         min-height: 0;
@@ -156,7 +154,7 @@
         text-align: center;
         line-height: var(--lh-display);
         text-box: normal;
-        padding-bottom: 0;
+        padding-bottom: calc(var(--page-gutter) * 2);
     }
     .footer-main .type-display-hero > span {
         display: block;

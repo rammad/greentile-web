@@ -36,7 +36,7 @@
 .contact-panel-inner {
     display: flex;
     flex-direction: column;
-    padding: 88px calc(var(--page-gutter) * 2) 40px;
+    padding: var(--space-for-nav) calc(var(--page-gutter) * 2) 40px;
     height: 100%;
 }
 
@@ -189,6 +189,10 @@ body.contact-is-open .nav-hamburger {
 }
 
 @media (max-width: 768px) {
+    .contact-form {
+        gap: 40px;
+        margin-top: 40px;
+    }
     .contact-panel {
         width: 100%;
     }

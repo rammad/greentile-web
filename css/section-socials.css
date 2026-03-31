@@ -15,7 +15,7 @@
 }
 
 .socials-header {
-    padding: 0 var(--page-gutter) 80px;
+    padding: 0 var(--page-gutter) 180px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -39,7 +39,7 @@
     display: flex;
     gap: 20px;
     justify-content: center;
-    margin-top: 40px;
+    margin-top: 20px;
     opacity: 0;
     transform: translateY(var(--travel-reveal));
     transition: 
@@ -147,10 +147,10 @@
     .socials-header {
         padding-bottom: 56px;
     }
-
+/* 
     .socials-icons {
         margin-top: 36px;
-    }
+    } */
 
     .social-img {
         transform: translateY(64px);

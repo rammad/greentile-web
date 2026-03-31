@@ -63,6 +63,7 @@
         const isMobile   = window.innerWidth < 768;
 
         const scatter = window.ScatterImages.init(section, viewport, numSlides, {});
+        if (isMobile) scatter.setSmooth(0.12);
 
         // ── persistent menu ───────────────────────────────────────────────────
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
@@ -93,6 +94,30 @@
         let activeIdx      = 0;
         let wasActive      = false;
         let menuIsRevealed = false;
+
+        const MENU_LERP    = isMobile ? 0.14 : 1;
+        let _menuCurrent   = null;
+        let _menuTarget    = 0;
+        let _bodyCurrent   = null;
+        let _bodyTarget    = 0;
+        let _menuRaf       = 0;
+
+        function menuSmoothTick() {
+            _menuCurrent += (_menuTarget - _menuCurrent) * MENU_LERP;
+            _bodyCurrent += (_bodyTarget - _bodyCurrent) * MENU_LERP;
+            const settled = Math.abs(_menuTarget - _menuCurrent) < 0.3
+                         && Math.abs(_bodyTarget - _bodyCurrent) < 0.3;
+            if (settled) { _menuCurrent = _menuTarget; _bodyCurrent = _bodyTarget; }
+
+            if (menuEl) menuEl.style.transform = `translateY(${_menuCurrent.toFixed(1)}px)`;
+            if (bodyEl) bodyEl.style.top = `${_bodyCurrent.toFixed(1)}px`;
+
+            if (!settled) {
+                _menuRaf = requestAnimationFrame(menuSmoothTick);
+            } else {
+                _menuRaf = 0;
+            }
+        }
 
         function buildLayout() {
             const stickyContent = section.querySelector('.about-sticky-content');
@@ -226,7 +251,13 @@
                 } else {
                     menuY = -exitPx;
                 }
-                menuEl.style.transform = `translateY(${menuY.toFixed(1)}px)`;
+                if (MENU_LERP < 1) {
+                    _menuTarget = menuY;
+                    if (_menuCurrent === null) _menuCurrent = menuY;
+                    if (!_menuRaf) _menuRaf = requestAnimationFrame(menuSmoothTick);
+                } else {
+                    menuEl.style.transform = `translateY(${menuY.toFixed(1)}px)`;
+                }
             }
 
             // ── text block transitions ──────────────────────────────
@@ -240,7 +271,13 @@
 
             if (bodyEl && menuEl && isActive) {
                 const gap = vpH * BODY_GAP_VH;
-                bodyEl.style.top = `${menuEl.getBoundingClientRect().bottom + gap}px`;
+                const bodyTop = menuEl.getBoundingClientRect().bottom + gap;
+                if (MENU_LERP < 1) {
+                    _bodyTarget = bodyTop;
+                    if (_bodyCurrent === null) _bodyCurrent = bodyTop;
+                } else {
+                    bodyEl.style.top = `${bodyTop}px`;
+                }
             }
 
             wasActive = isActive;
@@ -302,7 +339,10 @@
 
         const resizeDebounceMs = typeof staggerTime === 'number' ? staggerTime : 200;
         let resizeTimer;
+        let lastResizeWidth = window.innerWidth;
         window.addEventListener('resize', () => {
+            if (window.innerWidth === lastResizeWidth) return;
+            lastResizeWidth = window.innerWidth;
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 scatter.initLayout();

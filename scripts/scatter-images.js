@@ -46,7 +46,7 @@
             { id: 'fl',  x: -6, layer: 'front', stagger: -0.20, flushTop: true },
             { id: 'bl',  x: 13,   layer: 'back',  stagger: -0.15, frameInset: 5 },
             { id: 'br',  x: 71,  layer: 'back',  stagger: -0.15, frameInset: -5 },
-            { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20 }
+            { id: 'fr',  x: 86,  layer: 'front', stagger: 0.08 }
         ]
     };
 
@@ -139,6 +139,7 @@
             ? Array.from(track.querySelectorAll('.scatter-img:not(.back-layer)'))
             : [];
         var allElements = [];
+        var imgCache    = [];
         var backClones  = [];
         var state       = { trackHeight: 0, fullHeight: 0 };
 
@@ -155,6 +156,7 @@
             backClones.forEach(function (el) { el.remove(); });
             backClones  = [];
             allElements = [];
+            imgCache    = [];
 
             var bp       = getBreakpoint();
             var isMobile = bp === 'mobile';
@@ -284,6 +286,13 @@
                     img.dataset.speedFactor = speed.toFixed(3);
 
                     allElements.push(img);
+                    imgCache.push({
+                        el:         img,
+                        speed:      speed,
+                        naturalTop: top,
+                        height:     imgH,
+                        isBack:     isBack
+                    });
                 });
             }
 
@@ -301,39 +310,67 @@
 
         // ── parallax on scroll ────────────────────────────────────────────
 
+        var _smoothFactor = 0;
+        var _currentDepth = -1;
+        var _targetDepth  = 0;
+        var _smoothRaf    = 0;
+
+        function applyDepth(easedDepth) {
+            var fH       = state.fullHeight;
+            var strength = C.depthParallaxStrength;
+            for (var i = 0, len = imgCache.length; i < len; i++) {
+                var c         = imgCache[i];
+                var parallaxY = easedDepth * (1 - c.speed) * strength;
+                var minP      = -c.naturalTop;
+                var maxP      = c.isBack ? Infinity : fH - c.naturalTop - c.height;
+                var clamped   = parallaxY < minP ? minP : (parallaxY > maxP ? maxP : parallaxY);
+                c.el.style.transform = 'translateY(' + clamped.toFixed(2) + 'px)';
+            }
+        }
+
+        function easeRaw(depth, vpH) {
+            var easeStart = vpH * 0.9;
+            var easeLen   = vpH * 0.2;
+            if (depth <= easeStart) return depth;
+            var u = Math.min(depth - easeStart, easeLen);
+            return easeStart + u - (u * u) / (2 * easeLen);
+        }
+
+        function smoothTick() {
+            _currentDepth += (_targetDepth - _currentDepth) * _smoothFactor;
+            if (Math.abs(_targetDepth - _currentDepth) < 0.5) {
+                _currentDepth = _targetDepth;
+            }
+            applyDepth(_currentDepth);
+            if (_currentDepth !== _targetDepth) {
+                _smoothRaf = requestAnimationFrame(smoothTick);
+            } else {
+                _smoothRaf = 0;
+            }
+        }
+
         function updateImageScales() {
             if (!viewport) return;
-            var vpRect     = viewport.getBoundingClientRect();
-            var vpH        = vpRect.height;
+            var vpH        = viewport.getBoundingClientRect().height;
             var sectionTop = section.getBoundingClientRect().top;
-            var depth      = Math.max(0, vpH - sectionTop);
+            var rawDepth   = Math.max(0, vpH - sectionTop);
+            var easedDepth = easeRaw(rawDepth, vpH);
 
-            // Entrance easing: constant deceleration over the last 10% of
-            // each image's parallax displacement.  Because parallax is linear
-            // in depth, easing depth directly achieves per-image easing.
-            // Deceleration zone = 0.2·vpH of scroll to cover the final 10%.
-            var easeStart  = vpH * 0.9;
-            var easeLen    = vpH * 0.2;
-            var easedDepth;
-            if (depth <= easeStart) {
-                easedDepth = depth;
+            if (_smoothFactor > 0) {
+                _targetDepth = easedDepth;
+                if (_currentDepth < 0) _currentDepth = easedDepth;
+                if (!_smoothRaf) _smoothRaf = requestAnimationFrame(smoothTick);
             } else {
-                var u = Math.min(depth - easeStart, easeLen);
-                easedDepth = easeStart + u - (u * u) / (2 * easeLen);
+                applyDepth(easedDepth);
             }
+        }
 
-            allElements.forEach(function (img) {
-                var speed      = parseFloat(img.dataset.speedFactor || '1');
-                var parallaxY  = easedDepth * (1 - speed) * C.depthParallaxStrength;
-                var naturalTop = parseFloat(img.dataset.naturalTop || '0');
-                var imgH       = img.offsetHeight || 0;
-                var isBack     = img.classList.contains('back-layer');
-                var minP       = -naturalTop;
-                var maxP       = isBack ? Infinity : state.fullHeight - naturalTop - imgH;
-                var clamped    = Math.max(minP, Math.min(maxP, parallaxY));
-
-                img.style.transform = 'translateY(' + clamped.toFixed(2) + 'px)';
-            });
+        function setSmooth(factor) {
+            _smoothFactor = factor;
+            if (factor <= 0 && _smoothRaf) {
+                cancelAnimationFrame(_smoothRaf);
+                _smoothRaf = 0;
+            }
         }
 
         // ── expose ────────────────────────────────────────────────────────
@@ -342,6 +379,7 @@
             state:             state,
             initLayout:        initLayout,
             updateImageScales: updateImageScales,
+            setSmooth:         setSmooth,
             avoidanceEl:       null
         };
 

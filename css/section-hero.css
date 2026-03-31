@@ -23,7 +23,7 @@
 
 @media (max-width: 768px) {
     .hero .type-display-hero {
-        top: 50%;
+        top: calc(48% + var(--space-for-nav) / 2);
         bottom: auto;
         transform: translate(-50%, -50%);
         font-size: var(--size-display-hero) !important;

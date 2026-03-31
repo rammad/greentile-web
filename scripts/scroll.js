@@ -25,10 +25,16 @@
         const shim = { get scroll() { return viewport.scrollTop; } };
         window.lenis = shim;
 
+        let rafPending = false;
         viewport.addEventListener('scroll', () => {
-            window.dispatchEvent(
-                new CustomEvent('lenis-scroll', { detail: { scroll: viewport.scrollTop } })
-            );
+            if (rafPending) return;
+            rafPending = true;
+            requestAnimationFrame(() => {
+                rafPending = false;
+                window.dispatchEvent(
+                    new CustomEvent('lenis-scroll', { detail: { scroll: viewport.scrollTop } })
+                );
+            });
         }, { passive: true });
     }
 

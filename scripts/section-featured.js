@@ -24,6 +24,7 @@
         const section      = document.querySelector('.featured-section');
         if (!section) return;
 
+        const frame        = section.querySelector('.featured-frame');
         const marqueeLayer = section.querySelector('.featured-marquee-layer');
         const posterWrap   = section.querySelector('.featured-poster-wrap');
         const bgImg        = section.querySelector('.featured-bg-img');
@@ -37,8 +38,13 @@
         const recalcLayout = () => {
             lastWidth = window.innerWidth;
             cachedVH = window.innerHeight;
-            sectionCenterY = section.offsetTop + section.offsetHeight * 0.5;
-            sectionHeight  = section.offsetHeight;
+            if (isMobile && frame) {
+                sectionCenterY = section.offsetTop + frame.offsetTop + frame.offsetHeight * 0.5;
+                sectionHeight  = frame.offsetHeight;
+            } else {
+                sectionCenterY = section.offsetTop + section.offsetHeight * 0.5;
+                sectionHeight  = section.offsetHeight;
+            }
         };
 
         document.fonts.ready.then(recalcLayout);
