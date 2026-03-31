@@ -69,7 +69,7 @@
     bottom: calc(-1 * 4px);
     left: 50%;
     width: var(--active-indicator-width);
-    height: 1.5px;                         /* intentional hair line — not scaled */
+    height: 1px;                         /* intentional hair line — not scaled */
     background: var(--c-dark-green);
     transform: translateX(-50%);
 }
@@ -120,7 +120,6 @@
 
 .nav-subpage .nav-left,
 .nav-subpage .nav-right {
-    padding: 12px 24px calc(12px - 4px);
     min-height: 54px;
 }
 

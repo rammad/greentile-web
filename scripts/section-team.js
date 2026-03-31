@@ -120,7 +120,7 @@
         let cachedStickyTop = null;
 
         const GONE_THRESHOLD = 0.15;
-        const BODY_THRESHOLD = 0.3;
+        const BODY_THRESHOLD = 0.38;
 
         function pxVar(expression) {
             const tmp = document.createElement('div');
@@ -219,7 +219,7 @@
             /* ── wait for first poster to be 25 % on-screen before showing title/body ── */
             const posterRect = firstPoster.getBoundingClientRect();
             const posterEnteredBy = vh - posterRect.top;
-            if (posterEnteredBy < posterRect.height * 0.85) {
+            if (posterEnteredBy < posterRect.height * 0.75) {
                 hideTitle();
                 hideBody();
                 bodyAllowed = false;

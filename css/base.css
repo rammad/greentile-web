@@ -79,7 +79,7 @@
 
     --poster-gap: 20px;
     --poster-radius: 8% / 7%; /* circular corners on 4:5 aspect ratio */
-    --poster-full-height: calc(100vh - var(--space-for-nav) - 80px);
+    --poster-full-height: calc(100vh - var(--space-for-nav) - 40px);
 
     /* line-height — named so any reader knows the intent */
     --lh-tight:   0.85; /* all-caps display/header — flush with text-box trim */
@@ -698,7 +698,7 @@ body::after {
         --lh-body:    1.2;
         --lh-open:    1.4;
 
-        --space-for-nav: 70px;
+        --space-for-nav: 78px;
         --page-gutter: 12px;
 
         --gap-text: 24px;

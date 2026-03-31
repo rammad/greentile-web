@@ -82,7 +82,7 @@
         }
 
         // ── TUNING ────────────────────────────────────────────────
-        const SECTION_VH         = 1.5;   // section height in viewports (bigger = slower overall scroll)
+        const SECTION_VH         = 2.0;   // section height in viewports (bigger = slower overall scroll)
         const ENTRANCE_DELAY = -2.5;   // negative = cards start moving before progress reaches 0
         const STAGGER_SPLIT  = 0.2;  // 0–1, how much of the remaining range is card-to-card delay
         const FADE_Y_HI       = 0.30;  // card invisible when y > this × startOffset (travel distance)

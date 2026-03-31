@@ -15,7 +15,7 @@
     right: 0;
     width: 100%;
     height: calc(100vh - var(--space-for-nav));
-    padding: 40px var(--page-gutter);
+    padding: 0 var(--page-gutter) 40px;
     box-sizing: border-box;
 }
 

@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sphereRadius: 2.0,
         positionY: 0,
 
-        cameraPosition: { x: 0, y: 0, z: 2.6 },
+        cameraPosition: { x: 0, y: 0, z: 2.5 },
         cameraRotation: { x: 0, y: 0, z: 0 },
 
         segments: 512,

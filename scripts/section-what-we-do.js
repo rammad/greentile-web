@@ -23,15 +23,15 @@
     // Narrower ranges → faster motion;  wider → slower.
     // Travel values set vertical displacement in vh.
     const DESKTOP_MENU = {
-        revealAt:     -20,     // menu items fade in (stagger)
-        enterStart:   -25,     // begin sliding up from below
-        enterEnd:     20,      // arrive at pinned position
+        revealAt:     -15,     // menu items fade in (stagger)
+        enterStart:   -20,     // begin sliding up from below
+        enterEnd:     25,      // arrive at pinned position
         enterTravel:  75,      // vh below pinned position at start
-        slidesStart:  -15,      // first item selected
-        slidesEnd:    100,      // last item selected
+        slidesStart:  -0,      // first item selected
+        slidesEnd:    85,      // last item selected
         exitStart:    75,      // begin sliding upward off screen
         exitEnd:      130,     // fully offscreen
-        exitTravel:   75,      // vh above pinned position at end
+        exitTravel:   80,      // vh above pinned position at end
         hideAt:       130,     // menu items fade out
     };
 

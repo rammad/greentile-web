@@ -117,10 +117,10 @@
     opacity: 1;
     transform: translateY(0);
 }
-
+/* 
 .team-names {
     color: var(--c-dark-green-50);
-}
+} */
 
 /* type-body2 starts at opacity:0 / blur globally;
    inside .team-body the wrapper handles fade, so reset the child */

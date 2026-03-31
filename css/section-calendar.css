@@ -23,7 +23,6 @@
 .calendar-header .type-display-hero {
     font-size: 9.1vw;
     margin: 0;
-    padding-top: 8px;
     line-height: var(--lh-tight);
     overflow: visible;
 }
@@ -53,15 +52,16 @@
     bottom: 0;
     left: 50%;
     width: var(--active-indicator-width);
-    height: 1.5px;                         /* intentional hair line — not scaled */
+    height: 1px;
     background: var(--c-dark-green);
-    transform: translateX(-50%) scaleX(0);
-    transition: transform 0.3s ease;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .filter-btn.active::after,
 .view-btn.active::after {
-    transform: translateX(-50%) scaleX(1);
+    opacity: 1;
 }
 
 .divider { 
