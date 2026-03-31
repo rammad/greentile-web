@@ -98,7 +98,7 @@
 .hamburger-line {
     display: block;
     width: 20px;
-    height: 1.5px;
+    height: 1px;
     background: var(--c-dark-green);
     border-radius: 2px;
     transition: transform 0.4s var(--ease-standard), opacity 0.25s ease;

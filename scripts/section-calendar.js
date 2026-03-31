@@ -630,29 +630,20 @@ function initMobileFilterToggle() {
             const oldLabel = isGrid ? 'Grid' : 'List';
 
             hidden.textContent = newLabel;
-            const targetWidth = hidden.offsetWidth;
-
-            newBtnGrid.style.width = newBtnGrid.offsetWidth + 'px';
-            newBtnGrid.offsetHeight;
-            newBtnGrid.style.transition = `width ${rollMs}ms var(--ease-standard)`;
-            newBtnGrid.style.width = targetWidth + 'px';
 
             newBtnGrid.classList.add('is-rolling');
 
             setTimeout(() => {
                 visible.style.transition = 'none';
                 hidden.style.transition = 'none';
-                newBtnGrid.style.transition = 'none';
 
                 visible.textContent = newLabel;
                 hidden.textContent = oldLabel;
                 newBtnGrid.classList.remove('is-rolling');
-                newBtnGrid.style.width = '';
 
                 newBtnGrid.offsetHeight;
                 visible.style.transition = '';
                 hidden.style.transition = '';
-                newBtnGrid.style.transition = '';
                 gridRolling = false;
             }, rollMs);
         });

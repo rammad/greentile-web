@@ -59,6 +59,9 @@
 }
 
 @media (max-width: 768px) {
+    .archives-page {
+        padding-bottom: 0;
+    }
     .archives-title-mobile {
         padding: 0 12px 32px;
         overflow: visible;
@@ -92,5 +95,9 @@
     .grid-card {
         aspect-ratio: 4/5;
         width: 100%;
+    }
+
+    .load-more-container {
+        margin-top: 40px;
     }
 }
