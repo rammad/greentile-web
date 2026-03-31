@@ -158,6 +158,9 @@
         text-box: normal;
         padding-bottom: calc(var(--page-gutter) * 2);
     }
+    .footer-main .type-display-hero.is-edge-to-edge {
+        padding-bottom: var(--page-gutter);
+    }
     .footer-main .type-display-hero > span {
         display: block;
     }

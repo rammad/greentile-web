@@ -26,6 +26,29 @@
             const currentSize = parseFloat(title.style.fontSize);
             if (currentSize) title.style.fontSize = `${currentSize * scale}px`;
         }
+
+        updateFooterTitlePadding(title);
+    }
+
+    function updateFooterTitlePadding(title) {
+        if (!title) title = document.querySelector('.footer-main .type-display-hero');
+        if (!title || window.innerWidth > 1024) {
+            title?.classList.remove('is-edge-to-edge');
+            return;
+        }
+
+        const containerWidth = title.clientWidth;
+        const spans = title.querySelectorAll(':scope > span');
+        if (!spans.length) return;
+
+        const range = document.createRange();
+        let maxTextWidth = 0;
+        for (const span of spans) {
+            range.selectNodeContents(span);
+            maxTextWidth = Math.max(maxTextWidth, range.getBoundingClientRect().width);
+        }
+
+        title.classList.toggle('is-edge-to-edge', maxTextWidth >= containerWidth - 1);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
