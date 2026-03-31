@@ -9,33 +9,8 @@
         const content = document.getElementById('scroll-content');
         if (!viewport || !content) return;
 
-        if (isTouchDevice) {
-            initNativeTouch(viewport);
-        } else {
-            initLenis(viewport, content);
-        }
-
+        initLenis(viewport, content);
         initGradientSectionObserver(viewport);
-    }
-
-    function initNativeTouch(viewport) {
-        viewport.style.overflow = 'auto';
-        viewport.style.overscrollBehavior = 'none';
-
-        const shim = { get scroll() { return viewport.scrollTop; } };
-        window.lenis = shim;
-
-        let rafPending = false;
-        viewport.addEventListener('scroll', () => {
-            if (rafPending) return;
-            rafPending = true;
-            requestAnimationFrame(() => {
-                rafPending = false;
-                window.dispatchEvent(
-                    new CustomEvent('lenis-scroll', { detail: { scroll: viewport.scrollTop } })
-                );
-            });
-        }, { passive: true });
     }
 
     function initLenis(viewport, content) {
@@ -50,7 +25,10 @@
             wheelMultiplier: opts.lenisWheelMultiplier ?? 1.2,
             easing: (t) => 1 - Math.pow(1 - t, 4),
             smoothWheel: true,
-            syncTouch: false,
+            syncTouch: isTouchDevice,
+            syncTouchLerp: 0.075,
+            touchMultiplier: 0.5,
+            touchInertiaMultiplier: 25,
         });
 
         lenis.on('scroll', () => {

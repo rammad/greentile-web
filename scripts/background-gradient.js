@@ -251,11 +251,14 @@ class GradientEngine {
             antialias: true 
         });
         this.renderer.setSize(width, height, false);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const isMobile = window.innerWidth < 768;
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
         this._lastWidth = width;
         this._lastHeight = height;
 
         this.clock = new THREE.Clock();
+        this._throttle = window.innerWidth < 768;
+        this._skipFrame = false;
         window.addEventListener('resize', () => this.onResize());
 
         if (cfg.useSectionObserver && cfg.updateMode === 'observer') this.setupObserver();
@@ -328,6 +331,10 @@ class GradientEngine {
 
     animate() {
         requestAnimationFrame(() => this.animate());
+
+        if (this._skipFrame) { this._skipFrame = false; return; }
+        if (this._throttle) this._skipFrame = true;
+
         const delta = this.clock.getDelta();
         this.uniforms.uTime.value += delta;
 
@@ -350,6 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageSectionColors = pageSection
         ? pageSection.getAttribute('data-colors').split(',').map(s => s.trim())
         : ['#47ff54', '#f1ffe8', '#f0fd7c'];
+    const mobileGpu = window.innerWidth < 768;
 
     new GradientEngine('gradient-canvas', {
         colors: pageSectionColors,
@@ -372,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cameraPosition: { x: 0, y: 0, z: 2.6 },
         cameraRotation: { x: 0, y: 0, z: 0 },
 
-        segments: 512
+        segments: mobileGpu ? 128 : 512
     });
 
     new GradientEngine('footer-canvas', {
@@ -395,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cameraPosition: { x: 0, y: 0, z: 2.5 },
         cameraRotation: { x: 0, y: 0, z: 0 },
 
-        segments: 512,
-        useSectionObserver: false  // uses #footer-gradient-container data-colors, not active section
+        segments: mobileGpu ? 128 : 512,
+        useSectionObserver: false
     });
 });

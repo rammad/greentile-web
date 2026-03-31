@@ -34,6 +34,7 @@
 .nav-left {
     justify-self: start;
     padding: 12px 20px;
+    transition: opacity 0.3s ease;
 }
 
 .nav-right {
@@ -148,7 +149,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    gap: 24px;
+    gap: 36px;
 }
 
 .mobile-menu-subhead {
@@ -163,7 +164,8 @@
 }
 
 .mobile-menu .type-display-hero,
-.mobile-menu .type-h1 {
+.mobile-menu .type-h1,
+.mobile-menu .type-h2 {
     opacity: 1;
     text-align: center;
 }
@@ -171,6 +173,7 @@
 .mobile-menu-link {
     color: var(--c-dark-green-30);
     text-decoration: none;
+    word-spacing: 0.05em;
 }
 
 .mobile-menu-link.is-current {
@@ -181,6 +184,12 @@
     .nav-center,
     .nav-right {
         display: none;
+    }
+
+    body.mobile-menu-is-open .nav-left,
+    body.contact-is-open .nav-left {
+        opacity: 0;
+        pointer-events: none;
     }
 
     .sticky-nav {

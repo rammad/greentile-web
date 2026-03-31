@@ -454,15 +454,15 @@ const CURTAIN_TILE_SCATTER_DESKTOP = {
 };
 const CURTAIN_TILE_SCATTER_MOBILE = {
     3: [
-        { x: -93, y: 19,  r: -20 },
-        { x:   7, y: 28,  r:  12 },
-        { x:  88, y:  8,  r:  -8 },
+        { x: -68, y: 14,  r: -20 },
+        { x:   5, y: 21,  r:  12 },
+        { x:  65, y:  6,  r:  -8 },
     ],
     4: [
-        { x: -128, y: 16,  r: -22 },
-        { x:  -28, y: 33,  r:  16 },
-        { x:   48, y: 10,  r:  -8 },
-        { x:  128, y: 24,  r:  18 },
+        { x: -94, y: 12,  r: -22 },
+        { x: -21, y: 24,  r:  16 },
+        { x:  35, y:  7,  r:  -8 },
+        { x:  94, y: 18,  r:  18 },
     ],
 };
 const CURTAIN_TILE_SCATTER = window.innerWidth < 768 ? CURTAIN_TILE_SCATTER_MOBILE : CURTAIN_TILE_SCATTER_DESKTOP;
@@ -472,7 +472,7 @@ function vwPx(px) { return px; }
 
 // tile width + gap 4px = stride; compute a centered row for any count
 function getTileSnapX(count) {
-    const tileW  = window.innerWidth < 768 ? 76 : 88;
+    const tileW  = window.innerWidth < 768 ? 56 : 88;
     const stride = vwPx(tileW + 4);
     const start  = -((count - 1) / 2) * stride;
     return Array.from({ length: count }, (_, i) => Math.round(start + i * stride));
@@ -670,6 +670,7 @@ function initMobileMenu(nav) {
         hamburger.classList.toggle('is-active', isOpen);
         hamburger.setAttribute('aria-expanded', String(isOpen));
         menu.classList.toggle('is-open', isOpen);
+        document.body.classList.toggle('mobile-menu-is-open', isOpen);
 
         if (isOpen) {
             resetCascades();
@@ -693,6 +694,7 @@ function initMobileMenu(nav) {
         hamburger.classList.remove('is-active');
         hamburger.setAttribute('aria-expanded', 'false');
         menu.classList.remove('is-open');
+        document.body.classList.remove('mobile-menu-is-open');
         resetCascades();
     }
 

@@ -151,7 +151,7 @@
                 } else if (p > exitStart) {
                     stickyOff = -stickyMax * ((p - exitStart) / easeLen);
                 }
-                stickyInner.style.transform = `translateY(${Math.round(stickyOff)}px)`;
+                stickyInner.style.transform = `translate3d(0,${Math.round(stickyOff)}px,0)`;
             } else {
                 stickyInner.style.transform = '';
             }
@@ -159,7 +159,7 @@
             cards.forEach((card, i) => {
                 const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
                 const y = Math.round(startOffset * (1 - easeDecel(localP)));
-                card.style.transform = `translateY(${y}px)`;
+                card.style.transform = `translate3d(0,${y}px,0)`;
                 const hi = startOffset * FADE_Y_HI;
                 const lo = startOffset * FADE_Y_LO;
                 card.style.opacity = y >= hi ? 0 : y <= lo ? 1 : 1 - (y - lo) / (hi - lo);

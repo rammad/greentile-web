@@ -17,16 +17,14 @@ const CONTACT_CONFIG = {
     const statusEl = panel.querySelector('.contact-status');
     let isOpen = false;
     let selectedTopic = 'general';
-    let savedOverflow = '';
 
     function open() {
         if (isOpen) return;
         isOpen = true;
-        savedOverflow = document.body.style.overflow;
         document.body.classList.add('contact-is-open');
         panel.classList.add('is-open');
         backdrop.classList.add('is-open');
-        document.body.style.overflow = 'hidden';
+        if (window.lenis && window.lenis.stop) window.lenis.stop();
 
         const hamburger = document.querySelector('.nav-hamburger');
         if (hamburger) {
@@ -41,7 +39,7 @@ const CONTACT_CONFIG = {
         document.body.classList.remove('contact-is-open');
         panel.classList.remove('is-open');
         backdrop.classList.remove('is-open');
-        document.body.style.overflow = savedOverflow;
+        if (window.lenis && window.lenis.start) window.lenis.start();
 
         const hamburger = document.querySelector('.nav-hamburger');
         const mobileMenu = document.querySelector('.mobile-menu');

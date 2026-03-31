@@ -240,8 +240,8 @@ function initMobileScrollSpy() {
 
     const setSpacerWidths = () => {
         const w = datesRail.clientWidth / 2;
-        startSpacer.style.flexBasis = w + 'px';
-        endSpacer.style.flexBasis = w + 'px';
+        startSpacer.style.minWidth = w + 'px';
+        endSpacer.style.minWidth = w + 'px';
     };
 
     const sizeRailOverlap = () => {

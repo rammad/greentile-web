@@ -62,7 +62,7 @@
         var numSlides = textBlocks.length || 1;
 
         var scatter = window.ScatterImages.init(section, viewport, numSlides, SCATTER_CONFIG);
-        if (window.innerWidth < 768) scatter.setSmooth(0.12);
+        var _cachedSlides = null;
 
         // ── build: fixed body container + scroll-track slides ──────────────
 
@@ -100,12 +100,12 @@
 
         buildLayout();
 
-        // seed every block off-screen below
         var vpH = window.innerHeight;
+        var _initMobile = window.innerWidth < MOBILE_BREAKPOINT;
         textBlocks.forEach(function (block) {
             block.style.opacity   = '0';
-            block.style.filter    = 'blur(' + BLUR_MAX_PX + 'px)';
-            block.style.transform = 'translateY(' + (vpH * TRAVEL_VH) + 'px)';
+            if (!_initMobile) block.style.filter = 'blur(' + BLUR_MAX_PX + 'px)';
+            block.style.transform = 'translate3d(0,' + (vpH * TRAVEL_VH) + 'px,0)';
         });
 
         // ── Doppler scroll ─────────────────────────────────────────────────
@@ -138,16 +138,16 @@
             var range       = slideHeight * RANGE_FACTOR;
             var travelPx    = vpH * TRAVEL_VH;
 
-            var slides = section.querySelectorAll('.about-alt-slide');
+            if (!_cachedSlides) _cachedSlides = section.querySelectorAll('.about-alt-slide');
+            var _isMobileFrame = window.innerWidth < MOBILE_BREAKPOINT;
 
             textBlocks.forEach(function (block, i) {
-                var slide = slides[i];
+                var slide = _cachedSlides[i];
                 if (!slide) return;
 
                 var slideRect   = slide.getBoundingClientRect();
                 var slideCenter = slideRect.top + slideRect.height / 2;
 
-                // t: 0 at viewport center, negative below, positive above
                 var t = (vpCenter - slideCenter) / range;
 
                 var remapped = dopplerRemap(t, DOPPLER_EXPONENT);
@@ -155,11 +155,13 @@
 
                 var absT    = Math.abs(t);
                 var opacity = 1 - smoothstep(absT, OPACITY_DWELL_START, OPACITY_DWELL_END);
-                var blur    = BLUR_MAX_PX * smoothstep(absT, BLUR_START, BLUR_END);
 
-                block.style.transform = 'translateY(' + yPx.toFixed(1) + 'px)';
+                block.style.transform = 'translate3d(0,' + yPx.toFixed(1) + 'px,0)';
                 block.style.opacity   = opacity.toFixed(3);
-                block.style.filter    = blur > 0.1 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
+                if (!_isMobileFrame) {
+                    var blur = BLUR_MAX_PX * smoothstep(absT, BLUR_START, BLUR_END);
+                    block.style.filter = blur > 0.1 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
+                }
 
                 var readable = absT < READABLE_THRESHOLD;
                 block.classList.toggle('is-readable', readable);
@@ -209,6 +211,7 @@
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(function () {
                 scatter.initLayout();
+                _cachedSlides = null;
                 var slidesAfterResize = section.querySelectorAll('.about-alt-slide');
                 if (slidesAfterResize.length > 0) {
                     var h = scatter.state.trackHeight / slidesAfterResize.length;

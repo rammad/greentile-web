@@ -57,13 +57,13 @@
             const delta = (scrollY + cachedVH * 0.5 - sectionCenterY) / sectionHeight;
 
             if (bgImg) {
-                bgImg.style.transform = `translateY(${(delta * BG_PX).toFixed(2)}px)`;
+                bgImg.style.transform = `translate3d(0,${(delta * BG_PX).toFixed(2)}px,0)`;
             }
             if (marqueeLayer) {
-                marqueeLayer.style.transform = `translateY(${(delta * MARQUEE_PX).toFixed(2)}px)`;
+                marqueeLayer.style.transform = `translate3d(0,${(delta * MARQUEE_PX).toFixed(2)}px,0)`;
             }
             if (posterWrap) {
-                posterWrap.style.transform = `translateY(${(delta * POSTER_PX).toFixed(2)}px)`;
+                posterWrap.style.transform = `translate3d(0,${(delta * POSTER_PX).toFixed(2)}px,0)`;
             }
         };
 

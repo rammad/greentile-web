@@ -12,6 +12,7 @@
     const TIME_FADE_OUT       = 0.25;  // seconds — body text fade-out duration
     const BODY_BLUR_PX        = 8;     // px — blur on hidden body text blocks
     const BODY_GAP_VH         = 0.05;  // vh — gap between menu bottom and body text top
+    const _wwd_isMobile       = window.innerWidth < 768;
 
     // ── desktop menu animation sequence (progress 0–100) ───────────────
     //   ①  revealAt          — menu items fade in (stagger)
@@ -63,7 +64,6 @@
         const isMobile   = window.innerWidth < 768;
 
         const scatter = window.ScatterImages.init(section, viewport, numSlides, {});
-        if (isMobile) scatter.setSmooth(0.12);
 
         // ── persistent menu ───────────────────────────────────────────────────
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
@@ -94,30 +94,7 @@
         let activeIdx      = 0;
         let wasActive      = false;
         let menuIsRevealed = false;
-
-        const MENU_LERP    = isMobile ? 0.14 : 1;
-        let _menuCurrent   = null;
-        let _menuTarget    = 0;
-        let _bodyCurrent   = null;
-        let _bodyTarget    = 0;
-        let _menuRaf       = 0;
-
-        function menuSmoothTick() {
-            _menuCurrent += (_menuTarget - _menuCurrent) * MENU_LERP;
-            _bodyCurrent += (_bodyTarget - _bodyCurrent) * MENU_LERP;
-            const settled = Math.abs(_menuTarget - _menuCurrent) < 0.3
-                         && Math.abs(_bodyTarget - _bodyCurrent) < 0.3;
-            if (settled) { _menuCurrent = _menuTarget; _bodyCurrent = _bodyTarget; }
-
-            if (menuEl) menuEl.style.transform = `translateY(${_menuCurrent.toFixed(1)}px)`;
-            if (bodyEl) bodyEl.style.top = `${_bodyCurrent.toFixed(1)}px`;
-
-            if (!settled) {
-                _menuRaf = requestAnimationFrame(menuSmoothTick);
-            } else {
-                _menuRaf = 0;
-            }
-        }
+        let _cachedBlocks = [];
 
         function buildLayout() {
             const stickyContent = section.querySelector('.about-sticky-content');
@@ -147,6 +124,7 @@
         }
 
         buildLayout();
+        if (bodyEl) _cachedBlocks = Array.from(bodyEl.querySelectorAll('.about-text-block'));
 
         function initBlockStates() {
             if (!bodyEl) return;
@@ -154,13 +132,13 @@
             blocks.forEach((block) => {
                 block.style.transition    = 'none';
                 block.style.opacity       = '0';
-                block.style.filter        = `blur(${BODY_BLUR_PX}px)`;
+                if (!_wwd_isMobile) block.style.filter = `blur(${BODY_BLUR_PX}px)`;
             });
             void bodyEl.offsetHeight;
-            blocks.forEach((block) => {
-                block.style.transition =
-                    `opacity ${TIME_FADE_IN}s ease, filter ${TIME_FADE_IN}s ease`;
-            });
+            const trans = _wwd_isMobile
+                ? `opacity ${TIME_FADE_IN}s ease`
+                : `opacity ${TIME_FADE_IN}s ease, filter ${TIME_FADE_IN}s ease`;
+            blocks.forEach((block) => { block.style.transition = trans; });
         }
 
         initBlockStates();
@@ -169,16 +147,20 @@
 
         function showBlock(block) {
             if (!block) return;
-            block.style.transition    = `opacity ${TIME_FADE_IN}s ease, filter ${TIME_FADE_IN}s ease`;
-            block.style.opacity       = '1';
-            block.style.filter        = 'blur(0px)';
+            block.style.transition = _wwd_isMobile
+                ? `opacity ${TIME_FADE_IN}s ease`
+                : `opacity ${TIME_FADE_IN}s ease, filter ${TIME_FADE_IN}s ease`;
+            block.style.opacity = '1';
+            if (!_wwd_isMobile) block.style.filter = 'blur(0px)';
         }
 
         function hideBlock(block) {
             if (!block) return;
-            block.style.transition    = `opacity ${TIME_FADE_OUT}s ease, filter ${TIME_FADE_OUT}s ease`;
-            block.style.opacity       = '0';
-            block.style.filter        = `blur(${BODY_BLUR_PX}px)`;
+            block.style.transition = _wwd_isMobile
+                ? `opacity ${TIME_FADE_OUT}s ease`
+                : `opacity ${TIME_FADE_OUT}s ease, filter ${TIME_FADE_OUT}s ease`;
+            block.style.opacity = '0';
+            if (!_wwd_isMobile) block.style.filter = `blur(${BODY_BLUR_PX}px)`;
         }
 
         function showCtas(block) {
@@ -209,11 +191,8 @@
         const MENU_REVEAL_VH_DESKTOP = 0.05;  // vh — section top must reach this far down viewport to activate (desktop)
         const MENU_REVEAL_VH_MOBILE  = 0.35;  // vh — same trigger for mobile
 
-        function updateActiveSlide() {
-            const vpRect    = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
-            const secRect   = section.getBoundingClientRect();
-            const vpH       = vpRect.height;
-            const blocks    = bodyEl ? Array.from(bodyEl.querySelectorAll('.about-text-block')) : [];
+        function updateActiveSlide(secRect, vpH) {
+            const blocks    = _cachedBlocks;
             const revealVH  = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
             const cfg       = isMobile ? MOBILE_MENU : DESKTOP_MENU;
 
@@ -251,13 +230,12 @@
                 } else {
                     menuY = -exitPx;
                 }
-                if (MENU_LERP < 1) {
-                    _menuTarget = menuY;
-                    if (_menuCurrent === null) _menuCurrent = menuY;
-                    if (!_menuRaf) _menuRaf = requestAnimationFrame(menuSmoothTick);
-                } else {
-                    menuEl.style.transform = `translateY(${menuY.toFixed(1)}px)`;
-                }
+                menuEl.style.transform = `translate3d(0,${menuY.toFixed(1)}px,0)`;
+            }
+
+            if (bodyEl && menuEl && isActive) {
+                const gap = vpH * BODY_GAP_VH;
+                bodyEl.style.top = `${menuEl.getBoundingClientRect().bottom + gap}px`;
             }
 
             // ── text block transitions ──────────────────────────────
@@ -267,17 +245,6 @@
             }
             if (justBecameInactive) {
                 blocks.forEach(b => { hideBlock(b); hideCtas(b); });
-            }
-
-            if (bodyEl && menuEl && isActive) {
-                const gap = vpH * BODY_GAP_VH;
-                const bodyTop = menuEl.getBoundingClientRect().bottom + gap;
-                if (MENU_LERP < 1) {
-                    _bodyTarget = bodyTop;
-                    if (_bodyCurrent === null) _bodyCurrent = bodyTop;
-                } else {
-                    bodyEl.style.top = `${bodyTop}px`;
-                }
             }
 
             wasActive = isActive;
@@ -331,8 +298,10 @@
 
         window.addEventListener('lenis-scroll', () => {
             scrollHasFired = true;
-            scatter.updateImageScales();
-            updateActiveSlide();
+            const secRect = section.getBoundingClientRect();
+            const vpH     = viewport ? viewport.getBoundingClientRect().height : window.innerHeight;
+            updateActiveSlide(secRect, vpH);
+            scatter.updateImageScales(vpH, secRect.top);
         });
 
         // ── resize ────────────────────────────────────────────────────────────

@@ -33,7 +33,7 @@
     overscroll-behavior-y: contain; /* stop scroll from bubbling to the page */
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-top: 20px;
+    padding: 40px 0;
     width: 100%;
     height: 100%;
 }
@@ -48,35 +48,8 @@
     position: relative;
     overflow: hidden;
     margin-bottom: 64px;
-}
-
-.pdp-desc-wrapper::before,
-.pdp-desc-wrapper::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 60px;
-    pointer-events: none;
-    z-index: 2;
-}
-
-.pdp-desc-wrapper::before {
-    top: 0;
-    background: linear-gradient(to bottom, var(--color-bg) 0%, transparent 100%);
-}
-
-.pdp-desc-wrapper::after {
-    bottom: 0;
-    background: linear-gradient(to top, var(--color-bg) 0%, transparent 100%);
-}
-
-.pdp-desc-wrapper.hide-top-fade::before {
-    opacity: 0;
-}
-
-.pdp-desc-wrapper.hide-bottom-fade::after {
-    opacity: 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
 }
 
 .pdp-grid {
@@ -190,7 +163,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: var(--c-dark-green-10);
+    background-color: var(--c-dark-green-20);
     border-radius: 100px;
     padding: var(--cta-padding);
     min-width: 140px;
@@ -217,7 +190,7 @@
 
 .pdp-tag {
     display: inline-block;
-    background-color: var(--c-dark-green-10);
+    background-color: var(--c-dark-green-20);
     padding: 4px 8px calc(4px / 2);
     border-radius: 4px;
     margin: 0 4px 8px 0;
@@ -226,7 +199,7 @@
 }
 
 .pdp-tag .type-subRegular2,.pdp-tag .type-subRegular1{
-    color: var(--c-dark-green-80);
+    color: var(--c-dark-green-90);
 }
 
 .pdp-tag.is-visible{
@@ -327,11 +300,8 @@
         flex: none;
         min-height: unset;
         margin-bottom: 0;
-    }
-
-    .pdp-desc-wrapper::before,
-    .pdp-desc-wrapper::after {
-        display: none;
+        -webkit-mask-image: none;
+        mask-image: none;
     }
 
     .pdp-info {
@@ -351,7 +321,8 @@
         left: 0;
         right: 0;
         z-index: 100;
-        background-color: var(--color-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         padding: var(--page-gutter);
         padding-bottom: calc(var(--page-gutter) + env(safe-area-inset-bottom, 0px));
         transform: translateY(100%);

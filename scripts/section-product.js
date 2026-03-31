@@ -18,7 +18,6 @@
 
         initImageScroll();
         initMobileDots();
-        initDescFade();
         updateQty(0);
     });
 
@@ -222,12 +221,12 @@
 
         function tick() {
             currentY += (targetY - currentY) * LERP;
-            track.style.transform = `translateY(${-currentY}px)`;
+            track.style.transform = `translate3d(0,${-currentY}px,0)`;
             if (Math.abs(targetY - currentY) > 0.1) {
                 rafId = requestAnimationFrame(tick);
             } else {
                 currentY = targetY;
-                track.style.transform = `translateY(${-currentY}px)`;
+                track.style.transform = `translate3d(0,${-currentY}px,0)`;
                 rafId = null;
             }
         }
@@ -270,7 +269,7 @@
         window.addEventListener('resize', () => {
             targetY  = clamp(targetY, 0, maxScroll());
             currentY = targetY;
-            track.style.transform = `translateY(${-currentY}px)`;
+            track.style.transform = `translate3d(0,${-currentY}px,0)`;
         });
     }
 
@@ -330,25 +329,6 @@
             });
             dots.forEach((d, i) => d.classList.toggle('is-active', i === active));
         }, { passive: true });
-    }
-
-    function initDescFade() {
-        const desc    = document.querySelector('.pdp-desc');
-        const wrapper = document.querySelector('.pdp-desc-wrapper');
-        if (!desc || !wrapper) return;
-
-        function updateFades() {
-            const atTop    = desc.scrollTop <= 2;
-            const atBottom = desc.scrollTop + desc.clientHeight >= desc.scrollHeight - 2;
-            wrapper.classList.toggle('hide-top-fade', atTop);
-            wrapper.classList.toggle('hide-bottom-fade', atBottom);
-        }
-
-        desc.addEventListener('scroll', updateFades, { passive: true });
-        updateFades();
-
-        // re-check after content/layout settles
-        window.addEventListener('resize', updateFades);
     }
 
     // qty selector

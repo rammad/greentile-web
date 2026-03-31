@@ -80,7 +80,7 @@
         // ── vertical & horizontal scatter ──────────────────────────────────
         verticalJitter:         0.12,  // 0–1 — random vertical offset for front images (fraction of spacing)
         backVerticalJitter:     0.30,  // 0–1 — random vertical offset for back images (fraction of spacing)
-        mobileVerticalJitter:   0.30,  // 0–1 — front vertical jitter on mobile
+        mobileVerticalJitter:   0.25,  // 0–1 — front vertical jitter on mobile
         mobileBackVerticalJitter: 0.40, // 0–1 — back vertical jitter on mobile
         horizontalJitterPct:    1.5,   // % — random horizontal offset per image within its column
 
@@ -209,9 +209,15 @@
                 var backPerCol = isMobile ? C.mobileBackImagesPerCol : C.backImagesPerCol;
                 backCols.forEach(function (col) {
                     for (var i = 0; i < backPerCol; i++) {
-                        var clone = document.createElement('img');
-                        clone.src = srcPool[poolIdx % srcPool.length];
-                        clone.className = 'scatter-img back-layer';
+                        var clone;
+                        if (isMobile) {
+                            clone = document.createElement('div');
+                            clone.className = 'scatter-img back-layer back-card';
+                        } else {
+                            clone = document.createElement('img');
+                            clone.src = srcPool[poolIdx % srcPool.length];
+                            clone.className = 'scatter-img back-layer';
+                        }
                         clone.setAttribute('aria-hidden', 'true');
                         track.appendChild(clone);
                         backClones.push(clone);
@@ -324,7 +330,7 @@
                 var minP      = -c.naturalTop;
                 var maxP      = c.isBack ? Infinity : fH - c.naturalTop - c.height;
                 var clamped   = parallaxY < minP ? minP : (parallaxY > maxP ? maxP : parallaxY);
-                c.el.style.transform = 'translateY(' + clamped.toFixed(2) + 'px)';
+                c.el.style.transform = 'translate3d(0,' + clamped.toFixed(2) + 'px,0)';
             }
         }
 
@@ -349,10 +355,10 @@
             }
         }
 
-        function updateImageScales() {
+        function updateImageScales(preVpH, preSectionTop) {
             if (!viewport) return;
-            var vpH        = viewport.getBoundingClientRect().height;
-            var sectionTop = section.getBoundingClientRect().top;
+            var vpH        = preVpH || viewport.getBoundingClientRect().height;
+            var sectionTop = preSectionTop !== undefined ? preSectionTop : section.getBoundingClientRect().top;
             var rawDepth   = Math.max(0, vpH - sectionTop);
             var easedDepth = easeRaw(rawDepth, vpH);
 

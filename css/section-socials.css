@@ -103,6 +103,7 @@
     object-fit: cover;
     flex-shrink: 0;
     border-radius: var(--poster-radius);
+    will-change: transform, opacity;
 
     opacity: 0;
     transform: translateY(calc(80px + 40px));

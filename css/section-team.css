@@ -140,7 +140,7 @@
 @media (max-width: 768px) {
     .team-layout {
         grid-template-columns: 1fr;
-        row-gap: 40px;
+        row-gap: 60px;
     }
 
     .team-title-col,
@@ -148,6 +148,7 @@
     .team-text-col { grid-column: 1; }
 
     .team-images-col {
+        gap: 0;
         padding: 0 calc(40px - var(--page-gutter));
     }
 
@@ -159,6 +160,7 @@
         position: relative;
         top: 0;
         height: auto;
+        padding-bottom: 0;
         text-align: center;
     }
 
@@ -183,7 +185,8 @@
         position: relative;
         bottom: auto;
         width: auto;
-        padding: var(--poster-gap) 0;
+        padding: 0;
+        margin-top: var(--poster-gap);
         text-align: center;
     }
 
@@ -192,5 +195,10 @@
         width: 100%;
         opacity: 1;
         transform: none;
+        margin-top: 60px;
+    }
+
+    .team-poster-wrap:first-child {
+        margin-top: 0;
     }
 }
