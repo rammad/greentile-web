@@ -44,8 +44,8 @@
 
     // ── mobile menu animation sequence (progress 0–100) ─────────────
     const MOBILE_MENU = {
-        revealAt:      -10,     // menu items fade in (stagger)
-        enterStart:    -20,     // begin sliding up from below
+        revealAt:      0,     // menu items fade in (stagger)
+        enterStart:    -10,     // begin sliding up from below
         enterEnd:      20,      // arrive at pinned position
         enterTravel:   75,      // vh below pinned position at start
         firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
@@ -55,6 +55,17 @@
         exitTravel:    120,     // vh above pinned position at end
         hideAt:        110,     // menu items fade out
         edgeWeight:    1,       // equal time per slide
+    };
+
+    // ── image sizing — vw-based with px clamp ────────────────────────
+    //   width = clamp(min, vw × viewport-width, max)
+    const DESKTOP_IMAGE_SIZE = {
+        frontVw: 0.10,  frontMin: 120,  frontMax: 200,
+        backVw:  0.07,  backMin:  80,   backMax:  140,
+    };
+    const MOBILE_IMAGE_SIZE = {
+        frontVw: 0.30,  frontMin: 80,   frontMax: 140,
+        backVw:  0.26,  backMin:  50,   backMax:  90,
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -67,7 +78,10 @@
         const menuEl     = section.querySelector('.about-menu-persistent');
         const isMobile   = window.innerWidth <= 1024;
 
-        const scatter = window.ScatterImages.init(section, viewport, numSlides, {});
+        const scatter = window.ScatterImages.init(section, viewport, numSlides, {
+            desktopImages: DESKTOP_IMAGE_SIZE,
+            mobileImages:  MOBILE_IMAGE_SIZE,
+        });
 
         // ── persistent menu ───────────────────────────────────────────────────
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
@@ -147,6 +161,41 @@
         }
 
         initBlockStates();
+
+        // ── center menu + body vertically ───────────────────────────────────
+
+        function positionMenuCenter(vpH) {
+            if (!menuEl || !bodyEl) return;
+            void menuEl.offsetHeight;
+
+            const navSpace = parseFloat(
+                getComputedStyle(document.documentElement).getPropertyValue('--space-for-nav')
+            ) || 78;
+            const nudgeHigher = 8;
+
+            const menuH = menuEl.offsetHeight;
+            const gap   = vpH * BODY_GAP_VH;
+
+            const blocks = Array.from(bodyEl.querySelectorAll('.about-text-block'));
+            let contentH = 0;
+            blocks.forEach(b => {
+                let h = b.offsetHeight;
+                const cta = b.querySelector('.cta-btn');
+                if (cta) h += 40 + cta.offsetHeight;
+                if (h > contentH) contentH = h;
+            });
+
+            const totalH     = menuH + gap + contentH;
+            const availableH = vpH - navSpace - nudgeHigher;
+            const idealTop   = navSpace + (availableH - totalH) / 2;
+
+            menuEl.style.top = `${Math.max(navSpace, idealTop)}px`;
+        }
+
+        const initVpH = viewport
+            ? viewport.getBoundingClientRect().height
+            : window.innerHeight;
+        positionMenuCenter(initVpH);
 
         // ── block show / hide ─────────────────────────────────────────────────
 
@@ -353,6 +402,8 @@
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 scatter.initLayout();
+                const vpH = viewport ? viewport.getBoundingClientRect().height : window.innerHeight;
+                positionMenuCenter(vpH);
                 const slidesAfterResize = section.querySelectorAll('.about-slide');
                 if (slidesAfterResize.length > 0) {
                     const slideHeight = scatter.state.trackHeight / slidesAfterResize.length;

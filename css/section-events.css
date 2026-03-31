@@ -133,4 +133,15 @@
     .events-content-footer {
         position: static;
     }
+
+    .event-card {
+        filter: blur(8px);
+        transition: opacity 0.55s ease, filter 0.55s ease;
+        will-change: opacity, filter;
+    }
+
+    .event-card.is-visible {
+        opacity: 1;
+        filter: blur(0);
+    }
 }

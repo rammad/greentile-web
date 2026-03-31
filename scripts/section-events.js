@@ -121,6 +121,29 @@
         let currentlyMobile = window.matchMedia('(max-width: 1024px)').matches;
         let stickProgress = 0;
 
+        // ── Mobile: sequential blur-fade-in (replaces scroll-driven cards) ──
+        const CARD_STAGGER_MS = 120;
+        let mobileCardsRevealed = false;
+
+        function revealMobileCards() {
+            if (mobileCardsRevealed) return;
+            mobileCardsRevealed = true;
+            cards.forEach((card, i) => {
+                card.style.transform = '';
+                card.style.opacity   = '';
+                setTimeout(() => card.classList.add('is-visible'), i * CARD_STAGGER_MS);
+            });
+            if (btn && transitionCta) {
+                setTimeout(() => transitionCta(btn, 'enter'), cards.length * CARD_STAGGER_MS);
+            }
+        }
+
+        if (grid && observeElementInOut) {
+            observeElementInOut(grid, {
+                onEnter() { if (currentlyMobile) revealMobileCards(); }
+            });
+        }
+
         // disable CSS transitions on the title wrap — it's scroll-driven so lag is unwanted
         if (titleWrap) titleWrap.style.transition = 'none';
 
@@ -155,21 +178,23 @@
                 stickyInner.style.transform = '';
             }
 
-            cards.forEach((card, i) => {
-                const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
-                const y = Math.round(startOffset * (1 - easeDecel(localP)));
-                card.style.transform = `translate3d(0,${y}px,0)`;
-                const hi = startOffset * FADE_Y_HI;
-                const lo = startOffset * FADE_Y_LO;
-                card.style.opacity = y >= hi ? 0 : y <= lo ? 1 : 1 - (y - lo) / (hi - lo);
-            });
+            if (!currentlyMobile) {
+                cards.forEach((card, i) => {
+                    const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
+                    const y = Math.round(startOffset * (1 - easeDecel(localP)));
+                    card.style.transform = `translate3d(0,${y}px,0)`;
+                    const hi = startOffset * FADE_Y_HI;
+                    const lo = startOffset * FADE_Y_LO;
+                    card.style.opacity = y >= hi ? 0 : y <= lo ? 1 : 1 - (y - lo) / (hi - lo);
+                });
 
-            if (btn && transitionCta) {
-                const thresh = currentlyMobile ? btnThresholdMobile : btnThresholdDesktop;
-                if (progress >= thresh && !btn.classList.contains('is-visible')) {
-                    transitionCta(btn, 'enter');
-                } else if (progress < thresh && btn.classList.contains('is-visible')) {
-                    transitionCta(btn, 'exit');
+                if (btn && transitionCta) {
+                    const thresh = btnThresholdDesktop;
+                    if (progress >= thresh && !btn.classList.contains('is-visible')) {
+                        transitionCta(btn, 'enter');
+                    } else if (progress < thresh && btn.classList.contains('is-visible')) {
+                        transitionCta(btn, 'exit');
+                    }
                 }
             }
         }
@@ -201,6 +226,11 @@
                 section.style.paddingTop = '';
                 section.style.minHeight  = '';
 
+                cards.forEach(card => {
+                    card.style.transform = '';
+                    card.style.opacity   = '';
+                });
+
                 const scrollNow   = window.scrollY;
                 const titleAbsTop = titleWrap.getBoundingClientRect().top + scrollNow;
                 const titleH      = titleWrap.offsetHeight;
@@ -210,6 +240,9 @@
                 stickProgress = 0;
                 startOffset   = ih * MOBILE_START_RATIO;
             } else {
+                mobileCardsRevealed = false;
+                cards.forEach(card => card.classList.remove('is-visible'));
+
                 stickyInner.style.paddingTop = (navInset + s20) + 'px';
 
                 const maxPosterH = ih - navInset - titleWrap.offsetHeight - flexGap - s20;

@@ -59,23 +59,11 @@
         slideHeightVhDesktop:   0.85,  // vh per slide — controls total section height (desktop)
         slideHeightVhMobile:    0.85,  // vh per slide — same for mobile
 
-        // ── image sizing (desktop) ────────────────────────────────────────
-        desktopFrontMinPx:      120,   // px — smallest front image width on desktop
-        desktopFrontMaxPx:      180,   // px — largest front image width on desktop
-        desktopBackMinPx:       80,    // px — smallest back image width on desktop
-        desktopBackMaxPx:       120,   // px — largest back image width on desktop
-
-        // ── image sizing (tablet) ─────────────────────────────────────────
-        tabletFrontMinPx:       90,    // px — smallest front image width on tablet
-        tabletFrontMaxPx:       140,   // px — largest front image width on tablet
-        tabletBackMinPx:        60,    // px — smallest back image width on tablet
-        tabletBackMaxPx:        90,    // px — largest back image width on tablet
-
-        // ── image sizing (mobile) ─────────────────────────────────────────
-        mobileFrontMinPx:       80,    // px — smallest front image width on mobile
-        mobileFrontMaxPx:       120,   // px — largest front image width on mobile
-        mobileBackMinPx:        50,    // px — smallest back image width on mobile
-        mobileBackMaxPx:        70,    // px — largest back image width on mobile
+        // ── image sizing — vw-based with px clamp ────────────────────────
+        //   width = clamp(min, vw × viewport-width, max)
+        desktopImages: { frontVw: 0.10, frontMin: 120, frontMax: 200, backVw: 0.07, backMin: 80,  backMax: 140 },
+        tabletImages:  { frontVw: 0.10, frontMin: 90,  frontMax: 160, backVw: 0.07, backMin: 60,  backMax: 100 },
+        mobileImages:  { frontVw: 0.25, frontMin: 80,  frontMax: 140, backVw: 0.16, backMin: 50,  backMax: 90  },
 
         // ── vertical & horizontal scatter ──────────────────────────────────
         verticalJitter:         0.12,  // 0–1 — random vertical offset for front images (fraction of spacing)
@@ -229,27 +217,15 @@
 
             // ── size ranges ────────────────────────────────────────────────
 
-            var frontMinW, frontMaxW, backMinW, backMaxW;
-            if (isMobile) {
-                frontMinW = C.mobileFrontMinPx;
-                frontMaxW = C.mobileFrontMaxPx;
-                backMinW  = C.mobileBackMinPx;
-                backMaxW  = C.mobileBackMaxPx;
-            } else if (bp === 'tablet') {
-                frontMinW = C.tabletFrontMinPx;
-                frontMaxW = C.tabletFrontMaxPx;
-                backMinW  = C.tabletBackMinPx;
-                backMaxW  = C.tabletBackMaxPx;
-            } else {
-                frontMinW = C.desktopFrontMinPx;
-                frontMaxW = C.desktopFrontMaxPx;
-                backMinW  = C.desktopBackMinPx;
-                backMaxW  = C.desktopBackMaxPx;
-            }
+            var imgCfg   = isMobile ? C.mobileImages
+                         : bp === 'tablet' ? C.tabletImages
+                         : C.desktopImages;
+            var frontVw   = imgCfg.frontVw,  frontMinW = imgCfg.frontMin, frontMaxW = imgCfg.frontMax;
+            var backVw    = imgCfg.backVw,   backMinW  = imgCfg.backMin,  backMaxW  = imgCfg.backMax;
 
             // ── position each column's images ──────────────────────────────
 
-            function positionColumn(colDef, images, minW, maxW, isBack) {
+            function positionColumn(colDef, images, minW, maxW, vwScale, isBack) {
                 var count = images.length;
                 if (count === 0) return;
 
@@ -263,13 +239,13 @@
                 var jitterAmt  = spacing * jitterVal;
                 var frameInset = colDef.frameInset || 0;
                 var frameN     = frameInset ? (isMobile ? C.mobileFrameCount : C.frameCount) : 0;
+                var imgW       = Math.round(Math.max(minW, Math.min(maxW, vpW * vwScale)));
+                var imgH       = imgW * (5 / 4);
 
                 images.forEach(function (img, i) {
                     var centerOffset = (colDef.flushTop && i === 0) ? 0 : 0.5;
                     var baseTop = edgeTop + spacing * (i + centerOffset) + staggerPx;
                     var jitter  = (Math.random() - 0.5) * 2 * jitterAmt;
-                    var imgW    = Math.round(randRange(minW, maxW));
-                    var imgH    = imgW * (5 / 4);
                     var rawTop  = baseTop + jitter;
 
                     var top = Math.max(0, Math.min(fullSectionHeight - imgH, rawTop));
@@ -303,10 +279,10 @@
             }
 
             frontCols.forEach(function (col) {
-                positionColumn(col, frontBuckets[col.id], frontMinW, frontMaxW, false);
+                positionColumn(col, frontBuckets[col.id], frontMinW, frontMaxW, frontVw, false);
             });
             backCols.forEach(function (col) {
-                positionColumn(col, backBuckets[col.id], backMinW, backMaxW, true);
+                positionColumn(col, backBuckets[col.id], backMinW, backMaxW, backVw, true);
             });
 
             state.trackHeight = totalSlideHeight;
