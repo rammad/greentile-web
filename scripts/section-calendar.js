@@ -294,7 +294,6 @@ function initMobileScrollSpy() {
     /* ── sync: when centered date changes, lerp poster into place ── */
     let activeIndex = -1;
     let lerpRaf = 0;
-    let swipeLock = false;
 
     const lerpPoster = (idx) => {
         cancelAnimationFrame(lerpRaf);
@@ -316,7 +315,6 @@ function initMobileScrollSpy() {
     };
 
     const onDateScroll = () => {
-        if (swipeLock) return;
         const railRect = datesRail.getBoundingClientRect();
         const railCenterX = railRect.left + railRect.width / 2;
         let closestIdx = 0;
@@ -337,12 +335,13 @@ function initMobileScrollSpy() {
 
     datesRail.addEventListener('scroll', onDateScroll, { passive: true });
 
-    /* ── single-swipe guard: one swipe = exactly ±1 date ── */
+    /* ── swipe handler: detect direction, scrollTo ±1 ── */
     {
-        let swStartX, swStartY, swStartScroll, swStartIdx, swAxis;
-        let swMinScroll, swMaxScroll;
-        let swAnimating = false;
-        let swRaf = 0;
+        let swStartX = 0;
+        let swStartScroll = 0;
+        let swStartIdx = 0;
+        const HINT_MAX = 50;
+        const HINT_DAMPING = 3;
 
         const getCenterIdx = () => {
             const cx = datesRail.getBoundingClientRect().left + datesRail.clientWidth / 2;
@@ -358,107 +357,38 @@ function initMobileScrollSpy() {
         const centerScrollFor = (idx) =>
             dateItems[idx].offsetLeft + dateItems[idx].offsetWidth / 2 - datesRail.clientWidth / 2;
 
-        const animateRailTo = (targetScroll) => {
-            cancelAnimationFrame(swRaf);
-            swAnimating = true;
-            const from = datesRail.scrollLeft;
-            const dist = targetScroll - from;
-            if (Math.abs(dist) < 1) {
-                datesRail.scrollLeft = targetScroll;
-                swAnimating = false;
-                swipeLock = false;
-                datesRail.style.scrollSnapType = '';
-                return;
-            }
-            const duration = 300;
-            const t0 = performance.now();
-            const step = (now) => {
-                const t = Math.min((now - t0) / duration, 1);
-                const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-                datesRail.scrollLeft = from + dist * ease;
-                if (t < 1) {
-                    swRaf = requestAnimationFrame(step);
-                } else {
-                    datesRail.scrollLeft = targetScroll;
-                    swAnimating = false;
-                    swipeLock = false;
-                    datesRail.style.scrollSnapType = '';
-                }
-            };
-            swRaf = requestAnimationFrame(step);
-        };
-
         datesRail.addEventListener('touchstart', (e) => {
-            if (swAnimating) return;
             swStartX = e.touches[0].clientX;
-            swStartY = e.touches[0].clientY;
             swStartScroll = datesRail.scrollLeft;
             swStartIdx = getCenterIdx();
-            swAxis = null;
-            swipeLock = true;
             datesRail.style.scrollSnapType = 'none';
-            swMinScroll = centerScrollFor(Math.max(0, swStartIdx - 1));
-            swMaxScroll = centerScrollFor(Math.min(dateItems.length - 1, swStartIdx + 1));
         }, { passive: true });
 
         datesRail.addEventListener('touchmove', (e) => {
-            if (swAnimating) return;
             const dx = e.touches[0].clientX - swStartX;
-            const dy = e.touches[0].clientY - swStartY;
-            if (swAxis === null && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
-                swAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
-            }
-            if (swAxis === 'x') {
-                e.preventDefault();
-                const raw = swStartScroll - dx;
-                const CUSHION = 60;
-                let clamped = raw;
-
-                if (raw > swStartScroll) {
-                    const travel = raw - swStartScroll;
-                    const total  = swMaxScroll - swStartScroll;
-                    const free   = Math.max(0, total - CUSHION);
-                    if (travel > free) {
-                        const zone = total - free;
-                        const into = travel - free;
-                        clamped = swStartScroll + free + zone * into / (zone + into);
-                    }
-                } else {
-                    const travel = swStartScroll - raw;
-                    const total  = swStartScroll - swMinScroll;
-                    const free   = Math.max(0, total - CUSHION);
-                    if (travel > free) {
-                        const zone = total - free;
-                        const into = travel - free;
-                        clamped = swStartScroll - free - zone * into / (zone + into);
-                    }
-                }
-
-                datesRail.scrollLeft = clamped;
-            }
-        }, { passive: false });
+            const hint = Math.max(-HINT_MAX, Math.min(HINT_MAX, dx / HINT_DAMPING));
+            datesRail.scrollLeft = swStartScroll - hint;
+        }, { passive: true });
 
         datesRail.addEventListener('touchend', (e) => {
-            if (swAnimating) { swipeLock = false; return; }
-            if (swAxis !== 'x') {
-                swipeLock = false;
-                datesRail.style.scrollSnapType = '';
-                return;
-            }
             const dx = e.changedTouches[0].clientX - swStartX;
-            let target = swStartIdx;
-            if (dx < -30 && swStartIdx < dateItems.length - 1) target++;
-            else if (dx > 30 && swStartIdx > 0) target--;
+            let targetScroll;
+            if (Math.abs(dx) < 20) {
+                targetScroll = swStartScroll;
+            } else {
+                let target = swStartIdx;
+                if (dx < 0) target = Math.min(swStartIdx + 1, dateItems.length - 1);
+                else target = Math.max(swStartIdx - 1, 0);
+                targetScroll = centerScrollFor(target);
+            }
 
-            activeIndex = target;
-            dateItems.forEach((d, i) => d.classList.toggle('is-active', i === target));
-            lerpPoster(target);
-            animateRailTo(centerScrollFor(target));
-        });
+            datesRail.scrollTo({ left: targetScroll, behavior: 'smooth' });
+            datesRail.addEventListener('scrollend', () => {
+                datesRail.style.scrollSnapType = '';
+            }, { once: true });
+        }, { passive: true });
 
         datesRail.addEventListener('touchcancel', () => {
-            swipeLock = false;
-            swAnimating = false;
             datesRail.style.scrollSnapType = '';
         });
     }

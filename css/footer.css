@@ -162,4 +162,7 @@
     .footer-main .type-display-hero > span .char-reveal {
         display: inline-block;
     }
+    .marquee-item.type-subBold1 {
+        font-size: 12px;
+    }
 }

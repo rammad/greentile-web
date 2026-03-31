@@ -30,18 +30,24 @@
 
         let sectionCenterY = 0;
         let sectionHeight  = 1;
+        let cachedVH = window.innerHeight;
+        let lastWidth = window.innerWidth;
 
         const recalcLayout = () => {
+            lastWidth = window.innerWidth;
+            cachedVH = window.innerHeight;
             sectionCenterY = section.offsetTop + section.offsetHeight * 0.5;
             sectionHeight  = section.offsetHeight;
         };
 
         document.fonts.ready.then(recalcLayout);
-        window.addEventListener('resize', recalcLayout);
+        window.addEventListener('resize', () => {
+            if (window.innerWidth === lastWidth) return;
+            recalcLayout();
+        });
 
         const applyPositions = (scrollY) => {
-            const vh = window.innerHeight;
-            const delta = (scrollY + vh * 0.5 - sectionCenterY) / sectionHeight;
+            const delta = (scrollY + cachedVH * 0.5 - sectionCenterY) / sectionHeight;
 
             if (bgImg) {
                 bgImg.style.transform = `translateY(${(delta * BG_PX).toFixed(2)}px)`;

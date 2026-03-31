@@ -99,13 +99,13 @@
 
 @media (max-width: 768px) {
     .featured-section {
-        min-height: 100vh;
+        min-height: 100svh;
     }
 
     .featured-frame {
-        min-height: 100vh;
+        min-height: 100svh;
         flex-direction: column;
-        gap: 12vh;
+        gap: 12svh;
     }
 
     .featured-marquee-layer {

@@ -151,9 +151,12 @@
 
         document.fonts.ready.then(() => requestAnimationFrame(build));
 
+        let lastWidth = window.innerWidth;
         let resizeTimer;
         window.addEventListener('resize', () => {
             if (suppressResize) return;
+            if (window.innerWidth === lastWidth) return;
+            lastWidth = window.innerWidth;
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(build, 200);
         });

@@ -18,7 +18,6 @@
 
         initImageScroll();
         initMobileDots();
-        initMobileSwipeGuard();
         initDescFade();
         updateQty(0);
     });
@@ -304,98 +303,33 @@
         }, { passive: true });
     }
 
-    function initMobileSwipeGuard() {
+    function initMobileDots() {
         if (window.innerWidth > MOBILE_BREAKPOINT) return;
 
         const track = document.querySelector('.pdp-image-track');
-        if (!track) return;
-        const posters = Array.from(track.querySelectorAll('.pdp-poster'));
-        if (posters.length <= 1) return;
+        const container = document.querySelector('.pdp-dots');
+        if (!track || !container) return;
 
-        let currentIdx = 0;
-        let startX, startY, startScroll, axis;
-        let animating = false;
-        let rafId = 0;
+        const posters = track.querySelectorAll('.pdp-poster');
+        if (!posters.length) return;
 
-        const getIdx = () => {
+        posters.forEach((_, i) => {
+            const dot = document.createElement('span');
+            dot.classList.add('pdp-dot');
+            if (i === 0) dot.classList.add('is-active');
+            container.appendChild(dot);
+        });
+
+        const dots = container.querySelectorAll('.pdp-dot');
+
+        track.addEventListener('scroll', () => {
             const sl = track.scrollLeft;
-            let closest = 0, minDist = Infinity;
+            let active = 0;
             posters.forEach((p, i) => {
-                const dist = Math.abs(p.offsetLeft - sl);
-                if (dist < minDist) { minDist = dist; closest = i; }
+                if (Math.abs(p.offsetLeft - sl) < Math.abs(posters[active].offsetLeft - sl)) active = i;
             });
-            return closest;
-        };
-
-        const animateTo = (targetScroll) => {
-            cancelAnimationFrame(rafId);
-            animating = true;
-            const from = track.scrollLeft;
-            const dist = targetScroll - from;
-            if (Math.abs(dist) < 1) {
-                track.scrollLeft = targetScroll;
-                animating = false;
-                track.style.scrollSnapType = '';
-                return;
-            }
-            const duration = 300;
-            const t0 = performance.now();
-            const step = (now) => {
-                const t = Math.min((now - t0) / duration, 1);
-                const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-                track.scrollLeft = from + dist * ease;
-                if (t < 1) {
-                    rafId = requestAnimationFrame(step);
-                } else {
-                    track.scrollLeft = targetScroll;
-                    animating = false;
-                    track.style.scrollSnapType = '';
-                }
-            };
-            rafId = requestAnimationFrame(step);
-        };
-
-        track.addEventListener('touchstart', (e) => {
-            if (animating) return;
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            startScroll = track.scrollLeft;
-            currentIdx = getIdx();
-            axis = null;
-            track.style.scrollSnapType = 'none';
+            dots.forEach((d, i) => d.classList.toggle('is-active', i === active));
         }, { passive: true });
-
-        track.addEventListener('touchmove', (e) => {
-            if (animating) return;
-            const dx = e.touches[0].clientX - startX;
-            const dy = e.touches[0].clientY - startY;
-            if (axis === null && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
-                axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
-            }
-            if (axis === 'x') {
-                e.preventDefault();
-                track.scrollLeft = startScroll - dx;
-            }
-        }, { passive: false });
-
-        track.addEventListener('touchend', (e) => {
-            if (animating) return;
-            if (axis !== 'x') {
-                track.style.scrollSnapType = '';
-                return;
-            }
-            const dx = e.changedTouches[0].clientX - startX;
-            let target = currentIdx;
-            if (dx < -30 && currentIdx < posters.length - 1) target = currentIdx + 1;
-            else if (dx > 30 && currentIdx > 0) target = currentIdx - 1;
-            currentIdx = target;
-            animateTo(posters[target].offsetLeft);
-        });
-
-        track.addEventListener('touchcancel', () => {
-            animating = false;
-            track.style.scrollSnapType = '';
-        });
     }
 
     function initDescFade() {

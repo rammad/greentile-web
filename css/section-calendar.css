@@ -403,6 +403,7 @@
         scroll-snap-type: x mandatory;
         scrollbar-width: none;
         margin-top: auto;
+        touch-action: pan-y;
     }
     .calendar-dates-rail::-webkit-scrollbar { display: none; }
 

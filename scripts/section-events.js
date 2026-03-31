@@ -243,7 +243,10 @@
         if (ctaFooter) new ResizeObserver(syncCtaMargin).observe(ctaFooter);
 
         document.fonts.ready.then(recalcLayout);
+        let lastEventsWidth = window.innerWidth;
         window.addEventListener('resize', () => {
+            if (window.innerWidth === lastEventsWidth) return;
+            lastEventsWidth = window.innerWidth;
             syncTitleSize();
             recalcLayout();
         });
