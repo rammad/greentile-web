@@ -32,6 +32,7 @@
         let sectionHeight  = 1;
         let cachedVH = window.innerHeight;
         let lastWidth = window.innerWidth;
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
         const recalcLayout = () => {
             lastWidth = window.innerWidth;
@@ -42,7 +43,7 @@
 
         document.fonts.ready.then(recalcLayout);
         window.addEventListener('resize', () => {
-            if (window.innerWidth === lastWidth) return;
+            if (isMobile && window.innerWidth === lastWidth) return;
             recalcLayout();
         });
 

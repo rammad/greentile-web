@@ -245,7 +245,8 @@
         document.fonts.ready.then(recalcLayout);
         let lastEventsWidth = window.innerWidth;
         window.addEventListener('resize', () => {
-            if (window.innerWidth === lastEventsWidth) return;
+            const widthChanged = window.innerWidth !== lastEventsWidth;
+            if (currentlyMobile && !widthChanged) return;
             lastEventsWidth = window.innerWidth;
             syncTitleSize();
             recalcLayout();
