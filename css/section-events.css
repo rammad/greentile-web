@@ -107,6 +107,11 @@
         min-height: 0;
     }
 
+    .events-sticky {
+        position: static;
+        height: auto;
+    }
+
     .events-section .animate-line + .animate-line {
         margin-top: 0;
     }

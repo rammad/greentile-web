@@ -90,12 +90,14 @@
     left: 0;
     width: 100%;
     opacity: 0;
-    transition: opacity 0.5s ease;
+    filter: blur(var(--blur-standard));
+    transition: opacity 0.5s ease, filter 0.5s ease;
     pointer-events: none;
 }
 
 .team-body.is-active {
     opacity: 1;
+    filter: blur(0px);
     pointer-events: auto;
 }
 
@@ -117,6 +119,15 @@
     opacity: 1;
     transform: translateY(0);
     transition: opacity 0.7s ease;
+}
+
+/* desktop: opacity is scroll-driven in JS — strip CSS opacity transition
+   so it doesn't lag behind and "pop" when the inline transition changes */
+@media (min-width: 1025px) {
+    .team-section .animate-line,
+    .team-section .animate-line.is-visible {
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
 }
 /* 
 .team-names {
@@ -187,8 +198,14 @@
         bottom: auto;
         width: auto;
         padding: 0;
-        margin-top: var(--poster-gap);
+        margin-top: calc(var(--poster-gap) * 2);
         text-align: center;
+        filter: none;
+        transition: opacity 0.5s ease;
+    }
+
+    .team-body.is-active {
+        filter: none;
     }
 
     .team-poster-wrap {

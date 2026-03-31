@@ -15,26 +15,28 @@
     const _wwd_isMobile       = window.innerWidth <= 1024;
 
     // ── desktop menu animation sequence (progress 0–100) ───────────────
-    //   ①  revealAt          — menu items fade in (stagger)
-    //   ②  enterStart → end    — slide from below to pinned pos    (easeOut)
-    //   ③  slidesStart → end  — cycle through menu items evenly
-    //   ④  exitStart → end    — slide upward off screen            (easeIn)
-    //   ⑤  hideAt            — menu items fade out
+    //   ①  revealAt                    — menu items fade in (stagger)
+    //   ②  enterStart → end            — slide from below to pinned pos  (easeOut)
+    //   ③  firstSlideEnd → lastSlideEnd — cycle through remaining items
+    //   ④  exitStart → end              — slide upward off screen         (easeIn)
+    //   ⑤  hideAt                      — menu items fade out
     //
+    // Item 1 is always selected by default; firstSlideEnd marks when
+    // slide 1 transitions to slide 2.
     // Narrower ranges → faster motion;  wider → slower.
     // Travel values set vertical displacement in vh.
     const DESKTOP_MENU = {
-        revealAt:     -15,     // menu items fade in (stagger)
-        enterStart:   -20,     // begin sliding up from below
-        enterEnd:     25,      // arrive at pinned position
-        enterTravel:  75,      // vh below pinned position at start
-        slidesStart:  0,      // first item selected
-        slidesEnd:    85,      // last item selected
-        exitStart:    75,      // begin sliding upward off screen
-        exitEnd:      130,     // fully offscreen
-        exitTravel:   80,      // vh above pinned position at end
-        hideAt:       130,     // menu items fade out
-        edgeWeight:   0.80,   // edge items get 80% of equal share (compensates enter/exit bonus)
+        revealAt:      -15,     // menu items fade in (stagger)
+        enterStart:    -20,     // begin sliding up from below
+        enterEnd:      25,      // arrive at pinned position
+        enterTravel:   75,      // vh below pinned position at start
+        firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
+        lastSlideEnd:  85,      // last slide ends
+        exitStart:     75,      // begin sliding upward off screen
+        exitEnd:       130,     // fully offscreen + fade last body/CTA
+        exitTravel:    80,      // vh above pinned position at end
+        hideAt:        110,     // menu items fade out
+        edgeWeight:    0.80,    // edge items get 80% of equal share
     };
 
     function easeOutCubic(t) { return 1 - (1 - t) * (1 - t) * (1 - t); }
@@ -42,17 +44,17 @@
 
     // ── mobile menu animation sequence (progress 0–100) ─────────────
     const MOBILE_MENU = {
-        revealAt:     -10,     // menu items fade in (stagger)
-        enterStart:   -20,     // begin sliding up from below
-        enterEnd:     20,      // arrive at pinned position
-        enterTravel:  75,      // vh below pinned position at start
-        slidesStart:  0,      // first item selected
-        slidesEnd:    100,      // last item selected
-        exitStart:    80,      // begin sliding upward off screen
-        exitEnd:      130,     // fully offscreen
-        exitTravel:   120,      // vh above pinned position at end
-        hideAt:       120,     // menu items fade out
-        edgeWeight:   0.80,   // edge items get 80% of equal share (compensates enter/exit bonus)
+        revealAt:      -10,     // menu items fade in (stagger)
+        enterStart:    -20,     // begin sliding up from below
+        enterEnd:      20,      // arrive at pinned position
+        enterTravel:   75,      // vh below pinned position at start
+        firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
+        lastSlideEnd:  100,     // last slide ends
+        exitStart:     80,      // begin sliding upward off screen
+        exitEnd:       130,     // fully offscreen + fade last body/CTA
+        exitTravel:    120,     // vh above pinned position at end
+        hideAt:        110,     // menu items fade out
+        edgeWeight:    1,       // equal time per slide
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -96,6 +98,7 @@
         let activeIdx      = 0;
         let wasActive      = false;
         let menuIsRevealed = false;
+        let exitFaded      = false;
         let _cachedBlocks = [];
 
         function buildLayout() {
@@ -242,38 +245,41 @@
 
             // ── text block transitions ──────────────────────────────
             if (justBecameActive) {
+                exitFaded = false;
                 showBlock(blocks[activeIdx]);
                 if (scrollHasFired) showCtas(blocks[activeIdx]);
             }
             if (justBecameInactive) {
                 blocks.forEach(b => { hideBlock(b); hideCtas(b); });
+                exitFaded = false;
             }
 
             wasActive = isActive;
 
             // ── active slide index ──────────────────────────────────
-            if (sectionProg < cfg.slidesStart) {
-                menuItems.forEach(item => item.classList.remove('is-active'));
-                return;
-            }
-
-            const sp = (cfg.slidesEnd > cfg.slidesStart)
-                ? Math.max(0, Math.min(1, (sectionProg - cfg.slidesStart) / (cfg.slidesEnd - cfg.slidesStart)))
-                : 0;
-
             const n  = menuItems.length;
             const ew = cfg.edgeWeight ?? 1;
-            let closestIdx = n - 1;
-            if (n > 2 && ew < 1) {
-                const edge = ew / n;
-                const mid  = (1 - 2 * edge) / (n - 2);
-                let acc = 0;
-                for (let i = 0; i < n; i++) {
-                    acc += (i === 0 || i === n - 1) ? edge : mid;
-                    if (sp < acc) { closestIdx = i; break; }
-                }
+            let closestIdx;
+
+            if (sectionProg < cfg.firstSlideEnd) {
+                closestIdx = 0;
             } else {
-                closestIdx = Math.min(n - 1, Math.floor(sp * n));
+                const sp = (cfg.lastSlideEnd > cfg.firstSlideEnd)
+                    ? Math.max(0, Math.min(1, (sectionProg - cfg.firstSlideEnd) / (cfg.lastSlideEnd - cfg.firstSlideEnd)))
+                    : 0;
+                const remaining = n - 1;
+                closestIdx = n - 1;
+                if (remaining > 2 && ew < 1) {
+                    const edge = ew / remaining;
+                    const mid  = (1 - 2 * edge) / (remaining - 2);
+                    let acc = 0;
+                    for (let j = 0; j < remaining; j++) {
+                        acc += (j === 0 || j === remaining - 1) ? edge : mid;
+                        if (sp < acc) { closestIdx = j + 1; break; }
+                    }
+                } else if (remaining > 0) {
+                    closestIdx = 1 + Math.min(remaining - 1, Math.floor(sp * remaining));
+                }
             }
 
             menuItems.forEach((item, i) => item.classList.toggle('is-active', i === closestIdx));
@@ -281,9 +287,25 @@
             if (closestIdx !== activeIdx) {
                 hideCtas(blocks[activeIdx]);
                 hideBlock(blocks[activeIdx]);
-                showBlock(blocks[closestIdx]);
-                if (scrollHasFired) showCtas(blocks[closestIdx]);
+                if (sectionProg < cfg.hideAt) {
+                    showBlock(blocks[closestIdx]);
+                    if (scrollHasFired) showCtas(blocks[closestIdx]);
+                }
                 activeIdx = closestIdx;
+            }
+
+            if (sectionProg >= cfg.hideAt && !exitFaded) {
+                const fadeTrans = `opacity ${TIME_FADE_OUT}s ease`;
+                if (menuEl) { menuEl.style.transition = fadeTrans; menuEl.style.opacity = '0'; }
+                if (bodyEl) { bodyEl.style.transition = fadeTrans; bodyEl.style.opacity = '0'; }
+                exitFaded = true;
+            } else if (sectionProg < cfg.hideAt && exitFaded) {
+                const fadeTrans = `opacity ${TIME_FADE_IN}s ease`;
+                if (menuEl) { menuEl.style.transition = fadeTrans; menuEl.style.opacity = '1'; }
+                if (bodyEl) { bodyEl.style.transition = fadeTrans; bodyEl.style.opacity = '1'; }
+                showBlock(blocks[activeIdx]);
+                if (scrollHasFired) showCtas(blocks[activeIdx]);
+                exitFaded = false;
             }
         }
 
@@ -301,7 +323,7 @@
                 : 0;
 
             const isActive = secRect.top <= scrollStart && secRect.bottom > 0;
-            menuItems.forEach(item => item.classList.remove('is-active'));
+            menuItems.forEach((item, i) => item.classList.toggle('is-active', i === 0));
             wasActive = isActive;
 
             if (sectionProg >= cfg.revealAt && sectionProg <= cfg.hideAt) {

@@ -33,10 +33,27 @@
     padding: 0 120px;
 }
 
-.clients-col .type-subBold2,
-.clients-col .type-subRegular1 {
+.clients-col .type-subBold2 {
     line-height: 2;
-    word-spacing: 0.15em;
+}
+
+.clients-list {
+    line-height: 2;
+    text-align: center;
+    word-spacing: 0.55em;
+    text-wrap: pretty;
+}
+
+.clients-item {
+    display: inline;
+    white-space: nowrap;
+    word-spacing: normal;
+}
+
+.clients-sep {
+    display: inline-block;
+    margin-left: 1em;
+    transform: translateY(-0.3em);
 }
 
 .clients-col a {

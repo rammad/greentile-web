@@ -5,6 +5,13 @@
     const LINE_STAGGER_MS = 80;
     const MOBILE_BP = 1024;
 
+    // ── desktop title fade (scroll-driven opacity) ──────────────────────
+    // Section progress: 0 = section top at viewport top,
+    //                 100 = section bottom at viewport bottom.
+    // Negative / >100 values represent scroll outside that range.
+    const TITLE_FADE_START = -50;    // progress where title begins to appear
+    const TITLE_FADE_END   = 10;   // progress where title is fully opaque
+
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('team');
         if (!section) return;
@@ -179,7 +186,7 @@
             if (!titleShown) return;
             titleAnimId++;
             titleLines.forEach(l => {
-                l.style.transition = 'opacity 0.18s ease, transform 0.22s ease';
+                l.style.transition = 'transform 0.22s ease';
                 l.classList.remove('is-visible');
             });
             setTimeout(() => {
@@ -191,7 +198,9 @@
         function hideBody() {
             if (!activeBody) return;
             const prev = activeBody;
-            prev.style.transition = 'opacity 0.18s ease';
+            prev.style.transition = isMobile
+                ? 'opacity 0.18s ease'
+                : 'opacity 0.18s ease, filter 0.18s ease';
             prev.classList.remove('is-active');
             setTimeout(() => { prev.style.transition = ''; }, 200);
             activeBody = null;
@@ -204,6 +213,16 @@
             const stickyTop = getStickyTop();
             const rect = section.getBoundingClientRect();
             const vh = window.innerHeight;
+
+            // section progress (always computed — drives title opacity)
+            const sectionProgress = rect.height > vh
+                ? (-rect.top / (rect.height - vh)) * 100
+                : 0;
+            const titleT = (sectionProgress - TITLE_FADE_START)
+                         / (TITLE_FADE_END - TITLE_FADE_START);
+            titleLines.forEach(l => {
+                l.style.opacity = Math.max(0, Math.min(1, titleT));
+            });
 
             const visTop = Math.max(rect.top, 0);
             const visBot = Math.min(rect.bottom, vh);
