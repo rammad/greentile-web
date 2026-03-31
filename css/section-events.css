@@ -104,6 +104,12 @@
 @media (max-width: 768px) {
     .events-section {
         margin-top: calc(var(--section-spacing) * 2);
+        min-height: 0;
+    }
+
+    .events-sticky {
+        position: relative;
+        height: auto;
     }
 
     .events-section .animate-line + .animate-line {

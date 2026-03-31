@@ -40,16 +40,16 @@
 
     // ── mobile menu animation sequence (progress 0–100) ─────────────
     const MOBILE_MENU = {
-        revealAt:     -5,
-        enterStart:   -5,
-        enterEnd:     15,
-        enterTravel:  35,
-        slidesStart:  0,
-        slidesEnd:    90,
-        exitStart:    90,
-        exitEnd:      110,
-        exitTravel:   50,
-        hideAt:       110,
+        revealAt:     -10,     // menu items fade in (stagger)
+        enterStart:   -20,     // begin sliding up from below
+        enterEnd:     20,      // arrive at pinned position
+        enterTravel:  75,      // vh below pinned position at start
+        slidesStart:  -15,      // first item selected
+        slidesEnd:    100,      // last item selected
+        exitStart:    80,      // begin sliding upward off screen
+        exitEnd:      130,     // fully offscreen
+        exitTravel:   120,      // vh above pinned position at end
+        hideAt:       120,     // menu items fade out
     };
 
     document.addEventListener('DOMContentLoaded', () => {

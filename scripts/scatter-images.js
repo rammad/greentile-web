@@ -43,10 +43,10 @@
             { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20 }
         ],
         mobile: [
-            { id: 'fl',  x: -4, layer: 'front', stagger: -0.20, frameInset: 8, flushTop: true },
-            { id: 'bl',  x: 16,   layer: 'back',  stagger: -0.15, frameInset: 8 },
-            { id: 'br',  x: 68,  layer: 'back',  stagger: -0.15, frameInset: -8 },
-            { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20, frameInset: -8 }
+            { id: 'fl',  x: -6, layer: 'front', stagger: -0.20, flushTop: true },
+            { id: 'bl',  x: 13,   layer: 'back',  stagger: -0.15, frameInset: 5 },
+            { id: 'br',  x: 71,  layer: 'back',  stagger: -0.15, frameInset: -5 },
+            { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20 }
         ]
     };
 

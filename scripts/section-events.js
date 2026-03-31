@@ -83,25 +83,36 @@
 
         // ── TUNING ────────────────────────────────────────────────
         const SECTION_VH         = 1.5;   // section height in viewports (bigger = slower overall scroll)
-        const SECTION_VH_MOBILE  = 1.2;   // shorter on mobile so post-stick cards feel as fast as pre-stick
         const ENTRANCE_DELAY = -2.5;   // negative = cards start moving before progress reaches 0
         const STAGGER_SPLIT  = 0.2;  // 0–1, how much of the remaining range is card-to-card delay
         const FADE_Y_HI       = 0.30;  // card invisible when y > this × startOffset (travel distance)
         const FADE_Y_LO       = 0.10;  // card fully opaque when y < this × startOffset
-        const MOBILE_EARLY   = 0.30;  // on mobile, start animation this many vh before sticky kicks in
         const STICK_EASE     = 0.35;  // fraction of stick zone for entry/exit deceleration
+        // mobile flow-through: no sticky, cards settle as section enters viewport
+        const ENTRANCE_DELAY_MOBILE = 0;
+        const STAGGER_SPLIT_MOBILE  = 0.15;
+        const MOBILE_START_RATIO    = 0.5;  // startOffset = vh × this
         // ──────────────────────────────────────────────────────────
 
-        const n              = cards.length;
-        const availableRange = 1 - ENTRANCE_DELAY;
-        const totalDelay     = availableRange * STAGGER_SPLIT;
-        const travelDuration = availableRange * (1 - STAGGER_SPLIT);
-        const stepSize       = n > 1 ? totalDelay / (n - 1) : 0;
-
-        // card i starts moving at this scroll progress value
-        const cardStarts = Array.from(cards, (_, i) => ENTRANCE_DELAY + i * stepSize);
+        const n = cards.length;
+        let availableRange = 1 - ENTRANCE_DELAY;
+        let totalDelay     = availableRange * STAGGER_SPLIT;
+        let travelDuration = availableRange * (1 - STAGGER_SPLIT);
+        let stepSize       = n > 1 ? totalDelay / (n - 1) : 0;
+        let cardStarts     = Array.from(cards, (_, i) => ENTRANCE_DELAY + i * stepSize);
         const btnThresholdDesktop = cardStarts[n - 1] + travelDuration * 0.85;
-        const btnThresholdMobile  = cardStarts[n - 1] + travelDuration * 0.99;
+        let btnThresholdMobile    = cardStarts[n - 1] + travelDuration * 0.99;
+
+        function syncCardTiming() {
+            const ed = currentlyMobile ? ENTRANCE_DELAY_MOBILE : ENTRANCE_DELAY;
+            const ss = currentlyMobile ? STAGGER_SPLIT_MOBILE  : STAGGER_SPLIT;
+            availableRange = 1 - ed;
+            totalDelay     = availableRange * ss;
+            travelDuration = availableRange * (1 - ss);
+            stepSize       = n > 1 ? totalDelay / (n - 1) : 0;
+            cardStarts     = Array.from(cards, (_, i) => ed + i * stepSize);
+            btnThresholdMobile = cardStarts[n - 1] + travelDuration * 0.99;
+        }
 
         // cached layout values, recalculated after fonts/layout settle
         let phase2Start = 0;
@@ -126,20 +137,23 @@
         function applyPositions(scrollY) {
             const progress = Math.min(1, (scrollY - phase2Start) / phase2Len);
 
-            const stickLen    = 1 - stickProgress;
-            const easeLen     = STICK_EASE * stickLen;
-            const stickyMax   = easeLen * phase2Len / 2;
-            const entryEnd    = stickProgress + easeLen;
-            const exitStart   = 1 - easeLen;
-            const p           = Math.max(stickProgress, Math.min(1, progress));
-            let stickyOff     = 0;
-            if (p < entryEnd) {
-                stickyOff = stickyMax * (1 - (p - stickProgress) / easeLen);
-            } else if (p > exitStart) {
-                stickyOff = -stickyMax * ((p - exitStart) / easeLen);
+            if (!currentlyMobile) {
+                const stickLen    = 1 - stickProgress;
+                const easeLen     = STICK_EASE * stickLen;
+                const stickyMax   = easeLen * phase2Len / 2;
+                const entryEnd    = stickProgress + easeLen;
+                const exitStart   = 1 - easeLen;
+                const p           = Math.max(stickProgress, Math.min(1, progress));
+                let stickyOff     = 0;
+                if (p < entryEnd) {
+                    stickyOff = stickyMax * (1 - (p - stickProgress) / easeLen);
+                } else if (p > exitStart) {
+                    stickyOff = -stickyMax * ((p - exitStart) / easeLen);
+                }
+                stickyInner.style.transform = `translateY(${Math.round(stickyOff)}px)`;
+            } else {
+                stickyInner.style.transform = '';
             }
-            if (currentlyMobile) stickyOff = Math.max(stickyOff, 0);
-            stickyInner.style.transform = `translateY(${Math.round(stickyOff)}px)`;
 
             cards.forEach((card, i) => {
                 const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
@@ -174,8 +188,7 @@
                 : 0;
 
             currentlyMobile  = window.matchMedia('(max-width: 768px)').matches;
-
-            stickyInner.style.paddingTop = (navInset + (currentlyMobile ? s20 : 0)) + 'px';
+            syncCardTiming();
 
             const flexGap    = parseFloat(getComputedStyle(stickyInner).rowGap) || 0;
             const gridColGap = parseFloat(getComputedStyle(grid).columnGap) || 0;
@@ -183,27 +196,35 @@
                              + parseFloat(getComputedStyle(grid).paddingRight);
 
             if (currentlyMobile) {
+                stickyInner.style.paddingTop = '';
                 grid.style.maxWidth = '';
+                section.style.paddingTop = '';
+                section.style.minHeight  = '';
+
+                phase2Start   = section.offsetTop - ih;
+                phase2Len     = ih;
+                stickProgress = 0;
+                startOffset   = ih * MOBILE_START_RATIO;
             } else {
+                stickyInner.style.paddingTop = (navInset + s20) + 'px';
+
                 const maxPosterH = ih - navInset - titleWrap.offsetHeight - flexGap - s20;
                 const maxPosterW = maxPosterH * 4 / 5;
                 grid.style.maxWidth = Math.max(0, n * maxPosterW + (n - 1) * gridColGap + gridPad) + 'px';
+
+                const contentH = titleWrap.offsetHeight + flexGap + content.offsetHeight;
+                const usableH      = ih - navInset;
+                const centerOffset = navInset + Math.max(0, (usableH - contentH) / 2);
+                const adjustedPT   = Math.max(0, sectionSpacingPx - centerOffset);
+
+                section.style.paddingTop = adjustedPT + 'px';
+                section.style.minHeight  = (SECTION_VH * ih) + 'px';
+
+                phase2Start   = section.offsetTop;
+                phase2Len     = section.offsetHeight - ih;
+                stickProgress = 0;
+                startOffset   = ih;
             }
-
-            const contentH = titleWrap.offsetHeight + flexGap + content.offsetHeight;
-            const usableH      = ih - navInset;
-            const centerOffset = navInset + Math.max(0, (usableH - contentH) / 2);
-            const adjustedPT   = Math.max(0, sectionSpacingPx - centerOffset);
-
-            section.style.paddingTop = adjustedPT + 'px';
-            const sectionVh = currentlyMobile ? SECTION_VH_MOBILE : SECTION_VH;
-            section.style.minHeight  = (sectionVh * ih) + 'px';
-
-            const earlyPx = currentlyMobile ? ih * MOBILE_EARLY : 0;
-            phase2Start = section.offsetTop - earlyPx;
-            phase2Len   = section.offsetHeight - ih + earlyPx;
-            stickProgress = phase2Len > 0 ? earlyPx / phase2Len : 0;
-            startOffset = ih;
 
             applyPositions(window.lenis ? window.lenis.scroll : 0);
 
@@ -232,9 +253,9 @@
             const ctaBottom = ctaFooter.offsetTop + ctaFooter.offsetHeight;
             const nextPad = nextSection ? parseFloat(getComputedStyle(nextSection).paddingTop) || 0 : 0;
 
-            const stickLen = 1 - stickProgress;
-            const easeLen  = STICK_EASE * stickLen;
-            const stickyMaxAtRelease = easeLen * phase2Len / 2;
+            const stickyMaxAtRelease = currentlyMobile
+                ? 0
+                : STICK_EASE * (1 - stickProgress) * phase2Len / 2;
 
             const gapToEnd = stickyH - ctaBottom + stickyMaxAtRelease;
             section.style.marginBottom = (desired - gapToEnd - nextPad) + 'px';
