@@ -27,7 +27,7 @@
         enterStart:   -25,     // begin sliding up from below
         enterEnd:     20,      // arrive at pinned position
         enterTravel:  75,      // vh below pinned position at start
-        slidesStart:  -10,      // first item selected
+        slidesStart:  -15,      // first item selected
         slidesEnd:    100,      // last item selected
         exitStart:    75,      // begin sliding upward off screen
         exitEnd:      130,     // fully offscreen
@@ -38,13 +38,19 @@
     function easeOutCubic(t) { return 1 - (1 - t) * (1 - t) * (1 - t); }
     function easeInCubic(t)  { return t * t * t; }
 
-    // ── menu entrance / exit (mobile — unchanged) ──────────────────────
-    const MENU_START_VH_MOBILE     = 0.35;
-    const MENU_SCROLL_RATE_MOBILE  = 0.90;
-    const MENU_EASE_PX_MOBILE      = 120;
-    const MENU_EXIT_START_MOBILE   = 140;
-    const MENU_EXIT_RATE_MOBILE    = 0.85;
-    const MENU_EXIT_EASE_PX_MOBILE = 300;
+    // ── mobile menu animation sequence (progress 0–100) ─────────────
+    const MOBILE_MENU = {
+        revealAt:     -5,
+        enterStart:   -5,
+        enterEnd:     15,
+        enterTravel:  35,
+        slidesStart:  0,
+        slidesEnd:    90,
+        exitStart:    90,
+        exitEnd:      110,
+        exitTravel:   50,
+        hideAt:       110,
+    };
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('about');
@@ -184,8 +190,9 @@
             const vpH       = vpRect.height;
             const blocks    = bodyEl ? Array.from(bodyEl.querySelectorAll('.about-text-block')) : [];
             const revealVH  = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
+            const cfg       = isMobile ? MOBILE_MENU : DESKTOP_MENU;
 
-            // ── section progress 0–100 ──────────────────────────────
+            // ── section progress ────────────────────────────────────
             const scrollStart  = revealVH * vpH;
             const scrollEnd    = vpH - secRect.height;
             const scrollRange  = scrollStart - scrollEnd;
@@ -199,71 +206,27 @@
 
             // ── menu reveal / transform ─────────────────────────────
             if (menuEl) {
-                if (!isMobile) {
-                    // desktop — progress-based phases
-                    const cfg = DESKTOP_MENU;
-                    const shouldShow = sectionProg >= cfg.revealAt && sectionProg <= cfg.hideAt;
-                    if (shouldShow && !menuIsRevealed)  { revealMenuItems(); menuIsRevealed = true;  }
-                    if (!shouldShow && menuIsRevealed)   { hideMenuItems();   menuIsRevealed = false; }
+                const shouldShow = sectionProg >= cfg.revealAt && sectionProg <= cfg.hideAt;
+                if (shouldShow && !menuIsRevealed)  { revealMenuItems(); menuIsRevealed = true;  }
+                if (!shouldShow && menuIsRevealed)   { hideMenuItems();   menuIsRevealed = false; }
 
-                    const entryPx = (cfg.enterTravel / 100) * vpH;
-                    const exitPx  = (cfg.exitTravel  / 100) * vpH;
-                    let menuY;
-                    if (sectionProg <= cfg.enterStart) {
-                        menuY = entryPx;
-                    } else if (sectionProg <= cfg.enterEnd) {
-                        const t = (sectionProg - cfg.enterStart) / (cfg.enterEnd - cfg.enterStart);
-                        menuY = (1 - easeOutCubic(t)) * entryPx;
-                    } else if (sectionProg < cfg.exitStart) {
-                        menuY = 0;
-                    } else if (sectionProg <= cfg.exitEnd) {
-                        const t = (sectionProg - cfg.exitStart) / (cfg.exitEnd - cfg.exitStart);
-                        menuY = -easeInCubic(t) * exitPx;
-                    } else {
-                        menuY = -exitPx;
-                    }
-                    menuEl.style.transform = `translateY(${menuY.toFixed(1)}px)`;
+                const entryPx = (cfg.enterTravel / 100) * vpH;
+                const exitPx  = (cfg.exitTravel  / 100) * vpH;
+                let menuY;
+                if (sectionProg <= cfg.enterStart) {
+                    menuY = entryPx;
+                } else if (sectionProg <= cfg.enterEnd) {
+                    const t = (sectionProg - cfg.enterStart) / (cfg.enterEnd - cfg.enterStart);
+                    menuY = (1 - easeOutCubic(t)) * entryPx;
+                } else if (sectionProg < cfg.exitStart) {
+                    menuY = 0;
+                } else if (sectionProg <= cfg.exitEnd) {
+                    const t = (sectionProg - cfg.exitStart) / (cfg.exitEnd - cfg.exitStart);
+                    menuY = -easeInCubic(t) * exitPx;
                 } else {
-                    // mobile — original physics-based model
-                    if (isActive && !menuIsRevealed)  { revealMenuItems(); menuIsRevealed = true;  }
-                    if (!isActive && menuIsRevealed)   { hideMenuItems();   menuIsRevealed = false; }
-
-                    const startPx    = MENU_START_VH_MOBILE * vpH;
-                    const scrollPast = scrollStart - secRect.top;
-                    const brakeDist  = MENU_SCROLL_RATE_MOBILE * MENU_EASE_PX_MOBILE / 2;
-                    let menuTravel = 0;
-                    if (scrollPast > 0) {
-                        if (brakeDist < startPx) {
-                            const linearDist   = startPx - brakeDist;
-                            const linearScroll = linearDist / MENU_SCROLL_RATE_MOBILE;
-                            if (scrollPast <= linearScroll) {
-                                menuTravel = scrollPast * MENU_SCROLL_RATE_MOBILE;
-                            } else {
-                                const t = Math.min(1, (scrollPast - linearScroll) / MENU_EASE_PX_MOBILE);
-                                menuTravel = linearDist + MENU_SCROLL_RATE_MOBILE * MENU_EASE_PX_MOBILE * (t - t * t / 2);
-                            }
-                        } else {
-                            const v0 = 2 * startPx / MENU_EASE_PX_MOBILE;
-                            const t  = Math.min(1, scrollPast / MENU_EASE_PX_MOBILE);
-                            menuTravel = v0 * MENU_EASE_PX_MOBILE * (t - t * t / 2);
-                        }
-                    }
-                    const entryY = startPx * (1 - Math.min(1, menuTravel / startPx));
-
-                    let exitY = 0;
-                    const distToBottom = secRect.bottom - vpH;
-                    const exitScroll   = Math.max(0, MENU_EXIT_START_MOBILE - distToBottom);
-                    if (exitScroll > 0) {
-                        if (exitScroll <= MENU_EXIT_EASE_PX_MOBILE) {
-                            const t = exitScroll / MENU_EXIT_EASE_PX_MOBILE;
-                            exitY = -(MENU_EXIT_RATE_MOBILE * MENU_EXIT_EASE_PX_MOBILE * t * t / 2);
-                        } else {
-                            const easeDist = MENU_EXIT_RATE_MOBILE * MENU_EXIT_EASE_PX_MOBILE / 2;
-                            exitY = -(easeDist + MENU_EXIT_RATE_MOBILE * (exitScroll - MENU_EXIT_EASE_PX_MOBILE));
-                        }
-                    }
-                    menuEl.style.transform = `translateY(${(entryY + exitY).toFixed(1)}px)`;
+                    menuY = -exitPx;
                 }
+                menuEl.style.transform = `translateY(${menuY.toFixed(1)}px)`;
             }
 
             // ── text block transitions ──────────────────────────────
@@ -281,25 +244,17 @@
             }
 
             wasActive = isActive;
-            if (!isActive) {
+
+            // ── active slide index ──────────────────────────────────
+            if (sectionProg < cfg.slidesStart) {
                 menuItems.forEach(item => item.classList.remove('is-active'));
                 return;
             }
 
-            // ── active slide index ──────────────────────────────────
-            let closestIdx;
-            if (!isMobile) {
-                const cfg = DESKTOP_MENU;
-                const sp  = (cfg.slidesEnd > cfg.slidesStart)
-                    ? Math.max(0, Math.min(1, (sectionProg - cfg.slidesStart) / (cfg.slidesEnd - cfg.slidesStart)))
-                    : 0;
-                closestIdx = Math.min(menuItems.length - 1, Math.floor(sp * menuItems.length));
-            } else {
-                const p = scrollRange > 0
-                    ? Math.max(0, Math.min(1, (scrollStart - secRect.top) / scrollRange))
-                    : 0;
-                closestIdx = Math.min(menuItems.length - 1, Math.floor(p * menuItems.length));
-            }
+            const sp = (cfg.slidesEnd > cfg.slidesStart)
+                ? Math.max(0, Math.min(1, (sectionProg - cfg.slidesStart) / (cfg.slidesEnd - cfg.slidesStart)))
+                : 0;
+            const closestIdx = Math.min(menuItems.length - 1, Math.floor(sp * menuItems.length));
 
             menuItems.forEach((item, i) => item.classList.toggle('is-active', i === closestIdx));
 
@@ -317,6 +272,7 @@
             const secRect  = section.getBoundingClientRect();
             const vpH      = vpRect.height;
             const revealVH = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
+            const cfg      = isMobile ? MOBILE_MENU : DESKTOP_MENU;
             const scrollStart = revealVH * vpH;
             const scrollEnd   = vpH - secRect.height;
             const scrollRange = scrollStart - scrollEnd;
@@ -328,12 +284,7 @@
             menuItems.forEach(item => item.classList.remove('is-active'));
             wasActive = isActive;
 
-            if (!isMobile) {
-                if (sectionProg >= DESKTOP_MENU.revealAt && sectionProg <= DESKTOP_MENU.hideAt) {
-                    menuIsRevealed = true;
-                    window.pageReady.then(() => revealMenuItems());
-                }
-            } else if (isActive) {
+            if (sectionProg >= cfg.revealAt && sectionProg <= cfg.hideAt) {
                 menuIsRevealed = true;
                 window.pageReady.then(() => revealMenuItems());
             }

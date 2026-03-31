@@ -28,7 +28,7 @@
 .archives-title {
     font-family: var(--font-header);
     font-size: 8vw; 
-    line-height: var(--lh-tight);
+    line-height: var(--lh-single);
     font-weight: 800;
     text-transform: uppercase;
     color: var(--color-text-main);
