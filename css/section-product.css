@@ -251,7 +251,7 @@
         left: unset;
         right: unset;
         height: auto;
-        padding: var(--space-for-nav) var(--page-gutter) 80px;
+        padding: var(--space-for-nav) var(--page-gutter) 0;
         box-sizing: border-box;
     }
 

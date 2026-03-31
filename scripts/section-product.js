@@ -130,33 +130,37 @@
         });
 
         // match pdp-info bottom padding to the ticket-actions bar height,
-        // scrolling in lockstep with the CSS transition each frame
+        // scrolling in lockstep with the padding-top transition each frame
         const info = document.querySelector('.pdp-info');
         let prevBarH = 0;
         let rafId = 0;
-        const syncPad = () => {
+        const syncPad = (scroll) => {
             if (!info || !ticketActions) return;
             const visible = ticketActions.classList.contains('is-sticky-visible');
             const h = visible ? ticketActions.offsetHeight : 0;
             info.style.paddingBottom = h ? h + 'px' : '';
-            const delta = h - prevBarH;
-            if (delta !== 0 && visible) window.scrollBy(0, delta);
+            if (scroll && prevBarH > 0) {
+                const delta = h - prevBarH;
+                if (delta !== 0) window.scrollBy(0, delta);
+            }
             prevBarH = h;
         };
         const pollHeight = () => {
-            syncPad();
+            syncPad(true);
             rafId = requestAnimationFrame(pollHeight);
         };
         if (ticketActions && info) {
-            ticketActions.addEventListener('transitionstart', () => {
+            ticketActions.addEventListener('transitionstart', (e) => {
+                if (e.propertyName !== 'padding-top') return;
                 cancelAnimationFrame(rafId);
                 rafId = requestAnimationFrame(pollHeight);
             });
-            ticketActions.addEventListener('transitionend', () => {
+            ticketActions.addEventListener('transitionend', (e) => {
+                if (e.propertyName !== 'padding-top') return;
                 cancelAnimationFrame(rafId);
-                syncPad();
+                syncPad(true);
             });
-            new ResizeObserver(syncPad).observe(ticketActions);
+            new ResizeObserver(() => syncPad(false)).observe(ticketActions);
         }
 
         // keep the bar pinned to the real visual-viewport bottom
