@@ -2,11 +2,38 @@
 
 (function () {
     let lenis = null;
+    const isTouchDevice = matchMedia('(pointer: coarse)').matches;
 
     function init() {
         const viewport = document.getElementById('scroll-viewport');
         const content = document.getElementById('scroll-content');
-        if (!viewport || !content || typeof Lenis === 'undefined') return;
+        if (!viewport || !content) return;
+
+        if (isTouchDevice) {
+            initNativeTouch(viewport);
+        } else {
+            initLenis(viewport, content);
+        }
+
+        initGradientSectionObserver(viewport);
+    }
+
+    function initNativeTouch(viewport) {
+        viewport.style.overflow = 'auto';
+        viewport.style.webkitOverflowScrolling = 'touch';
+
+        const shim = { get scroll() { return viewport.scrollTop; } };
+        window.lenis = shim;
+
+        viewport.addEventListener('scroll', () => {
+            window.dispatchEvent(
+                new CustomEvent('lenis-scroll', { detail: { scroll: viewport.scrollTop } })
+            );
+        }, { passive: true });
+    }
+
+    function initLenis(viewport, content) {
+        if (typeof Lenis === 'undefined') return;
 
         const opts = window.AnimationUtils || {};
         lenis = new Lenis({
@@ -17,9 +44,7 @@
             wheelMultiplier: opts.lenisWheelMultiplier ?? 1.2,
             easing: (t) => 1 - Math.pow(1 - t, 4),
             smoothWheel: true,
-            syncTouch: true,
-            syncTouchLerp: 0.1,
-            touchMultiplier: 1,
+            syncTouch: false,
         });
 
         lenis.on('scroll', () => {
@@ -33,7 +58,6 @@
         requestAnimationFrame(raf);
 
         window.lenis = lenis;
-        initGradientSectionObserver(viewport);
     }
 
     function initGradientSectionObserver(viewport) {

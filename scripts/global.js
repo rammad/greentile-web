@@ -647,6 +647,15 @@ function initMobileMenu(nav) {
     let isOpen = false;
     const links = menu.querySelectorAll('.mobile-menu-link');
 
+    const page = window.location.pathname.split('/').pop() || 'index.html';
+    const eventsPages = ['events.html', 'product.html', 'archives.html'];
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href || href === '#') return;
+        const isCurrent = page === href || (href === 'events.html' && eventsPages.includes(page));
+        if (isCurrent) link.classList.add('is-current');
+    });
+
     function resetCascades() {
         links.forEach(link => {
             link.querySelectorAll('.char-reveal').forEach(c => {
@@ -678,7 +687,17 @@ function initMobileMenu(nav) {
         }
     }
 
+    function closeMenu() {
+        if (!isOpen) return;
+        isOpen = false;
+        hamburger.classList.remove('is-active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        menu.classList.remove('is-open');
+        resetCascades();
+    }
+
     hamburger.addEventListener('click', toggle);
+    window.mobileMenu = { close: closeMenu, isOpen: () => isOpen };
 
     links.forEach(link => {
         link.addEventListener('click', () => {});

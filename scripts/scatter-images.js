@@ -28,7 +28,7 @@
             // Left side — back-outer nestles between the two front columns
             { id: 'fol', x: -2,  layer: 'front', stagger:  0.08 },
             { id: 'bol', x: 6,   layer: 'back',  stagger: -0.10 },
-            { id: 'fil', x: 14,  layer: 'front', stagger: -0.25, frameInset: 8  },
+            { id: 'fil', x: 14,  layer: 'front', stagger: -0.25, frameInset: 8, flushTop: true },
             { id: 'bil', x: 26,  layer: 'back',  stagger: -0.20, frameInset: 8  },
             // Right side — mirror
             { id: 'bir', x: 66,  layer: 'back',  stagger: -0.20, frameInset: -8 },
@@ -43,7 +43,7 @@
             { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20 }
         ],
         mobile: [
-            { id: 'fl',  x: -4, layer: 'front', stagger: -0.20, frameInset: 8 },
+            { id: 'fl',  x: -4, layer: 'front', stagger: -0.20, frameInset: 8, flushTop: true },
             { id: 'bl',  x: 16,   layer: 'back',  stagger: -0.15, frameInset: 8 },
             { id: 'br',  x: 68,  layer: 'back',  stagger: -0.15, frameInset: -8 },
             { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20, frameInset: -8 }
@@ -257,7 +257,8 @@
                 var frameN     = frameInset ? (isMobile ? C.mobileFrameCount : C.frameCount) : 0;
 
                 images.forEach(function (img, i) {
-                    var baseTop = edgeTop + spacing * (i + 0.5) + staggerPx;
+                    var centerOffset = (colDef.flushTop && i === 0) ? 0 : 0.5;
+                    var baseTop = edgeTop + spacing * (i + centerOffset) + staggerPx;
                     var jitter  = (Math.random() - 0.5) * 2 * jitterAmt;
                     var imgW    = Math.round(randRange(minW, maxW));
                     var imgH    = imgW * (5 / 4);

@@ -20,8 +20,11 @@
         const bodyMap = {};
         bodies.forEach(b => { bodyMap[b.dataset.forIndex] = b; });
 
-        let activeBody = null;
-        let isMobile = window.innerWidth <= MOBILE_BP;
+        let activeBody   = null;
+        let isMobile     = window.innerWidth <= MOBILE_BP;
+        let bodyAllowed  = false;
+        let titleShown   = false;
+        let titleAnimId  = 0;
 
         /* ── fallback ── */
 
@@ -47,6 +50,7 @@
         }
 
         function activateBodyDesktop(posterEl) {
+            if (!bodyAllowed) return;
             const resolved = resolveBodyForIndex(posterEl.dataset.index);
             const body = bodyMap[resolved];
             if (!body || body === activeBody) return;
@@ -89,36 +93,6 @@
 
         posters.forEach(p => desktopBodyObs.observe(p));
 
-        /* ── desktop: deactivate body when section leaves viewport ── */
-
-        const CLEANUP_RATIO = 0.15;
-        let titleCleaned = false;
-        const sectionCleanupObs = new IntersectionObserver((entries) => {
-            if (isMobile) return;
-            for (const entry of entries) {
-                if (entry.intersectionRatio < CLEANUP_RATIO) {
-                    if (activeBody) {
-                        activeBody.classList.remove('is-active');
-                        activeBody = null;
-                        if (bodySizer) bodySizer.style.height = '';
-                    }
-                    if (titleFired) {
-                        titleLines.forEach(l => l.classList.remove('is-visible'));
-                        titleFired = false;
-                        titleCleaned = true;
-                    }
-                } else if (titleCleaned && !titleFired) {
-                    titleFired = true;
-                    titleCleaned = false;
-                    titleLines.forEach((line, i) => {
-                        setTimeout(() => line.classList.add('is-visible'), i * LINE_STAGGER_MS);
-                    });
-                }
-            }
-        }, { root, threshold: [0, CLEANUP_RATIO] });
-
-        sectionCleanupObs.observe(section);
-
         /* ── mobile: title + body animate in with observer ── */
 
         observeElementInOut(titleCol, {
@@ -139,10 +113,14 @@
             });
         });
 
-        /* ── fixed→sticky hand-off (desktop only) ── */
+        /* ── desktop: scroll-driven state machine (position + visibility) ── */
 
         const els = [titleInner, textSticky];
         let pinned = false;
+        let cachedStickyTop = null;
+
+        const GONE_THRESHOLD = 0.15;
+        const BODY_THRESHOLD = 0.3;
 
         function pxVar(expression) {
             const tmp = document.createElement('div');
@@ -153,9 +131,14 @@
             return val;
         }
 
+        function getStickyTop() {
+            if (cachedStickyTop === null) cachedStickyTop = pxVar('calc(var(--space-for-nav) + 20px)');
+            return cachedStickyTop;
+        }
+
         function applyFixed() {
-            if (window.innerWidth <= MOBILE_BP) { removeFixed(); return; }
-            const top = pxVar('calc(var(--space-for-nav) + 20px)');
+            if (pinned || isMobile) return;
+            const top = getStickyTop();
             els.forEach(el => {
                 const rect = el.getBoundingClientRect();
                 Object.assign(el.style, {
@@ -163,14 +146,13 @@
                     top:    `${top}px`,
                     left:   `${rect.left}px`,
                     width:  `${rect.width}px`,
-                    height: 'calc(100vh - var(--space-for-nav) - 40px)',
+                    height: 'calc(100svh - var(--space-for-nav) - 40px)',
                 });
             });
             pinned = true;
         }
 
-        let handedOff = false;
-        function removeFixed() {
+        function clearFixed() {
             if (!pinned) return;
             els.forEach(el => {
                 el.style.position = '';
@@ -180,28 +162,106 @@
                 el.style.height   = '';
             });
             pinned = false;
-            handedOff = true;
         }
 
-        applyFixed();
+        function showTitle() {
+            if (titleShown) return;
+            titleShown = true;
+            const id = ++titleAnimId;
+            titleLines.forEach((line, i) => {
+                setTimeout(() => {
+                    if (titleAnimId === id) line.classList.add('is-visible');
+                }, i * LINE_STAGGER_MS);
+            });
+        }
 
-        function waitForStickThenUnpin() {
-            const stickyTop = pxVar('calc(var(--space-for-nav) + 20px)');
-            function check() {
-                if (firstPoster.getBoundingClientRect().top <= stickyTop + 1) {
-                    removeFixed();
-                    window.removeEventListener('lenis-scroll', check);
+        function hideTitle() {
+            if (!titleShown) return;
+            titleAnimId++;
+            titleLines.forEach(l => l.classList.remove('is-visible'));
+            titleShown = false;
+        }
+
+        function hideBody() {
+            if (!activeBody) return;
+            activeBody.classList.remove('is-active');
+            activeBody = null;
+            if (bodySizer) bodySizer.style.height = '';
+        }
+
+        function updateDesktop() {
+            if (isMobile) return;
+
+            const stickyTop = getStickyTop();
+            const rect = section.getBoundingClientRect();
+            const vh = window.innerHeight;
+
+            const visTop = Math.max(rect.top, 0);
+            const visBot = Math.min(rect.bottom, vh);
+            const visPx  = Math.max(0, visBot - visTop);
+
+            /* ── gone: section barely / not visible ── */
+            if (visPx < vh * GONE_THRESHOLD) {
+                clearFixed();
+                hideTitle();
+                hideBody();
+                bodyAllowed = false;
+                return;
+            }
+
+            /* ── positioning: fixed while section top is below sticky threshold ── */
+            if (rect.top > stickyTop) {
+                applyFixed();
+            } else {
+                clearFixed();
+            }
+
+            /* ── wait for first poster to be 25 % on-screen before showing title/body ── */
+            const posterRect = firstPoster.getBoundingClientRect();
+            const posterEnteredBy = vh - posterRect.top;
+            if (posterEnteredBy < posterRect.height * 0.85) {
+                hideTitle();
+                hideBody();
+                bodyAllowed = false;
+                return;
+            }
+
+            /* ── title entrance ── */
+            showTitle();
+
+            /* ── body fades sooner than title on exit ── */
+            if (visPx < vh * BODY_THRESHOLD) {
+                hideBody();
+                bodyAllowed = false;
+            } else if (!bodyAllowed) {
+                bodyAllowed = true;
+                for (const poster of posters) {
+                    const pr = poster.getBoundingClientRect();
+                    const pVis = Math.min(pr.bottom, vh) - Math.max(pr.top, 0);
+                    if (pVis > 0 && pVis >= pr.height * 0.5) {
+                        activateBodyDesktop(poster);
+                        break;
+                    }
                 }
             }
-            window.addEventListener('lenis-scroll', check);
-            check();
         }
+
+        window.pageReady.then(() => {
+            updateDesktop();
+            window.addEventListener('lenis-scroll', updateDesktop);
+        });
+
+        /* ── resize ── */
 
         let resizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                if (!handedOff) applyFixed();
+                cachedStickyTop = null;
+                if (pinned) {
+                    clearFixed();
+                    applyFixed();
+                }
                 updateLayout();
             }, 50);
         });
@@ -225,32 +285,15 @@
             const nowMobile = window.innerWidth <= MOBILE_BP;
             if (nowMobile === isMobile) return;
             isMobile = nowMobile;
-            if (isMobile) arrangeForMobile();
-            else arrangeForDesktop();
+            if (isMobile) {
+                clearFixed();
+                arrangeForMobile();
+            } else {
+                arrangeForDesktop();
+                updateDesktop();
+            }
         }
 
         if (isMobile) arrangeForMobile();
-
-        /* ── desktop: title entrance trigger ── */
-
-        let titleFired = false;
-        const titleObs = new IntersectionObserver((entries) => {
-            if (titleFired || isMobile) return;
-            for (const entry of entries) {
-                if (entry.isIntersecting) {
-                    titleFired = true;
-                    titleObs.disconnect();
-                    window.pageReady.then(() => {
-                        titleLines.forEach((line, i) => {
-                            setTimeout(() => line.classList.add('is-visible'), i * LINE_STAGGER_MS);
-                        });
-                        waitForStickThenUnpin();
-                    });
-                    break;
-                }
-            }
-        }, { root, rootMargin: '0px 0px -75% 0px', threshold: 0 });
-
-        titleObs.observe(firstPoster);
     });
 })();

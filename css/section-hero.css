@@ -28,7 +28,7 @@
         transform: translate(-50%, -50%);
         font-size: var(--size-display-hero) !important;
         white-space: normal;
-        line-height: var(--lh-single);
+        line-height: var(--lh-display);
         text-box: normal;
     }
     

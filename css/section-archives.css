@@ -64,7 +64,7 @@
 
     .archives-title-mobile .fit-text {
         padding-top: 0;
-        line-height: var(--lh-single);
+        line-height: var(--lh-display);
         text-box: normal;
     }
 

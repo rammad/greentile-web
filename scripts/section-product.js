@@ -18,6 +18,7 @@
 
         initImageScroll();
         initMobileDots();
+        initMobileSwipeGuard();
         initDescFade();
         updateQty(0);
     });
@@ -128,6 +129,47 @@
             }
         });
 
+        // match pdp-info bottom padding to the ticket-actions bar height,
+        // scrolling in lockstep with the CSS transition each frame
+        const info = document.querySelector('.pdp-info');
+        let prevBarH = 0;
+        let rafId = 0;
+        const syncPad = () => {
+            if (!info || !ticketActions) return;
+            const visible = ticketActions.classList.contains('is-sticky-visible');
+            const h = visible ? ticketActions.offsetHeight : 0;
+            info.style.paddingBottom = h ? h + 'px' : '';
+            const delta = h - prevBarH;
+            if (delta !== 0 && visible) window.scrollBy(0, delta);
+            prevBarH = h;
+        };
+        const pollHeight = () => {
+            syncPad();
+            rafId = requestAnimationFrame(pollHeight);
+        };
+        if (ticketActions && info) {
+            ticketActions.addEventListener('transitionstart', () => {
+                cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(pollHeight);
+            });
+            ticketActions.addEventListener('transitionend', () => {
+                cancelAnimationFrame(rafId);
+                syncPad();
+            });
+            new ResizeObserver(syncPad).observe(ticketActions);
+        }
+
+        // keep the bar pinned to the real visual-viewport bottom
+        // (handles mobile browser chrome showing/hiding)
+        if (ticketActions && window.visualViewport) {
+            const syncBottom = () => {
+                const offset = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
+                ticketActions.style.bottom = Math.max(0, offset) + 'px';
+            };
+            window.visualViewport.addEventListener('resize', syncBottom);
+            window.visualViewport.addEventListener('scroll', syncBottom);
+        }
+
         // sticky purchase bar: slides up after the title enters the viewport, then stays
         if (title && ticketActions) {
             if (cta) {
@@ -142,9 +184,11 @@
                 repeat: true,
                 onEnter: () => {
                     ticketActions.classList.add('is-sticky-visible');
+                    syncPad();
                 },
                 onExit: () => {
                     ticketActions.classList.remove('is-sticky-visible');
+                    syncPad();
                 }
             });
         }
@@ -254,6 +298,100 @@
             });
             dots.forEach((d, i) => d.classList.toggle('is-active', i === active));
         }, { passive: true });
+    }
+
+    function initMobileSwipeGuard() {
+        if (window.innerWidth > MOBILE_BREAKPOINT) return;
+
+        const track = document.querySelector('.pdp-image-track');
+        if (!track) return;
+        const posters = Array.from(track.querySelectorAll('.pdp-poster'));
+        if (posters.length <= 1) return;
+
+        let currentIdx = 0;
+        let startX, startY, startScroll, axis;
+        let animating = false;
+        let rafId = 0;
+
+        const getIdx = () => {
+            const sl = track.scrollLeft;
+            let closest = 0, minDist = Infinity;
+            posters.forEach((p, i) => {
+                const dist = Math.abs(p.offsetLeft - sl);
+                if (dist < minDist) { minDist = dist; closest = i; }
+            });
+            return closest;
+        };
+
+        const animateTo = (targetScroll) => {
+            cancelAnimationFrame(rafId);
+            animating = true;
+            const from = track.scrollLeft;
+            const dist = targetScroll - from;
+            if (Math.abs(dist) < 1) {
+                track.scrollLeft = targetScroll;
+                animating = false;
+                track.style.scrollSnapType = '';
+                return;
+            }
+            const duration = 300;
+            const t0 = performance.now();
+            const step = (now) => {
+                const t = Math.min((now - t0) / duration, 1);
+                const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                track.scrollLeft = from + dist * ease;
+                if (t < 1) {
+                    rafId = requestAnimationFrame(step);
+                } else {
+                    track.scrollLeft = targetScroll;
+                    animating = false;
+                    track.style.scrollSnapType = '';
+                }
+            };
+            rafId = requestAnimationFrame(step);
+        };
+
+        track.addEventListener('touchstart', (e) => {
+            if (animating) return;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            startScroll = track.scrollLeft;
+            currentIdx = getIdx();
+            axis = null;
+            track.style.scrollSnapType = 'none';
+        }, { passive: true });
+
+        track.addEventListener('touchmove', (e) => {
+            if (animating) return;
+            const dx = e.touches[0].clientX - startX;
+            const dy = e.touches[0].clientY - startY;
+            if (axis === null && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+                axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+            }
+            if (axis === 'x') {
+                e.preventDefault();
+                track.scrollLeft = startScroll - dx;
+            }
+        }, { passive: false });
+
+        track.addEventListener('touchend', (e) => {
+            if (animating) return;
+            if (axis !== 'x') {
+                track.style.scrollSnapType = '';
+                return;
+            }
+            const dx = e.changedTouches[0].clientX - startX;
+            let target = currentIdx;
+            if (dx < -30 && currentIdx < posters.length - 1) target = currentIdx + 1;
+            else if (dx > 30 && currentIdx > 0) target = currentIdx - 1;
+            currentIdx = target;
+            animateTo(posters[target].offsetLeft);
+        });
+
+        track.addEventListener('touchcancel', () => {
+            animating = false;
+            track.style.scrollSnapType = '';
+        });
     }
 
     function initDescFade() {

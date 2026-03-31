@@ -71,6 +71,7 @@
     justify-items: center;
     z-index: 5;
     pointer-events: none;
+    touch-action: pan-y;
 }
 
 /* all text blocks occupy the same grid cell so they stack on top of each other */
@@ -83,6 +84,7 @@
     position: relative;
     /* opacity, filter, and transition are driven entirely by JS inline styles */
     will-change: opacity, filter;
+    touch-action: pan-y;
 }
 
 /* reset base.css opacity:0 on all child type elements — parent block controls visibility */
@@ -108,6 +110,8 @@
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
+    pointer-events: auto;
+    touch-action: pan-y;
 }
 
 /* ── persistent menu ─────────────────────────────────────────────────────── */
@@ -123,7 +127,8 @@
     justify-content: center;
     gap: 24px;
     z-index: 5;
-    pointer-events: auto;
+    pointer-events: none;
+    touch-action: pan-y;
 }
 
 .about-menu-persistent ul {
@@ -143,7 +148,7 @@
 .about-menu-persistent .menu-item {
     color: var(--c-dark-green-30);
     opacity: 0;
-    cursor: pointer;
+    pointer-events: none;
     transition: color var(--time-fade-out) ease, opacity var(--time-fade-out) ease;
 }
 
@@ -165,14 +170,14 @@
     right: 0;
     width: 100%;
     padding-top: 0;
-    pointer-events: auto;
+    pointer-events: none;
     z-index: 5;
     will-change: transform;
 }
 
 @media (max-width: 768px) {
     .what-we-do .about-menu-persistent { top: 18vh; }
-    .about-menu-persistent .menu-item { word-spacing: 100vw; line-height: var(--lh-single); }
+    .about-menu-persistent .menu-item { word-spacing: 100vw; line-height: var(--lh-display); }
     .about-menu-persistent .menu-item .ws-normal { word-spacing: normal; }
 
     .about-menu-persistent .menu-label {

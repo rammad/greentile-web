@@ -44,7 +44,9 @@ const CONTACT_CONFIG = {
         document.body.style.overflow = savedOverflow;
 
         const hamburger = document.querySelector('.nav-hamburger');
-        if (hamburger) {
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const menuStillOpen = mobileMenu && mobileMenu.classList.contains('is-open');
+        if (hamburger && !menuStillOpen) {
             hamburger.classList.remove('is-active');
             hamburger.setAttribute('aria-expanded', 'false');
         }
@@ -152,25 +154,17 @@ const CONTACT_CONFIG = {
                 if (isOpen) {
                     e.stopImmediatePropagation();
                     close();
+                    if (window.mobileMenu) window.mobileMenu.close();
                 }
             }, true);
         }
 
-        // mobile menu "Say Hi" link
+        // mobile menu "Say Hi" link — opens contact on top, menu stays open
         document.querySelectorAll('.mobile-menu-link').forEach(link => {
             if (link.getAttribute('href') === '#') {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const menu = document.querySelector('.mobile-menu');
-                    const hmb = document.querySelector('.nav-hamburger');
-                    if (menu && menu.classList.contains('is-open')) {
-                        menu.classList.remove('is-open');
-                        if (hmb) {
-                            hmb.classList.remove('is-active');
-                            hmb.setAttribute('aria-expanded', 'false');
-                        }
-                    }
-                    setTimeout(open, 300);
+                    open();
                 });
             }
         });

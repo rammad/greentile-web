@@ -244,6 +244,12 @@ function initMobileScrollSpy() {
         endSpacer.style.flexBasis = w + 'px';
     };
 
+    const sizeRailOverlap = () => {
+        const h = list.offsetHeight;
+        datesRail.style.paddingBottom = h + 'px';
+        datesRail.style.marginBottom  = -h + 'px';
+    };
+
     /* ── inject inline poster + badges into each slide ── */
     items.forEach(item => {
         const imgUrl = item.getAttribute('data-img');
@@ -288,6 +294,7 @@ function initMobileScrollSpy() {
     /* ── sync: when centered date changes, lerp poster into place ── */
     let activeIndex = -1;
     let lerpRaf = 0;
+    let swipeLock = false;
 
     const lerpPoster = (idx) => {
         cancelAnimationFrame(lerpRaf);
@@ -309,6 +316,7 @@ function initMobileScrollSpy() {
     };
 
     const onDateScroll = () => {
+        if (swipeLock) return;
         const railRect = datesRail.getBoundingClientRect();
         const railCenterX = railRect.left + railRect.width / 2;
         let closestIdx = 0;
@@ -328,6 +336,132 @@ function initMobileScrollSpy() {
     };
 
     datesRail.addEventListener('scroll', onDateScroll, { passive: true });
+
+    /* ── single-swipe guard: one swipe = exactly ±1 date ── */
+    {
+        let swStartX, swStartY, swStartScroll, swStartIdx, swAxis;
+        let swMinScroll, swMaxScroll;
+        let swAnimating = false;
+        let swRaf = 0;
+
+        const getCenterIdx = () => {
+            const cx = datesRail.getBoundingClientRect().left + datesRail.clientWidth / 2;
+            let best = 0, bestDist = Infinity;
+            dateItems.forEach((d, i) => {
+                const r = d.getBoundingClientRect();
+                const dist = Math.abs(r.left + r.width / 2 - cx);
+                if (dist < bestDist) { bestDist = dist; best = i; }
+            });
+            return best;
+        };
+
+        const centerScrollFor = (idx) =>
+            dateItems[idx].offsetLeft + dateItems[idx].offsetWidth / 2 - datesRail.clientWidth / 2;
+
+        const animateRailTo = (targetScroll) => {
+            cancelAnimationFrame(swRaf);
+            swAnimating = true;
+            const from = datesRail.scrollLeft;
+            const dist = targetScroll - from;
+            if (Math.abs(dist) < 1) {
+                datesRail.scrollLeft = targetScroll;
+                swAnimating = false;
+                swipeLock = false;
+                datesRail.style.scrollSnapType = '';
+                return;
+            }
+            const duration = 300;
+            const t0 = performance.now();
+            const step = (now) => {
+                const t = Math.min((now - t0) / duration, 1);
+                const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                datesRail.scrollLeft = from + dist * ease;
+                if (t < 1) {
+                    swRaf = requestAnimationFrame(step);
+                } else {
+                    datesRail.scrollLeft = targetScroll;
+                    swAnimating = false;
+                    swipeLock = false;
+                    datesRail.style.scrollSnapType = '';
+                }
+            };
+            swRaf = requestAnimationFrame(step);
+        };
+
+        datesRail.addEventListener('touchstart', (e) => {
+            if (swAnimating) return;
+            swStartX = e.touches[0].clientX;
+            swStartY = e.touches[0].clientY;
+            swStartScroll = datesRail.scrollLeft;
+            swStartIdx = getCenterIdx();
+            swAxis = null;
+            swipeLock = true;
+            datesRail.style.scrollSnapType = 'none';
+            swMinScroll = centerScrollFor(Math.max(0, swStartIdx - 1));
+            swMaxScroll = centerScrollFor(Math.min(dateItems.length - 1, swStartIdx + 1));
+        }, { passive: true });
+
+        datesRail.addEventListener('touchmove', (e) => {
+            if (swAnimating) return;
+            const dx = e.touches[0].clientX - swStartX;
+            const dy = e.touches[0].clientY - swStartY;
+            if (swAxis === null && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+                swAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+            }
+            if (swAxis === 'x') {
+                e.preventDefault();
+                const raw = swStartScroll - dx;
+                const CUSHION = 60;
+                let clamped = raw;
+
+                if (raw > swStartScroll) {
+                    const travel = raw - swStartScroll;
+                    const total  = swMaxScroll - swStartScroll;
+                    const free   = Math.max(0, total - CUSHION);
+                    if (travel > free) {
+                        const zone = total - free;
+                        const into = travel - free;
+                        clamped = swStartScroll + free + zone * into / (zone + into);
+                    }
+                } else {
+                    const travel = swStartScroll - raw;
+                    const total  = swStartScroll - swMinScroll;
+                    const free   = Math.max(0, total - CUSHION);
+                    if (travel > free) {
+                        const zone = total - free;
+                        const into = travel - free;
+                        clamped = swStartScroll - free - zone * into / (zone + into);
+                    }
+                }
+
+                datesRail.scrollLeft = clamped;
+            }
+        }, { passive: false });
+
+        datesRail.addEventListener('touchend', (e) => {
+            if (swAnimating) { swipeLock = false; return; }
+            if (swAxis !== 'x') {
+                swipeLock = false;
+                datesRail.style.scrollSnapType = '';
+                return;
+            }
+            const dx = e.changedTouches[0].clientX - swStartX;
+            let target = swStartIdx;
+            if (dx < -30 && swStartIdx < dateItems.length - 1) target++;
+            else if (dx > 30 && swStartIdx > 0) target--;
+
+            activeIndex = target;
+            dateItems.forEach((d, i) => d.classList.toggle('is-active', i === target));
+            lerpPoster(target);
+            animateRailTo(centerScrollFor(target));
+        });
+
+        datesRail.addEventListener('touchcancel', () => {
+            swipeLock = false;
+            swAnimating = false;
+            datesRail.style.scrollSnapType = '';
+        });
+    }
 
     /* ── forward taps from the rail's extended touch area to poster links ── */
     let railTouchScroll = 0;
@@ -352,6 +486,7 @@ function initMobileScrollSpy() {
     document.fonts.ready.then(() => {
         requestAnimationFrame(() => {
             setSpacerWidths();
+            sizeRailOverlap();
             dateItems[0].scrollIntoView({ inline: 'center', block: 'nearest' });
             activeIndex = 0;
             dateItems[0].classList.add('is-active');

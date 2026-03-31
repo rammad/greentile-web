@@ -19,9 +19,9 @@
     const MENU_EASE_PX            = 500;
 
     // ── menu entrance (mobile) ───────────────────────────────────────────
-    const MENU_START_VH_MOBILE    = 0.4;
-    const MENU_SCROLL_RATE_MOBILE = 0.85;
-    const MENU_EASE_PX_MOBILE     = 200;
+    const MENU_START_VH_MOBILE    = 0.15;
+    const MENU_SCROLL_RATE_MOBILE = 0.90;
+    const MENU_EASE_PX_MOBILE     = 120;
 
     // ── menu exit (desktop) ──────────────────────────────────────────────
     const MENU_EXIT_START         = 100;
@@ -111,7 +111,6 @@
                 block.style.transition    = 'none';
                 block.style.opacity       = '0';
                 block.style.filter        = `blur(${BODY_BLUR_PX}px)`;
-                block.style.pointerEvents = 'none';
             });
             void bodyEl.offsetHeight;
             blocks.forEach((block) => {
@@ -129,7 +128,6 @@
             block.style.transition    = `opacity ${TIME_FADE_IN}s ease, filter ${TIME_FADE_IN}s ease`;
             block.style.opacity       = '1';
             block.style.filter        = 'blur(0px)';
-            block.style.pointerEvents = 'auto';
         }
 
         function hideBlock(block) {
@@ -137,7 +135,6 @@
             block.style.transition    = `opacity ${TIME_FADE_OUT}s ease, filter ${TIME_FADE_OUT}s ease`;
             block.style.opacity       = '0';
             block.style.filter        = `blur(${BODY_BLUR_PX}px)`;
-            block.style.pointerEvents = 'none';
         }
 
         function showCtas(block) {
@@ -166,7 +163,7 @@
 
         // ── menu activation trigger ─────────────────────────────────────────
         const MENU_REVEAL_VH_DESKTOP = 0.05;  // vh — section top must reach this far down viewport to activate (desktop)
-        const MENU_REVEAL_VH_MOBILE  = 0.22;  // vh — same trigger for mobile
+        const MENU_REVEAL_VH_MOBILE  = 0.35;  // vh — same trigger for mobile
 
         function updateActiveSlide() {
             const vpRect    = viewport ? viewport.getBoundingClientRect() : { top: 0, height: window.innerHeight };
@@ -299,6 +296,82 @@
             scatter.updateImageScales();
             updateActiveSlide();
         });
+
+        // ── mobile snap-to-slide ────────────────────────────────────────────
+
+        if (isMobile && viewport) {
+            const SWIPE_THRESHOLD = 30;
+            const SNAP_OFFSET_VH  = 0.16;
+            const SNAP_LERP       = 0.04;
+            const SNAP_EPSILON    = 0.5;
+
+            let touchStartY  = 0;
+            let touchActive  = false;
+            let snapping     = false;
+            let snapTarget   = 0;
+            let snapIdx      = -1;
+
+            function getSlideScroll(idx) {
+                const vpH        = window.innerHeight;
+                const revealVH   = MENU_REVEAL_VH_MOBILE;
+                const scrollStart = revealVH * vpH;
+                const scrollRange = scrollStart - (vpH - section.offsetHeight);
+                const progress    = (idx + 0.1) / menuItems.length;
+                return section.offsetTop - scrollStart + progress * scrollRange + SNAP_OFFSET_VH * vpH;
+            }
+
+            function animateSnap() {
+                if (!snapping) return;
+                const current = viewport.scrollTop;
+                const diff    = snapTarget - current;
+                if (Math.abs(diff) < SNAP_EPSILON) {
+                    viewport.scrollTop = snapTarget;
+                    snapping = false;
+                    return;
+                }
+                viewport.scrollTop = current + diff * SNAP_LERP;
+                requestAnimationFrame(animateSnap);
+            }
+
+            section.addEventListener('touchstart', (e) => {
+                if (!wasActive) return;
+                touchStartY = e.touches[0].clientY;
+                touchActive = true;
+                snapping    = false;
+            }, { passive: true });
+
+            section.addEventListener('touchmove', (e) => {
+                if (!touchActive) return;
+                const deltaY   = touchStartY - e.touches[0].clientY;
+                const swipeUp  = deltaY > 0;
+                const atTop    = activeIdx === 0 && !swipeUp;
+                const atBottom = activeIdx === menuItems.length - 1 && swipeUp;
+                if (atTop || atBottom) {
+                    touchActive = false;
+                    return;
+                }
+                e.preventDefault();
+            }, { passive: false });
+
+            section.addEventListener('touchend', (e) => {
+                if (!touchActive) return;
+                touchActive = false;
+
+                const deltaY = touchStartY - e.changedTouches[0].clientY;
+                if (Math.abs(deltaY) < SWIPE_THRESHOLD) return;
+
+                const targetIdx = deltaY > 0
+                    ? Math.min(menuItems.length - 1, activeIdx + 1)
+                    : Math.max(0, activeIdx - 1);
+
+                if (targetIdx === snapIdx && snapping) return;
+
+                snapIdx    = targetIdx;
+                snapTarget = getSlideScroll(targetIdx);
+                snapping   = true;
+                requestAnimationFrame(animateSnap);
+            });
+        }
 
         // ── resize ────────────────────────────────────────────────────────────
 

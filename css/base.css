@@ -82,10 +82,11 @@
     --poster-full-height: calc(100vh - var(--space-for-nav) - 80px);
 
     /* line-height — named so any reader knows the intent */
-    --lh-tight:  0.85;  /* all-caps display/header — flush with text-box trim */
-    --lh-single: 1;     /* single-line labels, UI, subheaders */
-    --lh-body:   1.2;   /* body text */
-    --lh-open:   1.4;   /* large multi-line display text */
+    --lh-tight:   0.85; /* all-caps display/header — flush with text-box trim */
+    --lh-display: 1;  /* mobile multiline headers (text-box: normal) */
+    --lh-single:  1;    /* single-line labels, UI, subheaders */
+    --lh-body:    1.2;  /* body text */
+    --lh-open:    1.4;  /* large multi-line display text */
 
     /* type sizes — overridden per breakpoint below */
     --size-display-hero:  165px;
@@ -111,7 +112,7 @@
     --nav-cluster-gap: 32px;
     --active-indicator-width: 20px;
 
-    --section-spacing: 200px;
+    --section-spacing: 240px; /* space between sections was 200px*/
 }
 
 /* reset */
@@ -683,10 +684,11 @@ body::after {
         --size-body2:         14px;
         --size-body3:         16px;
 
-        --lh-tight:  0.85;
-        --lh-single: 0.9;
-        --lh-body:   1.2;
-        --lh-open:   1.4;
+        --lh-tight:   0.85;
+        --lh-display: 0.9;
+        --lh-single:  1;
+        --lh-body:    1.2;
+        --lh-open:    1.4;
 
         --space-for-nav: 70px;
         --page-gutter: 12px;
@@ -696,11 +698,10 @@ body::after {
 
         --section-spacing: 80px;
         --poster-gap: 12px;
-        --cta-padding: 12px 16px 8px;
     }
 
-    .cta-btn .ui-roll-layer {
-        gap: 20px;
+    .text-mask {
+        padding-top: 0.15em;
     }
 
     .cta-btn .ui-roll {

@@ -367,7 +367,7 @@
 
     .calendar-title-mobile .fit-text {
         padding-top: 0;
-        line-height: var(--lh-single);
+        line-height: var(--lh-display);
         text-box: normal;
     }
 
@@ -403,8 +403,6 @@
         scroll-snap-type: x mandatory;
         scrollbar-width: none;
         margin-top: auto;
-        padding-bottom: 80vh;
-        margin-bottom: -80vh;
     }
     .calendar-dates-rail::-webkit-scrollbar { display: none; }
 
@@ -423,7 +421,7 @@
     .cal-date-item {
         flex-shrink: 0;
         font-size: 56px;
-        line-height: var(--lh-single);
+        line-height: var(--lh-display);
         text-box: normal;
         color: var(--c-dark-green-30);
         transition: color 0.3s ease;

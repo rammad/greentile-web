@@ -11,6 +11,7 @@
     position: relative;
     margin-top: var(--section-spacing);
     padding-bottom: 80px;
+    overflow: hidden;
 }
 
 .socials-header {
@@ -122,6 +123,11 @@
 }
 
 @media (max-width: 768px) {
+
+    .socials-section {
+        margin-top: calc(var(--section-spacing) * 2);
+        padding-bottom: 40px;
+    }
 
     .icon-circle {
         width: 32px;

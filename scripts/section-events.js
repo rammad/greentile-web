@@ -138,6 +138,7 @@
             } else if (p > exitStart) {
                 stickyOff = -stickyMax * ((p - exitStart) / easeLen);
             }
+            if (currentlyMobile) stickyOff = Math.max(stickyOff, 0);
             stickyInner.style.transform = `translateY(${Math.round(stickyOff)}px)`;
 
             cards.forEach((card, i) => {
@@ -172,24 +173,17 @@
                 ? (parseFloat(getComputedStyle(nav).top) || 0) + nav.offsetHeight
                 : 0;
 
-            stickyInner.style.paddingTop = navInset + 'px';
+            currentlyMobile  = window.matchMedia('(max-width: 768px)').matches;
+
+            stickyInner.style.paddingTop = (navInset + (currentlyMobile ? s20 : 0)) + 'px';
 
             const flexGap    = parseFloat(getComputedStyle(stickyInner).rowGap) || 0;
             const gridColGap = parseFloat(getComputedStyle(grid).columnGap) || 0;
             const gridPad    = parseFloat(getComputedStyle(grid).paddingLeft)
                              + parseFloat(getComputedStyle(grid).paddingRight);
-            currentlyMobile  = window.matchMedia('(max-width: 768px)').matches;
 
             if (currentlyMobile) {
-                const numCols    = 2;
-                const numRows    = Math.ceil(n / numCols);
-                const gridRowGap = parseFloat(getComputedStyle(grid).rowGap) || 0;
-                const ctaH       = ctaFooter ? ctaFooter.offsetHeight : 0;
-                const titleH     = titleWrap.offsetHeight;
-                const availableH = ih - navInset - titleH - ctaH - flexGap * 2 - s20;
-                const maxPosterH = (availableH - (numRows - 1) * gridRowGap) / numRows;
-                const maxPosterW = maxPosterH * 4 / 5;
-                grid.style.maxWidth = Math.max(0, numCols * maxPosterW + (numCols - 1) * gridColGap + gridPad) + 'px';
+                grid.style.maxWidth = '';
             } else {
                 const maxPosterH = ih - navInset - titleWrap.offsetHeight - flexGap - s20;
                 const maxPosterW = maxPosterH * 4 / 5;
@@ -220,10 +214,33 @@
                     const posterBottom = content.offsetTop + content.offsetHeight;
                     ctaFooter.style.top    = (posterBottom + navSpace) + 'px';
                     ctaFooter.style.bottom = 'auto';
-                    section.style.marginBottom = '';
                 }
+                syncCtaMargin();
             }
         };
+
+        let nextSection = section.nextElementSibling;
+        while (nextSection && nextSection.tagName !== 'SECTION') nextSection = nextSection.nextElementSibling;
+
+        const syncCtaMargin = () => {
+            if (!ctaFooter) return;
+            const stickyH = stickyInner.offsetHeight;
+            const rs = getComputedStyle(document.documentElement);
+            const spacing = parseFloat(rs.getPropertyValue('--section-spacing'));
+            const mobile = window.matchMedia('(max-width: 768px)').matches;
+            const desired = mobile ? spacing * 1.5 : spacing;
+            const ctaBottom = ctaFooter.offsetTop + ctaFooter.offsetHeight;
+            const nextPad = nextSection ? parseFloat(getComputedStyle(nextSection).paddingTop) || 0 : 0;
+
+            const stickLen = 1 - stickProgress;
+            const easeLen  = STICK_EASE * stickLen;
+            const stickyMaxAtRelease = easeLen * phase2Len / 2;
+
+            const gapToEnd = stickyH - ctaBottom + stickyMaxAtRelease;
+            section.style.marginBottom = (desired - gapToEnd - nextPad) + 'px';
+        };
+
+        if (ctaFooter) new ResizeObserver(syncCtaMargin).observe(ctaFooter);
 
         document.fonts.ready.then(recalcLayout);
         window.addEventListener('resize', () => {
