@@ -44,9 +44,11 @@
     opacity: 0.5;
 }
 
-.archives-page .grid-card:hover .grid-card-poster {
-    filter: none;
-    opacity: 1;
+@media (hover: hover) {
+    .archives-page .grid-card:hover .grid-card-poster {
+        filter: none;
+        opacity: 1;
+    }
 }
 
 .load-more-container {

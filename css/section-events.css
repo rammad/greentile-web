@@ -79,8 +79,10 @@
     transition: rotate 0.2s ease-out;
 }
 
-.event-card:hover {
-    rotate: var(--hover-rotate);
+@media (hover: hover) {
+    .event-card:hover {
+        rotate: var(--hover-rotate);
+    }
 }
 
 .event-poster {

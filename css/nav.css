@@ -47,8 +47,10 @@
     transition: transform 0.3s ease;
 }
 
-.nav-logo:hover {
-    transform: rotate(15deg);
+@media (hover: hover) {
+    .nav-logo:hover {
+        transform: rotate(15deg);
+    }
 }
 
 .sticky-nav a {

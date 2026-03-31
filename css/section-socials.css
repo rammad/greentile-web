@@ -84,8 +84,10 @@
     -webkit-mask-image: url('../images/graphics/discord-icon-svgrepo-com.svg');
 }
 
-.icon-circle:hover {
-    background-color: var(--c-dark-green-50);
+@media (hover: hover) {
+    .icon-circle:hover {
+        background-color: var(--c-dark-green-50);
+    }
 }
 
 .socials-track {

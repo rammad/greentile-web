@@ -421,10 +421,12 @@ section {
 .ui-roll-hidden { position: absolute; top: 0; left: 0; transform: translateY(100%); }
 
 .ui-roll.is-visible .ui-roll-visible, .nav-loaded .ui-roll-visible { transform: translateY(0%); }
-.ui-roll.roll-hover:hover .ui-roll-visible,
 .ui-roll.is-rolling .ui-roll-visible { transform: translateY(-150%); }
-.ui-roll.roll-hover:hover .ui-roll-hidden,
 .ui-roll.is-rolling .ui-roll-hidden { transform: translateY(0%); }
+@media (hover: hover) {
+    .ui-roll.roll-hover:hover .ui-roll-visible { transform: translateY(-150%); }
+    .ui-roll.roll-hover:hover .ui-roll-hidden { transform: translateY(0%); }
+}
 
 .cta-btn {
     position: relative;
@@ -498,14 +500,15 @@ section {
 }
 
 /* roll only when btn is visible */
-.cta-btn.is-visible:hover .ui-roll-visible {
-    transform: translateY(-100%);
-    transition-delay: 0s;
-}
-
-.cta-btn.is-visible:hover .ui-roll-hidden {
-    transform: translateY(0%);
-    transition-delay: 0s;
+@media (hover: hover) {
+    .cta-btn.is-visible:hover .ui-roll-visible {
+        transform: translateY(-100%);
+        transition-delay: 0s;
+    }
+    .cta-btn.is-visible:hover .ui-roll-hidden {
+        transform: translateY(0%);
+        transition-delay: 0s;
+    }
 }
 
 .ui-roll-hidden { transform: translateY(150%); opacity: 1; }

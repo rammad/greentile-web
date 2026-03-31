@@ -85,8 +85,10 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-.contact-topic-btn:hover {
-    box-shadow: inset 0 0 0 1.5px var(--c-dark-green-50);
+@media (hover: hover) {
+    .contact-topic-btn:hover {
+        box-shadow: inset 0 0 0 1.5px var(--c-dark-green-50);
+    }
 }
 
 .contact-topic-btn.active {

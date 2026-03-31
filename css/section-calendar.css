@@ -141,8 +141,10 @@
     color var(--time-fade-in) ease;
 }
 .calendar-row.is-visible { opacity: 1; filter: blur(0px); }
-.calendar-row:hover {
-    color: var(--color-text-main);
+@media (hover: hover) {
+    .calendar-row:hover {
+        color: var(--color-text-main);
+    }
 }
 
 .calendar-poster-wrapper {
@@ -226,8 +228,17 @@
     transition: rotate 0.2s ease-out;
 }
 
-.grid-card:hover {
-    rotate: var(--hover-rotate);
+@media (hover: hover) {
+    .grid-card:hover {
+        rotate: var(--hover-rotate);
+    }
+    .grid-card:hover .grid-card-poster {
+        z-index: 2;
+    }
+    .calendar-page .grid-sold-out:hover .grid-card-poster {
+        filter: none;
+        opacity: 1;
+    }
 }
 
 .grid-card.grid-coming-soon {
@@ -247,18 +258,9 @@
     transition: all var(--time-fade-in) ease;
 }
 
-.grid-card:hover .grid-card-poster {
-    z-index: 2;
-}
-
 .calendar-page .grid-sold-out .grid-card-poster {
     filter: grayscale(100%) sepia(40%) hue-rotate(90deg);
     opacity: 0.5;
-}
-
-.calendar-page .grid-sold-out:hover .grid-card-poster {
-    filter: none;
-    opacity: 1;
 }
 
 .calendar-poster-img.is-sold-out {
