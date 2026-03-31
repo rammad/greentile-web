@@ -250,8 +250,10 @@ class GradientEngine {
             alpha: true, 
             antialias: true 
         });
-        this.renderer.setSize(width, height);
+        this.renderer.setSize(width, height, false);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this._lastWidth = width;
+        this._lastHeight = height;
 
         this.clock = new THREE.Clock();
         window.addEventListener('resize', () => this.onResize());
@@ -298,7 +300,10 @@ class GradientEngine {
     }
 
     getDimensions() {
-        return { width: window.innerWidth, height: window.innerHeight };
+        return {
+            width:  this.canvas.clientWidth  || window.innerWidth,
+            height: this.canvas.clientHeight || window.innerHeight
+        };
     }
 
     getScrollPosition() {
@@ -313,7 +318,10 @@ class GradientEngine {
 
     onResize() {
         const { width, height } = this.getDimensions();
-        this.renderer.setSize(width, height);
+        if (width === this._lastWidth && height === this._lastHeight) return;
+        this._lastWidth = width;
+        this._lastHeight = height;
+        this.renderer.setSize(width, height, false);
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
     }

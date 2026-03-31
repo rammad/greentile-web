@@ -20,7 +20,7 @@
 
     function initNativeTouch(viewport) {
         viewport.style.overflow = 'auto';
-        viewport.style.webkitOverflowScrolling = 'touch';
+        viewport.style.overscrollBehavior = 'none';
 
         const shim = { get scroll() { return viewport.scrollTop; } };
         window.lenis = shim;
