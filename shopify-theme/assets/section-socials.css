@@ -84,6 +84,18 @@
     -webkit-mask-image: var(--asset-icon-discord);
 }
 
+.icon-custom {
+    background-color: transparent;
+    mask-image: none;
+    -webkit-mask-image: none;
+}
+.icon-custom img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
 @media (hover: hover) {
     .icon-circle:hover {
         background-color: var(--c-dark-green-50);

@@ -4,7 +4,9 @@
       "type": "mission",
       "settings": {
         "label": "mission",
-        "gradient_colors": "#30FA30, #FFFCFA, #feea4f"
+        "gradient_color_1": "#30FA30",
+        "gradient_color_2": "#FFFCFA",
+        "gradient_color_3": "#feea4f"
       },
       "blocks": {
         "l1": { "type": "line", "settings": { "text": "Since day one," } },
@@ -20,7 +22,9 @@
       "type": "what-we-do",
       "settings": {
         "label": "What We Do",
-        "gradient_colors": "#FFFCFA, #C1FEC1, #FFFCFA"
+        "gradient_color_1": "#FFFCFA",
+        "gradient_color_2": "#C1FEC1",
+        "gradient_color_3": "#FFFCFA"
       },
       "blocks": {
         "cat0": {
@@ -62,7 +66,9 @@
       "type": "team",
       "settings": {
         "title": "THE TEAM",
-        "gradient_colors": "#FFFCFA, #C1FEC1, #FFFCFA"
+        "gradient_color_1": "#FFFCFA",
+        "gradient_color_2": "#C1FEC1",
+        "gradient_color_3": "#FFFCFA"
       }
     },
     "clients": {
@@ -70,20 +76,42 @@
       "settings": {
         "clients_title": "Clients",
         "press_title": "Press"
-      }
+      },
+      "blocks": {
+        "cl1": { "type": "client", "settings": { "name": "Anheuser-Busch", "url": "https://www.anheuser-busch.com" } },
+        "cl2": { "type": "client", "settings": { "name": "Boston Consulting Group", "url": "https://www.bcg.com" } },
+        "cl3": { "type": "client", "settings": { "name": "Brookfield", "url": "https://www.brookfield.com" } },
+        "cl4": { "type": "client", "settings": { "name": "Citi", "url": "https://www.citi.com" } },
+        "pr1": { "type": "press_logo", "settings": { "name": "Eater", "slug": "eater", "url": "https://www.eater.com" } },
+        "pr2": { "type": "press_logo", "settings": { "name": "TimeOut New York", "slug": "timeout", "url": "https://www.timeout.com/newyork" } },
+        "pr3": { "type": "press_logo", "settings": { "name": "Thrillist", "slug": "thrillist", "url": "https://www.thrillist.com" } },
+        "pr4": { "type": "press_logo", "settings": { "name": "Gothamist", "slug": "gothamist", "url": "https://gothamist.com" } },
+        "pr5": { "type": "press_logo", "settings": { "name": "The Infatuation", "slug": "infatuation", "url": "https://www.theinfatuation.com" } },
+        "pr6": { "type": "press_logo", "settings": { "name": "New York Magazine", "slug": "nymag", "url": "https://nymag.com" } },
+        "pr7": { "type": "press_logo", "settings": { "name": "Bon Appétit", "slug": "bonappetit", "url": "https://www.bonappetit.com" } }
+      },
+      "block_order": ["cl1", "cl2", "cl3", "cl4", "pr1", "pr2", "pr3", "pr4", "pr5", "pr6", "pr7"]
     },
     "socials": {
       "type": "socials",
       "settings": {
         "subheading": "hope we",
         "title": "SEE YOU SOON!"
-      }
+      },
+      "blocks": {
+        "sl_ig": { "type": "social_link", "settings": { "platform": "instagram", "url": "https://instagram.com/greentilesocialclub", "label": "Instagram" } },
+        "sl_tt": { "type": "social_link", "settings": { "platform": "tiktok", "url": "https://tiktok.com/@greentilesocialclub", "label": "TikTok" } },
+        "sl_dc": { "type": "social_link", "settings": { "platform": "discord", "url": "https://discord.gg/mwgd9P3cb4", "label": "Discord" } }
+      },
+      "block_order": ["sl_ig", "sl_tt", "sl_dc"]
     },
     "footer": {
       "type": "footer",
       "settings": {
         "title": "Green Tile Social Club",
-        "gradient_colors": "#30FA30, #FFFCFA, #FDE523"
+        "gradient_color_1": "#30FA30",
+        "gradient_color_2": "#FFFCFA",
+        "gradient_color_3": "#FDE523"
       },
       "blocks": {
         "mq1": { "type": "marquee", "settings": { "text": "our podcast greenroom now on spotify" } },

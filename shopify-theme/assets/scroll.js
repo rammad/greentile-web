@@ -27,6 +27,84 @@
                 detail: { scroll: window.scrollY }
             }));
         }, { passive: true });
+
+        initPullToRefresh();
+    }
+
+    function initPullToRefresh() {
+        let startY = 0;
+        let lastDy = 0;
+        let state = 'idle';
+        const DIR_THRESHOLD = 4;
+        const RELOAD_THRESHOLD = 120;
+
+        const indicator = document.createElement('div');
+        indicator.className = 'ptr-indicator';
+        document.body.appendChild(indicator);
+
+        document.addEventListener('touchstart', (e) => {
+            if (window.scrollY <= 5) {
+                startY = e.touches[0].clientY;
+                lastDy = 0;
+                state = 'deciding';
+            } else {
+                state = 'idle';
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (state === 'idle' || state === 'scrolling') return;
+
+            lastDy = e.touches[0].clientY - startY;
+
+            if (state === 'deciding') {
+                if (Math.abs(lastDy) >= DIR_THRESHOLD) {
+                    state = lastDy > 0 ? 'pulling' : 'scrolling';
+                }
+                return;
+            }
+
+            if (state === 'pulling') {
+                if (lastDy <= 0) {
+                    state = 'idle';
+                    hideIndicator();
+                    return;
+                }
+                showIndicator(lastDy);
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => {
+            if (state === 'pulling' && lastDy >= RELOAD_THRESHOLD) {
+                indicator.classList.add('is-reloading');
+                location.reload();
+                return;
+            }
+            state = 'idle';
+            lastDy = 0;
+            hideIndicator();
+        }, { passive: true });
+
+        document.addEventListener('touchcancel', () => {
+            state = 'idle';
+            lastDy = 0;
+            hideIndicator();
+        }, { passive: true });
+
+        function showIndicator(dy) {
+            const peek = Math.min(dy * 0.35, 55);
+            const spin = dy * 1.8;
+            indicator.style.transition = 'none';
+            indicator.style.opacity = '1';
+            indicator.style.transform =
+                'translateY(calc(-100% + ' + peek + 'px)) rotate(' + spin + 'deg)';
+        }
+
+        function hideIndicator() {
+            indicator.style.transition = '';
+            indicator.style.opacity = '0';
+            indicator.style.transform = 'translateY(-100%)';
+        }
     }
 
     /* ── desktop: Lenis on wrapper for wheel dampening ───────────────────── */

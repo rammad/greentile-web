@@ -6,7 +6,6 @@
 
 <div class="contact-panel" data-lenis-prevent
   data-default-email="{{ section.settings.default_email | default: settings.contact_email }}"
-  data-formspree-id="{{ section.settings.formspree_id | default: settings.formspree_id }}"
   data-success-msg="{{ section.settings.success_message | default: 'contact.success' | t }}"
   data-error-msg="{{ section.settings.error_message | default: 'contact.error' | t }}"
 >
@@ -150,12 +149,6 @@
       "id": "default_email",
       "label": "Default recipient email",
       "info": "Overrides theme-level contact email for this panel"
-    },
-    {
-      "type": "text",
-      "id": "formspree_id",
-      "label": "Formspree ID override",
-      "info": "Overrides theme-level Formspree ID"
     },
     {
       "type": "text",

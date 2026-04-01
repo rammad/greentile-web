@@ -9,7 +9,6 @@
 
     const CONFIG = {
         recipientEmail: panel.dataset.defaultEmail || (window.THEME_SETTINGS && window.THEME_SETTINGS.contactEmail) || 'hello@greentilesocialclub.com',
-        formspreeId: panel.dataset.formspreeId || (window.THEME_SETTINGS && window.THEME_SETTINGS.formspreeId) || '',
         successMsg: panel.dataset.successMsg || "Message sent — we'll be in touch!",
         errorMsg: panel.dataset.errorMsg || 'Something went wrong — please try again',
     };
@@ -30,6 +29,17 @@
         if (defaultBtn.dataset.email) selectedEmail = defaultBtn.dataset.email;
     }
 
+    function selectTopic(value) {
+        if (!value) return;
+        const btn = panel.querySelector(`.contact-topic-btn[data-topic="${CSS.escape(value)}"]`);
+        if (!btn) return;
+        topicBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTopic = btn.dataset.topic;
+        selectedEmail = btn.dataset.email || CONFIG.recipientEmail;
+        updateExtraFields();
+    }
+
     function updateExtraFields() {
         extraFields.forEach(field => {
             const showFor = field.dataset.showForTopics;
@@ -48,7 +58,8 @@
 
     updateExtraFields();
 
-    function open() {
+    function open(topic) {
+        if (topic) selectTopic(topic);
         if (isOpen) return;
         isOpen = true;
         document.body.classList.add('contact-is-open');
@@ -172,50 +183,36 @@
             data._cc = selectedEmail;
         }
 
-        if (CONFIG.formspreeId) {
-            const submitBtn = form.querySelector('.contact-submit');
-            try {
-                submitBtn.style.pointerEvents = 'none';
-                submitBtn.style.opacity = '0.5';
-                const res = await fetch(`https://formspree.io/f/${CONFIG.formspreeId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                    body: JSON.stringify(data),
-                });
-                if (!res.ok) throw new Error(res.status);
-                showStatus(CONFIG.successMsg, 'success');
-                form.reset();
-                topicBtns.forEach(b => b.classList.remove('active'));
-                if (topicBtns[0]) {
-                    topicBtns[0].classList.add('active');
-                    selectedTopic = topicBtns[0].dataset.topic || '';
-                    selectedEmail = topicBtns[0].dataset.email || CONFIG.recipientEmail;
-                }
-                updateExtraFields();
-            } catch (err) {
-                showStatus(CONFIG.errorMsg, 'error');
-            } finally {
-                submitBtn.style.pointerEvents = '';
-                submitBtn.style.opacity = '';
-            }
-        } else {
-            sendViaMailto(data);
-        }
+        /* ── Form submission integration ──
+           Plug in your preferred form backend here (e.g. Formspree, Basin,
+           Shopify form action, etc.). Until then, falls back to mailto. */
+
+        sendViaMailto(data);
     });
 
-    window.contactPanel = { open, close, isOpen: () => isOpen };
+    window.contactPanel = { open, close, isOpen: () => isOpen, selectTopic };
 
     function wireTriggers() {
-        // all elements with data-contact-trigger open the panel
         document.querySelectorAll('[data-contact-trigger]').forEach(trigger => {
             trigger.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (isOpen) close();
-                else open();
+                const topic = trigger.dataset.contactTopic;
+                if (isOpen && !topic) close();
+                else open(topic);
             });
         });
 
-        // hamburger: when contact panel is open, intercept click to close it
+        // any <a href="#contact"> or <a href="#contact:topicValue"> anywhere on the page
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a[href^="#contact"]');
+            if (!link || link.hasAttribute('data-contact-trigger')) return;
+            const href = link.getAttribute('href');
+            const match = href.match(/^#contact(?::(.+))?$/);
+            if (!match) return;
+            e.preventDefault();
+            open(match[1] || null);
+        });
+
         const hamburger = document.querySelector('.nav-hamburger');
         if (hamburger) {
             hamburger.addEventListener('click', (e) => {
@@ -226,10 +223,6 @@
                 }
             }, true);
         }
-
-        // mobile menu "Say Hi" link (has data-contact-trigger, handled above)
-
-        // footer links with data-contact-trigger (handled above)
     }
 
     if (document.readyState === 'loading') {

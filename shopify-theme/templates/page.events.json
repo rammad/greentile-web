@@ -3,15 +3,10 @@
     "calendar": {
       "type": "calendar",
       "settings": {
-        "title": "Spring Calendar 2025",
-        "gradient_colors": "#FFFCFA, #D6FED6, #FFFCFA"
-      },
-      "blocks": {
-        "f1": { "type": "month_filter", "settings": { "label": "March" } },
-        "f2": { "type": "month_filter", "settings": { "label": "April" } },
-        "f3": { "type": "month_filter", "settings": { "label": "May" } }
-      },
-      "block_order": ["f1", "f2", "f3"]
+        "gradient_color_1": "#FFFCFA",
+        "gradient_color_2": "#D6FED6",
+        "gradient_color_3": "#FFFCFA"
+      }
     }
   },
   "order": ["calendar"]

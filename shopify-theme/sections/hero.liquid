@@ -1,7 +1,7 @@
 {{ 'section-hero.css' | asset_url | stylesheet_tag }}
 
 <section id="hero" class="hero standard-margins"
-  data-colors="{{ section.settings.gradient_colors | default: '#30FA30, #FFFCFA, #feea4f' }}"
+  data-colors="{{ section.settings.gradient_color_1 | default: '#30FA30' }}, {{ section.settings.gradient_color_2 | default: '#FFFCFA' }}, {{ section.settings.gradient_color_3 | default: '#feea4f' }}"
   data-edge="0"
 >
   <h1 class="type-display-hero animate-cascade fit-text">
@@ -27,11 +27,26 @@
       "default": "Green Tile Social Club"
     },
     {
-      "type": "text",
-      "id": "gradient_colors",
-      "label": "Section gradient colors",
-      "default": "#30FA30, #FFFCFA, #feea4f",
-      "info": "Comma-separated CSS colors"
+      "type": "header",
+      "content": "Section gradient"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#30FA30"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#feea4f"
     }
   ],
   "presets": [

@@ -5,13 +5,6 @@
   assign evt_key = settings.event_metafield_key | default: 'event_v2'
 
   assign cal_collection = section.settings.collection
-  if cal_collection != blank
-    assign event_source = collections[cal_collection].products
-  else
-    assign event_source = collections.all.products
-  endif
-
-  assign manual_filters = section.blocks | where: 'type', 'month_filter'
 
   assign current_month = 'now' | date: '%m' | plus: 0
   assign current_year = 'now' | date: '%Y'
@@ -20,16 +13,20 @@
     assign season_label = 'Spring'
     assign season_start = current_year | append: '-03-01'
     assign season_end = current_year | append: '-05-31'
+    assign season_months = 'March,April,May'
   elsif current_month >= 6 and current_month <= 8
     assign season_label = 'Summer'
     assign season_start = current_year | append: '-06-01'
     assign season_end = current_year | append: '-08-31'
+    assign season_months = 'June,July,August'
   elsif current_month >= 9 and current_month <= 11
     assign season_label = 'Fall'
     assign season_start = current_year | append: '-09-01'
     assign season_end = current_year | append: '-11-30'
+    assign season_months = 'September,October,November'
   else
     assign season_label = 'Winter'
+    assign season_months = 'December,January,February'
     if current_month == 12
       assign season_start = current_year | append: '-12-01'
       assign next_year = current_year | plus: 1
@@ -41,22 +38,85 @@
     endif
   endif
 
+  assign season_months_arr = season_months | split: ','
+
   assign auto_title = season_label | append: ' Calendar ' | append: current_year
   assign page_title = section.settings.title | default: auto_title
+
+  if section.settings.cs_shape_1
+    assign cs1_url = section.settings.cs_shape_1 | image_url: width: 400
+  else
+    assign cs1_url = 'sticker-cs-shape-1-blank.svg' | asset_url
+  endif
+  if section.settings.cs_shape_2
+    assign cs2_url = section.settings.cs_shape_2 | image_url: width: 400
+  else
+    assign cs2_url = ''
+  endif
+  if section.settings.cs_shape_3
+    assign cs3_url = section.settings.cs_shape_3 | image_url: width: 400
+  else
+    assign cs3_url = 'sticker-cs-shape-3-blank.svg' | asset_url
+  endif
+  if section.settings.cs_shape_4
+    assign cs4_url = section.settings.cs_shape_4 | image_url: width: 400
+  else
+    assign cs4_url = 'sticker-cs-shape-4-blank.svg' | asset_url
+  endif
+  if section.settings.cs_text
+    assign cs_text_url = section.settings.cs_text | image_url: width: 400
+  else
+    assign cs_text_url = 'sticker-cs-text-white.svg' | asset_url
+  endif
+
+  if section.settings.so_shape_1
+    assign so1_url = section.settings.so_shape_1 | image_url: width: 400
+  else
+    assign so1_url = 'sticker-so-shape-1-blank.svg' | asset_url
+  endif
+  if section.settings.so_shape_2
+    assign so2_url = section.settings.so_shape_2 | image_url: width: 400
+  else
+    assign so2_url = 'sticker-so-shape-2-blank.svg' | asset_url
+  endif
+  if section.settings.so_shape_3
+    assign so3_url = section.settings.so_shape_3 | image_url: width: 400
+  else
+    assign so3_url = 'sticker-so-shape-3-blank.svg' | asset_url
+  endif
+  if section.settings.so_shape_4
+    assign so4_url = section.settings.so_shape_4 | image_url: width: 400
+  else
+    assign so4_url = 'sticker-so-shape-4-blank.svg' | asset_url
+  endif
+  if section.settings.so_text
+    assign so_text_url = section.settings.so_text | image_url: width: 400
+  else
+    assign so_text_url = 'sticker-so-text-white.svg' | asset_url
+  endif
+
+  assign cs_color = section.settings.cs_color | default: '#87A587'
+  assign so_color = section.settings.so_color | default: '#000000'
+  assign placeholder_color = section.settings.placeholder_color | default: '#B7C9B7'
+  assign placeholder_font = section.settings.placeholder_font_color | default: '#87A587'
 -%}
 
 <section class="calendar-page" id="cal-page-container"
-  data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #D6FED6, #FFFCFA' }}"
+  style="--placeholder-bg: {{ placeholder_color }}; --placeholder-font: {{ placeholder_font }}"
+  data-colors="{{ section.settings.gradient_color_1 | default: '#FFFCFA' }}, {{ section.settings.gradient_color_2 | default: '#D6FED6' }}, {{ section.settings.gradient_color_3 | default: '#FFFCFA' }}"
   data-edge="0"
-  data-sticker-cs-blank-1="{{ 'sticker-cs-shape-1-blank.svg' | asset_url }}"
-  data-sticker-cs-blank-3="{{ 'sticker-cs-shape-3-blank.svg' | asset_url }}"
-  data-sticker-cs-blank-4="{{ 'sticker-cs-shape-4-blank.svg' | asset_url }}"
-  data-sticker-cs-text="{{ 'sticker-cs-text-white.svg' | asset_url }}"
-  data-sticker-so-blank-1="{{ 'sticker-so-shape-1-blank.svg' | asset_url }}"
-  data-sticker-so-blank-2="{{ 'sticker-so-shape-2-blank.svg' | asset_url }}"
-  data-sticker-so-blank-3="{{ 'sticker-so-shape-3-blank.svg' | asset_url }}"
-  data-sticker-so-blank-4="{{ 'sticker-so-shape-4-blank.svg' | asset_url }}"
-  data-sticker-so-text="{{ 'sticker-so-text-white.svg' | asset_url }}"
+  data-sticker-cs-blank-1="{{ cs1_url }}"
+  data-sticker-cs-blank-2="{{ cs2_url }}"
+  data-sticker-cs-blank-3="{{ cs3_url }}"
+  data-sticker-cs-blank-4="{{ cs4_url }}"
+  data-sticker-cs-text="{{ cs_text_url }}"
+  data-sticker-cs-color="{{ cs_color }}"
+  data-sticker-so-blank-1="{{ so1_url }}"
+  data-sticker-so-blank-2="{{ so2_url }}"
+  data-sticker-so-blank-3="{{ so3_url }}"
+  data-sticker-so-blank-4="{{ so4_url }}"
+  data-sticker-so-text="{{ so_text_url }}"
+  data-sticker-so-color="{{ so_color }}"
 >
   <div class="calendar-header">
     <h1 class="type-display-hero animate-cascade desktop-only">
@@ -84,14 +144,14 @@
         <div class="text-mask">
           <span class="type-subRegular1 text-reveal-inner">{{ 'events.filters' | t }}</span>
         </div>
-        <button class="filter-btn type-subRegular1 ui-roll roll-hover active">
+        <button class="filter-btn type-subRegular1 ui-roll roll-hover active" data-filter="all">
           <span class="ui-roll-layer ui-roll-visible">{{ 'events.all' | t }}</span>
           <span class="ui-roll-layer ui-roll-hidden">{{ 'events.all' | t }}</span>
         </button>
-        {%- for block in manual_filters -%}
-          <button class="filter-btn type-subRegular1 ui-roll roll-hover" {{ block.shopify_attributes }}>
-            <span class="ui-roll-layer ui-roll-visible">{{ block.settings.label }}</span>
-            <span class="ui-roll-layer ui-roll-hidden">{{ block.settings.label }}</span>
+        {%- for month_name in season_months_arr -%}
+          <button class="filter-btn type-subRegular1 ui-roll roll-hover" data-filter="{{ month_name | downcase }}">
+            <span class="ui-roll-layer ui-roll-visible">{{ month_name }}</span>
+            <span class="ui-roll-layer ui-roll-hidden">{{ month_name }}</span>
           </button>
         {%- endfor -%}
       </div>
@@ -118,8 +178,8 @@
   <div class="calendar-body">
     <div class="calendar-interface-wrapper">
       <div class="calendar-list" data-lenis-prevent>
-        {%- if event_source.size > 0 -%}
-          {%- for product in event_source -%}
+        {%- if cal_collection != blank -%}
+          {%- for product in collections[cal_collection].products -%}
             {%- liquid
               assign ev = product.metafields[evt_ns][evt_key].value
               assign event_date_str = nil
@@ -152,6 +212,7 @@
               -%}
               {%- if row_status == 'coming-soon' -%}
                 <div class="calendar-row calendar-row--upcoming"
+                  data-month="{{ date_display | split: '.' | first }}"
                   data-img="{{ product.featured_image | image_url: width: 800 }}"
                   data-title="{{ product.title | escape }}"
                   {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
@@ -163,6 +224,7 @@
                 </div>
               {%- else -%}
                 <a href="{{ product.url }}" class="calendar-row"
+                  data-month="{{ date_display | split: '.' | first }}"
                   data-img="{{ product.featured_image | image_url: width: 800 }}"
                   data-title="{{ product.title | escape }}"
                   {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
@@ -177,21 +239,46 @@
               {%- endif -%}
             {%- endif -%}
           {%- endfor -%}
-        {%- else -%}
-          {%- for block in section.blocks -%}
-            {%- if block.type == 'event_row' -%}
-              <a href="{{ block.settings.url | default: '#' }}" class="calendar-row"
+        {%- endif -%}
+
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'event_row' -%}
+            {%- liquid
+              assign manual_status = block.settings.status
+              assign manual_is_upcoming = false
+              if manual_status == 'coming-soon'
+                assign manual_is_upcoming = true
+              endif
+            -%}
+            {%- if manual_is_upcoming -%}
+              <div class="calendar-row calendar-row--upcoming"
+                data-month="{{ block.settings.date | split: '.' | first }}"
                 data-img="{% if block.settings.poster %}{{ block.settings.poster | image_url: width: 800 }}{% endif %}"
                 data-title="{{ block.settings.title | escape }}"
-                {% if block.settings.status != blank %}data-status="{{ block.settings.status }}"{% endif %}
+                data-status="coming-soon"
                 {{ block.shopify_attributes }}
               >
                 <span class="cal-date type-h2">{{ block.settings.date }}</span>
                 <span class="cal-name type-h2">{{ block.settings.title }}</span>
+                <span class="cal-status type-subRegular2">Upcoming</span>
+              </div>
+            {%- else -%}
+              <a href="{{ block.settings.url | default: '#' }}" class="calendar-row"
+                data-month="{{ block.settings.date | split: '.' | first }}"
+                data-img="{% if block.settings.poster %}{{ block.settings.poster | image_url: width: 800 }}{% endif %}"
+                data-title="{{ block.settings.title | escape }}"
+                {% if manual_status != blank %}data-status="{{ manual_status }}"{% endif %}
+                {{ block.shopify_attributes }}
+              >
+                <span class="cal-date type-h2">{{ block.settings.date }}</span>
+                <span class="cal-name type-h2">{{ block.settings.title }}</span>
+                {%- if manual_status == 'sold-out' -%}
+                  <span class="cal-status type-subRegular2">Sold Out</span>
+                {%- endif -%}
               </a>
             {%- endif -%}
-          {%- endfor -%}
-        {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
       </div>
 
       <div class="calendar-poster-wrapper" id="poster-wrapper">
@@ -222,8 +309,7 @@
     {
       "type": "collection",
       "id": "collection",
-      "label": "Events collection (optional)",
-      "info": "Leave empty to pull from all active products. Only events within the current season are shown."
+      "label": "Events collection"
     },
     {
       "type": "url",
@@ -231,25 +317,163 @@
       "label": "Archives page URL"
     },
     {
-      "type": "text",
-      "id": "gradient_colors",
-      "label": "Section gradient colors",
-      "default": "#FFFCFA, #D6FED6, #FFFCFA"
+      "type": "header",
+      "content": "Section gradient"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#D6FED6"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "header",
+      "content": "Coming Soon sticker"
+    },
+    {
+      "type": "image_picker",
+      "id": "cs_shape_1",
+      "label": "Shape 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "cs_shape_2",
+      "label": "Shape 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "cs_shape_3",
+      "label": "Shape 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "cs_shape_4",
+      "label": "Shape 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "cs_text",
+      "label": "Text overlay"
+    },
+    {
+      "type": "select",
+      "id": "cs_color",
+      "label": "Shape color",
+      "options": [
+        { "value": "#0E4A0E", "label": "Dark Green" },
+        { "value": "#87A587", "label": "Moss" },
+        { "value": "#568056", "label": "Forest" },
+        { "value": "#B7C9B7", "label": "Sage" },
+        { "value": "#30FA30", "label": "Bright Green" },
+        { "value": "#000000", "label": "Black" },
+        { "value": "#FFFCFA", "label": "Off White" },
+        { "value": "#FDE523", "label": "Yellow" },
+        { "value": "#FF3B30", "label": "Red" },
+        { "value": "#E2DEDB", "label": "Light Grey" }
+      ],
+      "default": "#87A587"
+    },
+    {
+      "type": "header",
+      "content": "Sold Out sticker"
+    },
+    {
+      "type": "image_picker",
+      "id": "so_shape_1",
+      "label": "Shape 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "so_shape_2",
+      "label": "Shape 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "so_shape_3",
+      "label": "Shape 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "so_shape_4",
+      "label": "Shape 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "so_text",
+      "label": "Text overlay"
+    },
+    {
+      "type": "select",
+      "id": "so_color",
+      "label": "Shape color",
+      "options": [
+        { "value": "#000000", "label": "Black" },
+        { "value": "#0E4A0E", "label": "Dark Green" },
+        { "value": "#87A587", "label": "Moss" },
+        { "value": "#568056", "label": "Forest" },
+        { "value": "#B7C9B7", "label": "Sage" },
+        { "value": "#30FA30", "label": "Bright Green" },
+        { "value": "#FFFCFA", "label": "Off White" },
+        { "value": "#FDE523", "label": "Yellow" },
+        { "value": "#FF3B30", "label": "Red" },
+        { "value": "#E2DEDB", "label": "Light Grey" }
+      ],
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Placeholder poster"
+    },
+    {
+      "type": "select",
+      "id": "placeholder_color",
+      "label": "Background color",
+      "options": [
+        { "value": "#B7C9B7", "label": "Sage" },
+        { "value": "#87A587", "label": "Moss" },
+        { "value": "#0E4A0E", "label": "Dark Green" },
+        { "value": "#568056", "label": "Forest" },
+        { "value": "#30FA30", "label": "Bright Green" },
+        { "value": "#FFFCFA", "label": "Off White" },
+        { "value": "#000000", "label": "Black" },
+        { "value": "#FDE523", "label": "Yellow" },
+        { "value": "#FF3B30", "label": "Red" },
+        { "value": "#E2DEDB", "label": "Light Grey" }
+      ],
+      "default": "#B7C9B7"
+    },
+    {
+      "type": "select",
+      "id": "placeholder_font_color",
+      "label": "Text color",
+      "options": [
+        { "value": "#87A587", "label": "Moss" },
+        { "value": "#0E4A0E", "label": "Dark Green" },
+        { "value": "#568056", "label": "Forest" },
+        { "value": "#B7C9B7", "label": "Sage" },
+        { "value": "#FFFCFA", "label": "Off White" },
+        { "value": "#000000", "label": "Black" },
+        { "value": "#30FA30", "label": "Bright Green" },
+        { "value": "#FDE523", "label": "Yellow" },
+        { "value": "#FF3B30", "label": "Red" },
+        { "value": "#E2DEDB", "label": "Light Grey" }
+      ],
+      "default": "#87A587"
     }
   ],
   "blocks": [
-    {
-      "type": "month_filter",
-      "name": "Month filter",
-      "settings": [
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Month label",
-          "default": "March"
-        }
-      ]
-    },
     {
       "type": "event_row",
       "name": "Event (manual)",
@@ -293,12 +517,7 @@
   ],
   "presets": [
     {
-      "name": "Event calendar",
-      "blocks": [
-        { "type": "month_filter", "settings": { "label": "March" } },
-        { "type": "month_filter", "settings": { "label": "April" } },
-        { "type": "month_filter", "settings": { "label": "May" } }
-      ]
+      "name": "Event calendar"
     }
   ]
 }

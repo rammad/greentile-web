@@ -36,7 +36,7 @@
   assign current_variant = product.selected_or_first_available_variant
 -%}
 
-<section class="pdp-section" data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #D6FED6, #FFFCFA' }}" data-max-qty="{{ section.settings.max_qty | default: 4 }}">
+<section class="pdp-section" data-colors="{{ section.settings.gradient_color_1 | default: '#FFFCFA' }}, {{ section.settings.gradient_color_2 | default: '#D6FED6' }}, {{ section.settings.gradient_color_3 | default: '#FFFCFA' }}" data-max-qty="{{ section.settings.max_qty | default: 4 }}">
   <div class="pdp-sticky-wrapper">
     <div class="pdp-grid">
 
@@ -152,16 +152,20 @@
             <div class="ui-roll roll-hover">
               <span class="type-subRegular1 ui-roll-layer ui-roll-visible">
                 <span>
-                  <span class="buy-abbr">{{ current_variant.option1 | truncate: 3, '' | upcase }}</span>
-                  &ndash;
+                  {%- if product.variants.size > 1 -%}
+                    <span class="buy-abbr">{{ current_variant.option1 | truncate: 3, '' | upcase }}</span>
+                    &ndash;
+                  {%- endif -%}
                   <span class="buy-price">{{ current_variant.price | money }}</span>
                 </span>
                 <span>{{ section.settings.buy_label | default: 'Buy Now' }}</span>
               </span>
               <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">
                 <span>
-                  <span class="buy-abbr">{{ current_variant.option1 | truncate: 3, '' | upcase }}</span>
-                  &ndash;
+                  {%- if product.variants.size > 1 -%}
+                    <span class="buy-abbr">{{ current_variant.option1 | truncate: 3, '' | upcase }}</span>
+                    &ndash;
+                  {%- endif -%}
                   <span class="buy-price">{{ current_variant.price | money }}</span>
                 </span>
                 <span>{{ section.settings.buy_label | default: 'Buy Now' }}</span>
@@ -204,30 +208,26 @@
       "default": 4
     },
     {
-      "type": "text",
-      "id": "gradient_colors",
-      "label": "Section gradient colors",
-      "default": "#FFFCFA, #D6FED6, #FFFCFA"
-    },
-    {
       "type": "header",
-      "content": "Event ticketing app"
+      "content": "Section gradient"
     },
     {
-      "type": "paragraph",
-      "content": "Event date, venue, and time are pulled from product metafields. Configure the metafield keys in Theme Settings > Event settings. The event ticketing app populates these automatically."
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#FFFCFA"
     },
     {
-      "type": "checkbox",
-      "id": "show_event_ticketing_widget",
-      "label": "Show event ticketing app widget",
-      "default": true,
-      "info": "If the Event Ticketing app adds a widget via app blocks, enable this to show it"
-    }
-  ],
-  "blocks": [
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#D6FED6"
+    },
     {
-      "type": "@app"
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#FFFCFA"
     }
   ],
   "presets": [

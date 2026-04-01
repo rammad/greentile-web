@@ -1,7 +1,7 @@
 {{ 'section-mission.css' | asset_url | stylesheet_tag }}
 
 <section id="mission" class="mission-section"
-  data-colors="{{ section.settings.gradient_colors | default: '#30FA30, #FFFCFA, #feea4f' }}"
+  data-colors="{{ section.settings.gradient_color_1 | default: '#30FA30' }}, {{ section.settings.gradient_color_2 | default: '#FFFCFA' }}, {{ section.settings.gradient_color_3 | default: '#feea4f' }}"
   data-touch-speed="1.0"
 >
   <div class="text-mask">
@@ -32,10 +32,26 @@
       "default": "mission"
     },
     {
-      "type": "text",
-      "id": "gradient_colors",
-      "label": "Section gradient colors",
-      "default": "#30FA30, #FFFCFA, #feea4f"
+      "type": "header",
+      "content": "Section gradient"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#30FA30"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#feea4f"
     }
   ],
   "blocks": [

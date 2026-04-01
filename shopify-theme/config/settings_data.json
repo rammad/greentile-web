@@ -1,13 +1,6 @@
 {
   "current": {
-    "social_instagram": "https://instagram.com/greentilesocialclub",
-    "social_tiktok": "https://tiktok.com/@greentilesocialclub",
-    "social_discord": "https://discord.gg/mwgd9P3cb4",
     "contact_email": "hello@greentilesocialclub.com",
-    "formspree_id": "",
-    "enable_page_curtain": true,
-    "enable_gradient_bg": true,
-    "enable_smooth_scroll": true,
     "event_metafield_namespace": "event_ticketing",
     "event_metafield_key": "event_v2",
     "sections": {

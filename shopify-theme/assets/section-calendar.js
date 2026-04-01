@@ -2,16 +2,18 @@
 
 function buildStickerAssets() {
     const el = document.getElementById('cal-page-container');
-    if (!el) return { 'coming-soon': { blanks: [], text: '' }, 'sold-out': { blanks: [], text: '' } };
+    if (!el) return { 'coming-soon': { blanks: [], text: '', color: '' }, 'sold-out': { blanks: [], text: '', color: '' } };
     const d = el.dataset;
     return {
         'coming-soon': {
-            blanks: [d.stickerCsBlank1, d.stickerCsBlank3, d.stickerCsBlank4].filter(Boolean),
+            blanks: [d.stickerCsBlank1, d.stickerCsBlank2, d.stickerCsBlank3, d.stickerCsBlank4].filter(Boolean),
             text: d.stickerCsText || '',
+            color: d.stickerCsColor || '',
         },
         'sold-out': {
             blanks: [d.stickerSoBlank1, d.stickerSoBlank2, d.stickerSoBlank3, d.stickerSoBlank4].filter(Boolean),
             text: d.stickerSoText || '',
+            color: d.stickerSoColor || '',
         }
     };
 }
@@ -23,7 +25,8 @@ function randomPick(arr) {
 function buildBadgeHTML(type) {
     const assets = buildStickerAssets()[type];
     const blankSrc = randomPick(assets.blanks);
-    return `<div class="badge-layer badge-layer-blank" style="-webkit-mask-image:url('${blankSrc}');mask-image:url('${blankSrc}')"></div>` +
+    const colorStyle = assets.color ? `background-color:${assets.color};` : '';
+    return `<div class="badge-layer badge-layer-blank" style="-webkit-mask-image:url('${blankSrc}');mask-image:url('${blankSrc}');${colorStyle}"></div>` +
            `<img class="badge-layer badge-layer-text" src="${assets.text}" alt="">`;
 }
 
@@ -87,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initEventInteractions();
     initMobileFilterToggle();
+    initMonthFilters();
     initRowPacker();
     animateEntrance();
     initMobileScrollSpy();
@@ -198,7 +202,7 @@ function initMobileScrollSpy() {
 
     const wrapper = document.querySelector('.calendar-interface-wrapper');
     const list = document.querySelector('.calendar-list');
-    const items = document.querySelectorAll('.calendar-row');
+    const items = document.querySelectorAll('.calendar-row:not(.filtered-out)');
 
     if (!wrapper || !list || items.length === 0) return;
 
@@ -424,9 +428,12 @@ function initMobileScrollSpy() {
 /* pack list rows into a grid grouped by month */
 function initRowPacker() {
     const container = document.getElementById('dynamic-grid-container');
-    const listRows = document.querySelectorAll('.calendar-row');
+    const listRows = document.querySelectorAll('.calendar-row:not(.filtered-out)');
 
-    if (!container || listRows.length === 0) return;
+    if (!container || listRows.length === 0) {
+        if (container) container.innerHTML = '';
+        return;
+    }
 
     container.innerHTML = '';
 
@@ -644,6 +651,59 @@ function initMobileFilterToggle() {
             }, rollMs);
         });
     }
+}
+
+function destroyMobileLayout() {
+    const rail = document.querySelector('.calendar-dates-rail');
+    if (rail) rail.remove();
+    document.querySelectorAll('.cal-poster-wrap').forEach(el => el.remove());
+}
+
+function initMonthFilters() {
+    const filterBtns = document.querySelectorAll('.filter-btn[data-filter]');
+    if (!filterBtns.length) return;
+
+    const monthMap = {
+        january: '01', february: '02', march: '03', april: '04',
+        may: '05', june: '06', july: '07', august: '08',
+        september: '09', october: '10', november: '11', december: '12'
+    };
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filter = btn.dataset.filter;
+            const monthNum = monthMap[filter];
+            const allRows = document.querySelectorAll('.calendar-row');
+
+            allRows.forEach(row => {
+                if (filter === 'all' || row.dataset.month === monthNum) {
+                    row.classList.remove('filtered-out');
+                } else {
+                    row.classList.add('filtered-out');
+                }
+            });
+
+            initRowPacker();
+
+            if (window.innerWidth <= 1024) {
+                destroyMobileLayout();
+                initMobileScrollSpy();
+            }
+
+            const { staggerTime, wait } = window.AnimationUtils || {};
+            if (staggerTime && wait) {
+                const visibleRows = document.querySelectorAll('.calendar-row:not(.filtered-out)');
+                visibleRows.forEach(r => r.classList.remove('is-visible'));
+                for (const row of visibleRows) {
+                    row.classList.add('is-visible');
+                    await wait(staggerTime * 0.3);
+                }
+            }
+        });
+    });
 }
 
 function initControlsClamping() {

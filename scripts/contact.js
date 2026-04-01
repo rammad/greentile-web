@@ -1,24 +1,65 @@
-/* contact panel — slide-in form + email dispatch */
-
-const CONTACT_CONFIG = {
-    recipientEmail: 'hello@greentilesocialclub.com',
-    // Formspree: sign up at https://formspree.io, create a form, paste the ID below
-    // e.g. 'xpzvQrLk' → endpoint becomes 'https://formspree.io/f/xpzvQrLk'
-    formspreeId: '',
-};
+/* contact panel — Shopify theme adapted
+   Reads config from DOM data attributes set by Liquid.
+   Supports per-topic email routing and extra conditional fields. */
 
 (function () {
     const panel = document.querySelector('.contact-panel');
     const backdrop = document.querySelector('.contact-backdrop');
     if (!panel || !backdrop) return;
 
+    const CONFIG = {
+        recipientEmail: panel.dataset.defaultEmail || (window.THEME_SETTINGS && window.THEME_SETTINGS.contactEmail) || 'hello@greentilesocialclub.com',
+        successMsg: panel.dataset.successMsg || "Message sent — we'll be in touch!",
+        errorMsg: panel.dataset.errorMsg || 'Something went wrong — please try again',
+    };
+
     const form = panel.querySelector('#contact-form');
     const topicBtns = panel.querySelectorAll('.contact-topic-btn');
     const statusEl = panel.querySelector('.contact-status');
+    const infoFields = panel.querySelectorAll('.contact-info-field');
+    const extraFields = panel.querySelectorAll('.contact-extra-field');
     let isOpen = false;
-    let selectedTopic = 'general';
+    let selectedTopic = '';
+    let selectedEmail = CONFIG.recipientEmail;
 
-    function open() {
+    // set initial topic from active button
+    const defaultBtn = panel.querySelector('.contact-topic-btn.active');
+    if (defaultBtn) {
+        selectedTopic = defaultBtn.dataset.topic || '';
+        if (defaultBtn.dataset.email) selectedEmail = defaultBtn.dataset.email;
+    }
+
+    function selectTopic(value) {
+        if (!value) return;
+        const btn = panel.querySelector(`.contact-topic-btn[data-topic="${CSS.escape(value)}"]`);
+        if (!btn) return;
+        topicBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTopic = btn.dataset.topic;
+        selectedEmail = btn.dataset.email || CONFIG.recipientEmail;
+        updateExtraFields();
+    }
+
+    function updateExtraFields() {
+        extraFields.forEach(field => {
+            const showFor = field.dataset.showForTopics;
+            if (!showFor) {
+                field.style.display = '';
+                return;
+            }
+            const topics = showFor.split(',').map(t => t.trim());
+            field.style.display = topics.includes(selectedTopic) ? '' : 'none';
+            if (field.style.display === 'none') {
+                const input = field.querySelector('input, textarea, select');
+                if (input) input.removeAttribute('required');
+            }
+        });
+    }
+
+    updateExtraFields();
+
+    function open(topic) {
+        if (topic) selectTopic(topic);
         if (isOpen) return;
         isOpen = true;
         document.body.classList.add('contact-is-open');
@@ -61,6 +102,8 @@ const CONTACT_CONFIG = {
             topicBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             selectedTopic = btn.dataset.topic;
+            selectedEmail = btn.dataset.email || CONFIG.recipientEmail;
+            updateExtraFields();
         });
     });
 
@@ -80,11 +123,29 @@ const CONTACT_CONFIG = {
     }
 
     function sendViaMailto(data) {
-        const subject = encodeURIComponent(`[${data.topic}] Contact from ${data.name}`);
-        const body = encodeURIComponent(
-            `Name: ${data.name}\nEmail: ${data.email}\nTopic: ${data.topic}\n\n${data.message}`
-        );
-        window.location.href = `mailto:${CONTACT_CONFIG.recipientEmail}?subject=${subject}&body=${body}`;
+        const senderName = data.name || 'Unknown';
+        const subject = encodeURIComponent(`[${data.topic}] Contact from ${senderName}`);
+        const bodyParts = [`Topic: ${data.topic}`];
+
+        infoFields.forEach(field => {
+            if (field.value) {
+                const label = field.getAttribute('placeholder') || field.getAttribute('name') || 'Field';
+                bodyParts.push(`${label}: ${field.value}`);
+            }
+        });
+
+        extraFields.forEach(field => {
+            if (field.style.display === 'none') return;
+            const input = field.querySelector('input, textarea, select');
+            if (input && input.value) {
+                const label = input.getAttribute('placeholder') || input.getAttribute('name') || 'Field';
+                bodyParts.push(`${label}: ${input.value}`);
+            }
+        });
+
+        bodyParts.push('', data.message);
+        const body = encodeURIComponent(bodyParts.join('\n'));
+        window.location.href = `mailto:${selectedEmail}?subject=${subject}&body=${body}`;
     }
 
     form.addEventListener('submit', async (e) => {
@@ -92,60 +153,66 @@ const CONTACT_CONFIG = {
         clearStatus();
 
         const fd = new FormData(form);
-        const data = {
-            name: fd.get('name')?.trim(),
-            email: fd.get('email')?.trim(),
-            message: fd.get('message')?.trim(),
-            topic: selectedTopic,
-        };
+        const data = { topic: selectedTopic };
 
-        if (!data.name || !data.email || !data.message) {
-            showStatus('Please fill in all fields', 'error');
+        infoFields.forEach(field => {
+            if (field.name) data[field.name] = field.value?.trim() || '';
+        });
+
+        data.message = fd.get('message')?.trim();
+
+        extraFields.forEach(field => {
+            if (field.style.display === 'none') return;
+            const input = field.querySelector('input, textarea, select');
+            if (input && input.name) {
+                data[input.name] = input.value?.trim() || '';
+            }
+        });
+
+        const missing = Array.from(infoFields)
+            .filter(f => f.required && !f.value?.trim())
+            .length > 0;
+        if (missing || !data.message) {
+            showStatus('Please fill in all required fields', 'error');
             return;
         }
 
-        if (CONTACT_CONFIG.formspreeId) {
-            const submitBtn = form.querySelector('.contact-submit');
-            try {
-                submitBtn.style.pointerEvents = 'none';
-                submitBtn.style.opacity = '0.5';
-                const res = await fetch(`https://formspree.io/f/${CONTACT_CONFIG.formspreeId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                    body: JSON.stringify(data),
-                });
-                if (!res.ok) throw new Error(res.status);
-                showStatus('Message sent — we\'ll be in touch!', 'success');
-                form.reset();
-                topicBtns.forEach(b => b.classList.remove('active'));
-                topicBtns[0].classList.add('active');
-                selectedTopic = 'general';
-            } catch (err) {
-                showStatus('Something went wrong — please try again', 'error');
-            } finally {
-                submitBtn.style.pointerEvents = '';
-                submitBtn.style.opacity = '';
-            }
-        } else {
-            sendViaMailto(data);
+        if (data.email) data._replyto = data.email;
+        data._subject = `[${data.topic}] Contact from ${data.name || 'Unknown'}`;
+        if (selectedEmail !== CONFIG.recipientEmail) {
+            data._cc = selectedEmail;
         }
+
+        /* ── Form submission integration ──
+           Plug in your preferred form backend here (e.g. Formspree, Basin,
+           Shopify form action, etc.). Until then, falls back to mailto. */
+
+        sendViaMailto(data);
     });
 
-    window.contactPanel = { open, close, isOpen: () => isOpen };
+    window.contactPanel = { open, close, isOpen: () => isOpen, selectTopic };
 
     function wireTriggers() {
-        // desktop nav: "SAY HI" toggles the panel open/closed
-        const navRight = document.querySelector('.nav-right a');
-        if (navRight) {
-            navRight.addEventListener('click', (e) => {
+        document.querySelectorAll('[data-contact-trigger]').forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (isOpen) close();
-                else open();
+                const topic = trigger.dataset.contactTopic;
+                if (isOpen && !topic) close();
+                else open(topic);
             });
-        }
+        });
 
-        // mobile hamburger: when contact panel is open, intercept click to close it
-        // capture phase + stopImmediatePropagation prevents the mobile menu toggle from firing
+        // any <a href="#contact"> or <a href="#contact:topicValue"> anywhere on the page
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a[href^="#contact"]');
+            if (!link || link.hasAttribute('data-contact-trigger')) return;
+            const href = link.getAttribute('href');
+            const match = href.match(/^#contact(?::(.+))?$/);
+            if (!match) return;
+            e.preventDefault();
+            open(match[1] || null);
+        });
+
         const hamburger = document.querySelector('.nav-hamburger');
         if (hamburger) {
             hamburger.addEventListener('click', (e) => {
@@ -156,28 +223,6 @@ const CONTACT_CONFIG = {
                 }
             }, true);
         }
-
-        // mobile menu "Say Hi" link — opens contact on top, menu stays open
-        document.querySelectorAll('.mobile-menu-link').forEach(link => {
-            if (link.getAttribute('href') === '#') {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    open();
-                });
-            }
-        });
-
-        // footer "Contact Us" link
-        document.querySelectorAll('.footer-links a').forEach(link => {
-            const visible = link.querySelector('.ui-roll-visible');
-            const text = visible ? visible.textContent.trim().toLowerCase() : '';
-            if (text === 'contact us') {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    open();
-                });
-            }
-        });
     }
 
     if (document.readyState === 'loading') {

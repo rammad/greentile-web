@@ -189,10 +189,14 @@
 
 .calendar-poster-img {
     height: calc(100% - var(--page-gutter));
-    width: auto;
+    aspect-ratio: 4/5;
     object-fit: cover;
     border-radius: var(--poster-radius);
     opacity: 1; 
+}
+
+.calendar-row.filtered-out {
+    display: none;
 }
 
 .packed-row {
@@ -325,7 +329,7 @@
     position: relative;
     width: 100%;
     height: 100%;
-    background: linear-gradient(160deg, rgba(183, 201, 183, 0.5), rgba(255, 252, 250, 0.5), rgba(135, 165, 135, 0.5));
+    background: var(--placeholder-bg, #B7C9B7);
     border-radius: var(--poster-radius);
     overflow: hidden;
     container-type: inline-size;
@@ -339,7 +343,7 @@
 .grid-card-label {
     position: absolute;
     bottom: 20px; left: 12px; right: 12px;
-    color: var(--c-dark-green-50);
+    color: var(--placeholder-font, var(--c-dark-green-50));
     font-family: var(--font-header);
     font-size: clamp(14px, 14cqi, var(--size-h1));
     font-weight: 800;

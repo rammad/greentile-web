@@ -46,6 +46,10 @@
 
         /* ── helpers ── */
 
+        function getMaxBodyHeight() {
+            return Math.max(...bodies.map(b => b.scrollHeight));
+        }
+
         function resolveBodyForIndex(idx) {
             if (bodyMap[idx]) return idx;
             const sorted = Object.keys(bodyMap).map(Number).sort((a, b) => a - b);
@@ -314,7 +318,7 @@
                 if (activeBody) activeBody.classList.remove('is-active');
                 body.classList.add('is-active');
                 activeBody = body;
-                if (bodySizer) bodySizer.style.height = body.scrollHeight + 'px';
+                if (bodySizer) bodySizer.style.height = getMaxBodyHeight() + 'px';
             }
         }
 
@@ -345,7 +349,7 @@
                 firstBody.classList.add('is-active');
                 activeBody = firstBody;
             }
-            if (bodySizer && firstBody) bodySizer.style.height = firstBody.scrollHeight + 'px';
+            if (bodySizer) bodySizer.style.height = getMaxBodyHeight() + 'px';
 
             imagesCol.addEventListener('scroll', handleCarouselScroll, { passive: true });
         }

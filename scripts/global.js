@@ -1,5 +1,14 @@
 /* globals */
 
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+window.addEventListener('pageshow', () => {
+    window.scrollTo(0, 0);
+    if (window.lenis) window.lenis.scrollTo(0, { immediate: true });
+    const viewport = document.getElementById('scroll-viewport');
+    if (viewport) viewport.scrollTop = 0;
+});
+
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // returns current season based on month: spring/summer/fall/winter

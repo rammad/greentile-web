@@ -5,21 +5,41 @@
     <div class="type-subBold1 socials-subhead">{{ section.settings.subheading | default: 'hope we' }}</div>
     <div class="type-h1 animate-cascade">{{ section.settings.title | default: 'SEE YOU SOON!' }}</div>
     <div class="socials-icons">
-      {%- if settings.social_instagram != blank -%}
-        <a class="icon-circle icon-instagram" href="{{ settings.social_instagram }}" target="_blank" rel="noopener">
-          <img src="{{ 'Instagram_Glyph_White.svg' | asset_url }}" alt="Instagram">
-        </a>
-      {%- endif -%}
-      {%- if settings.social_tiktok != blank -%}
-        <a class="icon-circle icon-tiktok" href="{{ settings.social_tiktok }}" target="_blank" rel="noopener">
-          <img src="{{ 'tiktok-circle.svg' | asset_url }}" alt="TikTok">
-        </a>
-      {%- endif -%}
-      {%- if settings.social_discord != blank -%}
-        <a class="icon-circle icon-discord" href="{{ settings.social_discord }}" target="_blank" rel="noopener">
-          <img src="{{ 'discord-icon-svgrepo-com.svg' | asset_url }}" alt="Discord">
-        </a>
-      {%- endif -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'social_link' and block.settings.url != blank -%}
+          {%- liquid
+            assign icon_url = ''
+            assign alt_text = block.settings.label | default: 'Social'
+            case block.settings.platform
+              when 'instagram'
+                assign icon_url = 'Instagram_Glyph_White.svg' | asset_url
+                assign alt_text = block.settings.label | default: 'Instagram'
+              when 'tiktok'
+                assign icon_url = 'tiktok-circle.svg' | asset_url
+                assign alt_text = block.settings.label | default: 'TikTok'
+              when 'discord'
+                assign icon_url = 'discord-icon-svgrepo-com.svg' | asset_url
+                assign alt_text = block.settings.label | default: 'Discord'
+            endcase
+            if block.settings.icon
+              assign icon_url = block.settings.icon | image_url: width: 100
+            endif
+          -%}
+          {%- liquid
+            assign is_custom = false
+            if block.settings.icon
+              assign is_custom = true
+            elsif block.settings.platform == 'custom'
+              assign is_custom = true
+            endif
+          -%}
+          {%- if icon_url != blank -%}
+            <a class="icon-circle{% unless is_custom %} icon-{{ block.settings.platform }}{% endunless %}{% if is_custom %} icon-custom{% endif %}" href="{{ block.settings.url }}" target="_blank" rel="noopener" {{ block.shopify_attributes }}>
+              <img src="{{ icon_url }}" alt="{{ alt_text | escape }}">
+            </a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
     </div>
   </div>
 
@@ -28,7 +48,7 @@
       {%- if block.type == 'image' -%}
         <img
           src="{{ block.settings.image | image_url: width: 800 }}"
-          class="social-img{% if block.settings.push_down %} push-down{% endif %}"
+          class="social-img"
           alt="{{ block.settings.image.alt | default: 'Social Post' | escape }}"
           loading="lazy"
           {{ block.shopify_attributes }}
@@ -61,6 +81,42 @@
   ],
   "blocks": [
     {
+      "type": "social_link",
+      "name": "Social link",
+      "settings": [
+        {
+          "type": "select",
+          "id": "platform",
+          "label": "Platform",
+          "options": [
+            { "value": "instagram", "label": "Instagram" },
+            { "value": "tiktok", "label": "TikTok" },
+            { "value": "discord", "label": "Discord" },
+            { "value": "custom", "label": "Custom" }
+          ],
+          "default": "instagram",
+          "info": "Selects the built-in icon. Choose Custom to upload your own."
+        },
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Custom icon",
+          "info": "Overrides the built-in platform icon"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link URL"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Used as alt text for accessibility"
+        }
+      ]
+    },
+    {
       "type": "image",
       "name": "Gallery image",
       "settings": [
@@ -68,20 +124,36 @@
           "type": "image_picker",
           "id": "image",
           "label": "Image"
-        },
-        {
-          "type": "checkbox",
-          "id": "push_down",
-          "label": "Offset down",
-          "default": false,
-          "info": "Alternating vertical offset for visual rhythm"
         }
       ]
     }
   ],
   "presets": [
     {
-      "name": "Socials"
+      "name": "Socials",
+      "blocks": [
+        {
+          "type": "social_link",
+          "settings": {
+            "platform": "instagram",
+            "label": "Instagram"
+          }
+        },
+        {
+          "type": "social_link",
+          "settings": {
+            "platform": "tiktok",
+            "label": "TikTok"
+          }
+        },
+        {
+          "type": "social_link",
+          "settings": {
+            "platform": "discord",
+            "label": "Discord"
+          }
+        }
+      ]
     }
   ]
 }

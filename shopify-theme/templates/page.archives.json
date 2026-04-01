@@ -5,7 +5,9 @@
       "settings": {
         "title": "Event Archives",
         "load_more_label": "Load More",
-        "gradient_colors": "#FFFCFA, #D6FED6, #FFFCFA"
+        "gradient_color_1": "#FFFCFA",
+        "gradient_color_2": "#D6FED6",
+        "gradient_color_3": "#FFFCFA"
       }
     }
   },

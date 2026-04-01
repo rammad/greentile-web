@@ -5,7 +5,7 @@
 -%}
 
 <section id="about" class="what-we-do"
-  data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #C1FEC1, #FFFCFA' }}"
+  data-colors="{{ section.settings.gradient_color_1 | default: '#FFFCFA' }}, {{ section.settings.gradient_color_2 | default: '#C1FEC1' }}, {{ section.settings.gradient_color_3 | default: '#FFFCFA' }}"
   data-edge="0"
   data-touch-speed="0.5"
 >
@@ -28,7 +28,11 @@
         <div class="about-content">
           <p class="type-body2">{{ block.settings.body }}</p>
           {%- if block.settings.cta_label != blank -%}
-            <a href="{{ block.settings.cta_url | default: '#' }}" class="cta-btn">
+            {%- if block.settings.contact_topic != blank -%}
+              <a href="#" class="cta-btn" data-contact-trigger data-contact-topic="{{ block.settings.contact_topic }}">
+            {%- else -%}
+              <a href="{{ block.settings.cta_url | default: '#' }}" class="cta-btn">
+            {%- endif -%}
               <div class="ui-roll roll-hover">
                 <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ block.settings.cta_label }}</span>
                 <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ block.settings.cta_label }}</span>
@@ -87,10 +91,26 @@
       "default": "What We Do"
     },
     {
-      "type": "text",
-      "id": "gradient_colors",
-      "label": "Section gradient colors",
-      "default": "#FFFCFA, #C1FEC1, #FFFCFA"
+      "type": "header",
+      "content": "Section gradient"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#C1FEC1"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#FFFCFA"
     }
   ],
   "blocks": [
@@ -119,6 +139,12 @@
           "type": "url",
           "id": "cta_url",
           "label": "CTA link"
+        },
+        {
+          "type": "text",
+          "id": "contact_topic",
+          "label": "Contact topic",
+          "info": "If set, the CTA opens the contact form with this topic preselected instead of navigating. Use the topic value (e.g. 'general', 'collaboration', 'sponsorship')."
         },
         {
           "type": "header",

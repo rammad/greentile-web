@@ -81,7 +81,6 @@
   <script>
     window.THEME_SETTINGS = {
       contactEmail: {{ settings.contact_email | default: 'hello@greentilesocialclub.com' | json }},
-      formspreeId: {{ settings.formspree_id | default: '' | json }},
       routes: {
         root: {{ routes.root_url | json }},
         cart: {{ routes.cart_url | json }},

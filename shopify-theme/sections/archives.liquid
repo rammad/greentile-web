@@ -34,7 +34,7 @@
 -%}
 
 <section class="archives-page"
-  data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #D6FED6, #FFFCFA' }}"
+  data-colors="{{ section.settings.gradient_color_1 | default: '#FFFCFA' }}, {{ section.settings.gradient_color_2 | default: '#D6FED6' }}, {{ section.settings.gradient_color_3 | default: '#FFFCFA' }}"
   data-edge="0"
 >
   <div class="archives-header desktop-only">
@@ -128,10 +128,26 @@
       "default": "Load More"
     },
     {
-      "type": "text",
-      "id": "gradient_colors",
-      "label": "Section gradient colors",
-      "default": "#FFFCFA, #D6FED6, #FFFCFA"
+      "type": "header",
+      "content": "Section gradient"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#D6FED6"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#FFFCFA"
     }
   ],
   "blocks": [

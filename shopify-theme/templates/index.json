@@ -4,7 +4,9 @@
       "type": "hero",
       "settings": {
         "title": "Green Tile Social Club",
-        "gradient_colors": "#30FA30, #FFFCFA, #feea4f"
+        "gradient_color_1": "#30FA30",
+        "gradient_color_2": "#FFFCFA",
+        "gradient_color_3": "#feea4f"
       }
     },
     "manifesto": {
@@ -12,7 +14,9 @@
       "settings": {
         "subheading": "manifesto",
         "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at odio nulla. Suspendisse laoreet suscipit enim et mollis. Nunc condimentum felis ac ligula tincidunt, dictum accumsan purus laoreet. Pellentesque fermentum dapibus aliquet. Mauris lectus nulla, tincidunt vitae suscipit vel, porttitor non quam. Praesent volutpat ut diam ut tincidunt. Phasellus tempus nisl eget malesuada rhoncus.",
-        "gradient_colors": "#30FA30, #FFFCFA, #feea4f"
+        "gradient_color_1": "#30FA30",
+        "gradient_color_2": "#FFFCFA",
+        "gradient_color_3": "#feea4f"
       },
       "blocks": {
         "img1": { "type": "inline_image", "settings": { "word_position": 5 } },
@@ -29,14 +33,18 @@
         "title": "upcoming events",
         "browse_label": "Browse All Events",
         "max_events": 4,
-        "gradient_colors": "#FFFCFA, #C1FEC1, #FFFCFA"
+        "gradient_color_1": "#FFFCFA",
+        "gradient_color_2": "#C1FEC1",
+        "gradient_color_3": "#FFFCFA"
       }
     },
     "featured": {
       "type": "featured",
       "settings": {
         "marquee_text": "FEATURING",
-        "gradient_colors": "#FFFCFA, #C1FEC1, #FFFCFA"
+        "gradient_color_1": "#FFFCFA",
+        "gradient_color_2": "#C1FEC1",
+        "gradient_color_3": "#FFFCFA"
       }
     },
     "socials": {
@@ -44,13 +52,21 @@
       "settings": {
         "subheading": "hope we",
         "title": "SEE YOU SOON!"
-      }
+      },
+      "blocks": {
+        "sl_ig": { "type": "social_link", "settings": { "platform": "instagram", "url": "https://instagram.com/greentilesocialclub", "label": "Instagram" } },
+        "sl_tt": { "type": "social_link", "settings": { "platform": "tiktok", "url": "https://tiktok.com/@greentilesocialclub", "label": "TikTok" } },
+        "sl_dc": { "type": "social_link", "settings": { "platform": "discord", "url": "https://discord.gg/mwgd9P3cb4", "label": "Discord" } }
+      },
+      "block_order": ["sl_ig", "sl_tt", "sl_dc"]
     },
     "footer": {
       "type": "footer",
       "settings": {
         "title": "Green Tile Social Club",
-        "gradient_colors": "#30FA30, #FFFCFA, #FDE523"
+        "gradient_color_1": "#30FA30",
+        "gradient_color_2": "#FFFCFA",
+        "gradient_color_3": "#FDE523"
       },
       "blocks": {
         "mq1": { "type": "marquee", "settings": { "text": "our podcast greenroom now on spotify" } },

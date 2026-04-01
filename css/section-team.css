@@ -248,6 +248,10 @@
         padding-bottom: 0;
     }
 
+    .team-body-sizer {
+        transition: none;
+    }
+
     .team-body {
         top: 0;
         bottom: auto;

@@ -25,7 +25,7 @@
   {{ 'section-featured.css' | asset_url | stylesheet_tag }}
 
   <section id="featured" class="featured-section"
-    data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #C1FEC1, #FFFCFA' }}"
+    data-colors="{{ section.settings.gradient_color_1 | default: '#FFFCFA' }}, {{ section.settings.gradient_color_2 | default: '#C1FEC1' }}, {{ section.settings.gradient_color_3 | default: '#FFFCFA' }}"
     data-edge="0"
   >
     <div class="featured-bg-wrap">
@@ -130,10 +130,26 @@
       "default": "FEATURING"
     },
     {
-      "type": "text",
-      "id": "gradient_colors",
-      "label": "Section gradient colors",
-      "default": "#FFFCFA, #C1FEC1, #FFFCFA"
+      "type": "header",
+      "content": "Section gradient"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient color 1",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient color 2",
+      "default": "#C1FEC1"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "label": "Gradient color 3",
+      "default": "#FFFCFA"
     }
   ],
   "presets": [

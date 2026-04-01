@@ -5,8 +5,9 @@
       "settings": {
         "buy_label": "Buy Now",
         "max_qty": 4,
-        "gradient_colors": "#FFFCFA, #D6FED6, #FFFCFA",
-        "show_event_ticketing_widget": true
+        "gradient_color_1": "#FFFCFA",
+        "gradient_color_2": "#D6FED6",
+        "gradient_color_3": "#FFFCFA"
       }
     }
   },

@@ -130,6 +130,11 @@
         const imageEls     = Array.from(imgContainer.querySelectorAll('.about-inline-img'));
         imgContainer.remove();
 
+        imageEls.forEach(img => {
+            const pool = (img.dataset.images || '').split('|').filter(Boolean);
+            if (pool.length > 1) img.src = pool[Math.floor(Math.random() * pool.length)];
+        });
+
         // Guard: prevents the synthetic resize we fire after building from
         // immediately triggering another rebuild of this section.
         let suppressResize = false;
