@@ -196,8 +196,12 @@
         text-box: trim-both cap alphabetic;
     }
 
+    .about-menu-persistent .menu-item {
+        line-height: var(--lh-single);
+    }
+
     .about-menu-persistent ul {
-        gap: var(--gap-text);
+        gap: 32px;
     }
 
     .what-we-do-body .about-text-block { max-width: 240px; }

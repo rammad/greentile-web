@@ -50,10 +50,10 @@
         enterTravel:   75,      // vh below pinned position at start
         firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
         lastSlideEnd:  100,     // last slide ends
-        exitStart:     80,      // begin sliding upward off screen
-        exitEnd:       130,     // fully offscreen + fade last body/CTA
-        exitTravel:    120,     // vh above pinned position at end
-        hideAt:        110,     // menu items fade out
+        exitStart:     70,      // begin sliding upward off screen
+        exitEnd:       140,     // fully offscreen + fade last body/CTA
+        exitTravel:    150,  // vh above pinned position at end
+        hideAt:        120,     // menu items fade out
         edgeWeight:    1,       // equal time per slide
     };
 

@@ -8,8 +8,10 @@
 
 .clients-columns {
     display: flex;
-    align-items: stretch;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
+    gap: 72px;
 
     opacity: 0;
     transform: translateY(var(--travel-reveal));
@@ -24,13 +26,12 @@
 }
 
 .clients-col {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: var(--gap-text);
-    padding: 0 120px;
+    max-width: 740px;
 }
 
 .clients-col .type-subBold2 {
@@ -48,6 +49,11 @@
     display: inline;
     white-space: nowrap;
     word-spacing: normal;
+}
+
+.clients-pair {
+    display: inline;
+    white-space: nowrap;
 }
 
 .clients-sep {
@@ -70,13 +76,114 @@
     transform: translateY(-3px);
 }
 
-.clients-divider {
-    width: 1px;
+/* ── press logos ──────────────────────────────────────────── */
+
+.press-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    flex-wrap: nowrap;
+}
+
+.press-logo-link {
+    display: block;
+    height: 24px;
     flex-shrink: 0;
-    align-self: stretch;
-    margin: 3em 0;
-    background: var(--color-text-subheader);
-    opacity: 0.25;
+    background-color: var(--c-dark-green-50);
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    transition: background-color 0.3s ease;
+}
+
+@media (hover: hover) {
+    .press-logo-link:hover {
+        background-color: var(--c-dark-green-50);
+    }
+}
+
+.press-eater {
+    mask-image: url('../images/press/eater.svg');
+    -webkit-mask-image: url('../images/press/eater.svg');
+    aspect-ratio: 3132 / 849;
+}
+
+.press-timeout {
+    mask-image: url('../images/press/timeout.svg');
+    -webkit-mask-image: url('../images/press/timeout.svg');
+    aspect-ratio: 209 / 79;
+}
+
+.press-thrillist {
+    mask-image: url('../images/press/thrillist.svg');
+    -webkit-mask-image: url('../images/press/thrillist.svg');
+    aspect-ratio: 129 / 31.22;
+}
+
+.press-gothamist {
+    mask-image: url('../images/press/gothamist.svg');
+    -webkit-mask-image: url('../images/press/gothamist.svg');
+    aspect-ratio: 1109 / 230;
+}
+
+.press-infatuation {
+    mask-image: url('../images/press/infatuation.svg');
+    -webkit-mask-image: url('../images/press/infatuation.svg');
+    aspect-ratio: 222 / 29;
+}
+
+.press-nymag {
+    mask-image: url('../images/press/nymag.svg');
+    -webkit-mask-image: url('../images/press/nymag.svg');
+    aspect-ratio: 768.73 / 165.13;
+}
+
+.press-bonappetit {
+    mask-image: url('../images/press/bonappetit.svg');
+    -webkit-mask-image: url('../images/press/bonappetit.svg');
+    aspect-ratio: 418 / 87;
+}
+
+/* ── press marquee ────────────────────────────────────────── */
+
+.press-marquee {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-text);
+    width: 100%;
+}
+
+.press-marquee-wrapper {
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+}
+
+.press-marquee-track {
+    display: flex;
+    align-items: center;
+    gap: 64px;
+    flex-shrink: 0;
+    transform: translateX(0);
+    will-change: transform;
+}
+
+.press-marquee-track.has-seamless-animation {
+    animation: seamless-scroll-press var(--marquee-duration) linear infinite;
+}
+
+.press-marquee-track.marquee-reverse.has-seamless-animation {
+    animation-direction: reverse;
+}
+
+@keyframes seamless-scroll-press {
+    0%   { transform: translateX(var(--press-scroll-dist)); }
+    100% { transform: translateX(0); }
 }
 
 @media (max-width: 1024px) {
@@ -87,20 +194,28 @@
     }
 
     .clients-columns {
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        gap: 48px;
+        gap: calc(var(--section-spacing) * 2);
     }
 
     .clients-col {
-        padding: 0;
-        width: 75%;
+        width: 85%;
+        gap: 64px;
     }
 
-    .clients-divider {
-        align-self: center;
-        width: 60%;
-        height: 1px;
+    .press-logos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px 64px;
+        justify-items: center;
+    }
+
+    .press-logo-link{
+        height: 48px;
+        /* height: 24px; */
+    }
+
+    .press-logos .press-logo-link:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+        justify-self: center;
     }
 }

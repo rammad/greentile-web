@@ -29,47 +29,61 @@
         });
     }
 
-    function updateClientCommas() {
+    function preventOrphans() {
         document.querySelectorAll('.clients-list').forEach(list => {
-            const items = [...list.querySelectorAll('.clients-item')];
-            if (!items.length) return;
-
-            list.querySelectorAll('.clients-sep').forEach(sep => {
-                sep.style.display = '';
+            list.querySelectorAll('.clients-pair').forEach(wrapper => {
+                while (wrapper.firstChild) wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
+                wrapper.remove();
             });
 
-            for (let pass = 0; pass < 10; pass++) {
-                const endOfRow = new Set();
-                let rowTop = items[0].getBoundingClientRect().top;
-                let last = items[0];
+            const items = [...list.querySelectorAll('.clients-item')];
+            if (items.length < 3) return;
 
-                for (let i = 1; i < items.length; i++) {
-                    const top = items[i].getBoundingClientRect().top;
-                    if (Math.abs(top - rowTop) > 2) {
-                        endOfRow.add(last);
-                        rowTop = top;
-                    }
-                    last = items[i];
+            const last = items[items.length - 1];
+            const prev = items[items.length - 2];
+
+            if (Math.abs(last.getBoundingClientRect().top - prev.getBoundingClientRect().top) > 2) {
+                const pair = document.createElement('span');
+                pair.className = 'clients-pair';
+                prev.parentNode.insertBefore(pair, prev);
+                pair.appendChild(prev);
+                while (pair.nextSibling && pair.nextSibling !== last) {
+                    pair.appendChild(pair.nextSibling);
                 }
-                endOfRow.add(last);
-
-                let changed = false;
-                items.forEach(item => {
-                    const sep = item.querySelector('.clients-sep');
-                    if (!sep) return;
-                    const shouldHide = endOfRow.has(item);
-                    const isHidden = sep.style.display === 'none';
-                    if (shouldHide && !isHidden) {
-                        sep.style.display = 'none';
-                        changed = true;
-                    } else if (!shouldHide && isHidden) {
-                        sep.style.display = '';
-                        changed = true;
-                    }
-                });
-
-                if (!changed) break;
+                pair.appendChild(last);
             }
+        });
+    }
+
+    const PRESS_SPEED = 50;
+    const PRESS_GAP = 64;
+
+    function initPressMarquee() {
+        document.querySelectorAll('.press-marquee-track').forEach(track => {
+            if (track.classList.contains('is-initialized')) return;
+            const items = Array.from(track.children);
+            if (!items.length) return;
+
+            track.style.gap = `${PRESS_GAP}px`;
+            const first = items[0];
+            void first.offsetWidth;
+
+            let patternWidth = 0;
+            items.forEach(item => { patternWidth += item.offsetWidth; });
+            patternWidth += PRESS_GAP * items.length;
+
+            const copies = Math.ceil(window.innerWidth / patternWidth) + 2;
+            const fragment = document.createDocumentFragment();
+            for (let c = 0; c < copies; c++) {
+                items.forEach(item => fragment.appendChild(item.cloneNode(true)));
+            }
+            track.appendChild(fragment);
+
+            const duration = patternWidth / PRESS_SPEED;
+            track.style.setProperty('--press-scroll-dist', `-${patternWidth}px`);
+            track.style.setProperty('--marquee-duration', `${duration}s`);
+            track.classList.add('has-seamless-animation');
+            track.classList.add('is-initialized');
         });
     }
 
@@ -86,13 +100,15 @@
         }
 
         buildClientItems();
-        updateClientCommas();
-        document.fonts.ready.then(updateClientCommas);
+        preventOrphans();
+        document.fonts.ready.then(preventOrphans);
+
+        initPressMarquee();
 
         let resizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(updateClientCommas, 150);
+            resizeTimer = setTimeout(preventOrphans, 150);
         });
     });
 })();

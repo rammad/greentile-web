@@ -27,13 +27,13 @@
             //        x       layer    stagger (centered around 0)
             // Left side — back-outer nestles between the two front columns
             { id: 'fol', x: -2,  layer: 'front', stagger:  0.08 },
-            { id: 'bol', x: 6,   layer: 'back',  stagger: -0.10 },
+            // { id: 'bol', x: 6,   layer: 'back',  stagger: -0.10 },
             { id: 'fil', x: 14,  layer: 'front', stagger: -0.25, frameInset: 8, flushTop: true },
-            { id: 'bil', x: 26,  layer: 'back',  stagger: -0.20, frameInset: 8  },
+            // { id: 'bil', x: 26,  layer: 'back',  stagger: -0.20, frameInset: 8  },
             // Right side — mirror
-            { id: 'bir', x: 66,  layer: 'back',  stagger: -0.20, frameInset: -8 },
+            // { id: 'bir', x: 66,  layer: 'back',  stagger: -0.20, frameInset: -8 },
             { id: 'fir', x: 76,  layer: 'front', stagger: -0.25, frameInset: -8 },
-            { id: 'bor', x: 84,  layer: 'back',  stagger: -0.10 },
+            // { id: 'bor', x: 84,  layer: 'back',  stagger: -0.10 },
             { id: 'for', x: 91,  layer: 'front', stagger:  0.08 }
         ],
         tablet: [
@@ -43,10 +43,10 @@
             { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20 }
         ],
         mobile: [
-            { id: 'fl',  x: -10, layer: 'front', stagger: -0.20, flushTop: true },
-            { id: 'bl',  x: 13,   layer: 'back',  stagger: -0.15, frameInset: 5 },
-            { id: 'br',  x: 71,  layer: 'back',  stagger: -0.15, frameInset: -5 },
-            { id: 'fr',  x: 86,  layer: 'front', stagger: 0.08 }
+            { id: 'fl',  x: -20, layer: 'front', stagger: 0 },
+            // { id: 'bl',  x: 13,   layer: 'back',  stagger: -0.15, frameInset: 5 },
+            // { id: 'br',  x: 71,  layer: 'back',  stagger: -0.15, frameInset: -5 },
+            { id: 'fr',  x: 90,  layer: 'front', stagger: 0 }
         ]
     };
 
@@ -68,9 +68,10 @@
         // ── vertical & horizontal scatter ──────────────────────────────────
         verticalJitter:         0.12,  // 0–1 — random vertical offset for front images (fraction of spacing)
         backVerticalJitter:     0.30,  // 0–1 — random vertical offset for back images (fraction of spacing)
-        mobileVerticalJitter:   0.25,  // 0–1 — front vertical jitter on mobile
+        mobileVerticalJitter:   0,  // 0–1 — front vertical jitter on mobile
         mobileBackVerticalJitter: 0.40, // 0–1 — back vertical jitter on mobile
         horizontalJitterPct:    1.5,   // % — random horizontal offset per image within its column
+        mobileAlternateOffsetPct: 5,  // % — alternating left/right offset per image on mobile
 
         // ── parallax ───────────────────────────────────────────────────────
         frontSpeedMin:          0.94,  // parallax speed range for front images (1.0 = natural scroll)
@@ -82,9 +83,9 @@
         // ── image counts & layout ──────────────────────────────────────────
         backImagesPerCol:       5,     // cloned back images per back column
         mobileBackImagesPerCol: 8,     // cloned back images per back column on mobile
-        maxImagesPerColMobile:  10,    // max front images per column on mobile
+        maxImagesPerColMobile:  14,    // max front images per column on mobile
         frameCount:             1,     // images at top and bottom of each inner column to inset toward center (desktop)
-        mobileFrameCount:       1,     // same but for mobile (more images per column so needs more)
+        mobileFrameCount:       0,     // same but for mobile (more images per column so needs more)
 
         // ── spacing ────────────────────────────────────────────────────────
         edgePadding:            0,     // 0–1 — fraction of section height reserved at top and bottom edges
@@ -245,16 +246,19 @@
                 images.forEach(function (img, i) {
                     var centerOffset = (colDef.flushTop && i === 0) ? 0 : 0.5;
                     var baseTop = edgeTop + spacing * (i + centerOffset) + staggerPx;
-                    var jitter  = (Math.random() - 0.5) * 2 * jitterAmt;
+                    var jitter  = isMobile ? 0 : (Math.random() - 0.5) * 2 * jitterAmt;
                     var rawTop  = baseTop + jitter;
 
                     var top = Math.max(0, Math.min(fullSectionHeight - imgH, rawTop));
 
-                    var speed = isBack
-                        ? randRange(C.backSpeedMin, C.backSpeedMax)
+                    var speed = isMobile ? 1.0
+                        : isBack ? randRange(C.backSpeedMin, C.backSpeedMax)
                         : randRange(C.frontSpeedMin, C.frontSpeedMax);
 
-                    var xJitter = (Math.random() - 0.5) * 2 * C.horizontalJitterPct;
+                    var inwardSign = colDef.x < 50 ? 1 : -1;
+                    var xJitter = isMobile
+                        ? ((i % 2 === 0 ? -inwardSign : inwardSign) * C.mobileAlternateOffsetPct)
+                        : (Math.random() - 0.5) * 2 * C.horizontalJitterPct;
                     var insetX  = (frameN > 0 && (i < frameN || i >= count - frameN))
                         ? frameInset : 0;
 

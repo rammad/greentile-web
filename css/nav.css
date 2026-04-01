@@ -193,8 +193,8 @@
     }
 
     .sticky-nav {
-        left: var(--page-gutter);
-        right: var(--page-gutter);
+        left: 12px;
+        right: 12px;
         grid-template-columns: 1fr auto;
     }
 

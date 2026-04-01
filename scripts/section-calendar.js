@@ -51,10 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const { fitTextToWidth } = window.AppUtils || {};
             await document.fonts.ready;
             if (fitTextToWidth) {
-                const lines = Array.from(mobileTitleLines);
-                lines.forEach(line => { line.style.fontSize = ''; fitTextToWidth(line); });
-                const minSize = Math.min(...lines.map(l => parseFloat(l.style.fontSize)));
-                lines.forEach(line => { line.style.fontSize = `${minSize}px`; });
+                Array.from(mobileTitleLines).forEach(line => {
+                    line.style.fontSize = '';
+                    fitTextToWidth(line);
+                });
             }
             for (let i = 0; i < mobileTitleLines.length; i++) {
                 mobileTitleLines[i].classList.add('is-initialized');
@@ -652,26 +652,5 @@ function initMobileFilterToggle() {
 
 function initControlsClamping() {
     if (window.innerWidth > 1024) return;
-
-    const page = document.getElementById('cal-page-container');
-    const controls = document.querySelector('.calendar-controls');
-    if (!page || !controls) return;
-
-    const navBottom = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue('--space-for-nav')
-    );
-
-    const pageRect = page.getBoundingClientRect();
-    const controlsRect = controls.getBoundingClientRect();
-    const controlsFlowTop = controlsRect.top - pageRect.top + page.scrollTop;
-
-    page.addEventListener('scroll', () => {
-        const visualTop = controlsFlowTop - page.scrollTop;
-        if (visualTop < navBottom) {
-            controls.style.transform = `translateY(${navBottom - visualTop}px)`;
-        } else {
-            controls.style.transform = '';
-        }
-    }, { passive: true });
 }
 

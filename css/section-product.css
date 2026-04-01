@@ -26,6 +26,8 @@
     width: 100%;
 }
 
+.pdp-date-short { display: none; }
+
 .pdp-desc {
     flex: 1 1 0;
     min-height: 0;
@@ -250,11 +252,17 @@
     .pdp-image-track {
         transform: none !important;
         display: flex;
-        gap: 8px;
+        gap: 20px;
+        width: 100vw;
+        margin-left: calc(-1 * var(--page-gutter));
+        padding-left: 20px;
+        padding-right: 20px;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
+        scroll-padding-inline-start: 20px;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        box-sizing: border-box;
     }
 
     .pdp-image-track::-webkit-scrollbar {
@@ -263,9 +271,9 @@
 
     .pdp-poster {
         display: block;
-        width: 100%;
+        width: calc(100vw - 40px);
         height: auto;
-        flex: 0 0 100%;
+        flex: 0 0 calc(100vw - 40px);
         scroll-snap-align: start;
         scroll-snap-stop: always;
         margin-bottom: 0;
@@ -274,19 +282,20 @@
     .pdp-dots {
         display: flex;
         justify-content: center;
-        gap: 8px;
+        gap: 6px;
         padding-top: 16px;
     }
 
     .pdp-dot {
         width: 6px;
         height: 6px;
-        border-radius: 50%;
-        background-color: var(--c-dark-green-20);
-        transition: background-color 0.3s ease;
+        border-radius: 3px;
+        background-color: var(--c-dark-green-30);
+        transition: width 0.3s ease, background-color 0.3s ease;
     }
 
     .pdp-dot.is-active {
+        width: 20px;
         background-color: var(--c-dark-green);
     }
 
@@ -303,6 +312,14 @@
         -webkit-mask-image: none;
         mask-image: none;
     }
+
+    .pdp-hero-title {
+        font-size: 36px;
+        line-height: var(--lh-single);
+    }
+
+    .pdp-date-full { display: none; }
+    .pdp-date-short { display: inline; }
 
     .pdp-info {
         padding-bottom: 0; /* overridden dynamically by JS to match ticket-actions height */

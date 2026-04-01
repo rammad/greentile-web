@@ -736,7 +736,7 @@ body::after {
 /* small mobile — ≤768px */
 @media (max-width: 768px) {
     :root {
-        --page-gutter: 12px;
+        --page-gutter: 20px;
     }
 }
 

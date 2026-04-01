@@ -32,6 +32,7 @@
         let bodyAllowed  = false;
         let titleShown   = false;
         let titleAnimId  = 0;
+        let mobileCarousel = false;
 
         /* ── fallback ── */
 
@@ -114,7 +115,7 @@
         posters.forEach(poster => {
             observeElementInOut(poster, {
                 onEnter: () => {
-                    if (!isMobile) return;
+                    if (!isMobile || mobileCarousel) return;
                     revealBodyMobile(poster);
                 },
             });
@@ -296,16 +297,67 @@
 
         /* ── mobile ↔ desktop layout switching ── */
 
-        function arrangeForMobile() {
+        function handleCarouselScroll() {
             const imagesCol = section.querySelector('.team-images-col');
-            bodies.forEach(body => {
-                const idx = body.dataset.forIndex;
-                const poster = imagesCol.querySelector(`.team-poster-wrap[data-index="${idx}"]`);
-                if (poster) poster.after(body);
+            const sl = imagesCol.scrollLeft;
+            let closest = 0;
+            posters.forEach((p, i) => {
+                if (Math.abs(p.offsetLeft - sl) < Math.abs(posters[closest].offsetLeft - sl)) closest = i;
             });
+
+            const dots = section.querySelectorAll('.team-dot');
+            dots.forEach((d, i) => d.classList.toggle('is-active', i === closest));
+
+            const resolved = resolveBodyForIndex(posters[closest].dataset.index);
+            const body = bodyMap[resolved];
+            if (body && body !== activeBody) {
+                if (activeBody) activeBody.classList.remove('is-active');
+                body.classList.add('is-active');
+                activeBody = body;
+                if (bodySizer) bodySizer.style.height = body.scrollHeight + 'px';
+            }
+        }
+
+        function arrangeForMobile() {
+            mobileCarousel = true;
+            const imagesCol = section.querySelector('.team-images-col');
+
+            if (bodySizer) bodies.forEach(body => bodySizer.appendChild(body));
+
+            let dotsEl = section.querySelector('.team-dots');
+            if (!dotsEl) {
+                dotsEl = document.createElement('div');
+                dotsEl.className = 'team-dots';
+                imagesCol.after(dotsEl);
+            }
+            dotsEl.innerHTML = '';
+            posters.forEach((_, i) => {
+                const dot = document.createElement('span');
+                dot.classList.add('team-dot');
+                if (i === 0) dot.classList.add('is-active');
+                dotsEl.appendChild(dot);
+            });
+
+            bodies.forEach(b => b.classList.remove('is-active'));
+            const firstIdx = resolveBodyForIndex(posters[0] ? posters[0].dataset.index : '0');
+            const firstBody = bodyMap[firstIdx];
+            if (firstBody) {
+                firstBody.classList.add('is-active');
+                activeBody = firstBody;
+            }
+            if (bodySizer && firstBody) bodySizer.style.height = firstBody.scrollHeight + 'px';
+
+            imagesCol.addEventListener('scroll', handleCarouselScroll, { passive: true });
         }
 
         function arrangeForDesktop() {
+            mobileCarousel = false;
+            const imagesCol = section.querySelector('.team-images-col');
+            imagesCol.removeEventListener('scroll', handleCarouselScroll);
+
+            const dotsEl = section.querySelector('.team-dots');
+            if (dotsEl) dotsEl.remove();
+
             bodies.forEach(body => bodySizer.appendChild(body));
         }
 
