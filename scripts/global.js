@@ -144,7 +144,7 @@ function observeElementInOut(element, options = {}) {
         onExit,
         enterThreshold = ENTER_THRESHOLD,
         repeat = false,
-        root = document.getElementById('scroll-viewport') || null
+        root = matchMedia('(pointer: coarse)').matches ? null : (document.getElementById('scroll-viewport') || null)
     } = options;
 
     let didEnter = false;

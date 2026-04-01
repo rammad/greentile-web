@@ -77,7 +77,7 @@
         }, { passive: true });
 
         requestAnimationFrame(() => {
-            applyPositions(window.lenis ? window.lenis.scroll : 0);
+            applyPositions(window.lenis ? window.lenis.scroll : window.scrollY);
         });
     });
 })();

@@ -75,7 +75,7 @@
             body.classList.add('is-active');
         }
 
-        const root = document.getElementById('scroll-viewport') || null;
+        const root = matchMedia('(pointer: coarse)').matches ? null : (document.getElementById('scroll-viewport') || null);
         const firstPoster = posters[0];
         if (!firstPoster) return;
 

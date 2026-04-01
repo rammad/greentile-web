@@ -272,7 +272,7 @@
                 startOffset   = ih;
             }
 
-            applyPositions(window.lenis ? window.lenis.scroll : 0);
+            applyPositions(window.lenis ? window.lenis.scroll : window.scrollY);
 
             if (ctaFooter) {
                 if (currentlyMobile) {

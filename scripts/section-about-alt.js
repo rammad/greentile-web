@@ -54,7 +54,8 @@
         var section = document.querySelector('.about-alt');
         if (!section) return;
 
-        var viewport           = document.getElementById('scroll-viewport') || null;
+        var _isMobileScroll = matchMedia('(pointer: coarse)').matches;
+        var viewport           = _isMobileScroll ? null : (document.getElementById('scroll-viewport') || null);
         var textBlockContainer = section.querySelector('.about-alt-text-blocks');
         var textBlocks         = textBlockContainer
             ? Array.from(textBlockContainer.querySelectorAll('.about-alt-block'))
@@ -81,8 +82,8 @@
             bodyEl.style.visibility = 'hidden';
             textBlocks.forEach(function (block) { bodyEl.appendChild(block); });
 
-            var scrollViewport = document.getElementById('scroll-viewport');
-            (scrollViewport || document.body).appendChild(bodyEl);
+            var appendTarget = _isMobileScroll ? document.body : (document.getElementById('scroll-viewport') || document.body);
+            appendTarget.appendChild(bodyEl);
 
             textBlockContainer.remove();
 

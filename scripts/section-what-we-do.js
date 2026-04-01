@@ -72,7 +72,8 @@
         const section = document.getElementById('about');
         if (!section) return;
 
-        const viewport   = document.getElementById('scroll-viewport') || null;
+        const _isMobileScroll = matchMedia('(pointer: coarse)').matches;
+        const viewport   = _isMobileScroll ? null : (document.getElementById('scroll-viewport') || null);
         const textBlocks = Array.from(section.querySelectorAll('.about-text-block'));
         const numSlides  = textBlocks.length || 4;
         const menuEl     = section.querySelector('.about-menu-persistent');
@@ -125,8 +126,8 @@
             bodyEl.className = 'what-we-do-body';
             blocks.forEach((block) => bodyEl.appendChild(block));
 
-            const scrollViewport = document.getElementById('scroll-viewport');
-            (scrollViewport || document.body).appendChild(bodyEl);
+            const appendTarget = _isMobileScroll ? document.body : (document.getElementById('scroll-viewport') || document.body);
+            appendTarget.appendChild(bodyEl);
 
             stickyContent.remove();
 

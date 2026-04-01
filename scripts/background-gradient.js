@@ -310,12 +310,9 @@ class GradientEngine {
     }
 
     getScrollPosition() {
-        // lenis drives scroll via transform, so use its value when available
         if (typeof window !== 'undefined' && window.lenis != null && typeof window.lenis.scroll === 'number') {
             return window.lenis.scroll;
         }
-        const el = this.config.contentSelector ? document.querySelector(this.config.contentSelector) : null;
-        if (el) return el.scrollTop;
         return typeof window !== 'undefined' ? (window.scrollY ?? document.documentElement.scrollTop) : 0;
     }
 

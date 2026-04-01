@@ -13,9 +13,9 @@
         const heroTitle = document.querySelector('#hero .type-display-hero');
         if (!heroTitle) return;
 
-        const viewport = document.getElementById('scroll-viewport');
+        const viewport = matchMedia('(pointer: coarse)').matches ? null : (document.getElementById('scroll-viewport') || null);
         observeElementInOut(heroTitle, {
-            root: viewport || null,
+            root: viewport,
             enterThreshold: 0.15,
             onEnter: runHeroEnter
         });

@@ -142,7 +142,7 @@ html {
     will-change: transform;
 }
 
-/* lenis: viewport clips, content scrolls */
+/* lenis: viewport clips, content scrolls (desktop only) */
 .scroll-viewport {
     position: fixed;
     inset: 0;
@@ -156,6 +156,21 @@ html {
     position: relative;
     width: 100%;
     min-height: 100%;
+}
+
+/* mobile: native document scroll — JS adds .native-scroll to html + .scroll-viewport */
+html.native-scroll,
+html.native-scroll body {
+    overflow: visible;
+    height: auto;
+}
+.scroll-viewport.native-scroll {
+    position: static;
+    overflow: visible;
+    height: auto;
+}
+html, body {
+    overscroll-behavior-y: none;
 }
 
 main { position: relative; width: 100%; height: 100%; }
