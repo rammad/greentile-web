@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "settings": {
+        "buy_label": "Buy Now",
+        "max_qty": 4,
+        "gradient_colors": "#FFFCFA, #D6FED6, #FFFCFA",
+        "show_event_ticketing_widget": true
+      }
+    }
+  },
+  "order": ["main"]
+}

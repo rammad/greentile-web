@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "archives": {
+      "type": "archives",
+      "settings": {
+        "title": "Event Archives",
+        "load_more_label": "Load More",
+        "gradient_colors": "#FFFCFA, #D6FED6, #FFFCFA"
+      }
+    }
+  },
+  "order": ["archives"]
+}

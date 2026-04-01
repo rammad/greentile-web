@@ -1,0 +1,43 @@
+{
+  "general": {
+    "menu": "menu",
+    "home": "Home",
+    "back": "BACK",
+    "say_hi": "SAY HI",
+    "play_with_us": "PLAY WITH US",
+    "work_with_us": "WORK WITH US"
+  },
+  "contact": {
+    "title": "SAY HELLO!",
+    "topic_label": "What is your question about?",
+    "info_label": "Your Information",
+    "name_placeholder": "NAME",
+    "email_placeholder": "EMAIL",
+    "message_placeholder": "WRITE YOUR MESSAGE HERE",
+    "submit": "Send Message",
+    "success": "Message sent — we'll be in touch!",
+    "error": "Something went wrong — please try again",
+    "validation_error": "Please fill in all fields"
+  },
+  "product": {
+    "buy_now": "Buy Now",
+    "max_qty": "Max Limit Reached",
+    "sold_out": "Sold Out",
+    "coming_soon": "Coming Soon",
+    "add_to_cart": "Add to Cart"
+  },
+  "events": {
+    "filters": "Filters:",
+    "all": "All",
+    "list": "List",
+    "grid": "Grid",
+    "archives": "Archives",
+    "load_more": "Load More"
+  },
+  "footer": {
+    "privacy_policy": "Privacy Policy",
+    "faq": "FAQ",
+    "contact_us": "Contact Us",
+    "follow_us": "Follow Us"
+  }
+}

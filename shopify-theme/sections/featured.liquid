@@ -1,0 +1,120 @@
+{{ 'section-featured.css' | asset_url | stylesheet_tag }}
+
+<section id="featured" class="featured-section"
+  data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #C1FEC1, #FFFCFA' }}"
+  data-edge="0"
+>
+  <div class="featured-bg-wrap">
+    {%- if section.settings.background_image -%}
+      <img class="featured-bg-img"
+        src="{{ section.settings.background_image | image_url: width: 1920 }}"
+        alt="" aria-hidden="true" loading="lazy"
+      >
+    {%- elsif section.settings.product != blank -%}
+      {%- assign feat_product = all_products[section.settings.product] -%}
+      {%- if feat_product.featured_image -%}
+        <img class="featured-bg-img"
+          src="{{ feat_product.featured_image | image_url: width: 1920 }}"
+          alt="" aria-hidden="true" loading="lazy"
+        >
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+
+  <div class="featured-frame">
+    <div class="featured-marquee-layer" aria-hidden="true">
+      <div class="featured-marquee-track">
+        {%- for i in (1..20) -%}
+          <span class="featured-marquee-item type-h1">{{ section.settings.marquee_text | default: 'FEATURING' }}</span>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <div class="featured-poster-wrap">
+      {%- if section.settings.poster_image -%}
+        <img src="{{ section.settings.poster_image | image_url: width: 1920 }}"
+          class="featured-img"
+          alt="{{ section.settings.poster_alt | default: 'Featured Event' }}"
+          loading="lazy"
+        >
+      {%- elsif section.settings.product != blank -%}
+        {%- assign feat_product = all_products[section.settings.product] -%}
+        {%- if feat_product.featured_image -%}
+          <a href="{{ feat_product.url }}">
+            <img src="{{ feat_product.featured_image | image_url: width: 1920 }}"
+              class="featured-img"
+              alt="{{ feat_product.title | escape }}"
+              loading="lazy"
+            >
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+
+    <div class="featured-marquee-layer featured-marquee-bottom" aria-hidden="true">
+      <div class="featured-marquee-track marquee-reverse">
+        {%- for i in (1..20) -%}
+          <span class="featured-marquee-item type-h1">{{ section.settings.marquee_text | default: 'FEATURING' }}</span>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'section-featured.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Featured event",
+  "tag": "div",
+  "class": "featured-section-wrapper",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Featured product",
+      "info": "Auto-pulls poster from product image. Or use manual images below."
+    },
+    {
+      "type": "image_picker",
+      "id": "poster_image",
+      "label": "Poster image (manual)",
+      "info": "Overrides product image if set"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image (manual)",
+      "info": "Blurred background. Overrides product image if set"
+    },
+    {
+      "type": "text",
+      "id": "poster_alt",
+      "label": "Poster alt text"
+    },
+    {
+      "type": "text",
+      "id": "marquee_text",
+      "label": "Marquee text",
+      "default": "FEATURING"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link URL",
+      "info": "Where clicking the poster navigates"
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Section gradient colors",
+      "default": "#FFFCFA, #C1FEC1, #FFFCFA"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured event"
+    }
+  ]
+}
+{% endschema %}

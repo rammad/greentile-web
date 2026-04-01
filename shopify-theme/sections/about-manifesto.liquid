@@ -1,0 +1,88 @@
+{{ 'section-about.css' | asset_url | stylesheet_tag }}
+
+<section id="about" class="about section-spacer"
+  data-colors="{{ section.settings.gradient_colors | default: '#30FA30, #FFFCFA, #feea4f' }}"
+  data-edge="0"
+>
+  <div class="about-inner">
+    <div class="type-subBold1 about-subhead animate-line">{{ section.settings.subheading | default: 'manifesto' }}</div>
+    <div class="about-text type-h1">{{ section.settings.body }}</div>
+
+    <div class="about-images" hidden aria-hidden="true">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'inline_image' -%}
+          <img
+            src="{{ block.settings.image | image_url: width: 600 }}"
+            class="about-inline-img"
+            alt="{{ block.settings.image.alt | escape }}"
+            data-word="{{ block.settings.word_position }}"
+            loading="lazy"
+            {{ block.shopify_attributes }}
+          >
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'section-about.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Manifesto",
+  "tag": "div",
+  "class": "manifesto-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "manifesto"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Manifesto text",
+      "default": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at odio nulla. Suspendisse laoreet suscipit enim et mollis."
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Section gradient colors",
+      "default": "#30FA30, #FFFCFA, #feea4f"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "inline_image",
+      "name": "Inline image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "number",
+          "id": "word_position",
+          "label": "Word position",
+          "default": 5,
+          "info": "Which word number to anchor this image near (1-based)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Manifesto",
+      "blocks": [
+        { "type": "inline_image", "settings": { "word_position": 5 } },
+        { "type": "inline_image", "settings": { "word_position": 15 } },
+        { "type": "inline_image", "settings": { "word_position": 27 } },
+        { "type": "inline_image", "settings": { "word_position": 38 } },
+        { "type": "inline_image", "settings": { "word_position": 48 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

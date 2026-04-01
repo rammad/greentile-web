@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "calendar": {
+      "type": "calendar",
+      "settings": {
+        "title": "Events"
+      }
+    }
+  },
+  "order": ["calendar"]
+}

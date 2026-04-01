@@ -1,0 +1,128 @@
+/* about section (index.html) — natural scroll, large text, procedural inline images */
+
+.about {
+    padding-top: calc(var(--section-spacing) * 2);
+    position: relative;
+    width: 100%;
+}
+
+.about-inner {
+    width: 70%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 64px;
+}
+
+/* subheader label above the manifesto text */
+.about-subhead {
+    margin-bottom: calc(var(--gap-text) - 64px);
+}
+
+/* text block — full width so JS line measurements are stable */
+.about-text.type-h1 {
+    width: 100%;
+    line-height: var(--lh-tight);
+    text-align: center;
+    text-box: normal;
+}
+
+/* after JS splits text into lines, margin controls inter-line spacing
+   (flex-column can't be used here — it breaks pre-split inline flow) */
+.about .animate-line + .animate-line {
+    margin-top: var(--gap-text);
+}
+
+.about .animate-line {
+    display: block;
+    opacity: 0;
+    transform: translateY(0.25em);
+    transition: opacity 0.7s ease, transform 0.7s var(--ease-standard);
+}
+
+.about .animate-line.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* inline photo thumbnails — 4:5 ratio flipped horizontal (5:4), wider than tall */
+/* Default: inline-block during JS probe phase (images must be in flow for accurate measurement) */
+.about-inline-img {
+    display: inline-block;
+    height: 1.1em;
+    width: calc(1.1em * 1.25);
+    object-fit: cover;
+    border-radius: 7% / 8%;
+    vertical-align: middle;
+    margin: 0 0.3em;
+    flex-shrink: 0;
+}
+
+/* Wrapper: sits in-flow (holds horizontal space) but contributes only ~cap-height to line box.
+   The image overflows visually without pushing adjacent lines apart.
+   top: -0.1em compensates for vertical-align:middle targeting x-height center,
+   which sits too low for the all-caps text used here. */
+.about-img-wrap {
+    display: inline-block;
+    vertical-align: middle;
+    width: calc(1.1em * 1.25);
+    height: 0.67em;
+    overflow: visible;
+    position: relative;
+    top: -0.1em;
+    margin: 0 0.3em;
+    flex-shrink: 0;
+}
+
+/* Inside wrapper: absolutely positioned so it overflows without affecting line box height */
+.about-img-wrap .about-inline-img {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 1.1em;
+    margin: 0;
+}
+
+/* CTA button */
+.about-cta {
+    pointer-events: auto;
+}
+
+@media (max-width: 1024px) {
+    .about {
+        padding-top: var(--section-spacing);
+    }
+
+    .about-inner {
+        width: 90%;
+        gap: var(--gap-text);
+    }
+
+    .about-text.type-h1 {
+        line-height: var(--lh-open);
+    }
+    .about .animate-line + .animate-line {
+        margin-top: 0;
+    }
+
+    .about-subhead {
+        margin-bottom: 0;
+    }
+
+    .about-inline-img {
+        height: 1.5em;
+        width: calc(1.5em * 1.25);
+    }
+
+    .about-img-wrap {
+        width: calc(1.5em * 1.25);
+        height: 0.97em;
+    }
+
+    .about-img-wrap .about-inline-img {
+        height: 1.5em;
+    }
+}

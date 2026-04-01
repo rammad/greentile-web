@@ -1,0 +1,38 @@
+/* hero */
+
+.hero {
+    height: 100vh; 
+    width: 100%;
+    position: relative;
+    z-index: 1; 
+    pointer-events: none;
+}
+
+.hero .type-display-hero {
+    width: 100%;
+    text-align: center;
+    z-index: 0;
+
+    position: absolute;
+    top: auto;
+    bottom: 20px;
+    left: 50%;
+    overflow: visible;
+    transform: translateX(-50%);
+}
+
+@media (max-width: 1024px) {
+    .hero .type-display-hero {
+        top: calc(48% + var(--space-for-nav) / 2);
+        bottom: auto;
+        transform: translate(-50%, -50%);
+        font-size: var(--size-display-hero) !important;
+        white-space: normal;
+        line-height: var(--lh-display);
+        text-box: normal;
+    }
+    
+    .hero .type-display-hero > span {
+        display: block;
+    }
+}

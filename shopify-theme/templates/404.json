@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "hero",
+      "settings": {
+        "title": "Page Not Found"
+      }
+    }
+  },
+  "order": ["main"]
+}

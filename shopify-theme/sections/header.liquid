@@ -1,0 +1,147 @@
+{%- liquid
+  assign is_subpage = false
+  if template.name == 'product' or request.path contains '/pages/archives'
+    assign is_subpage = true
+  endif
+-%}
+
+<nav class="sticky-nav{% if is_subpage %} nav-subpage{% endif %}">
+  {% if is_subpage %}
+    <div class="nav-left">
+      <a href="{{ section.settings.back_link | default: routes.root_url }}" class="nav-back-link type-subRegular1 ui-roll roll-hover">
+        <span class="ui-roll-layer ui-roll-visible">{{ section.settings.back_label | default: 'BACK' }}</span>
+        <span class="ui-roll-layer ui-roll-hidden">{{ section.settings.back_label | default: 'BACK' }}</span>
+      </a>
+    </div>
+  {% else %}
+    <div class="nav-left">
+      <a href="{{ routes.root_url }}" class="logo-link">
+        {%- if section.settings.logo -%}
+          <img
+            src="{{ section.settings.logo | image_url: width: 200 }}"
+            class="nav-logo"
+            alt="{{ shop.name }}"
+            width="{{ section.settings.logo.width }}"
+            height="{{ section.settings.logo.height }}"
+            loading="eager"
+          >
+        {%- else -%}
+          <img src="{{ 'gtsc-logo-1tile.svg' | asset_url }}" class="nav-logo" alt="{{ shop.name }}">
+        {%- endif -%}
+      </a>
+    </div>
+    <div class="nav-center">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'nav_link' -%}
+          <a href="{{ block.settings.url }}" class="type-subRegular1 ui-roll roll-hover" {{ block.shopify_attributes }}>
+            <span class="ui-roll-layer ui-roll-visible">{{ block.settings.label }}</span>
+            <span class="ui-roll-layer ui-roll-hidden">{{ block.settings.label }}</span>
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {% endif %}
+
+  <div class="nav-right">
+    <a href="#" class="type-subRegular1 ui-roll roll-hover" data-contact-trigger>
+      <span class="ui-roll-layer ui-roll-visible">{{ section.settings.contact_label | default: 'SAY HI' }}</span>
+      <span class="ui-roll-layer ui-roll-hidden">{{ section.settings.contact_label | default: 'SAY HI' }}</span>
+    </a>
+  </div>
+
+  <button class="nav-hamburger" aria-label="Menu" aria-expanded="false">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
+</nav>
+
+<div class="mobile-menu">
+  <div class="mobile-menu-inner">
+    <div class="type-subBold1 mobile-menu-subhead">{{ 'general.menu' | t }}</div>
+    <a href="{{ routes.root_url }}" class="type-h2 mobile-menu-link animate-cascade">{{ 'general.home' | t }}</a>
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'nav_link' -%}
+        <a href="{{ block.settings.url }}" class="type-h2 mobile-menu-link animate-cascade">{{ block.settings.mobile_label | default: block.settings.label }}</a>
+      {%- endif -%}
+    {%- endfor -%}
+    <a href="#" class="type-h2 mobile-menu-link animate-cascade" data-contact-trigger>{{ section.settings.contact_label | default: 'Say Hi' }}</a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "header-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "text",
+      "id": "contact_label",
+      "label": "Contact link label",
+      "default": "SAY HI"
+    },
+    {
+      "type": "text",
+      "id": "back_label",
+      "label": "Back link label (subpages)",
+      "default": "BACK"
+    },
+    {
+      "type": "url",
+      "id": "back_link",
+      "label": "Back link URL (subpages)",
+      "info": "Where the BACK button goes on product/archive pages"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Navigation link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "PLAY WITH US"
+        },
+        {
+          "type": "text",
+          "id": "mobile_label",
+          "label": "Mobile label (optional)",
+          "info": "If different from desktop. E.g. 'Play with us' instead of 'PLAY WITH US'"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header",
+      "blocks": [
+        {
+          "type": "nav_link",
+          "settings": {
+            "label": "PLAY WITH US",
+            "mobile_label": "Play with us"
+          }
+        },
+        {
+          "type": "nav_link",
+          "settings": {
+            "label": "WORK WITH US",
+            "mobile_label": "Work with us"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,223 @@
+/* contact panel */
+
+.contact-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    background: rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.contact-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.contact-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 40%;
+    height: 100%;
+    background: var(--c-off-white);
+    z-index: 1002;
+    transform: translateX(100%);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.contact-panel.is-open {
+    transform: translateX(0);
+}
+
+.contact-panel-inner {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-for-nav) calc(var(--page-gutter) * 2) 40px;
+    min-height: 100%;
+}
+
+.contact-title {
+    font-size: clamp(48px, 8vw, 96px);
+    text-align: left;
+    opacity: 1;
+    color: var(--c-dark-green);
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+    margin-top: 64px;
+    flex: 1;
+}
+
+.contact-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.contact-section:nth-child(2) {
+    flex: 1;
+    min-height: 0;
+}
+
+.contact-label {
+    display: block;
+}
+
+.contact-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.contact-topic-btn {
+    background: none;
+    border: none;
+    box-shadow: inset 0 0 0 1px var(--c-dark-green-20);
+    color: var(--color-text-main);
+    transition: background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+    .contact-topic-btn:hover {
+        box-shadow: inset 0 0 0 1px var(--c-dark-green-50);
+    }
+}
+
+.contact-topic-btn.active {
+    background: var(--c-bright-green);
+    box-shadow: inset 0 0 0 1px var(--c-bright-green);
+    color: var(--c-dark-green);
+}
+
+.contact-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.contact-input,
+.contact-textarea {
+    font-family: var(--font-subheader);
+    font-size: var(--size-subRegular1);
+    font-weight: 300;
+    font-variation-settings: 'wdth' 450;
+    color: var(--color-text-main);
+    background: none;
+    border: none;
+    box-shadow: inset 0 0 0 1px var(--c-dark-green-20);
+    border-radius: 100px;
+    padding: var(--cta-padding);
+    outline: none;
+    transition: box-shadow 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.contact-input::placeholder,
+.contact-textarea::placeholder {
+    color: var(--c-dark-green-30);
+}
+
+.contact-input:focus,
+.contact-textarea:focus {
+    box-shadow: inset 0 0 0 1px var(--c-dark-green-50);
+}
+
+.contact-textarea {
+    border-radius: 16px;
+    padding: 16px;
+    flex: 1;
+    min-height: 96px;
+    resize: none;
+}
+
+.contact-submit-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.contact-submit .ui-roll {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.contact-status {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.contact-status.is-visible {
+    opacity: 1;
+}
+
+.contact-status.success {
+    color: var(--c-mid-green);
+}
+
+.contact-status.error {
+    color: var(--c-red);
+}
+
+/* desktop: hide "SAY HI", show hamburger X instead */
+body.contact-is-open .nav-right {
+    display: none;
+}
+
+body.contact-is-open .nav-hamburger {
+    display: flex;
+}
+
+@media (min-width: 1025px) {
+    .contact-panel {
+        top: 12px;
+        right: 20px;
+        bottom: 12px;
+        height: auto;
+        border-radius: 27px;
+        transform: translateX(calc(100% + var(--page-gutter)));
+    }
+
+    body.contact-is-open .nav-hamburger {
+        gap: 5px;
+    }
+
+    body.contact-is-open .hamburger-line {
+        width: 16px;
+    }
+
+    body.contact-is-open .nav-hamburger.is-active .hamburger-line:first-child {
+        transform: translateY(3px) rotate(45deg);
+    }
+
+    body.contact-is-open .nav-hamburger.is-active .hamburger-line:last-child {
+        transform: translateY(-3px) rotate(-45deg);
+    }
+}
+
+@media (max-width: 1024px) {
+    .contact-form {
+        gap: 40px;
+        margin-top: 40px;
+    }
+    .contact-panel {
+        width: 100%;
+    }
+
+    .contact-title {
+        font-size: 48px;
+    }
+
+    .contact-fields-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}

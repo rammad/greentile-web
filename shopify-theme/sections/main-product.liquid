@@ -1,0 +1,213 @@
+{{ 'section-product.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign ns = settings.event_date_metafield_namespace | default: 'custom'
+  assign date_key = settings.event_date_metafield_key | default: 'event_date'
+  assign venue_key = settings.event_venue_metafield_key | default: 'event_venue'
+  assign time_key = settings.event_time_metafield_key | default: 'event_time'
+
+  assign event_date = product.metafields[ns][date_key].value
+  assign event_venue = product.metafields[ns][venue_key].value
+  assign event_time = product.metafields[ns][time_key].value
+
+  if event_date
+    assign date_full = event_date | date: '%A, %B %e'
+    assign date_short = event_date | date: '%a %b %e'
+  endif
+
+  assign current_variant = product.selected_or_first_available_variant
+-%}
+
+<section class="pdp-section" data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #D6FED6, #FFFCFA' }}">
+  <div class="pdp-sticky-wrapper">
+    <div class="pdp-grid">
+
+      {%- comment -%} Image column {%- endcomment -%}
+      <div class="pdp-image-col">
+        <div class="pdp-image-track">
+          {%- for image in product.images -%}
+            <img
+              src="{{ image | image_url: width: 1200 }}"
+              class="pdp-poster"
+              alt="{{ image.alt | default: product.title | escape }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+            >
+          {%- endfor -%}
+          {%- comment -%} Fallback if no images {%- endcomment -%}
+          {%- if product.images.size == 0 -%}
+            <div class="pdp-poster pdp-poster-placeholder"></div>
+          {%- endif -%}
+        </div>
+        <div class="pdp-dots"></div>
+      </div>
+
+      {%- comment -%} Info column {%- endcomment -%}
+      <div class="pdp-info">
+
+        {%- comment -%} Date row {%- endcomment -%}
+        {%- if event_date or event_time -%}
+          <div class="pdp-meta-row text-mask">
+            <span class="type-subBold2 text-reveal-inner">
+              {%- if event_date -%}
+                <span class="pdp-date-full">{{ date_full }}{% if event_time %} &bull; {{ event_time }}{% endif %}</span>
+                <span class="pdp-date-short">{{ date_short }}{% if event_time %} &bull; {{ event_time }}{% endif %}</span>
+              {%- elsif event_time -%}
+                {{ event_time }}
+              {%- endif -%}
+            </span>
+          </div>
+        {%- endif -%}
+
+        {%- comment -%} Title {%- endcomment -%}
+        <h1 class="type-h3 animate-cascade pdp-hero-title">
+          {{ product.title }}
+        </h1>
+
+        {%- comment -%} Venue row {%- endcomment -%}
+        {%- if event_venue -%}
+          <div class="pdp-meta-row text-mask">
+            <span class="type-subBold2 text-reveal-inner">{{ event_venue }}</span>
+          </div>
+        {%- endif -%}
+
+        {%- comment -%} Ticket types (variants) {%- endcomment -%}
+        <div class="pdp-ticket-types">
+          {%- for variant in product.variants -%}
+            <button
+              type="button"
+              class="pdp-ticket-btn cta-btn is-visible type-subRegular1{% if variant == current_variant %} active{% endif %}"
+              data-ticket="{{ variant.id }}"
+              data-variant-id="{{ variant.id }}"
+              data-price="{{ variant.price }}"
+              data-abbr="{{ variant.option1 | truncate: 3, '' | upcase }}"
+              {% unless variant.available %}disabled{% endunless %}
+            >
+              {{ variant.title }} &ndash; {{ variant.price | money }}
+              {%- unless variant.available %} ({{ 'product.sold_out' | t }}){% endunless -%}
+            </button>
+          {%- endfor -%}
+        </div>
+
+        {%- comment -%} Tags {%- endcomment -%}
+        {%- if product.tags.size > 0 -%}
+          <div class="pdp-meta-row">
+            {%- for tag in product.tags -%}
+              <div class="pdp-tag">
+                <span class="type-subRegular2 text-reveal-inner">{{ tag }}</span>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- comment -%} Description {%- endcomment -%}
+        <div class="pdp-desc-wrapper">
+          <div class="pdp-desc type-body1">
+            {{ product.description }}
+          </div>
+        </div>
+
+        {%- comment -%} Add to cart / Buy now {%- endcomment -%}
+        <div class="ticket-actions">
+          <div class="max-qty-label pdp-tag type-subRegular2" id="max-qty-msg">{{ 'product.max_qty' | t }}</div>
+
+          <div class="qty-wrapper">
+            <div class="qty-selector">
+              <button class="qty-btn type-subRegular1" type="button" data-qty-change="-1">&minus;</button>
+              <span class="qty-val type-subRegular1" id="ticket-qty">1</span>
+              <button class="qty-btn type-subRegular1" type="button" data-qty-change="1">&plus;</button>
+            </div>
+          </div>
+
+          <button type="button" class="cta-btn buy-button-override" id="pdp-add-to-cart"
+            data-variant-id="{{ current_variant.id }}"
+          >
+            <div class="ui-roll roll-hover">
+              <span class="type-subRegular1 ui-roll-layer ui-roll-visible">
+                <span>
+                  <span class="buy-abbr">{{ current_variant.option1 | truncate: 3, '' | upcase }}</span>
+                  &ndash;
+                  <span class="buy-price">{{ current_variant.price | money }}</span>
+                </span>
+                <span>{{ section.settings.buy_label | default: 'Buy Now' }}</span>
+              </span>
+              <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">
+                <span>
+                  <span class="buy-abbr">{{ current_variant.option1 | truncate: 3, '' | upcase }}</span>
+                  &ndash;
+                  <span class="buy-price">{{ current_variant.price | money }}</span>
+                </span>
+                <span>{{ section.settings.buy_label | default: 'Buy Now' }}</span>
+              </span>
+            </div>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{%- comment -%} Product JSON for JS cart integration {%- endcomment -%}
+<script type="application/json" id="product-json">
+  {{ product | json }}
+</script>
+
+<script src="{{ 'section-product.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Product detail",
+  "tag": "div",
+  "class": "main-product-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "buy_label",
+      "label": "Buy button label",
+      "default": "Buy Now"
+    },
+    {
+      "type": "range",
+      "id": "max_qty",
+      "label": "Max quantity per order",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Section gradient colors",
+      "default": "#FFFCFA, #D6FED6, #FFFCFA"
+    },
+    {
+      "type": "header",
+      "content": "Event ticketing app"
+    },
+    {
+      "type": "paragraph",
+      "content": "Event date, venue, and time are pulled from product metafields. Configure the metafield keys in Theme Settings > Event settings. The event ticketing app populates these automatically."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_event_ticketing_widget",
+      "label": "Show event ticketing app widget",
+      "default": true,
+      "info": "If the Event Ticketing app adds a widget via app blocks, enable this to show it"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product detail"
+    }
+  ]
+}
+{% endschema %}

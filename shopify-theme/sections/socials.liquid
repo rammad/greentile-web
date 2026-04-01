@@ -1,0 +1,88 @@
+{{ 'section-socials.css' | asset_url | stylesheet_tag }}
+
+<div id="socials" class="socials-section">
+  <div class="socials-header">
+    <div class="type-subBold1 socials-subhead">{{ section.settings.subheading | default: 'hope we' }}</div>
+    <div class="type-h1 animate-cascade">{{ section.settings.title | default: 'SEE YOU SOON!' }}</div>
+    <div class="socials-icons">
+      {%- if settings.social_instagram != blank -%}
+        <a class="icon-circle icon-instagram" href="{{ settings.social_instagram }}" target="_blank" rel="noopener">
+          <img src="{{ 'Instagram_Glyph_White.svg' | asset_url }}" alt="Instagram">
+        </a>
+      {%- endif -%}
+      {%- if settings.social_tiktok != blank -%}
+        <a class="icon-circle icon-tiktok" href="{{ settings.social_tiktok }}" target="_blank" rel="noopener">
+          <img src="{{ 'tiktok-circle.svg' | asset_url }}" alt="TikTok">
+        </a>
+      {%- endif -%}
+      {%- if settings.social_discord != blank -%}
+        <a class="icon-circle icon-discord" href="{{ settings.social_discord }}" target="_blank" rel="noopener">
+          <img src="{{ 'discord-icon-svgrepo-com.svg' | asset_url }}" alt="Discord">
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="socials-track">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'image' -%}
+        <img
+          src="{{ block.settings.image | image_url: width: 800 }}"
+          class="social-img{% if block.settings.push_down %} push-down{% endif %}"
+          alt="{{ block.settings.image.alt | default: 'Social Post' | escape }}"
+          loading="lazy"
+          {{ block.shopify_attributes }}
+        >
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+<script src="{{ 'section-socials.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Socials",
+  "tag": "div",
+  "class": "socials-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "hope we"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "SEE YOU SOON!"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Gallery image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "checkbox",
+          "id": "push_down",
+          "label": "Offset down",
+          "default": false,
+          "info": "Alternating vertical offset for visual rhythm"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Socials"
+    }
+  ]
+}
+{% endschema %}

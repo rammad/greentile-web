@@ -1,0 +1,80 @@
+{
+  "current": {
+    "social_instagram": "https://instagram.com/greentilesocialclub",
+    "social_tiktok": "https://tiktok.com/@greentilesocialclub",
+    "social_discord": "https://discord.gg/mwgd9P3cb4",
+    "contact_email": "hello@greentilesocialclub.com",
+    "formspree_id": "",
+    "enable_page_curtain": true,
+    "enable_gradient_bg": true,
+    "enable_smooth_scroll": true,
+    "event_date_metafield_namespace": "custom",
+    "event_date_metafield_key": "event_date",
+    "event_venue_metafield_key": "event_venue",
+    "event_time_metafield_key": "event_time",
+    "event_status_metafield_key": "event_status",
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {
+          "contact_label": "SAY HI",
+          "back_label": "BACK"
+        },
+        "blocks": {
+          "nav1": {
+            "type": "nav_link",
+            "settings": {
+              "label": "PLAY WITH US",
+              "mobile_label": "Play with us"
+            }
+          },
+          "nav2": {
+            "type": "nav_link",
+            "settings": {
+              "label": "WORK WITH US",
+              "mobile_label": "Work with us"
+            }
+          }
+        },
+        "block_order": ["nav1", "nav2"]
+      },
+      "contact-panel": {
+        "type": "contact-panel",
+        "settings": {
+          "title": "SAY HELLO!",
+          "topic_label": "What is your question about?",
+          "info_label": "Your Information",
+          "name_placeholder": "NAME",
+          "email_placeholder": "EMAIL",
+          "message_placeholder": "WRITE YOUR MESSAGE HERE",
+          "submit_label": "Send Message"
+        },
+        "blocks": {
+          "topic1": {
+            "type": "topic",
+            "settings": {
+              "label": "General Inquiry",
+              "value": "general",
+              "default": true
+            }
+          },
+          "topic2": {
+            "type": "topic",
+            "settings": {
+              "label": "Collaboration",
+              "value": "collaboration"
+            }
+          },
+          "topic3": {
+            "type": "topic",
+            "settings": {
+              "label": "Sponsorship",
+              "value": "sponsorship"
+            }
+          }
+        },
+        "block_order": ["topic1", "topic2", "topic3"]
+      }
+    }
+  }
+}

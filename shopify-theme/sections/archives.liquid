@@ -1,0 +1,131 @@
+{{ 'section-calendar.css' | asset_url | stylesheet_tag }}
+{{ 'section-archives.css' | asset_url | stylesheet_tag }}
+
+<style>html, body { overflow: auto !important; height: auto !important; }</style>
+
+{%- liquid
+  assign ns = settings.event_date_metafield_namespace | default: 'custom'
+  assign date_key = settings.event_date_metafield_key | default: 'event_date'
+  assign archive_collection = section.settings.collection
+-%}
+
+<section class="archives-page"
+  data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #D6FED6, #FFFCFA' }}"
+  data-edge="0"
+>
+  <div class="archives-header desktop-only">
+    <h1 class="archives-title animate-cascade">{{ section.settings.title | default: 'Event Archives' }}</h1>
+  </div>
+  <div class="archives-title-mobile mobile-only">
+    {%- assign title_words = section.settings.title | default: 'Event Archives' | split: ' ' -%}
+    {%- for word in title_words -%}
+      <div class="type-display-hero fit-text" data-fit-managed>{{ word }}</div>
+    {%- endfor -%}
+  </div>
+
+  <div id="dynamic-archive-container">
+    {%- if archive_collection != blank -%}
+      {%- for product in collections[archive_collection].products -%}
+        {%- liquid
+          assign event_date = product.metafields[ns][date_key].value
+          assign month_label = event_date | date: '%B %Y'
+        -%}
+        <a href="{{ product.url }}" class="archive-cell" data-month="{{ month_label | default: 'Undated' }}">
+          {%- if product.featured_image -%}
+            <img src="{{ product.featured_image | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ product.title | escape }}">
+          {%- endif -%}
+        </a>
+      {%- endfor -%}
+    {%- else -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'archive_event' -%}
+          <a href="{{ block.settings.url | default: '#' }}" class="archive-cell" data-month="{{ block.settings.month }}" {{ block.shopify_attributes }}>
+            {%- if block.settings.poster -%}
+              <img src="{{ block.settings.poster | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ block.settings.title | escape }}">
+            {%- endif -%}
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+
+  <div class="load-more-container">
+    <button id="btn-load-more" class="cta-btn">
+      <div class="ui-roll roll-hover">
+        <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ section.settings.load_more_label | default: 'Load More' }}</span>
+        <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ section.settings.load_more_label | default: 'Load More' }}</span>
+      </div>
+    </button>
+  </div>
+</section>
+
+<script src="{{ 'section-archives.js' | asset_url }}"></script>
+
+{% schema %}
+{
+  "name": "Event archives",
+  "tag": "div",
+  "class": "archives-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page title",
+      "default": "Event Archives"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Past events collection",
+      "info": "Products from this collection shown as past events. Leave empty for manual blocks."
+    },
+    {
+      "type": "text",
+      "id": "load_more_label",
+      "label": "Load more button label",
+      "default": "Load More"
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Section gradient colors",
+      "default": "#FFFCFA, #D6FED6, #FFFCFA"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "archive_event",
+      "name": "Past event",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Event title"
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Event poster"
+        },
+        {
+          "type": "text",
+          "id": "month",
+          "label": "Month label",
+          "default": "March 2025",
+          "info": "Used for grouping, e.g. 'March 2025'"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Event link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Event archives"
+    }
+  ]
+}
+{% endschema %}

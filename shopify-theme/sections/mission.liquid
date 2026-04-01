@@ -1,0 +1,68 @@
+{{ 'section-mission.css' | asset_url | stylesheet_tag }}
+
+<section id="mission" class="mission-section"
+  data-colors="{{ section.settings.gradient_colors | default: '#30FA30, #FFFCFA, #feea4f' }}"
+  data-touch-speed="1.0"
+>
+  <div class="text-mask">
+    <span class="type-subBold1 text-reveal-inner">{{ section.settings.label | default: 'mission' }}</span>
+  </div>
+
+  <div class="mission-lines">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'line' -%}
+        <h1 class="type-display-hero animate-line" {{ block.shopify_attributes }}>{{ block.settings.text }}</h1>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+<script src="{{ 'section-mission.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Mission",
+  "tag": "div",
+  "class": "mission-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Section label",
+      "default": "mission"
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Section gradient colors",
+      "default": "#30FA30, #FFFCFA, #feea4f"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "line",
+      "name": "Text line",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Line text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mission",
+      "blocks": [
+        { "type": "line", "settings": { "text": "Since day one," } },
+        { "type": "line", "settings": { "text": "we've been about" } },
+        { "type": "line", "settings": { "text": "creating Asian American" } },
+        { "type": "line", "settings": { "text": "spaces + experiences" } },
+        { "type": "line", "settings": { "text": "that center and celebrate" } },
+        { "type": "line", "settings": { "text": "our joy." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

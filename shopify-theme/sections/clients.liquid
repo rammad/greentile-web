@@ -1,0 +1,144 @@
+{{ 'section-clients.css' | asset_url | stylesheet_tag }}
+
+<section id="clients" class="clients-section">
+  <div class="clients-columns">
+
+    <div class="clients-col">
+      <h2 class="type-h3">{{ section.settings.clients_title | default: 'Clients' }}</h2>
+      <p class="type-subRegular1 clients-list">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'client' -%}
+            {%- if block.settings.url != blank -%}
+              <a href="{{ block.settings.url }}" target="_blank" rel="noopener" class="ui-roll roll-hover" {{ block.shopify_attributes }}>
+                <span class="ui-roll-layer ui-roll-visible">{{ block.settings.name }}</span>
+                <span class="ui-roll-layer ui-roll-hidden">{{ block.settings.name }}</span>
+              </a>
+            {%- else -%}
+              <span class="clients-plain" {{ block.shopify_attributes }}>{{ block.settings.name }}</span>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </p>
+    </div>
+
+    <div class="press-marquee">
+      <span class="type-subBold1">{{ section.settings.press_title | default: 'Press' }}</span>
+      <div class="press-marquee-wrapper">
+        <div class="press-marquee-track">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'press_logo' -%}
+              <a href="{{ block.settings.url | default: '#' }}" target="_blank" rel="noopener"
+                class="press-logo-link press-{{ block.settings.slug }}"
+                aria-label="{{ block.settings.name }}"
+                {% if block.settings.logo %}style="mask-image: url('{{ block.settings.logo | image_url: width: 400 }}'); -webkit-mask-image: url('{{ block.settings.logo | image_url: width: 400 }}');"{% endif %}
+                {{ block.shopify_attributes }}
+              ></a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+      <div class="press-marquee-wrapper">
+        <div class="press-marquee-track marquee-reverse">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'press_logo' -%}
+              <a href="{{ block.settings.url | default: '#' }}" target="_blank" rel="noopener"
+                class="press-logo-link press-{{ block.settings.slug }}"
+                aria-label="{{ block.settings.name }}"
+                {% if block.settings.logo %}style="mask-image: url('{{ block.settings.logo | image_url: width: 400 }}'); -webkit-mask-image: url('{{ block.settings.logo | image_url: width: 400 }}');"{% endif %}
+                {{ block.shopify_attributes }}
+              ></a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script src="{{ 'section-clients.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Clients & Press",
+  "tag": "div",
+  "class": "clients-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "clients_title",
+      "label": "Clients heading",
+      "default": "Clients"
+    },
+    {
+      "type": "text",
+      "id": "press_title",
+      "label": "Press heading",
+      "default": "Press"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "client",
+      "name": "Client",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Client name",
+          "default": "Client Name"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Website URL",
+          "info": "Leave empty for plain text (no link)"
+        }
+      ]
+    },
+    {
+      "type": "press_logo",
+      "name": "Press logo",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Publication name",
+          "default": "Publication"
+        },
+        {
+          "type": "text",
+          "id": "slug",
+          "label": "CSS class slug",
+          "info": "Used for CSS class: press-{slug}. E.g. 'eater', 'timeout', 'thrillist'"
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo SVG/image",
+          "info": "Used as a CSS mask image. Upload an SVG for best results."
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Publication URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Clients & Press",
+      "blocks": [
+        { "type": "client", "settings": { "name": "Anheuser-Busch", "url": "https://www.anheuser-busch.com" } },
+        { "type": "client", "settings": { "name": "Boston Consulting Group", "url": "https://www.bcg.com" } },
+        { "type": "client", "settings": { "name": "Brookfield", "url": "https://www.brookfield.com" } },
+        { "type": "client", "settings": { "name": "Citi", "url": "https://www.citi.com" } },
+        { "type": "press_logo", "settings": { "name": "Eater", "slug": "eater", "url": "https://www.eater.com" } },
+        { "type": "press_logo", "settings": { "name": "TimeOut New York", "slug": "timeout", "url": "https://www.timeout.com/newyork" } },
+        { "type": "press_logo", "settings": { "name": "Thrillist", "slug": "thrillist", "url": "https://www.thrillist.com" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

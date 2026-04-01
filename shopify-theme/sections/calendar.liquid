@@ -1,0 +1,216 @@
+{{ 'section-calendar.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign ns = settings.event_date_metafield_namespace | default: 'custom'
+  assign date_key = settings.event_date_metafield_key | default: 'event_date'
+  assign status_key = settings.event_status_metafield_key | default: 'event_status'
+  assign cal_collection = section.settings.collection
+  assign manual_filters = section.blocks | where: 'type', 'month_filter'
+-%}
+
+<section class="calendar-page" id="cal-page-container"
+  data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #D6FED6, #FFFCFA' }}"
+  data-edge="0"
+>
+  <div class="calendar-header">
+    <h1 class="type-display-hero animate-cascade desktop-only">
+      {{ section.settings.title | default: 'Spring Calendar 2025' }}
+    </h1>
+    <div class="calendar-title-mobile mobile-only">
+      {%- assign title_words = section.settings.title | default: 'Spring Calendar 2025' | split: ' ' -%}
+      {%- assign first_word = title_words | first -%}
+      {%- assign rest = '' -%}
+      {%- for word in title_words -%}
+        {%- unless forloop.first -%}
+          {%- if rest == '' -%}
+            {%- assign rest = word -%}
+          {%- else -%}
+            {%- assign rest = rest | append: ' ' | append: word -%}
+          {%- endif -%}
+        {%- endunless -%}
+      {%- endfor -%}
+      <div class="type-display-hero fit-text" data-fit-managed>{{ first_word }}</div>
+      <div class="type-display-hero fit-text" data-fit-managed>{{ rest }}</div>
+    </div>
+
+    <div class="calendar-controls">
+      <div class="filters-list">
+        <div class="text-mask">
+          <span class="type-subRegular1 text-reveal-inner">{{ 'events.filters' | t }}</span>
+        </div>
+        <button class="filter-btn type-subRegular1 ui-roll roll-hover active">
+          <span class="ui-roll-layer ui-roll-visible">{{ 'events.all' | t }}</span>
+          <span class="ui-roll-layer ui-roll-hidden">{{ 'events.all' | t }}</span>
+        </button>
+        {%- for block in manual_filters -%}
+          <button class="filter-btn type-subRegular1 ui-roll roll-hover" {{ block.shopify_attributes }}>
+            <span class="ui-roll-layer ui-roll-visible">{{ block.settings.label }}</span>
+            <span class="ui-roll-layer ui-roll-hidden">{{ block.settings.label }}</span>
+          </button>
+        {%- endfor -%}
+      </div>
+
+      <div class="filters-list">
+        <button class="view-btn type-subRegular1 ui-roll roll-hover active" id="btn-list">
+          <span class="ui-roll-layer ui-roll-visible">{{ 'events.list' | t }}</span>
+          <span class="ui-roll-layer ui-roll-hidden">{{ 'events.list' | t }}</span>
+        </button>
+        <span class="divider">/</span>
+        <button class="view-btn type-subRegular1 ui-roll roll-hover" id="btn-grid">
+          <span class="ui-roll-layer ui-roll-visible">{{ 'events.grid' | t }}</span>
+          <span class="ui-roll-layer ui-roll-hidden">{{ 'events.grid' | t }}</span>
+        </button>
+        <span class="divider">/</span>
+        <a href="{{ section.settings.archives_url | default: '#' }}" class="filter-btn type-subRegular1 ui-roll roll-hover">
+          <span class="ui-roll-layer ui-roll-visible">{{ 'events.archives' | t }}</span>
+          <span class="ui-roll-layer ui-roll-hidden">{{ 'events.archives' | t }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="calendar-body">
+    <div class="calendar-interface-wrapper">
+      <div class="calendar-list" data-lenis-prevent>
+        {%- if cal_collection != blank -%}
+          {%- for product in collections[cal_collection].products -%}
+            {%- liquid
+              assign event_date = product.metafields[ns][date_key].value
+              assign event_status = product.metafields[ns][status_key].value
+              assign date_display = event_date | date: '%m.%d'
+            -%}
+            <a href="{{ product.url }}" class="calendar-row"
+              data-img="{{ product.featured_image | image_url: width: 800 }}"
+              data-title="{{ product.title | escape }}"
+              {% if event_status != blank %}data-status="{{ event_status }}"{% endif %}
+            >
+              <span class="cal-date type-h2">{{ date_display | default: '—' }}</span>
+              <span class="cal-name type-h2">{{ product.title }}</span>
+            </a>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'event_row' -%}
+              <a href="{{ block.settings.url | default: '#' }}" class="calendar-row"
+                data-img="{% if block.settings.poster %}{{ block.settings.poster | image_url: width: 800 }}{% endif %}"
+                data-title="{{ block.settings.title | escape }}"
+                {% if block.settings.status != blank %}data-status="{{ block.settings.status }}"{% endif %}
+                {{ block.shopify_attributes }}
+              >
+                <span class="cal-date type-h2">{{ block.settings.date }}</span>
+                <span class="cal-name type-h2">{{ block.settings.title }}</span>
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+
+      <div class="calendar-poster-wrapper" id="poster-wrapper">
+        <img src="" alt="Event Poster" class="calendar-poster-img" id="poster-img">
+        <div class="status-badge badge-soon" id="status-soon"></div>
+        <div class="status-badge badge-sold" id="status-sold"></div>
+      </div>
+    </div>
+
+    <div id="dynamic-grid-container" class="calendar-grid-packed"></div>
+  </div>
+</section>
+
+<script src="{{ 'section-calendar.js' | asset_url }}"></script>
+
+{% schema %}
+{
+  "name": "Event calendar",
+  "tag": "div",
+  "class": "calendar-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page title",
+      "default": "Spring Calendar 2025"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Events collection",
+      "info": "Products from this collection appear as event rows. Leave empty for manual blocks."
+    },
+    {
+      "type": "url",
+      "id": "archives_url",
+      "label": "Archives page URL"
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Section gradient colors",
+      "default": "#FFFCFA, #D6FED6, #FFFCFA"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "month_filter",
+      "name": "Month filter",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Month label",
+          "default": "March"
+        }
+      ]
+    },
+    {
+      "type": "event_row",
+      "name": "Event (manual)",
+      "settings": [
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Date display",
+          "default": "03.07",
+          "info": "Format: MM.DD"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Event title",
+          "default": "Event Name"
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Event poster"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Event link"
+        },
+        {
+          "type": "select",
+          "id": "status",
+          "label": "Status",
+          "options": [
+            { "value": "", "label": "Available" },
+            { "value": "coming-soon", "label": "Coming Soon" },
+            { "value": "sold-out", "label": "Sold Out" }
+          ],
+          "default": ""
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Event calendar",
+      "blocks": [
+        { "type": "month_filter", "settings": { "label": "March" } },
+        { "type": "month_filter", "settings": { "label": "April" } },
+        { "type": "month_filter", "settings": { "label": "May" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

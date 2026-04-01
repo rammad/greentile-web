@@ -1,0 +1,101 @@
+{
+  "sections": {
+    "mission": {
+      "type": "mission",
+      "settings": {
+        "label": "mission",
+        "gradient_colors": "#30FA30, #FFFCFA, #feea4f"
+      },
+      "blocks": {
+        "l1": { "type": "line", "settings": { "text": "Since day one," } },
+        "l2": { "type": "line", "settings": { "text": "we've been about" } },
+        "l3": { "type": "line", "settings": { "text": "creating Asian American" } },
+        "l4": { "type": "line", "settings": { "text": "spaces + experiences" } },
+        "l5": { "type": "line", "settings": { "text": "that center and celebrate" } },
+        "l6": { "type": "line", "settings": { "text": "our joy." } }
+      },
+      "block_order": ["l1", "l2", "l3", "l4", "l5", "l6"]
+    },
+    "what_we_do": {
+      "type": "what-we-do",
+      "settings": {
+        "label": "What We Do",
+        "gradient_colors": "#FFFCFA, #C1FEC1, #FFFCFA"
+      },
+      "blocks": {
+        "cat0": {
+          "type": "menu_item",
+          "settings": {
+            "title": "Community Events",
+            "body": "The heart of GTSC 💚 Every month, we host pop-up mahjong events to gather our growing community over games of Hong Kong mahjong.",
+            "cta_label": "All Events"
+          }
+        },
+        "cat1": {
+          "type": "menu_item",
+          "settings": {
+            "title": "Brand Partnerships",
+            "body": "On occasion, we partner with values-aligned brands to amplify Chinese mahjong and culture on the national stage.",
+            "cta_label": "Partner with us"
+          }
+        },
+        "cat2": {
+          "type": "menu_item",
+          "settings": {
+            "title": "Corporate & Private Events",
+            "body": "GTSC on your turf. We can bring our entire pop-up operation to birthdays, weddings, corporate headquarters, and more.",
+            "cta_label": "book a private event"
+          }
+        },
+        "cat3": {
+          "type": "menu_item",
+          "settings": {
+            "title": "Special Projects",
+            "body": "Books, podcasts, merch, etc — we love making things that celebrate the community + culture behind Chinese mahjong.",
+            "cta_label": "Collaborate with us"
+          }
+        }
+      },
+      "block_order": ["cat0", "cat1", "cat2", "cat3"]
+    },
+    "team": {
+      "type": "team",
+      "settings": {
+        "title": "THE TEAM",
+        "gradient_colors": "#FFFCFA, #C1FEC1, #FFFCFA"
+      }
+    },
+    "clients": {
+      "type": "clients",
+      "settings": {
+        "clients_title": "Clients",
+        "press_title": "Press"
+      }
+    },
+    "socials": {
+      "type": "socials",
+      "settings": {
+        "subheading": "hope we",
+        "title": "SEE YOU SOON!"
+      }
+    },
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "title": "Green Tile Social Club",
+        "gradient_colors": "#30FA30, #FFFCFA, #FDE523"
+      },
+      "blocks": {
+        "mq1": { "type": "marquee", "settings": { "text": "our podcast greenroom now on spotify" } },
+        "mq2": { "type": "marquee", "settings": { "text": "STREAM GTSC SOUNDS @ PARLOR", "reverse": true } },
+        "lnk1": { "type": "footer_link", "settings": { "label": "Privacy Policy" } },
+        "lnk2": { "type": "footer_link", "settings": { "label": "Go Fund Me" } },
+        "lnk3": { "type": "footer_link", "settings": { "label": "FAQ" } },
+        "lnk4": { "type": "footer_link", "settings": { "label": "Contact Us", "is_contact_trigger": true } },
+        "lnk5": { "type": "footer_link", "settings": { "label": "Follow Us" } }
+      },
+      "block_order": ["mq1", "mq2", "lnk1", "lnk2", "lnk3", "lnk4", "lnk5"]
+    }
+  },
+  "order": ["mission", "what_we_do", "team", "clients", "socials", "footer"]
+}

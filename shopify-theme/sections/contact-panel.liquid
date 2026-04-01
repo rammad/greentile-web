@@ -1,0 +1,295 @@
+{%- liquid
+  assign topics = section.blocks | where: 'type', 'topic'
+  assign extra_fields = section.blocks | where: 'type', 'extra_field'
+-%}
+
+<div class="contact-panel" data-lenis-prevent
+  data-default-email="{{ section.settings.default_email | default: settings.contact_email }}"
+  data-formspree-id="{{ section.settings.formspree_id | default: settings.formspree_id }}"
+  data-success-msg="{{ section.settings.success_message | default: 'contact.success' | t }}"
+  data-error-msg="{{ section.settings.error_message | default: 'contact.error' | t }}"
+>
+  <div class="contact-panel-inner">
+    <h2 class="contact-title type-display-hero">{{ section.settings.title | default: 'SAY HELLO!' }}</h2>
+
+    <form class="contact-form" id="contact-form">
+      {%- comment -%} Topic selection {%- endcomment -%}
+      <div class="contact-section">
+        <label class="type-subRegular1 contact-label">{{ section.settings.topic_label | default: 'What is your question about?' }}</label>
+        <div class="contact-topics">
+          {%- for block in topics -%}
+            <button
+              type="button"
+              class="contact-topic-btn cta-btn is-visible type-subRegular1{% if block.settings.default %} active{% endif %}"
+              data-topic="{{ block.settings.value }}"
+              data-email="{{ block.settings.email }}"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.label }}
+            </button>
+          {%- endfor -%}
+        </div>
+      </div>
+
+      {%- comment -%} Standard fields {%- endcomment -%}
+      <div class="contact-section">
+        <label class="type-subRegular1 contact-label">{{ section.settings.info_label | default: 'Your Information' }}</label>
+        <div class="contact-fields-row">
+          <input type="text" class="contact-input type-subRegular1" name="name"
+            placeholder="{{ section.settings.name_placeholder | default: 'NAME' }}" required>
+          <input type="email" class="contact-input type-subRegular1" name="email"
+            placeholder="{{ section.settings.email_placeholder | default: 'EMAIL' }}" required>
+        </div>
+
+        {%- comment -%} Extra fields (conditionally shown per topic via JS) {%- endcomment -%}
+        {%- for block in extra_fields -%}
+          <div class="contact-extra-field"
+            data-show-for-topics="{{ block.settings.show_for_topics }}"
+            {{ block.shopify_attributes }}
+          >
+            {%- case block.settings.type -%}
+              {%- when 'textarea' -%}
+                <textarea
+                  class="contact-textarea type-subRegular1"
+                  name="{{ block.settings.name }}"
+                  placeholder="{{ block.settings.placeholder }}"
+                  {% if block.settings.required %}required{% endif %}
+                ></textarea>
+
+              {%- when 'select' -%}
+                <select
+                  class="contact-input type-subRegular1"
+                  name="{{ block.settings.name }}"
+                  {% if block.settings.required %}required{% endif %}
+                >
+                  <option value="" disabled selected>{{ block.settings.placeholder }}</option>
+                  {%- assign options = block.settings.options | split: '
+' -%}
+                  {%- for option in options -%}
+                    {%- assign trimmed = option | strip -%}
+                    {%- if trimmed != blank -%}
+                      <option value="{{ trimmed }}">{{ trimmed }}</option>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </select>
+
+              {%- else -%}
+                <input
+                  type="{{ block.settings.type | default: 'text' }}"
+                  class="contact-input type-subRegular1"
+                  name="{{ block.settings.name }}"
+                  placeholder="{{ block.settings.placeholder }}"
+                  {% if block.settings.required %}required{% endif %}
+                >
+            {%- endcase -%}
+          </div>
+        {%- endfor -%}
+
+        <textarea class="contact-textarea type-subRegular1" name="message"
+          placeholder="{{ section.settings.message_placeholder | default: 'WRITE YOUR MESSAGE HERE' }}" required></textarea>
+      </div>
+
+      <div class="contact-submit-row">
+        <button type="submit" class="contact-submit cta-btn is-visible">
+          <div class="ui-roll roll-hover">
+            <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ section.settings.submit_label | default: 'Send Message' }}</span>
+            <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ section.settings.submit_label | default: 'Send Message' }}</span>
+          </div>
+        </button>
+        <span class="contact-status type-subRegular1"></span>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="contact-backdrop"></div>
+
+{% schema %}
+{
+  "name": "Contact panel",
+  "class": "contact-panel-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Panel title",
+      "default": "SAY HELLO!"
+    },
+    {
+      "type": "text",
+      "id": "topic_label",
+      "label": "Topic question label",
+      "default": "What is your question about?"
+    },
+    {
+      "type": "text",
+      "id": "info_label",
+      "label": "Information section label",
+      "default": "Your Information"
+    },
+    {
+      "type": "text",
+      "id": "name_placeholder",
+      "label": "Name placeholder",
+      "default": "NAME"
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "EMAIL"
+    },
+    {
+      "type": "text",
+      "id": "message_placeholder",
+      "label": "Message placeholder",
+      "default": "WRITE YOUR MESSAGE HERE"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button label",
+      "default": "Send Message"
+    },
+    {
+      "type": "text",
+      "id": "default_email",
+      "label": "Default recipient email",
+      "info": "Overrides theme-level contact email for this panel"
+    },
+    {
+      "type": "text",
+      "id": "formspree_id",
+      "label": "Formspree ID override",
+      "info": "Overrides theme-level Formspree ID"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Message sent — we'll be in touch!"
+    },
+    {
+      "type": "text",
+      "id": "error_message",
+      "label": "Error message",
+      "default": "Something went wrong — please try again"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "topic",
+      "name": "Topic",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Display label",
+          "default": "General Inquiry"
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Internal value",
+          "default": "general",
+          "info": "Used in form data and email subject"
+        },
+        {
+          "type": "text",
+          "id": "email",
+          "label": "Route to email address",
+          "info": "If set, this topic sends to a different email than the default"
+        },
+        {
+          "type": "checkbox",
+          "id": "default",
+          "label": "Selected by default",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "extra_field",
+      "name": "Extra field",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Field label"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Field name",
+          "info": "Used as the form field name in submitted data"
+        },
+        {
+          "type": "select",
+          "id": "type",
+          "label": "Field type",
+          "options": [
+            { "value": "text", "label": "Text" },
+            { "value": "email", "label": "Email" },
+            { "value": "tel", "label": "Phone" },
+            { "value": "url", "label": "URL" },
+            { "value": "textarea", "label": "Textarea" },
+            { "value": "select", "label": "Dropdown" }
+          ],
+          "default": "text"
+        },
+        {
+          "type": "textarea",
+          "id": "options",
+          "label": "Dropdown options",
+          "info": "One option per line. Only used when type is Dropdown."
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Required",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Placeholder text"
+        },
+        {
+          "type": "text",
+          "id": "show_for_topics",
+          "label": "Show only for topics",
+          "info": "Comma-separated topic values. Leave empty to show for all topics."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact panel",
+      "blocks": [
+        {
+          "type": "topic",
+          "settings": {
+            "label": "General Inquiry",
+            "value": "general",
+            "default": true
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "label": "Collaboration",
+            "value": "collaboration"
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "label": "Sponsorship",
+            "value": "sponsorship"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

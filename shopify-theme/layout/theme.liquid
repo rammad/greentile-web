@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  {% if page_title == blank %}
+    <title>{{ shop.name }}</title>
+  {% else %}
+    <title>{{ page_title }} - {{ shop.name }}</title>
+  {% endif %}
+
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}">
+  {% endif %}
+
+  {%- comment -%} Fonts: @font-face requires Liquid for asset URLs, so declared inline {%- endcomment -%}
+  <style>
+    @import url('https://use.typekit.net/fbu0ukm.css');
+
+    @font-face {
+      font-family: 'OT Jubilee Golden';
+      src: url('{{ "OTJubilee-GoldenExtrabold.otf" | asset_url }}') format('opentype');
+      font-weight: 800;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Obviously Sans';
+      src: url('{{ "ObviouslyVariable.ttf" | asset_url }}') format('truetype');
+      font-weight: 100 900;
+      font-stretch: 25% 400%;
+      font-style: normal;
+    }
+
+    :root {
+      --asset-arrow-right: url('{{ "arrow-right.png" | asset_url }}');
+      --asset-temp-grad: url('{{ "temp-grad.png" | asset_url }}');
+      --asset-press-eater: url('{{ "press-eater.svg" | asset_url }}');
+      --asset-press-timeout: url('{{ "press-timeout.svg" | asset_url }}');
+      --asset-press-thrillist: url('{{ "press-thrillist.svg" | asset_url }}');
+      --asset-press-gothamist: url('{{ "press-gothamist.svg" | asset_url }}');
+      --asset-press-nymag: url('{{ "press-nymag.svg" | asset_url }}');
+      --asset-press-bonappetit: url('{{ "press-bonappetit.svg" | asset_url }}');
+      --asset-press-infatuation: url('{{ "press-infatuation.svg" | asset_url }}');
+    }
+  </style>
+
+  {{ 'base.css' | asset_url | stylesheet_tag }}
+  {{ 'nav.css' | asset_url | stylesheet_tag }}
+  {{ 'contact.css' | asset_url | stylesheet_tag }}
+
+  {{ content_for_header }}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.0.43/dist/lenis.min.js"></script>
+
+  <script src="{{ 'global.js' | asset_url }}" defer></script>
+  <script src="{{ 'background-gradient.js' | asset_url }}" defer></script>
+  <script src="{{ 'scroll.js' | asset_url }}" defer></script>
+  <script src="{{ 'contact.js' | asset_url }}" defer></script>
+</head>
+<body class="template-{{ template.name }}{% if template.suffix %} template-{{ template.suffix }}{% endif %}">
+
+  {% render 'page-curtain' %}
+  <canvas id="gradient-canvas"></canvas>
+
+  {% section 'header' %}
+  {% section 'contact-panel' %}
+
+  <div id="scroll-viewport" class="scroll-viewport">
+    <div id="scroll-content" class="scroll-content">
+      {{ content_for_layout }}
+    </div>
+  </div>
+
+  {%- comment -%} Pass theme settings to JS for contact form routing {%- endcomment -%}
+  <script>
+    window.THEME_SETTINGS = {
+      contactEmail: {{ settings.contact_email | default: 'hello@greentilesocialclub.com' | json }},
+      formspreeId: {{ settings.formspree_id | default: '' | json }},
+      routes: {
+        root: {{ routes.root_url | json }},
+        cart: {{ routes.cart_url | json }},
+        cartAdd: '{{ routes.cart_add_url }}.js',
+        cartChange: '{{ routes.cart_change_url }}.js',
+      }
+    };
+  </script>
+</body>
+</html>

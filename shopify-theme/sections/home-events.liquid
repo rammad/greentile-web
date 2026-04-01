@@ -1,0 +1,145 @@
+{{ 'section-events.css' | asset_url | stylesheet_tag }}
+
+<section id="events" class="events-section sticky-track"
+  data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #C1FEC1, #FFFCFA' }}"
+  data-edge="0"
+>
+  <div class="events-sticky">
+    <div class="events-sticky-inner">
+
+      <div class="events-title-wrap">
+        <div class="events-title-lines desktop-only">
+          <div class="type-display-hero animate-line">{{ section.settings.title | default: 'upcoming events' }}</div>
+        </div>
+        {%- assign title_words = section.settings.title | default: 'upcoming events' | split: ' ' -%}
+        <div class="events-title-lines mobile-only">
+          {%- for word in title_words -%}
+            <div class="type-display-hero animate-line">{{ word }}</div>
+          {%- endfor -%}
+        </div>
+      </div>
+
+      <div class="events-content">
+        <div class="events-grid">
+          {%- if section.settings.collection != blank -%}
+            {%- for product in collections[section.settings.collection].products limit: section.settings.max_events -%}
+              <a href="{{ product.url }}" class="event-card">
+                {%- if product.featured_image -%}
+                  <img
+                    src="{{ product.featured_image | image_url: width: 800 }}"
+                    class="event-poster"
+                    alt="{{ product.title | escape }}"
+                    loading="lazy"
+                  >
+                {%- endif -%}
+              </a>
+            {%- endfor -%}
+          {%- else -%}
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'event_card' -%}
+                <a href="{{ block.settings.url | default: '#' }}" class="event-card" {{ block.shopify_attributes }}>
+                  {%- if block.settings.poster -%}
+                    <img
+                      src="{{ block.settings.poster | image_url: width: 800 }}"
+                      class="event-poster"
+                      alt="{{ block.settings.title | escape }}"
+                      loading="lazy"
+                    >
+                  {%- endif -%}
+                </a>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="events-content-footer">
+        <a href="{{ section.settings.browse_url | default: '#' }}" class="cta-btn">
+          <div class="ui-roll roll-hover">
+            <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ section.settings.browse_label | default: 'Browse All Events' }}</span>
+            <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ section.settings.browse_label | default: 'Browse All Events' }}</span>
+          </div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'section-events.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Upcoming events",
+  "tag": "div",
+  "class": "home-events-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section title",
+      "default": "upcoming events"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Events collection",
+      "info": "Select a collection to auto-populate event posters. Leave empty to use manual blocks."
+    },
+    {
+      "type": "range",
+      "id": "max_events",
+      "label": "Max events to show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "browse_label",
+      "label": "Browse CTA label",
+      "default": "Browse All Events"
+    },
+    {
+      "type": "url",
+      "id": "browse_url",
+      "label": "Browse CTA link"
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Section gradient colors",
+      "default": "#FFFCFA, #C1FEC1, #FFFCFA"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "event_card",
+      "name": "Event card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Event title"
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Poster image"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Upcoming events"
+    }
+  ]
+}
+{% endschema %}

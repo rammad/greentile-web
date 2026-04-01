@@ -1,0 +1,113 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Green Tile Social Club",
+    "theme_version": "1.0.0",
+    "theme_author": "GTSC",
+    "theme_documentation_url": "",
+    "theme_support_url": ""
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "url",
+        "id": "social_instagram",
+        "label": "Instagram URL"
+      },
+      {
+        "type": "url",
+        "id": "social_tiktok",
+        "label": "TikTok URL"
+      },
+      {
+        "type": "url",
+        "id": "social_discord",
+        "label": "Discord URL"
+      }
+    ]
+  },
+  {
+    "name": "Contact form",
+    "settings": [
+      {
+        "type": "text",
+        "id": "contact_email",
+        "label": "Default contact email",
+        "default": "hello@greentilesocialclub.com"
+      },
+      {
+        "type": "text",
+        "id": "formspree_id",
+        "label": "Formspree form ID",
+        "info": "Optional. Sign up at formspree.io, create a form, paste the ID here. Leave empty to use mailto: fallback."
+      }
+    ]
+  },
+  {
+    "name": "Page transitions",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "enable_page_curtain",
+        "label": "Enable page transition curtain",
+        "default": true,
+        "info": "Animated mahjong tile curtain between page navigations"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_gradient_bg",
+        "label": "Enable gradient background",
+        "default": true,
+        "info": "Three.js animated gradient canvas behind content"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_smooth_scroll",
+        "label": "Enable smooth scroll (Lenis)",
+        "default": true,
+        "info": "Smooth scrolling on desktop. Disabled automatically on touch devices."
+      }
+    ]
+  },
+  {
+    "name": "Event settings",
+    "settings": [
+      {
+        "type": "text",
+        "id": "event_date_metafield_namespace",
+        "label": "Event date metafield namespace",
+        "default": "custom",
+        "info": "Namespace for the product metafield containing event date"
+      },
+      {
+        "type": "text",
+        "id": "event_date_metafield_key",
+        "label": "Event date metafield key",
+        "default": "event_date",
+        "info": "Key for the product metafield containing event date"
+      },
+      {
+        "type": "text",
+        "id": "event_venue_metafield_key",
+        "label": "Event venue metafield key",
+        "default": "event_venue",
+        "info": "Key for the product metafield containing venue name/address"
+      },
+      {
+        "type": "text",
+        "id": "event_time_metafield_key",
+        "label": "Event time metafield key",
+        "default": "event_time",
+        "info": "Key for the product metafield containing event time range"
+      },
+      {
+        "type": "text",
+        "id": "event_status_metafield_key",
+        "label": "Event status metafield key",
+        "default": "event_status",
+        "info": "Key for sold-out / coming-soon status. Values: sold-out, coming-soon, or empty for available."
+      }
+    ]
+  }
+]

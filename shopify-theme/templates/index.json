@@ -1,0 +1,68 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "title": "Green Tile Social Club",
+        "gradient_colors": "#30FA30, #FFFCFA, #feea4f"
+      }
+    },
+    "manifesto": {
+      "type": "about-manifesto",
+      "settings": {
+        "subheading": "manifesto",
+        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at odio nulla. Suspendisse laoreet suscipit enim et mollis. Nunc condimentum felis ac ligula tincidunt, dictum accumsan purus laoreet. Pellentesque fermentum dapibus aliquet. Mauris lectus nulla, tincidunt vitae suscipit vel, porttitor non quam. Praesent volutpat ut diam ut tincidunt. Phasellus tempus nisl eget malesuada rhoncus.",
+        "gradient_colors": "#30FA30, #FFFCFA, #feea4f"
+      },
+      "blocks": {
+        "img1": { "type": "inline_image", "settings": { "word_position": 5 } },
+        "img2": { "type": "inline_image", "settings": { "word_position": 15 } },
+        "img3": { "type": "inline_image", "settings": { "word_position": 27 } },
+        "img4": { "type": "inline_image", "settings": { "word_position": 38 } },
+        "img5": { "type": "inline_image", "settings": { "word_position": 48 } }
+      },
+      "block_order": ["img1", "img2", "img3", "img4", "img5"]
+    },
+    "events": {
+      "type": "home-events",
+      "settings": {
+        "title": "upcoming events",
+        "browse_label": "Browse All Events",
+        "max_events": 4,
+        "gradient_colors": "#FFFCFA, #C1FEC1, #FFFCFA"
+      }
+    },
+    "featured": {
+      "type": "featured",
+      "settings": {
+        "marquee_text": "FEATURING",
+        "gradient_colors": "#FFFCFA, #C1FEC1, #FFFCFA"
+      }
+    },
+    "socials": {
+      "type": "socials",
+      "settings": {
+        "subheading": "hope we",
+        "title": "SEE YOU SOON!"
+      }
+    },
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "title": "Green Tile Social Club",
+        "gradient_colors": "#30FA30, #FFFCFA, #FDE523"
+      },
+      "blocks": {
+        "mq1": { "type": "marquee", "settings": { "text": "our podcast greenroom now on spotify" } },
+        "mq2": { "type": "marquee", "settings": { "text": "STREAM GTSC SOUNDS @ PARLOR", "reverse": true } },
+        "lnk1": { "type": "footer_link", "settings": { "label": "Privacy Policy" } },
+        "lnk2": { "type": "footer_link", "settings": { "label": "Go Fund Me" } },
+        "lnk3": { "type": "footer_link", "settings": { "label": "FAQ" } },
+        "lnk4": { "type": "footer_link", "settings": { "label": "Contact Us", "is_contact_trigger": true } },
+        "lnk5": { "type": "footer_link", "settings": { "label": "Follow Us" } }
+      },
+      "block_order": ["mq1", "mq2", "lnk1", "lnk2", "lnk3", "lnk4", "lnk5"]
+    }
+  },
+  "order": ["hero", "manifesto", "events", "featured", "socials", "footer"]
+}

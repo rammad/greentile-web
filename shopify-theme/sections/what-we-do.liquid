@@ -1,0 +1,168 @@
+{{ 'section-what-we-do.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign items = section.blocks | where: 'type', 'menu_item'
+-%}
+
+<section id="about" class="what-we-do"
+  data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #C1FEC1, #FFFCFA' }}"
+  data-edge="0"
+  data-touch-speed="0.5"
+>
+  <div class="about-menu-persistent">
+    <div class="menu-label text-mask">
+      <span class="type-subBold1 text-reveal-inner">{{ section.settings.label | default: 'What We Do' }}</span>
+    </div>
+    <ul>
+      {%- for block in items -%}
+        <li class="menu-item type-h2" data-index="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+          {{ block.settings.title }}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  <div class="about-sticky-content">
+    {%- for block in items -%}
+      <div class="about-text-block" id="text-{{ forloop.index0 }}">
+        <div class="about-content">
+          <p class="type-body2">{{ block.settings.body }}</p>
+          {%- if block.settings.cta_label != blank -%}
+            <a href="{{ block.settings.cta_url | default: '#' }}" class="cta-btn">
+              <div class="ui-roll roll-hover">
+                <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ block.settings.cta_label }}</span>
+                <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ block.settings.cta_label }}</span>
+              </div>
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <div class="about-image-track">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'scatter_image' -%}
+        <img
+          src="{{ block.settings.image | image_url: width: 800 }}"
+          class="scatter-img"
+          data-group="{{ block.settings.group }}"
+          loading="lazy"
+          {{ block.shopify_attributes }}
+        >
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+<script src="{{ 'scatter-images.js' | asset_url }}" defer></script>
+<script src="{{ 'section-what-we-do.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "What we do",
+  "tag": "div",
+  "class": "what-we-do-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Section label",
+      "default": "What We Do"
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Section gradient colors",
+      "default": "#FFFCFA, #C1FEC1, #FFFCFA"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu_item",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Menu title",
+          "default": "Community Events"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Description"
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "CTA label",
+          "default": "All Events"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "CTA link"
+        }
+      ]
+    },
+    {
+      "type": "scatter_image",
+      "name": "Scatter image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "number",
+          "id": "group",
+          "label": "Category group index",
+          "default": 0,
+          "info": "0-based index matching the category this image belongs to"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "What we do",
+      "blocks": [
+        {
+          "type": "menu_item",
+          "settings": {
+            "title": "Community Events",
+            "body": "The heart of GTSC 💚 Every month, we host pop-up mahjong events to gather our growing community over games of Hong Kong mahjong.",
+            "cta_label": "All Events"
+          }
+        },
+        {
+          "type": "menu_item",
+          "settings": {
+            "title": "Brand Partnerships",
+            "body": "On occasion, we partner with values-aligned brands to amplify Chinese mahjong and culture on the national stage.",
+            "cta_label": "Partner with us"
+          }
+        },
+        {
+          "type": "menu_item",
+          "settings": {
+            "title": "Corporate & Private Events",
+            "body": "GTSC on your turf. We can bring our entire pop-up operation to birthdays, weddings, corporate headquarters, and more.",
+            "cta_label": "book a private event"
+          }
+        },
+        {
+          "type": "menu_item",
+          "settings": {
+            "title": "Special Projects",
+            "body": "Books, podcasts, merch, etc — we love making things that celebrate the community + culture behind Chinese mahjong.",
+            "cta_label": "Collaborate with us"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

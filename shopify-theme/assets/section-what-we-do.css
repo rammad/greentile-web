@@ -1,0 +1,208 @@
+/* what we do section (about-us.html) — column images + fixed body text + persistent menu */
+
+/* ── image track ──────────────────────────────────────────────────── */
+
+.about-image-track {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+    min-height: 100vh;
+}
+
+.about-image-track-positioned {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+}
+
+.scatter-img {
+    position: absolute;
+    top: 0; left: 0;
+    display: block;
+    width: 12vw;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--poster-radius);
+    will-change: transform;
+}
+
+.scatter-img.back-layer {
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.scatter-img.back-card {
+    background: var(--c-dark-green, #0E4A0E);
+    border-radius: var(--poster-radius);
+    aspect-ratio: 4 / 5;
+}
+
+@media (min-width: 1025px) {
+    .scatter-img.back-layer {
+        filter: grayscale(1);
+    }
+}
+
+/* ── what we do section ───────────────────────────────────────────────────── */
+
+.what-we-do {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding-top: 0;
+    background-color: transparent;
+}
+
+/* scroll-track slides — no visible content, just set heights for JS to measure */
+.what-we-do .about-slides {
+    position: relative;
+    width: 100%;
+    z-index: 0;
+}
+
+.what-we-do .about-slide {
+    position: relative;
+    width: 100%;
+}
+
+/* ── fixed body text container ───────────────────────────────────────────── */
+
+/* Always fixed — lives outside #scroll-content to avoid Lenis transform context.
+   `top` is set dynamically by JS relative to the menu's bottom edge. */
+.what-we-do-body {
+    position: fixed;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: grid;
+    justify-items: center;
+    z-index: 5;
+    pointer-events: none;
+    touch-action: pan-y;
+}
+
+/* all text blocks occupy the same grid cell so they stack on top of each other */
+.what-we-do-body .about-text-block {
+    grid-area: 1 / 1;
+    width: 100%;
+    max-width: 600px;
+    padding: 0 var(--page-gutter);
+    text-align: center;
+    position: relative;
+    /* opacity, filter, and transition are driven entirely by JS inline styles */
+    will-change: opacity, filter;
+    touch-action: pan-y;
+}
+
+/* reset base.css opacity:0 on all child type elements — parent block controls visibility */
+.what-we-do-body .type-body1,
+.what-we-do-body .type-body2,
+.what-we-do-body p {
+    opacity: 1 !important;
+    filter: none !important;
+    transition: none !important;
+}
+
+/* about-content wrapper — scoped to .what-we-do-body because JS moves blocks there at runtime */
+.what-we-do-body .about-content {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.what-we-do-body .about-content .cta-btn {
+    position: absolute;
+    top: calc(100% + 40px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    pointer-events: auto;
+    touch-action: pan-y;
+}
+
+/* ── persistent menu ─────────────────────────────────────────────────────── */
+
+.about-menu-persistent {
+    position: absolute;
+    top: 20vh;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    z-index: 5;
+    pointer-events: none;
+    touch-action: pan-y;
+}
+
+.about-menu-persistent ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.about-menu-persistent .menu-label {
+    display: block;
+}
+
+.about-menu-persistent .menu-item {
+    color: var(--c-dark-green-30);
+    opacity: 0;
+    pointer-events: none;
+    transition: color var(--time-fade-out) ease, opacity var(--time-fade-out) ease;
+}
+
+.about-menu-persistent .menu-item.is-revealed {
+    opacity: 1;
+    transition: color var(--time-fade-out) ease, opacity 0.5s ease;
+}
+
+.about-menu-persistent .menu-item.is-active {
+    color: var(--color-text-main);
+    transition: color var(--time-fade-in) ease, opacity 0.5s ease;
+}
+
+/* menu is always fixed — JS controls visibility and translateY for scroll-out + ease-in */
+.what-we-do .about-menu-persistent {
+    position: fixed;
+    top: 28vh;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding-top: 0;
+    pointer-events: none;
+    z-index: 5;
+    will-change: transform;
+}
+
+@media (max-width: 1024px) {
+    .about-image-track { overflow-x: clip; }
+    .what-we-do .about-menu-persistent { top: 18vh; }
+    .about-menu-persistent .menu-item { word-spacing: 100vw; line-height: var(--lh-display); }
+    .about-menu-persistent .menu-item .ws-normal { word-spacing: normal; }
+
+    .about-menu-persistent .menu-label {
+        line-height: var(--lh-tight);
+        text-box: trim-both cap alphabetic;
+    }
+
+    .about-menu-persistent .menu-item {
+        line-height: var(--lh-single);
+    }
+
+    .about-menu-persistent ul {
+        gap: 32px;
+    }
+
+    .what-we-do-body .about-text-block { max-width: 240px; }
+}

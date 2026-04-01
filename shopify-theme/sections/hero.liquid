@@ -1,0 +1,43 @@
+{{ 'section-hero.css' | asset_url | stylesheet_tag }}
+
+<section id="hero" class="hero standard-margins"
+  data-colors="{{ section.settings.gradient_colors | default: '#30FA30, #FFFCFA, #feea4f' }}"
+  data-edge="0"
+>
+  <h1 class="type-display-hero animate-cascade fit-text">
+    {%- assign title_words = section.settings.title | default: 'Green Tile Social Club' | split: ' ' -%}
+    {%- for word in title_words -%}
+      <span>{{ word }}</span>
+    {%- endfor -%}
+  </h1>
+</section>
+
+<script src="{{ 'section-hero.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Hero",
+  "tag": "div",
+  "class": "hero-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Hero title",
+      "default": "Green Tile Social Club"
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Section gradient colors",
+      "default": "#30FA30, #FFFCFA, #feea4f",
+      "info": "Comma-separated CSS colors"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero"
+    }
+  ]
+}
+{% endschema %}

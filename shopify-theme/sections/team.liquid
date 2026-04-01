@@ -1,0 +1,93 @@
+{{ 'section-team.css' | asset_url | stylesheet_tag }}
+
+<section id="team" class="team-section"
+  data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #C1FEC1, #FFFCFA' }}"
+  data-edge="0"
+  data-touch-speed="1.0"
+>
+  <div class="team-layout">
+
+    <div class="team-title-col">
+      <div class="team-title-inner">
+        <div class="type-h1 team-title-text animate-line">{{ section.settings.title | default: 'THE TEAM' }}</div>
+      </div>
+    </div>
+
+    <div class="team-images-col">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'team_group' -%}
+          <div class="team-poster-wrap" data-index="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+            {%- if block.settings.image -%}
+              <img class="team-poster" src="{{ block.settings.image | image_url: width: 1200 }}" alt="{{ block.settings.image.alt | escape }}" loading="lazy">
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <div class="team-text-col">
+      <div class="team-text-sticky">
+        <div class="team-body-sizer">
+          {%- assign index = 0 -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'team_group' -%}
+              <div class="team-body" data-for-index="{{ index }}">
+                <p class="team-names type-body2">{{ block.settings.names }}</p>
+              </div>
+              {%- assign index = index | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script src="{{ 'section-team.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Team",
+  "tag": "div",
+  "class": "team-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section title",
+      "default": "THE TEAM"
+    },
+    {
+      "type": "text",
+      "id": "gradient_colors",
+      "label": "Section gradient colors",
+      "default": "#FFFCFA, #C1FEC1, #FFFCFA"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "team_group",
+      "name": "Team group",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Group photo"
+        },
+        {
+          "type": "textarea",
+          "id": "names",
+          "label": "Team member names",
+          "info": "Comma-separated list of names"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Team"
+    }
+  ]
+}
+{% endschema %}

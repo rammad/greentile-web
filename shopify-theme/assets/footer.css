@@ -1,0 +1,173 @@
+/* footer */
+
+.footer-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    margin-top: calc(var(--section-spacing) - var(--space-for-nav));
+    padding-top: var(--space-for-nav);
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    overflow: clip;
+}
+
+#footer-gradient-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+#footer-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.marquee-wrapper {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.marquee-bar {
+    width: 100%;
+    overflow: hidden;
+    padding: 12px 0;
+    margin-top: 8px;
+    white-space: nowrap;
+    display: flex;
+    background-color: var(--color-accent);
+    flex-direction: row; 
+    overflow-anchor: none;
+}
+
+.marquee-content { 
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 0px; 
+    transform: translateX(0);
+    will-change: transform;
+}
+
+.marquee-content.has-seamless-animation {
+    animation: seamless-scroll var(--marquee-duration) linear infinite;
+}
+
+.marquee-content.marquee-reverse.has-seamless-animation {
+    animation-direction: reverse;
+}
+
+.marquee-content.marquee-reverse .arrow {
+    transform: scaleX(-1);
+}
+
+/* vvv come back to this, not working how i want >:( */
+/* .marquee-content.has-seamless-animation:hover {
+    animation: seamless-scroll calc(var(--marquee-duration) * 2) linear infinite;
+} */
+
+@keyframes seamless-scroll {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+}
+
+.marquee-item {
+    padding: 0 40px;
+}
+
+.marquee-item.arrow{
+    display: inline-block;
+    width: 14px;
+    height: 7px;
+    -webkit-mask-image: var(--asset-arrow-right);
+    mask-image: var(--asset-arrow-right);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    background-color: var(--c-dark-green);
+}
+
+.footer-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    flex-grow: 1;
+    margin-top: 8px;
+    position: relative;
+    z-index: 1;
+    padding-left: var(--page-gutter);
+    padding-right: var(--page-gutter);
+    box-sizing: border-box;
+}
+
+.footer-main .type-display-hero {
+    display: block;        
+    width: 100%;
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    overflow: visible;
+    padding-bottom: var(--page-gutter);
+}
+
+.footer-links {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 40px var(--page-gutter);
+}
+
+.footer-link a {
+    text-decoration: none;
+    margin-bottom: 0; 
+    line-height: var(--lh-single); 
+}
+
+@media (max-width: 1024px) {
+    .footer-section {
+        height: 100vh;
+        margin-top: 0;
+    }
+    .footer-main {
+        min-height: 0;
+    }
+    .footer-links {
+        height: auto;
+        flex-grow: 1;
+        margin-bottom: 0;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 40px 0;
+    }
+    .footer-main .type-display-hero {
+        text-align: center;
+        line-height: var(--lh-display);
+        text-box: normal;
+        padding-bottom: calc(var(--page-gutter) * 2);
+    }
+    .footer-main .type-display-hero.is-edge-to-edge {
+        padding-bottom: var(--page-gutter);
+    }
+    .footer-main .type-display-hero > span {
+        display: block;
+    }
+    .footer-main .type-display-hero > span .char-reveal {
+        display: inline-block;
+    }
+    .marquee-item.type-subBold1 {
+        font-size: 12px;
+    }
+}
