@@ -50,7 +50,7 @@
 
 @media (hover: hover) {
     .nav-logo:hover {
-        transform: rotate(15deg);
+        transform: rotate(-15deg);
     }
 }
 

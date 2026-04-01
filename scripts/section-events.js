@@ -250,51 +250,26 @@
                 const maxPosterW = maxPosterH * 4 / 5;
                 grid.style.maxWidth = Math.max(0, n * maxPosterW + (n - 1) * gridColGap + gridPad) + 'px';
 
-                const contentH = titleWrap.offsetHeight + flexGap + content.offsetHeight;
-                const usableH      = ih - navInset;
-                const centerOffset = navInset + Math.max(0, (usableH - contentH) / 2);
-                const desiredGap   = sectionSpacingPx * 2;
-                const adjustedPT   = Math.max(0, desiredGap - centerOffset);
+                const desiredGap = sectionSpacingPx * 2;
 
                 section.style.marginTop  = '0px';
-                section.style.paddingTop = adjustedPT + 'px';
+                section.style.paddingTop = '0px';
                 section.style.minHeight  = (SECTION_VH * ih) + 'px';
+                void section.offsetHeight;
+
+                let prevSec = section.previousElementSibling;
+                while (prevSec && prevSec.tagName !== 'SECTION') prevSec = prevSec.previousElementSibling;
+                const baselineGap = prevSec
+                    ? titleWrap.getBoundingClientRect().top - prevSec.getBoundingClientRect().bottom
+                    : 0;
+                const adjustedPT = Math.max(0, desiredGap - baselineGap);
+
+                section.style.paddingTop = adjustedPT + 'px';
 
                 phase2Start   = section.offsetTop;
                 phase2Len     = section.offsetHeight - ih;
                 stickProgress = 0;
                 startOffset   = ih;
-
-                // ── DEBUG: measure actual gap from prev section bottom to title top ──
-                const prevSection = section.previousElementSibling;
-                const prevBottom  = prevSection
-                    ? prevSection.getBoundingClientRect().bottom + (window.lenis ? window.lenis.scroll : window.scrollY)
-                    : 0;
-                const titleAbsTop = titleWrap.getBoundingClientRect().top + (window.lenis ? window.lenis.scroll : window.scrollY);
-                const actualGap   = titleAbsTop - prevBottom;
-                console.table({
-                    '--section-spacing (px)': sectionSpacingPx,
-                    'desiredGap (2×spacing)': desiredGap,
-                    'viewportH (ih)':         ih,
-                    'navInset':               navInset,
-                    's20':                    s20,
-                    'stickyInner paddingTop':  navInset + s20,
-                    'titleWrap.offsetHeight':  titleWrap.offsetHeight,
-                    'flexGap':                flexGap,
-                    'content.offsetHeight':   content.offsetHeight,
-                    'contentH':               contentH,
-                    'usableH':                usableH,
-                    'centerOffset':           centerOffset,
-                    'adjustedPT':             adjustedPT,
-                    'section marginTop':      0,
-                    'section paddingTop':     adjustedPT,
-                    'section.offsetTop':      section.offsetTop,
-                    'prevSection bottom (abs)': prevBottom,
-                    'titleWrap top (abs)':    titleAbsTop,
-                    'ACTUAL GAP (title – prev)': actualGap,
-                    'EXPECTED GAP':           desiredGap,
-                    'DIFF (actual – expected)': actualGap - desiredGap,
-                });
             }
 
             applyPositions(window.lenis ? window.lenis.scroll : 0);

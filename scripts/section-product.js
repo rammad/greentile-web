@@ -18,6 +18,7 @@
 
         initImageScroll();
         initMobileDots();
+        initTicketTypes();
         updateQty(0);
     });
 
@@ -40,6 +41,11 @@
             await wait(staggerTime);
         }
 
+        const ticketBtns = section.querySelectorAll('.pdp-ticket-btn');
+        ticketBtns.forEach(b => b.classList.add('is-visible'));
+
+        await wait(staggerTime);
+
         const tags = section.querySelectorAll('.pdp-tag');
         for (const tag of tags) {
             if (!tag.classList.contains('max-qty-label')) tag.classList.add('is-visible');
@@ -61,14 +67,14 @@
             await wait(150);
         }
 
-        const cta = section.querySelector('.cta-btn');
+        const cta = section.querySelector('.buy-button-override');
         if (cta) transitionCta(cta, 'enter');
     }
 
     function initMobileAnimations(section) {
         const title = document.querySelector('.pdp-hero-title');
         const ticketActions = document.querySelector('.ticket-actions');
-        const cta = section.querySelector('.cta-btn');
+        const cta = section.querySelector('.buy-button-override');
 
         // images: fade in when the carousel enters the viewport
         const imageCol = document.querySelector('.pdp-image-col');
@@ -109,6 +115,11 @@
                     sub.classList.add('is-visible');
                     await wait(staggerTime);
                 }
+
+                const ticketBtns = section.querySelectorAll('.pdp-ticket-btn');
+                ticketBtns.forEach(b => b.classList.add('is-visible'));
+
+                await wait(staggerTime);
 
                 const tags = section.querySelectorAll('.pdp-tag');
                 for (const tag of tags) {
@@ -273,6 +284,19 @@
         });
     }
 
+    function initTicketTypes() {
+        const btns = document.querySelectorAll('.pdp-ticket-btn');
+        if (!btns.length) return;
+
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                updateBuyButton();
+            });
+        });
+    }
+
     function initMobileDots() {
         if (window.innerWidth > MOBILE_BREAKPOINT) return;
 
@@ -348,5 +372,23 @@
         maxMsg && (qty === MAX_QTY
             ? maxMsg.classList.add('is-visible')
             : maxMsg.classList.remove('is-visible'));
+
+        updateBuyButton();
     };
+
+    function updateBuyButton() {
+        const activeBtn = document.querySelector('.pdp-ticket-btn.active');
+        if (!activeBtn) return;
+
+        const unitPrice = parseInt(activeBtn.dataset.price, 10) || 0;
+        const abbr = activeBtn.dataset.abbr || '';
+        const total = unitPrice * qty;
+
+        document.querySelectorAll('.buy-abbr').forEach(el => {
+            el.textContent = abbr;
+        });
+        document.querySelectorAll('.buy-price').forEach(el => {
+            el.textContent = '$' + total;
+        });
+    }
 })();

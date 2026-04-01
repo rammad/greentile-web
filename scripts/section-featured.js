@@ -25,7 +25,8 @@
         if (!section) return;
 
         const frame        = section.querySelector('.featured-frame');
-        const marqueeLayer = section.querySelector('.featured-marquee-layer');
+        const marqueeLayer = section.querySelector('.featured-marquee-layer:not(.featured-marquee-bottom)');
+        const marqueeBottom = section.querySelector('.featured-marquee-bottom');
         const posterWrap   = section.querySelector('.featured-poster-wrap');
         const bgImg        = section.querySelector('.featured-bg-img');
 
@@ -55,12 +56,16 @@
 
         const applyPositions = (scrollY) => {
             const delta = (scrollY + cachedVH * 0.5 - sectionCenterY) / sectionHeight;
+            const marqueePx = isMobile ? POSTER_PX : MARQUEE_PX;
 
             if (bgImg) {
                 bgImg.style.transform = `translate3d(0,${(delta * BG_PX).toFixed(2)}px,0)`;
             }
             if (marqueeLayer) {
-                marqueeLayer.style.transform = `translate3d(0,${(delta * MARQUEE_PX).toFixed(2)}px,0)`;
+                marqueeLayer.style.transform = `translate3d(0,${(delta * marqueePx).toFixed(2)}px,0)`;
+            }
+            if (marqueeBottom) {
+                marqueeBottom.style.transform = `translate3d(0,${(delta * marqueePx).toFixed(2)}px,0)`;
             }
             if (posterWrap) {
                 posterWrap.style.transform = `translate3d(0,${(delta * POSTER_PX).toFixed(2)}px,0)`;
