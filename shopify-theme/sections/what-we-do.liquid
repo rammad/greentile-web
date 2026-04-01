@@ -41,15 +41,31 @@
   </div>
 
   <div class="about-image-track">
-    {%- for block in section.blocks -%}
-      {%- if block.type == 'scatter_image' -%}
-        <img
-          src="{{ block.settings.image | image_url: width: 800 }}"
-          class="scatter-img"
-          data-group="{{ block.settings.group }}"
-          loading="lazy"
-          {{ block.shopify_attributes }}
-        >
+    {%- for block in items -%}
+      {%- assign g = forloop.index0 -%}
+      {%- if block.settings.image_1 != blank -%}
+        <img src="{{ block.settings.image_1 | image_url: width: 800 }}" alt="{{ block.settings.image_1.alt | default: '' }}" class="scatter-img" data-group="{{ g }}" loading="lazy">
+      {%- endif -%}
+      {%- if block.settings.image_2 != blank -%}
+        <img src="{{ block.settings.image_2 | image_url: width: 800 }}" alt="{{ block.settings.image_2.alt | default: '' }}" class="scatter-img" data-group="{{ g }}" loading="lazy">
+      {%- endif -%}
+      {%- if block.settings.image_3 != blank -%}
+        <img src="{{ block.settings.image_3 | image_url: width: 800 }}" alt="{{ block.settings.image_3.alt | default: '' }}" class="scatter-img" data-group="{{ g }}" loading="lazy">
+      {%- endif -%}
+      {%- if block.settings.image_4 != blank -%}
+        <img src="{{ block.settings.image_4 | image_url: width: 800 }}" alt="{{ block.settings.image_4.alt | default: '' }}" class="scatter-img" data-group="{{ g }}" loading="lazy">
+      {%- endif -%}
+      {%- if block.settings.image_5 != blank -%}
+        <img src="{{ block.settings.image_5 | image_url: width: 800 }}" alt="{{ block.settings.image_5.alt | default: '' }}" class="scatter-img" data-group="{{ g }}" loading="lazy">
+      {%- endif -%}
+      {%- if block.settings.image_6 != blank -%}
+        <img src="{{ block.settings.image_6 | image_url: width: 800 }}" alt="{{ block.settings.image_6.alt | default: '' }}" class="scatter-img" data-group="{{ g }}" loading="lazy">
+      {%- endif -%}
+      {%- if block.settings.image_7 != blank -%}
+        <img src="{{ block.settings.image_7 | image_url: width: 800 }}" alt="{{ block.settings.image_7.alt | default: '' }}" class="scatter-img" data-group="{{ g }}" loading="lazy">
+      {%- endif -%}
+      {%- if block.settings.image_8 != blank -%}
+        <img src="{{ block.settings.image_8 | image_url: width: 800 }}" alt="{{ block.settings.image_8.alt | default: '' }}" class="scatter-img" data-group="{{ g }}" loading="lazy">
       {%- endif -%}
     {%- endfor -%}
   </div>
@@ -103,24 +119,50 @@
           "type": "url",
           "id": "cta_url",
           "label": "CTA link"
-        }
-      ]
-    },
-    {
-      "type": "scatter_image",
-      "name": "Scatter image",
-      "settings": [
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Image"
         },
         {
-          "type": "number",
-          "id": "group",
-          "label": "Category group index",
-          "default": 0,
-          "info": "0-based index matching the category this image belongs to"
+          "type": "header",
+          "content": "Scatter images"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Image 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Image 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Image 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_4",
+          "label": "Image 4"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_5",
+          "label": "Image 5"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_6",
+          "label": "Image 6"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_7",
+          "label": "Image 7"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_8",
+          "label": "Image 8"
         }
       ]
     }

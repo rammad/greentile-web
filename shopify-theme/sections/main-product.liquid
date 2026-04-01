@@ -1,24 +1,42 @@
 {{ 'section-product.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
-  assign ns = settings.event_date_metafield_namespace | default: 'custom'
-  assign date_key = settings.event_date_metafield_key | default: 'event_date'
-  assign venue_key = settings.event_venue_metafield_key | default: 'event_venue'
-  assign time_key = settings.event_time_metafield_key | default: 'event_time'
+  assign evt_ns = settings.event_metafield_namespace | default: 'event_ticketing'
+  assign evt_key = settings.event_metafield_key | default: 'event_v2'
+  assign event_meta = product.metafields[evt_ns][evt_key].value
 
-  assign event_date = product.metafields[ns][date_key].value
-  assign event_venue = product.metafields[ns][venue_key].value
-  assign event_time = product.metafields[ns][time_key].value
+  assign event_date = nil
+  assign event_time = nil
+  assign event_venue_name = nil
+  assign event_venue_address = nil
+  assign date_full = nil
+  assign date_short = nil
 
-  if event_date
-    assign date_full = event_date | date: '%A, %B %e'
-    assign date_short = event_date | date: '%a %b %e'
+  if event_meta
+    assign event_date = event_meta.starts_at
+    assign event_time = event_meta.time
+
+    if event_date
+      assign date_full = event_date | date: '%A, %B %e'
+      assign date_short = event_date | date: '%a %b %e'
+    endif
+
+    assign venue = event_meta.venue
+    if venue
+      assign event_venue_name = venue.name
+      assign addr = venue.address
+      if addr
+        assign event_venue_address = addr.address1
+        assign event_venue_city = addr.city
+        assign event_venue_state = addr.state
+      endif
+    endif
   endif
 
   assign current_variant = product.selected_or_first_available_variant
 -%}
 
-<section class="pdp-section" data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #D6FED6, #FFFCFA' }}">
+<section class="pdp-section" data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #D6FED6, #FFFCFA' }}" data-max-qty="{{ section.settings.max_qty | default: 4 }}">
   <div class="pdp-sticky-wrapper">
     <div class="pdp-grid">
 
@@ -47,10 +65,10 @@
       <div class="pdp-info">
 
         {%- comment -%} Date row {%- endcomment -%}
-        {%- if event_date or event_time -%}
+        {%- if date_full or event_time -%}
           <div class="pdp-meta-row text-mask">
             <span class="type-subBold2 text-reveal-inner">
-              {%- if event_date -%}
+              {%- if date_full -%}
                 <span class="pdp-date-full">{{ date_full }}{% if event_time %} &bull; {{ event_time }}{% endif %}</span>
                 <span class="pdp-date-short">{{ date_short }}{% if event_time %} &bull; {{ event_time }}{% endif %}</span>
               {%- elsif event_time -%}
@@ -66,29 +84,36 @@
         </h1>
 
         {%- comment -%} Venue row {%- endcomment -%}
-        {%- if event_venue -%}
+        {%- if event_venue_name -%}
           <div class="pdp-meta-row text-mask">
-            <span class="type-subBold2 text-reveal-inner">{{ event_venue }}</span>
+            <span class="type-subBold2 text-reveal-inner">
+              {{ event_venue_name }}
+              {%- if event_venue_address %} &bull; {{ event_venue_address }}{% endif -%}
+              {%- if event_venue_city %}, {{ event_venue_city }}{% endif -%}
+              {%- if event_venue_state %}, {{ event_venue_state }}{% endif -%}
+            </span>
           </div>
         {%- endif -%}
 
-        {%- comment -%} Ticket types (variants) {%- endcomment -%}
-        <div class="pdp-ticket-types">
-          {%- for variant in product.variants -%}
-            <button
-              type="button"
-              class="pdp-ticket-btn cta-btn is-visible type-subRegular1{% if variant == current_variant %} active{% endif %}"
-              data-ticket="{{ variant.id }}"
-              data-variant-id="{{ variant.id }}"
-              data-price="{{ variant.price }}"
-              data-abbr="{{ variant.option1 | truncate: 3, '' | upcase }}"
-              {% unless variant.available %}disabled{% endunless %}
-            >
-              {{ variant.title }} &ndash; {{ variant.price | money }}
-              {%- unless variant.available %} ({{ 'product.sold_out' | t }}){% endunless -%}
-            </button>
-          {%- endfor -%}
-        </div>
+        {%- comment -%} Ticket types — only shown when multiple variants exist {%- endcomment -%}
+        {%- if product.variants.size > 1 -%}
+          <div class="pdp-ticket-types">
+            {%- for variant in product.variants -%}
+              <button
+                type="button"
+                class="pdp-ticket-btn cta-btn is-visible type-subRegular1{% if variant == current_variant %} active{% endif %}"
+                data-ticket="{{ variant.id }}"
+                data-variant-id="{{ variant.id }}"
+                data-price="{{ variant.price }}"
+                data-abbr="{{ variant.option1 | truncate: 3, '' | upcase }}"
+                {% unless variant.available %}disabled{% endunless %}
+              >
+                {{ variant.title }} &ndash; {{ variant.price | money }}
+                {%- unless variant.available %} ({{ 'product.sold_out' | t }}){% endunless -%}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
 
         {%- comment -%} Tags {%- endcomment -%}
         {%- if product.tags.size > 0 -%}
@@ -122,6 +147,7 @@
 
           <button type="button" class="cta-btn buy-button-override" id="pdp-add-to-cart"
             data-variant-id="{{ current_variant.id }}"
+            data-price="{{ current_variant.price }}"
           >
             <div class="ui-roll roll-hover">
               <span class="type-subRegular1 ui-roll-layer ui-roll-visible">

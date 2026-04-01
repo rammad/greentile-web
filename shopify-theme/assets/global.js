@@ -1,5 +1,14 @@
 /* globals — Shopify theme adapted */
 
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+window.addEventListener('pageshow', (e) => {
+    window.scrollTo(0, 0);
+    if (window.lenis) window.lenis.scrollTo(0, { immediate: true });
+    const viewport = document.getElementById('scroll-viewport');
+    if (viewport) viewport.scrollTop = 0;
+});
+
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 function getCurrentSeason() {
@@ -398,7 +407,7 @@ class MarqueeManager {
     }
 }
 
-const T = (name) => `images/graphics/tiles/two-tone/${name}.png`;
+const T = (name) => (window.THEME_SETTINGS && window.THEME_SETTINGS.tileUrls && window.THEME_SETTINGS.tileUrls[name]) || '';
 const CURTAIN_COMBOS = [
     { type: 'pong', tiles: [T('East'),        T('East'),        T('East')]        },
     { type: 'pong', tiles: [T('West'),        T('West'),        T('West')]        },

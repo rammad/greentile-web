@@ -70,18 +70,18 @@
 }
 
 .icon-instagram {
-    mask-image: url('../images/graphics/Instagram_Glyph_White.svg');
-    -webkit-mask-image: url('../images/graphics/Instagram_Glyph_White.svg');
+    mask-image: var(--asset-icon-instagram);
+    -webkit-mask-image: var(--asset-icon-instagram);
 }
 
 .icon-tiktok {
-    mask-image: url('../images/graphics/tiktok-circle.svg');
-    -webkit-mask-image: url('../images/graphics/tiktok-circle.svg');
+    mask-image: var(--asset-icon-tiktok);
+    -webkit-mask-image: var(--asset-icon-tiktok);
 }
 
 .icon-discord {
-    mask-image: url('../images/graphics/discord-icon-svgrepo-com.svg');
-    -webkit-mask-image: url('../images/graphics/discord-icon-svgrepo-com.svg');
+    mask-image: var(--asset-icon-discord);
+    -webkit-mask-image: var(--asset-icon-discord);
 }
 
 @media (hover: hover) {
@@ -117,11 +117,13 @@
     transform: translateY(80px);
 }
 
-.social-img.push-down {
+.social-img.push-down,
+.social-img:nth-child(odd) {
     transform: translateY(64px);
 }
 
-.social-img.push-down.is-visible {
+.social-img.push-down.is-visible,
+.social-img:nth-child(odd).is-visible {
     transform: translateY(0);
 }
 
@@ -161,11 +163,13 @@
         transform: translateY(0);
     }
 
-    .social-img.push-down {
+    .social-img.push-down,
+    .social-img:nth-child(odd) {
         transform: translateY(calc(40px + 40px));
     }
 
-    .social-img.push-down.is-visible {
+    .social-img.push-down.is-visible,
+    .social-img:nth-child(odd).is-visible {
         transform: translateY(40px);
     }
 }

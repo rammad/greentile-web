@@ -433,7 +433,7 @@
         box-sizing: border-box;
         padding: var(--cta-padding);
         opacity: 1;
-        color: var(--color-btn-text);
+        color: var(--color-text-btn);
     }
 
     .ticket-actions .cta-btn .ui-roll {

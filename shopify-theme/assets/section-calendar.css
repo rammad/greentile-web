@@ -141,6 +141,25 @@
     color var(--time-fade-in) ease;
 }
 .calendar-row.is-visible { opacity: 1; filter: blur(0px); }
+
+.cal-status {
+    margin-left: auto;
+    padding-left: 1em;
+    white-space: nowrap;
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.calendar-row--upcoming {
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.45;
+}
+.calendar-row--upcoming.is-visible {
+    opacity: 0.45;
+    filter: blur(0px);
+}
 @media (hover: hover) {
     .calendar-row:hover {
         color: var(--color-text-main);

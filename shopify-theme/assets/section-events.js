@@ -257,8 +257,16 @@
                 section.style.minHeight  = (SECTION_VH * ih) + 'px';
                 void section.offsetHeight;
 
-                let prevSec = section.previousElementSibling;
-                while (prevSec && prevSec.tagName !== 'SECTION') prevSec = prevSec.previousElementSibling;
+                let prevSec = null;
+                const shopifyWrapper = section.closest('.shopify-section');
+                if (shopifyWrapper) {
+                    let prevWrapper = shopifyWrapper.previousElementSibling;
+                    while (prevWrapper && !prevWrapper.querySelector('section')) prevWrapper = prevWrapper.previousElementSibling;
+                    if (prevWrapper) prevSec = prevWrapper.querySelector('section');
+                } else {
+                    prevSec = section.previousElementSibling;
+                    while (prevSec && prevSec.tagName !== 'SECTION') prevSec = prevSec.previousElementSibling;
+                }
                 const baselineGap = prevSec
                     ? titleWrap.getBoundingClientRect().top - prevSec.getBoundingClientRect().bottom
                     : 0;
@@ -286,8 +294,16 @@
             }
         };
 
-        let nextSection = section.nextElementSibling;
-        while (nextSection && nextSection.tagName !== 'SECTION') nextSection = nextSection.nextElementSibling;
+        let nextSection = null;
+        const sectionShopifyWrap = section.closest('.shopify-section');
+        if (sectionShopifyWrap) {
+            let nextWrapper = sectionShopifyWrap.nextElementSibling;
+            while (nextWrapper && !nextWrapper.querySelector('section')) nextWrapper = nextWrapper.nextElementSibling;
+            if (nextWrapper) nextSection = nextWrapper.querySelector('section');
+        } else {
+            nextSection = section.nextElementSibling;
+            while (nextSection && nextSection.tagName !== 'SECTION') nextSection = nextSection.nextElementSibling;
+        }
 
         const syncCtaMargin = () => {
             if (!ctaFooter) return;

@@ -1,5 +1,6 @@
 {%- liquid
   assign topics = section.blocks | where: 'type', 'topic'
+  assign info_fields = section.blocks | where: 'type', 'info'
   assign extra_fields = section.blocks | where: 'type', 'extra_field'
 -%}
 
@@ -31,14 +32,20 @@
         </div>
       </div>
 
-      {%- comment -%} Standard fields {%- endcomment -%}
+      {%- comment -%} Info fields (name, email, custom) {%- endcomment -%}
       <div class="contact-section">
         <label class="type-subRegular1 contact-label">{{ section.settings.info_label | default: 'Your Information' }}</label>
         <div class="contact-fields-row">
-          <input type="text" class="contact-input type-subRegular1" name="name"
-            placeholder="{{ section.settings.name_placeholder | default: 'NAME' }}" required>
-          <input type="email" class="contact-input type-subRegular1" name="email"
-            placeholder="{{ section.settings.email_placeholder | default: 'EMAIL' }}" required>
+          {%- for block in info_fields -%}
+            <input
+              type="{{ block.settings.type | default: 'text' }}"
+              class="contact-input contact-info-field type-subRegular1"
+              name="{{ block.settings.name }}"
+              placeholder="{{ block.settings.placeholder }}"
+              {% if block.settings.required %}required{% endif %}
+              {{ block.shopify_attributes }}
+            >
+          {%- endfor -%}
         </div>
 
         {%- comment -%} Extra fields (conditionally shown per topic via JS) {%- endcomment -%}
@@ -128,18 +135,6 @@
     },
     {
       "type": "text",
-      "id": "name_placeholder",
-      "label": "Name placeholder",
-      "default": "NAME"
-    },
-    {
-      "type": "text",
-      "id": "email_placeholder",
-      "label": "Email placeholder",
-      "default": "EMAIL"
-    },
-    {
-      "type": "text",
       "id": "message_placeholder",
       "label": "Message placeholder",
       "default": "WRITE YOUR MESSAGE HERE"
@@ -176,6 +171,42 @@
     }
   ],
   "blocks": [
+    {
+      "type": "info",
+      "name": "Info field",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Field name",
+          "info": "Used as the form field key in submitted data (e.g. name, email, phone)"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Placeholder text",
+          "default": "YOUR FIELD"
+        },
+        {
+          "type": "select",
+          "id": "type",
+          "label": "Input type",
+          "options": [
+            { "value": "text", "label": "Text" },
+            { "value": "email", "label": "Email" },
+            { "value": "tel", "label": "Phone" },
+            { "value": "url", "label": "URL" }
+          ],
+          "default": "text"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Required",
+          "default": true
+        }
+      ]
+    },
     {
       "type": "topic",
       "name": "Topic",
@@ -266,6 +297,24 @@
     {
       "name": "Contact panel",
       "blocks": [
+        {
+          "type": "info",
+          "settings": {
+            "name": "name",
+            "placeholder": "NAME",
+            "type": "text",
+            "required": true
+          }
+        },
+        {
+          "type": "info",
+          "settings": {
+            "name": "email",
+            "placeholder": "EMAIL",
+            "type": "email",
+            "required": true
+          }
+        },
         {
           "type": "topic",
           "settings": {

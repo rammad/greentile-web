@@ -1,5 +1,15 @@
 {{ 'section-events.css' | asset_url | stylesheet_tag }}
 
+{%- comment -%}
+  Resolve event source: specific collection → all active products.
+  Manual event_card blocks are still supported as a final fallback.
+{%- endcomment -%}
+{%- if section.settings.collection != blank -%}
+  {%- assign event_source = collections[section.settings.collection].products -%}
+{%- else -%}
+  {%- assign event_source = collections.all.products -%}
+{%- endif -%}
+
 <section id="events" class="events-section sticky-track"
   data-colors="{{ section.settings.gradient_colors | default: '#FFFCFA, #C1FEC1, #FFFCFA' }}"
   data-edge="0"
@@ -21,20 +31,24 @@
 
       <div class="events-content">
         <div class="events-grid">
-          {%- if section.settings.collection != blank -%}
-            {%- for product in collections[section.settings.collection].products limit: section.settings.max_events -%}
-              <a href="{{ product.url }}" class="event-card">
-                {%- if product.featured_image -%}
-                  <img
-                    src="{{ product.featured_image | image_url: width: 800 }}"
-                    class="event-poster"
-                    alt="{{ product.title | escape }}"
-                    loading="lazy"
-                  >
-                {%- endif -%}
-              </a>
-            {%- endfor -%}
-          {%- else -%}
+          {%- assign events_shown = 0 -%}
+          {%- for product in event_source -%}
+            {%- if events_shown >= section.settings.max_events -%}{%- break -%}{%- endif -%}
+            <a href="{{ product.url }}" class="event-card">
+              {%- if product.featured_image -%}
+                <img
+                  src="{{ product.featured_image | image_url: width: 800 }}"
+                  class="event-poster"
+                  alt="{{ product.title | escape }}"
+                  loading="lazy"
+                >
+              {%- endif -%}
+            </a>
+            {%- assign events_shown = events_shown | plus: 1 -%}
+          {%- endfor -%}
+
+          {%- comment -%} Manual block fallback when no products found {%- endcomment -%}
+          {%- if events_shown == 0 -%}
             {%- for block in section.blocks -%}
               {%- if block.type == 'event_card' -%}
                 <a href="{{ block.settings.url | default: '#' }}" class="event-card" {{ block.shopify_attributes }}>
@@ -83,15 +97,15 @@
     {
       "type": "collection",
       "id": "collection",
-      "label": "Events collection",
-      "info": "Select a collection to auto-populate event posters. Leave empty to use manual blocks."
+      "label": "Events collection (optional)",
+      "info": "Pick a collection to limit which events appear. Leave empty to show all active products."
     },
     {
       "type": "range",
       "id": "max_events",
       "label": "Max events to show",
       "min": 2,
-      "max": 8,
+      "max": 12,
       "step": 1,
       "default": 4
     },
@@ -116,7 +130,7 @@
   "blocks": [
     {
       "type": "event_card",
-      "name": "Event card",
+      "name": "Event card (manual)",
       "settings": [
         {
           "type": "text",

@@ -1,230 +1,450 @@
-/* PDP — Shopify theme adapted
-   Reads product data from #product-json for cart integration.
-   Preserves all original animation/scroll behavior. */
+/* PDP — original animation flow + Shopify cart integration */
 
-(function() {
-    const section = document.querySelector('.pdp-section');
-    if (!section) return;
+(() => {
+    const { wait, transitionCta, transitionHeader, staggerTime, observeElementInOut } = window.AnimationUtils || {};
+    const MOBILE_BREAKPOINT = 1024;
 
-    // Shopify product data
+    /* ── Shopify product data ── */
+
     let productData = null;
     const productJsonEl = document.getElementById('product-json');
     if (productJsonEl) {
-        try { productData = JSON.parse(productJsonEl.textContent); } catch(e) {}
+        try { productData = JSON.parse(productJsonEl.textContent); } catch (e) {}
     }
 
-    const maxQty = parseInt(document.querySelector('.main-product-wrapper')?.dataset?.maxQty) || 4;
+    const maxQty = parseInt(
+        document.querySelector('.pdp-section')?.getAttribute('data-max-qty')
+        || '4', 10
+    );
+
     let qty = 1;
     let currentVariantId = null;
+    let currentUnitPrice = 0;
 
-    const qtyEl = document.getElementById('ticket-qty');
-    const maxMsg = document.getElementById('max-qty-msg');
-    const buyBtn = document.getElementById('pdp-add-to-cart');
-    const ticketBtns = section.querySelectorAll('.pdp-ticket-btn');
+    /* ── Cart helpers ── */
 
-    // init variant from active button or first available
-    const activeBtn = section.querySelector('.pdp-ticket-btn.active');
-    if (activeBtn) {
-        currentVariantId = parseInt(activeBtn.dataset.variantId);
-    } else if (buyBtn) {
-        currentVariantId = parseInt(buyBtn.dataset.variantId);
+    function formatPrice(cents) {
+        if (productData) {
+            return (cents / 100).toLocaleString('en-US', {
+                style: 'currency',
+                currency: productData.currency || 'USD'
+            });
+        }
+        return '$' + (cents / 100).toFixed(2);
     }
 
-    function updateQty(change) {
-        const newQty = qty + change;
-        if (newQty < 1 || newQty > maxQty) return;
-        qty = newQty;
-        if (qtyEl) qtyEl.textContent = qty;
+    window.updateQty = function (change) {
+        const qtyDisplay = document.getElementById('ticket-qty');
+        const maxMsg = document.getElementById('max-qty-msg');
+        if (!qtyDisplay) return;
+
+        qty += change;
+        if (qty < 1) qty = 1;
+        if (qty > maxQty) qty = maxQty;
+
+        qtyDisplay.innerText = qty;
         if (maxMsg) maxMsg.classList.toggle('is-visible', qty >= maxQty);
-        updateBuyButton();
-    }
-    window.updateQty = updateQty;
+        syncPriceDisplay();
+    };
 
-    // qty buttons via data attributes
-    section.querySelectorAll('[data-qty-change]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            updateQty(parseInt(btn.dataset.qtyChange));
-        });
-    });
+    function syncPriceDisplay() {
+        if (!currentUnitPrice) return;
+        const total = currentUnitPrice * qty;
+        document.querySelectorAll('.buy-price').forEach(el => { el.textContent = formatPrice(total); });
+    }
 
     function updateBuyButton() {
-        if (!buyBtn) return;
+        const buyBtn = document.getElementById('pdp-add-to-cart');
+        const activeBtn = document.querySelector('.pdp-ticket-btn.active');
 
-        const active = section.querySelector('.pdp-ticket-btn.active');
-        if (!active) return;
+        if (activeBtn) {
+            currentUnitPrice = parseInt(activeBtn.dataset.price, 10) || 0;
+            currentVariantId = parseInt(activeBtn.dataset.variantId, 10);
+            const abbr = activeBtn.dataset.abbr || '';
+            if (buyBtn) buyBtn.dataset.variantId = currentVariantId;
+            document.querySelectorAll('.buy-abbr').forEach(el => { el.textContent = abbr; });
+        } else if (buyBtn) {
+            currentVariantId = parseInt(buyBtn.dataset.variantId, 10);
+            currentUnitPrice = parseInt(buyBtn.dataset.price, 10) || 0;
+        }
 
-        const price = parseInt(active.dataset.price) || 0;
-        const abbr = active.dataset.abbr || '';
-        const variantId = parseInt(active.dataset.variantId);
-
-        currentVariantId = variantId;
-        buyBtn.dataset.variantId = variantId;
-
-        const totalCents = price * qty;
-        const formatted = productData
-            ? (totalCents / 100).toLocaleString('en-US', { style: 'currency', currency: productData.currency || 'USD' })
-            : `$${totalCents / 100}`;
-
-        buyBtn.querySelectorAll('.buy-abbr').forEach(el => el.textContent = abbr);
-        buyBtn.querySelectorAll('.buy-price').forEach(el => el.textContent = formatted);
+        syncPriceDisplay();
     }
 
-    ticketBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (btn.disabled) return;
-            ticketBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            qty = 1;
-            if (qtyEl) qtyEl.textContent = qty;
-            if (maxMsg) maxMsg.classList.remove('is-visible');
-            updateBuyButton();
-        });
-    });
+    function initTicketTypes() {
+        const btns = document.querySelectorAll('.pdp-ticket-btn');
+        if (!btns.length) return;
 
-    // add to cart
-    if (buyBtn) {
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.disabled) return;
+                btns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                qty = 1;
+                const qtyDisplay = document.getElementById('ticket-qty');
+                if (qtyDisplay) qtyDisplay.innerText = qty;
+                const maxMsg = document.getElementById('max-qty-msg');
+                if (maxMsg) maxMsg.classList.remove('is-visible');
+                updateBuyButton();
+            });
+        });
+    }
+
+    function initAddToCart() {
+        const buyBtn = document.getElementById('pdp-add-to-cart');
+        if (!buyBtn) return;
+
+        updateBuyButton();
+
+        window.addEventListener('pageshow', () => {
+            buyBtn.style.pointerEvents = '';
+            buyBtn.style.opacity = '';
+        });
+
         buyBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             if (!currentVariantId) return;
 
             const routes = window.THEME_SETTINGS?.routes;
             const cartAddUrl = routes?.cartAdd || '/cart/add.js';
+            const cartClearUrl = routes?.cartClear || '/cart/clear.js';
 
             buyBtn.style.pointerEvents = 'none';
             buyBtn.style.opacity = '0.6';
 
             try {
-                const res = await fetch(cartAddUrl, {
+                const clearRes = await fetch(cartClearUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!clearRes.ok) throw new Error('Clear cart failed: ' + clearRes.status);
+
+                const addRes = await fetch(cartAddUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        items: [{
-                            id: currentVariantId,
-                            quantity: qty
-                        }]
-                    })
+                    body: JSON.stringify({ items: [{ id: currentVariantId, quantity: qty }] })
                 });
+                if (!addRes.ok) throw new Error('Add to cart failed: ' + addRes.status);
 
-                if (!res.ok) throw new Error(res.status);
-
-                window.location.href = routes?.cart || '/cart';
-            } catch(err) {
-                console.error('Add to cart failed:', err);
+                window.location.href = '/checkout';
+            } catch (err) {
+                console.error('Buy now failed:', err);
                 buyBtn.style.pointerEvents = '';
                 buyBtn.style.opacity = '';
             }
         });
     }
 
-    // ── entrance animation (preserved from original) ──
+    /* ── Qty buttons via data attributes ── */
 
-    const { animate, waitForTransition, transitionHeader, transitionCta, observeElementInOut } = window.AnimationUtils || {};
-    if (!animate) return;
+    function initQtyButtons() {
+        const section = document.querySelector('.pdp-section');
+        if (!section) return;
+        section.querySelectorAll('[data-qty-change]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                window.updateQty(parseInt(btn.dataset.qtyChange, 10));
+            });
+        });
+    }
 
-    const imageCol = section.querySelector('.pdp-image-col');
-    const infoCol = section.querySelector('.pdp-info');
-    const descWrapper = section.querySelector('.pdp-desc-wrapper');
-    const stickyWrapper = section.querySelector('.pdp-sticky-wrapper');
+    /* ── Desktop animations (from original) ── */
 
-    const masks = section.querySelectorAll('.text-mask');
-    const tags = section.querySelectorAll('.pdp-tag:not(.max-qty-label)');
-    const posters = section.querySelectorAll('.pdp-poster');
-    const bodyText = section.querySelectorAll('.type-body1, .type-body2');
-    const cascadeTitle = section.querySelector('.animate-cascade');
-    const ticketActions = section.querySelector('.ticket-actions');
+    async function initDesktopAnimations(section) {
+        if (!transitionHeader) return;
 
-    let headerDone = false;
+        const title = section.querySelector('.animate-cascade');
+        if (title) {
+            const checkInit = setInterval(() => {
+                if (title.classList.contains('is-initialized') && window.playCascade) {
+                    clearInterval(checkInit);
+                    transitionHeader(title, 'enter');
+                }
+            }, 50);
+        }
 
-    async function playEntrance() {
-        if (headerDone) return;
-        headerDone = true;
+        await wait(staggerTime);
 
-        const overlap = 150;
+        const subtitles = section.querySelectorAll('.text-mask');
+        for (const sub of subtitles) {
+            sub.classList.add('is-visible');
+            await wait(staggerTime);
+        }
 
-        for (const mask of masks) { await animate(mask, 'is-visible', overlap); }
-        if (cascadeTitle && window.playCascade) await window.playCascade(cascadeTitle, overlap);
+        const ticketBtns = section.querySelectorAll('.pdp-ticket-btn');
+        ticketBtns.forEach(b => b.classList.add('is-visible'));
 
-        ticketBtns.forEach((btn, i) => {
-            setTimeout(() => {
-                btn.classList.add('is-visible');
-                const roll = btn.querySelector('.ui-roll');
+        await wait(staggerTime);
+
+        const tags = section.querySelectorAll('.pdp-tag');
+        for (const tag of tags) {
+            if (!tag.classList.contains('max-qty-label')) tag.classList.add('is-visible');
+        }
+
+        await wait(staggerTime);
+
+        section.querySelectorAll('.pdp-poster').forEach(p => p.classList.add('is-visible'));
+
+        await wait(200);
+
+        section.querySelectorAll('.type-body1, .type-body2').forEach(el => el.classList.add('is-visible'));
+
+        const qtyWrapper = section.querySelector('.qty-wrapper');
+        if (qtyWrapper) {
+            void qtyWrapper.offsetWidth;
+            qtyWrapper.classList.add('is-visible');
+            await wait(150);
+        }
+
+        const cta = section.querySelector('.buy-button-override');
+        if (cta) transitionCta(cta, 'enter');
+    }
+
+    /* ── Mobile animations (from original) ── */
+
+    function initMobileAnimations(section) {
+        if (!observeElementInOut) return;
+
+        const title = section.querySelector('.pdp-hero-title');
+        const ticketActions = section.querySelector('.ticket-actions');
+        const cta = section.querySelector('.buy-button-override');
+        const descWrapper = section.querySelector('.pdp-desc-wrapper');
+
+        const imageCol = section.querySelector('.pdp-image-col');
+        if (imageCol) {
+            observeElementInOut(imageCol, {
+                root: null,
+                enterThreshold: 0.1,
+                onEnter: () => {
+                    section.querySelectorAll('.pdp-poster').forEach(p => p.classList.add('is-visible'));
+                }
+            });
+        }
+
+        const infoBlock = section.querySelector('.pdp-info');
+        const waitForCascade = () => new Promise(resolve => {
+            const el = section.querySelector('.animate-cascade');
+            if (!el) { resolve(); return; }
+            if (el.classList.contains('is-initialized') && window.playCascade) { resolve(); return; }
+            const poll = setInterval(() => {
+                if (el.classList.contains('is-initialized') && window.playCascade) {
+                    clearInterval(poll);
+                    resolve();
+                }
+            }, 50);
+        });
+
+        if (infoBlock) {
+            observeElementInOut(infoBlock, {
+                root: null,
+                enterThreshold: 0.05,
+                onEnter: async () => {
+                    await waitForCascade();
+                    const cascadeEl = section.querySelector('.animate-cascade');
+                    if (cascadeEl && transitionHeader) transitionHeader(cascadeEl, 'enter');
+
+                    if (wait && staggerTime) await wait(staggerTime);
+
+                    const subtitles = section.querySelectorAll('.text-mask');
+                    for (const sub of subtitles) {
+                        sub.classList.add('is-visible');
+                        if (wait && staggerTime) await wait(staggerTime);
+                    }
+
+                    section.querySelectorAll('.pdp-ticket-btn').forEach(b => b.classList.add('is-visible'));
+
+                    if (wait && staggerTime) await wait(staggerTime);
+
+                    const tags = section.querySelectorAll('.pdp-tag');
+                    for (const tag of tags) {
+                        if (!tag.classList.contains('max-qty-label')) tag.classList.add('is-visible');
+                    }
+                }
+            });
+        }
+
+        if (descWrapper) {
+            observeElementInOut(descWrapper, {
+                root: null,
+                enterThreshold: 0.05,
+                onEnter: () => {
+                    section.querySelectorAll('.type-body1, .type-body2').forEach(el => el.classList.add('is-visible'));
+                }
+            });
+        }
+
+        /* sticky purchase bar */
+        if (title && ticketActions) {
+            if (cta) {
+                cta.classList.add('is-visible');
+                const roll = cta.querySelector('.ui-roll');
                 if (roll) roll.classList.add('is-visible');
-            }, i * 80);
-        });
+            }
 
-        tags.forEach((tag, i) => {
-            setTimeout(() => tag.classList.add('is-visible'), i * 60);
-        });
+            const info = section.querySelector('.pdp-info');
+            let prevBarH = 0;
+            let rafId = 0;
+            const syncPad = (scroll) => {
+                if (!info || !ticketActions) return;
+                const visible = ticketActions.classList.contains('is-sticky-visible');
+                const h = visible ? ticketActions.offsetHeight : 0;
+                info.style.paddingBottom = h ? h + 'px' : '';
+                if (scroll && prevBarH > 0) {
+                    const delta = h - prevBarH;
+                    if (delta !== 0) window.scrollBy(0, delta);
+                }
+                prevBarH = h;
+            };
+            const pollHeight = () => { syncPad(true); rafId = requestAnimationFrame(pollHeight); };
 
-        posters.forEach((p, i) => {
-            setTimeout(() => p.classList.add('is-visible'), i * 100);
-        });
+            ticketActions.addEventListener('transitionstart', (e) => {
+                if (e.propertyName !== 'padding-top') return;
+                cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(pollHeight);
+            });
+            ticketActions.addEventListener('transitionend', (e) => {
+                if (e.propertyName !== 'padding-top') return;
+                cancelAnimationFrame(rafId);
+                syncPad(true);
+            });
+            new ResizeObserver(() => syncPad(false)).observe(ticketActions);
 
-        bodyText.forEach(el => el.classList.add('is-visible'));
+            if (window.visualViewport) {
+                const syncBottom = () => {
+                    const offset = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
+                    ticketActions.style.bottom = Math.max(0, offset) + 'px';
+                };
+                window.visualViewport.addEventListener('resize', syncBottom);
+                window.visualViewport.addEventListener('scroll', syncBottom);
+            }
 
-        if (ticketActions) {
-            setTimeout(() => ticketActions.classList.add('is-visible'), 300);
+            if (descWrapper) {
+                observeElementInOut(descWrapper, {
+                    root: null,
+                    enterThreshold: 0.05,
+                    repeat: true,
+                    onEnter: () => { ticketActions.classList.add('is-sticky-visible'); syncPad(); },
+                    onExit: () => { ticketActions.classList.remove('is-sticky-visible'); syncPad(); }
+                });
+            }
         }
     }
 
-    if (imageCol) {
-        observeElementInOut(imageCol, { onEnter: playEntrance });
-    }
-    if (infoCol) {
-        observeElementInOut(infoCol, { onEnter: playEntrance });
+    /* ── Image scroll (desktop) ── */
+
+    function initImageScroll() {
+        if (window.innerWidth <= MOBILE_BREAKPOINT) return;
+
+        const col = document.querySelector('.pdp-image-col');
+        const track = document.querySelector('.pdp-image-track');
+        const desc = document.querySelector('.pdp-desc');
+        const wrapper = document.querySelector('.pdp-sticky-wrapper');
+        if (!col || !track) return;
+
+        const LERP = 0.12;
+        const SCALAR = 0.8;
+        const DESC_SCALAR = 0.35;
+
+        let targetY = 0;
+        let currentY = 0;
+        let rafId = null;
+
+        function maxScroll() { return Math.max(0, track.offsetHeight - col.clientHeight); }
+        function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+        function tick() {
+            currentY += (targetY - currentY) * LERP;
+            track.style.transform = `translate3d(0,${-currentY}px,0)`;
+            if (Math.abs(targetY - currentY) > 0.1) {
+                rafId = requestAnimationFrame(tick);
+            } else {
+                currentY = targetY;
+                track.style.transform = `translate3d(0,${-currentY}px,0)`;
+                rafId = null;
+            }
+        }
+
+        function nudge(delta) {
+            targetY = clamp(targetY + delta * SCALAR, 0, maxScroll());
+            if (!rafId) rafId = requestAnimationFrame(tick);
+        }
+
+        if (wrapper) {
+            wrapper.addEventListener('wheel', e => e.preventDefault(), { passive: false });
+        }
+
+        col.addEventListener('wheel', e => nudge(e.deltaY), { passive: true });
+
+        if (desc) {
+            desc.addEventListener('wheel', e => { desc.scrollTop += e.deltaY * DESC_SCALAR; }, { passive: true });
+        }
+
+        let touchY = 0;
+        col.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
+        col.addEventListener('touchmove', e => {
+            const dy = touchY - e.touches[0].clientY;
+            touchY = e.touches[0].clientY;
+            nudge(dy);
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+            targetY = clamp(targetY, 0, maxScroll());
+            currentY = targetY;
+            track.style.transform = `translate3d(0,${-currentY}px,0)`;
+        });
     }
 
-    // ── mobile image dots ──
+    /* ── Mobile image dots ── */
 
     function initMobileDots() {
-        if (window.innerWidth > 1024) return;
-        const track = section.querySelector('.pdp-image-track');
-        const dotsWrap = section.querySelector('.pdp-dots');
-        if (!track || !dotsWrap || dotsWrap.children.length > 0) return;
+        if (window.innerWidth > MOBILE_BREAKPOINT) return;
 
-        const images = track.querySelectorAll('.pdp-poster');
-        if (images.length <= 1) return;
+        const track = document.querySelector('.pdp-image-track');
+        const container = document.querySelector('.pdp-dots');
+        if (!track || !container) return;
 
-        images.forEach((_, i) => {
+        const posters = track.querySelectorAll('.pdp-poster');
+        if (!posters.length) return;
+
+        posters.forEach((_, i) => {
             const dot = document.createElement('span');
-            dot.className = 'pdp-dot' + (i === 0 ? ' active' : '');
-            dotsWrap.appendChild(dot);
+            dot.classList.add('pdp-dot');
+            if (i === 0) dot.classList.add('is-active');
+            container.appendChild(dot);
         });
+
+        const dots = container.querySelectorAll('.pdp-dot');
 
         track.addEventListener('scroll', () => {
-            const scrollLeft = track.scrollLeft;
-            const width = track.offsetWidth;
-            const idx = Math.round(scrollLeft / width);
-            dotsWrap.querySelectorAll('.pdp-dot').forEach((d, i) => {
-                d.classList.toggle('active', i === idx);
+            const sl = track.scrollLeft;
+            let active = 0;
+            posters.forEach((p, i) => {
+                if (Math.abs(p.offsetLeft - sl) < Math.abs(posters[active].offsetLeft - sl)) active = i;
             });
-        });
+            dots.forEach((d, i) => d.classList.toggle('is-active', i === active));
+        }, { passive: true });
     }
 
-    initMobileDots();
+    /* ── Init ── */
 
-    // ── desktop image scroll ──
+    document.addEventListener('DOMContentLoaded', () => {
+        const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+        const section = document.querySelector('.pdp-section');
+        if (!section) return;
 
-    if (window.innerWidth > 1024 && imageCol) {
-        const track = imageCol.querySelector('.pdp-image-track');
-        if (track) {
-            imageCol.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                track.scrollTop += e.deltaY;
-            }, { passive: false });
+        section.classList.add('is-active');
+
+        initTicketTypes();
+        initQtyButtons();
+        initAddToCart();
+        window.updateQty(0);
+
+        if (isMobile) {
+            initMobileAnimations(section);
+        } else {
+            initDesktopAnimations(section);
         }
-    }
 
-    // ── sticky bar (mobile) ──
-
-    if (ticketActions && window.innerWidth <= 1024) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                ticketActions.classList.toggle('is-sticky-visible', !entry.isIntersecting);
-            });
-        }, { threshold: 0 });
-
-        const descEl = section.querySelector('.pdp-desc');
-        if (descEl) observer.observe(descEl);
-    }
+        initImageScroll();
+        initMobileDots();
+    });
 })();

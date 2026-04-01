@@ -34,7 +34,7 @@
 
     :root {
       --asset-arrow-right: url('{{ "arrow-right.png" | asset_url }}');
-      --asset-temp-grad: url('{{ "temp-grad.png" | asset_url }}');
+
       --asset-press-eater: url('{{ "press-eater.svg" | asset_url }}');
       --asset-press-timeout: url('{{ "press-timeout.svg" | asset_url }}');
       --asset-press-thrillist: url('{{ "press-thrillist.svg" | asset_url }}');
@@ -42,6 +42,10 @@
       --asset-press-nymag: url('{{ "press-nymag.svg" | asset_url }}');
       --asset-press-bonappetit: url('{{ "press-bonappetit.svg" | asset_url }}');
       --asset-press-infatuation: url('{{ "press-infatuation.svg" | asset_url }}');
+
+      --asset-icon-instagram: url('{{ "Instagram_Glyph_White.svg" | asset_url }}');
+      --asset-icon-tiktok: url('{{ "tiktok-circle.svg" | asset_url }}');
+      --asset-icon-discord: url('{{ "discord-icon-svgrepo-com.svg" | asset_url }}');
     }
   </style>
 
@@ -83,6 +87,51 @@
         cart: {{ routes.cart_url | json }},
         cartAdd: '{{ routes.cart_add_url }}.js',
         cartChange: '{{ routes.cart_change_url }}.js',
+        cartClear: '/cart/clear.js',
+      },
+      tileUrls: {
+        'East': {{ 'tile-east.png' | asset_url | json }},
+        'West': {{ 'tile-west.png' | asset_url | json }},
+        'North': {{ 'tile-north.png' | asset_url | json }},
+        'South': {{ 'tile-south.png' | asset_url | json }},
+        'Center': {{ 'tile-center.png' | asset_url | json }},
+        'Fortune': {{ 'tile-fortune.png' | asset_url | json }},
+        'White Board': {{ 'tile-white-board.png' | asset_url | json }},
+        '1 Circle': {{ 'tile-1-circle.png' | asset_url | json }},
+        '2 Circles': {{ 'tile-2-circles.png' | asset_url | json }},
+        '3 Circles': {{ 'tile-3-circles.png' | asset_url | json }},
+        '4 Circles': {{ 'tile-4-circles.png' | asset_url | json }},
+        '5 Circles': {{ 'tile-5-circles.png' | asset_url | json }},
+        '6 Circles': {{ 'tile-6-circles.png' | asset_url | json }},
+        '7 Circles': {{ 'tile-7-circles.png' | asset_url | json }},
+        '8 Circles': {{ 'tile-8-circles.png' | asset_url | json }},
+        '9 Circles': {{ 'tile-9-circles.png' | asset_url | json }},
+        '1 Stick': {{ 'tile-1-stick.png' | asset_url | json }},
+        '2 Sticks': {{ 'tile-2-sticks.png' | asset_url | json }},
+        '3 Sticks': {{ 'tile-3-sticks.png' | asset_url | json }},
+        '4 Sticks': {{ 'tile-4-sticks.png' | asset_url | json }},
+        '5 Sticks': {{ 'tile-5-sticks.png' | asset_url | json }},
+        '6 Sticks': {{ 'tile-6-sticks.png' | asset_url | json }},
+        '7 Sticks': {{ 'tile-7-sticks.png' | asset_url | json }},
+        '8 Sticks': {{ 'tile-8-sticks.png' | asset_url | json }},
+        '9 Sticks': {{ 'tile-9-sticks.png' | asset_url | json }},
+        '10 Thousand': {{ 'tile-10-thousand.png' | asset_url | json }},
+        '20 Thousand': {{ 'tile-20-thousand.png' | asset_url | json }},
+        '30 Thousand': {{ 'tile-30-thousand.png' | asset_url | json }},
+        '40 Thousand': {{ 'tile-40-thousand.png' | asset_url | json }},
+        '50 Thousand': {{ 'tile-50-thousand.png' | asset_url | json }},
+        '60 Thousand': {{ 'tile-60-thousand.png' | asset_url | json }},
+        '70 Thousand': {{ 'tile-70-thousand.png' | asset_url | json }},
+        '80 Thousand': {{ 'tile-80-thousand.png' | asset_url | json }},
+        '90 Thousand': {{ 'tile-90-thousand.png' | asset_url | json }},
+        '1 Flower': {{ 'tile-1-flower.png' | asset_url | json }},
+        '2 Flower': {{ 'tile-2-flower.png' | asset_url | json }},
+        '3 Flower': {{ 'tile-3-flower.png' | asset_url | json }},
+        '4 Flower': {{ 'tile-4-flower.png' | asset_url | json }},
+        '1 Season': {{ 'tile-1-season.png' | asset_url | json }},
+        '2 Season': {{ 'tile-2-season.png' | asset_url | json }},
+        '3 Season': {{ 'tile-3-season.png' | asset_url | json }},
+        '4 Season': {{ 'tile-4-season.png' | asset_url | json }}
       }
     };
   </script>

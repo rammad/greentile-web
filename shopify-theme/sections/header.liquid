@@ -1,6 +1,6 @@
 {%- liquid
   assign is_subpage = false
-  if template.name == 'product' or request.path contains '/pages/archives'
+  if template.name == 'product' or template.suffix == 'archives' or template.suffix == 'events' or template.suffix == 'calendar'
     assign is_subpage = true
   endif
 -%}

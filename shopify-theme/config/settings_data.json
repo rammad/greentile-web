@@ -8,11 +8,8 @@
     "enable_page_curtain": true,
     "enable_gradient_bg": true,
     "enable_smooth_scroll": true,
-    "event_date_metafield_namespace": "custom",
-    "event_date_metafield_key": "event_date",
-    "event_venue_metafield_key": "event_venue",
-    "event_time_metafield_key": "event_time",
-    "event_status_metafield_key": "event_status",
+    "event_metafield_namespace": "event_ticketing",
+    "event_metafield_key": "event_v2",
     "sections": {
       "header": {
         "type": "header",

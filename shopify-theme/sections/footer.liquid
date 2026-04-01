@@ -4,12 +4,20 @@
   <div class="marquee-wrapper">
     {%- for block in section.blocks -%}
       {%- if block.type == 'marquee' -%}
+        {%- if block.settings.url != blank -%}
+        <a href="{{ block.settings.url }}" class="marquee-bar" {{ block.shopify_attributes }}>
+        {%- else -%}
         <div class="marquee-bar" {{ block.shopify_attributes }}>
+        {%- endif -%}
           <div class="marquee-content{% if block.settings.reverse %} marquee-reverse{% endif %}">
             <span class="marquee-item type-subBold1">{{ block.settings.text }}</span>
             <span class="marquee-item arrow" aria-hidden="true"></span>
           </div>
+        {%- if block.settings.url != blank -%}
+        </a>
+        {%- else -%}
         </div>
+        {%- endif -%}
       {%- endif -%}
     {%- endfor -%}
   </div>
@@ -36,7 +44,7 @@
 
     <div class="type-display-hero animate-cascade fit-text">
       {%- assign title_words = section.settings.title | default: 'Green Tile Social Club' | split: ' ' -%}
-      {%- for word in title_words -%}
+      {%- for word in title_words %}
         <span>{{ word }}</span>
       {%- endfor -%}
     </div>

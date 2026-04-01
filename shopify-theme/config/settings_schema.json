@@ -74,39 +74,22 @@
     "name": "Event settings",
     "settings": [
       {
-        "type": "text",
-        "id": "event_date_metafield_namespace",
-        "label": "Event date metafield namespace",
-        "default": "custom",
-        "info": "Namespace for the product metafield containing event date"
+        "type": "paragraph",
+        "content": "Event data is read from the Event Ticketing app's metafield: event_ticketing.event_v2 (JSON). This metafield must have Storefront access enabled in Settings → Custom data → Products."
       },
       {
         "type": "text",
-        "id": "event_date_metafield_key",
-        "label": "Event date metafield key",
-        "default": "event_date",
-        "info": "Key for the product metafield containing event date"
+        "id": "event_metafield_namespace",
+        "label": "Event metafield namespace",
+        "default": "event_ticketing",
+        "info": "Namespace of the Event Ticketing app's product metafield"
       },
       {
         "type": "text",
-        "id": "event_venue_metafield_key",
-        "label": "Event venue metafield key",
-        "default": "event_venue",
-        "info": "Key for the product metafield containing venue name/address"
-      },
-      {
-        "type": "text",
-        "id": "event_time_metafield_key",
-        "label": "Event time metafield key",
-        "default": "event_time",
-        "info": "Key for the product metafield containing event time range"
-      },
-      {
-        "type": "text",
-        "id": "event_status_metafield_key",
-        "label": "Event status metafield key",
-        "default": "event_status",
-        "info": "Key for sold-out / coming-soon status. Values: sold-out, coming-soon, or empty for available."
+        "id": "event_metafield_key",
+        "label": "Event metafield key",
+        "default": "event_v2",
+        "info": "Key of the JSON metafield containing date, time, venue, etc."
       }
     ]
   }

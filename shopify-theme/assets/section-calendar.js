@@ -1,31 +1,27 @@
 /* events / calendar page */
 
-const STICKER_ASSETS = {
-    'coming-soon': {
-        blanks: [
-            'images/graphics/coming-soon/Blank/GTSC WEB EVENT STICKER_CS SHAPE 1 INSIDE BLANK.svg',
-            'images/graphics/coming-soon/Blank/GTSC WEB EVENT STICKER_CS SHAPE 3 INSIDE BLANK.svg',
-            'images/graphics/coming-soon/Blank/GTSC WEB EVENT STICKER_CS SHAPE 4 INSIDE BLANK.svg',
-        ],
-        text: 'images/graphics/coming-soon/Text only/GTSC WEB EVENT STICKER_CS INSIDE TEXT ONLY WHITE.svg',
-    },
-    'sold-out': {
-        blanks: [
-            'images/graphics/sold-out/Blank/GTSC WEB EVENT STICKER_SO SHAPE 1 BLANK.svg',
-            'images/graphics/sold-out/Blank/GTSC WEB EVENT STICKER_SO SHAPE 2 BLANK.svg',
-            'images/graphics/sold-out/Blank/GTSC WEB EVENT STICKER_SO SHAPE 3 BLANK.svg',
-            'images/graphics/sold-out/Blank/GTSC WEB EVENT STICKER_SO SHAPE 4 BLANK.svg',
-        ],
-        text: 'images/graphics/sold-out/Text only/GTSC WEB EVENT STICKER_SO TEXT ONLY WHITE.svg',
-    }
-};
+function buildStickerAssets() {
+    const el = document.getElementById('cal-page-container');
+    if (!el) return { 'coming-soon': { blanks: [], text: '' }, 'sold-out': { blanks: [], text: '' } };
+    const d = el.dataset;
+    return {
+        'coming-soon': {
+            blanks: [d.stickerCsBlank1, d.stickerCsBlank3, d.stickerCsBlank4].filter(Boolean),
+            text: d.stickerCsText || '',
+        },
+        'sold-out': {
+            blanks: [d.stickerSoBlank1, d.stickerSoBlank2, d.stickerSoBlank3, d.stickerSoBlank4].filter(Boolean),
+            text: d.stickerSoText || '',
+        }
+    };
+}
 
 function randomPick(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
 function buildBadgeHTML(type) {
-    const assets = STICKER_ASSETS[type];
+    const assets = buildStickerAssets()[type];
     const blankSrc = randomPick(assets.blanks);
     return `<div class="badge-layer badge-layer-blank" style="-webkit-mask-image:url('${blankSrc}');mask-image:url('${blankSrc}')"></div>` +
            `<img class="badge-layer badge-layer-text" src="${assets.text}" alt="">`;

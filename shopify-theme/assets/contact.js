@@ -17,6 +17,7 @@
     const form = panel.querySelector('#contact-form');
     const topicBtns = panel.querySelectorAll('.contact-topic-btn');
     const statusEl = panel.querySelector('.contact-status');
+    const infoFields = panel.querySelectorAll('.contact-info-field');
     const extraFields = panel.querySelectorAll('.contact-extra-field');
     let isOpen = false;
     let selectedTopic = '';
@@ -111,10 +112,17 @@
     }
 
     function sendViaMailto(data) {
-        const subject = encodeURIComponent(`[${data.topic}] Contact from ${data.name}`);
-        const bodyParts = [`Name: ${data.name}`, `Email: ${data.email}`, `Topic: ${data.topic}`];
+        const senderName = data.name || 'Unknown';
+        const subject = encodeURIComponent(`[${data.topic}] Contact from ${senderName}`);
+        const bodyParts = [`Topic: ${data.topic}`];
 
-        // include extra field values
+        infoFields.forEach(field => {
+            if (field.value) {
+                const label = field.getAttribute('placeholder') || field.getAttribute('name') || 'Field';
+                bodyParts.push(`${label}: ${field.value}`);
+            }
+        });
+
         extraFields.forEach(field => {
             if (field.style.display === 'none') return;
             const input = field.querySelector('input, textarea, select');
@@ -134,14 +142,14 @@
         clearStatus();
 
         const fd = new FormData(form);
-        const data = {
-            name: fd.get('name')?.trim(),
-            email: fd.get('email')?.trim(),
-            message: fd.get('message')?.trim(),
-            topic: selectedTopic,
-        };
+        const data = { topic: selectedTopic };
 
-        // gather extra fields
+        infoFields.forEach(field => {
+            if (field.name) data[field.name] = field.value?.trim() || '';
+        });
+
+        data.message = fd.get('message')?.trim();
+
         extraFields.forEach(field => {
             if (field.style.display === 'none') return;
             const input = field.querySelector('input, textarea, select');
@@ -150,14 +158,16 @@
             }
         });
 
-        if (!data.name || !data.email || !data.message) {
-            showStatus('Please fill in all fields', 'error');
+        const missing = Array.from(infoFields)
+            .filter(f => f.required && !f.value?.trim())
+            .length > 0;
+        if (missing || !data.message) {
+            showStatus('Please fill in all required fields', 'error');
             return;
         }
 
-        // include target email for Formspree routing
-        data._replyto = data.email;
-        data._subject = `[${data.topic}] Contact from ${data.name}`;
+        if (data.email) data._replyto = data.email;
+        data._subject = `[${data.topic}] Contact from ${data.name || 'Unknown'}`;
         if (selectedEmail !== CONFIG.recipientEmail) {
             data._cc = selectedEmail;
         }
