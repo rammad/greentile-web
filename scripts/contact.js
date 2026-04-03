@@ -15,6 +15,19 @@
 
     const form = panel.querySelector('#contact-form');
     const topicBtns = panel.querySelectorAll('.contact-topic-btn');
+
+    topicBtns.forEach(btn => {
+        if (btn.querySelector('.ui-roll')) return;
+        const label = btn.innerHTML.trim();
+        btn.innerHTML = '';
+        const roll = document.createElement('div');
+        roll.className = 'ui-roll roll-hover is-visible';
+        roll.innerHTML =
+            '<span class="ui-roll-layer ui-roll-visible">' + label + '</span>' +
+            '<span class="ui-roll-layer ui-roll-hidden">' + label + '</span>';
+        btn.appendChild(roll);
+    });
+
     const messageEl = panel.querySelector('textarea[name="message"]');
     const defaultPlaceholder = messageEl ? messageEl.getAttribute('placeholder') : '';
     const statusEl = panel.querySelector('.contact-status');
@@ -89,11 +102,12 @@
         document.body.classList.remove('contact-is-open');
         panel.classList.remove('is-open');
         backdrop.classList.remove('is-open');
-        if (window.lenis && window.lenis.start) window.lenis.start();
-
         const hamburger = document.querySelector('.nav-hamburger');
         const mobileMenu = document.querySelector('.mobile-menu');
         const menuStillOpen = mobileMenu && mobileMenu.classList.contains('is-open');
+
+        if (!menuStillOpen && window.lenis && window.lenis.start) window.lenis.start();
+
         if (hamburger && !menuStillOpen) {
             hamburger.classList.remove('is-active');
             hamburger.setAttribute('aria-expanded', 'false');
@@ -229,7 +243,6 @@
                 if (isOpen) {
                     e.stopImmediatePropagation();
                     close();
-                    if (window.mobileMenu) window.mobileMenu.close();
                 }
             }, true);
         }

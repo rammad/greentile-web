@@ -166,7 +166,9 @@
 .calendar-coming-soon {
     display: flex;
     justify-content: center;
-    align-items: baseline;
+    align-items: center;
+    flex: 1;
+    min-height: 0;
     color: var(--c-dark-green-30);
     opacity: 0;
     filter: blur(10px);
@@ -423,12 +425,10 @@
         padding-bottom: 40px;
     }
 
-    .calendar-row,
-    .calendar-coming-soon {
+    .calendar-row {
         filter: blur(20px);
     }
-    .calendar-row.is-visible,
-    .calendar-coming-soon.is-visible { filter: blur(0px); }
+    .calendar-row.is-visible { filter: blur(0px); }
 
     /* font-size for .cal-date/.cal-name now auto-scales via fluid --size-h2 */
 
@@ -459,8 +459,6 @@
 }
 
 @media (max-width: 1024px) {
-    .calendar-coming-soon { display: none; }
-
     .calendar-page {
         position: relative;
         height: auto;

@@ -1,7 +1,7 @@
 /* events section */
 
 (function () {
-    const { transitionCta, observeElementInOut } = window.AnimationUtils || {};
+    const { transitionCta, observeElementInOut, staggerTime } = window.AnimationUtils || {};
     const { fitTextToWidth } = window.AppUtils || {};
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -126,8 +126,7 @@
         let currentlyMobile = window.matchMedia('(max-width: 1024px)').matches;
         let stickProgress = 0;
 
-        // ── Mobile: sequential blur-fade-in (replaces scroll-driven cards) ──
-        const CARD_STAGGER_MS = 120;
+        // ── Mobile: sequential slide-fade-in (matches socials entrance) ──
         let mobileCardsRevealed = false;
 
         function revealMobileCards() {
@@ -136,10 +135,10 @@
             cards.forEach((card, i) => {
                 card.style.transform = '';
                 card.style.opacity   = '';
-                setTimeout(() => card.classList.add('is-visible'), i * CARD_STAGGER_MS);
+                setTimeout(() => card.classList.add('is-visible'), staggerTime * i);
             });
             if (btn && transitionCta) {
-                setTimeout(() => transitionCta(btn, 'enter'), cards.length * CARD_STAGGER_MS);
+                setTimeout(() => transitionCta(btn, 'enter'), cards.length * staggerTime);
             }
         }
 

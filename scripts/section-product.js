@@ -2,7 +2,7 @@
 
 (() => {
     const { wait, transitionCta, transitionHeader, staggerTime, observeElementInOut } = window.AnimationUtils;
-    const MOBILE_BREAKPOINT = 480;
+    const MOBILE_BREAKPOINT = 1024;
 
     document.addEventListener('DOMContentLoaded', () => {
         const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
@@ -289,41 +289,23 @@
         if (!btns.length) return;
 
         btns.forEach(btn => {
+            if (!btn.querySelector('.ui-roll')) {
+                const label = btn.innerHTML.trim();
+                btn.innerHTML = '';
+                const roll = document.createElement('div');
+                roll.className = 'ui-roll roll-hover is-visible';
+                roll.innerHTML =
+                    '<span class="ui-roll-layer ui-roll-visible">' + label + '</span>' +
+                    '<span class="ui-roll-layer ui-roll-hidden">' + label + '</span>';
+                btn.appendChild(roll);
+            }
+
             btn.addEventListener('click', () => {
                 btns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 updateBuyButton();
             });
         });
-    }
-
-    function initMobileDots() {
-        if (window.innerWidth > MOBILE_BREAKPOINT) return;
-
-        const track = document.querySelector('.pdp-image-track');
-        const container = document.querySelector('.pdp-dots');
-        if (!track || !container) return;
-
-        const posters = track.querySelectorAll('.pdp-poster');
-        if (!posters.length) return;
-
-        posters.forEach((_, i) => {
-            const dot = document.createElement('span');
-            dot.classList.add('pdp-dot');
-            if (i === 0) dot.classList.add('is-active');
-            container.appendChild(dot);
-        });
-
-        const dots = container.querySelectorAll('.pdp-dot');
-
-        track.addEventListener('scroll', () => {
-            const sl = track.scrollLeft;
-            let active = 0;
-            posters.forEach((p, i) => {
-                if (Math.abs(p.offsetLeft - sl) < Math.abs(posters[active].offsetLeft - sl)) active = i;
-            });
-            dots.forEach((d, i) => d.classList.toggle('is-active', i === active));
-        }, { passive: true });
     }
 
     function initMobileDots() {

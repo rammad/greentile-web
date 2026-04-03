@@ -11,7 +11,7 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    gap: clamp(72px, 3.75vw, 144px);
+    gap: var(--section-spacing);
 
     opacity: 0;
     transform: translateY(var(--travel-reveal));
@@ -224,5 +224,13 @@
     .press-logos .press-logo-link:last-child:nth-child(odd) {
         grid-column: 1 / -1;
         justify-self: center;
+    }
+
+    .press-marquee-track {
+        gap: 24px;
+    }
+
+    .press-marquee-track .press-logo-link {
+        height: 16px;
     }
 }

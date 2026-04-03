@@ -56,7 +56,8 @@
     }
 
     const PRESS_SPEED = 50;
-    const PRESS_GAP = 64;
+    const isMobile = window.innerWidth <= 1024;
+    const PRESS_GAP = isMobile ? 24 : 64;
 
     function initPressMarquee() {
         document.querySelectorAll('.press-marquee-track').forEach(track => {

@@ -36,10 +36,10 @@
     function _scaledDesktopCols() {
         var s = _scatterScale();
         return [
-            { id: 'fol', side: 'left',  offset: 240 * s, stagger:  0.08 },
-            { id: 'fil', side: 'left',  offset: -20 * s,  stagger: -0.25, frameShiftPx: 60 * s, flushTop: true },
-            { id: 'fir', side: 'right', offset: -20 * s,  stagger: -0.25, frameShiftPx: 60 * s },
-            { id: 'for', side: 'right', offset: 240 * s, stagger:  0.08 }
+            { id: 'fol', side: 'left',  offset: 200 * s, stagger:  0.08 },
+            { id: 'fil', side: 'left',  offset: -40 * s,  stagger: -0.25, frameShiftPx: 60 * s, flushTop: true },
+            { id: 'fir', side: 'right', offset: -40 * s,  stagger: -0.25, frameShiftPx: 60 * s },
+            { id: 'for', side: 'right', offset: 200 * s, stagger:  0.08 }
         ];
     }
 
@@ -50,8 +50,8 @@
             { id: 'fr', side: 'right', offset: 100, stagger: 0 }
         ],
         mobile: [
-            { id: 'fl', side: 'left',  offset: 30, stagger: 0 },
-            { id: 'fr', side: 'right', offset: 30, stagger: 0 }
+            { id: 'fl', side: 'left',  offset: 15, stagger: 0 },
+            { id: 'fr', side: 'right', offset: 15, stagger: 0 }
         ]
     };
 
@@ -59,14 +59,14 @@
         mobileBreakpoint:       768,
         tabletBreakpoint:       1024,
 
-        slideHeightVhDesktop:   1.1,
+        slideHeightVhDesktop:   1.25,
         slideHeightVhMobile:    1.1,
 
-        desktopImageWidth:      200,
+        desktopImageWidth:      180,
         tabletImageWidth:       200,
-        mobileImageWidth:       140,
+        mobileImageWidth:       125,
 
-        verticalJitter:         0.12,
+        verticalJitter:         0.20,
         compactVerticalJitter:  0,
 
         horizontalJitterPx:     40,
@@ -254,6 +254,8 @@
             state.trackHeight = totalSlideHeight;
             state.fullHeight  = fullSectionHeight;
             if (track) track.style.height = state.fullHeight + 'px';
+
+            _allUnity = imgCache.length > 0 && imgCache.every(function (c) { return c.speed === 1; });
         }
 
         // ── parallax on scroll ──────────────────────────────────────────
@@ -262,8 +264,10 @@
         var _currentDepth = -1;
         var _targetDepth  = 0;
         var _smoothRaf    = 0;
+        var _allUnity     = false;
 
         function applyDepth(easedDepth) {
+            if (_allUnity) return;
             var fH       = state.fullHeight;
             var strength = C.depthParallaxStrength;
             for (var i = 0, len = imgCache.length; i < len; i++) {

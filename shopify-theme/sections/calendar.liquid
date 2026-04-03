@@ -124,19 +124,9 @@
     </h1>
     <div class="calendar-title-mobile mobile-only">
       {%- assign title_words = page_title | split: ' ' -%}
-      {%- assign first_word = title_words | first -%}
-      {%- assign rest = '' -%}
       {%- for word in title_words -%}
-        {%- unless forloop.first -%}
-          {%- if rest == '' -%}
-            {%- assign rest = word -%}
-          {%- else -%}
-            {%- assign rest = rest | append: ' ' | append: word -%}
-          {%- endif -%}
-        {%- endunless -%}
+        <div class="type-display-hero fit-text" data-fit-managed>{{ word }}</div>
       {%- endfor -%}
-      <div class="type-display-hero fit-text" data-fit-managed>{{ first_word }}</div>
-      <div class="type-display-hero fit-text" data-fit-managed>{{ rest }}</div>
     </div>
 
     <div class="calendar-controls">
@@ -279,7 +269,6 @@
             {%- endif -%}
           {%- endif -%}
         {%- endfor -%}
-        <div class="calendar-coming-soon"><span class="type-h2">more events coming soon!</span></div>
       </div>
 
       <div class="calendar-poster-wrapper" id="poster-wrapper">
@@ -290,6 +279,7 @@
     </div>
 
     <div id="dynamic-grid-container" class="calendar-grid-packed"></div>
+    <div class="calendar-coming-soon"><span class="type-h2">more events coming soon!</span></div>
   </div>
 </section>
 

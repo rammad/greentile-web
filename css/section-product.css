@@ -242,6 +242,11 @@
     opacity: 1;
 }
 
+.pdp-ticket-btn .ui-roll {
+    transform: translateY(0);
+    opacity: 1;
+}
+
 @media (hover: hover) {
     .pdp-ticket-btn:hover {
         box-shadow: inset 0 0 0 1px var(--c-dark-green-50);
@@ -407,7 +412,7 @@
                     padding-top 0.3s ease,
                     bottom 0.15s ease;
         flex-direction: column;
-        gap: var(--page-gutter);
+        gap: 8px;
     }
 
     .ticket-actions:has(.max-qty-label.is-visible) {
@@ -489,10 +494,11 @@
         transform: translateX(-50%);
         margin-bottom: 0;
     }
-}
 
-/* mobile: image carousel */
-@media (max-width: 480px) {
+    .pdp-ticket-types {
+        flex-wrap: nowrap;
+    }
+
     .pdp-image-track {
         transform: none !important;
         display: flex;

@@ -127,6 +127,8 @@
 
 /* 4K block removed — all values now fluid via clamp in base rules */
 
+.socials-dots { display: none; }
+
 @media (max-width: 1024px) {
 
     .socials-section {
@@ -140,23 +142,27 @@
     }
 
     .socials-track {
+        width: 100%;
         gap: 8px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding-left: calc(50vw - 110px);
+        padding-right: calc(50vw - 110px);
+        padding-bottom: 40px;
     }
+    .socials-track::-webkit-scrollbar { display: none; }
 
     .social-img {
         width: 220px;
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
+        transform: translateY(64px);
     }
 
     .socials-header {
         padding-bottom: 56px;
-    }
-/* 
-    .socials-icons {
-        margin-top: 36px;
-    } */
-
-    .social-img {
-        transform: translateY(64px);
     }
 
     .social-img.is-visible {
@@ -169,5 +175,25 @@
 
     .social-img.push-down.is-visible {
         transform: translateY(40px);
+    }
+
+    .socials-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        padding-top: 16px;
+    }
+
+    .socials-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background-color: var(--c-dark-green-30);
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    .socials-dot.is-active {
+        width: 20px;
+        background-color: var(--c-dark-green);
     }
 }

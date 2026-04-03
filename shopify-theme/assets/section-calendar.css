@@ -184,7 +184,9 @@
 .calendar-coming-soon {
     display: flex;
     justify-content: center;
-    align-items: baseline;
+    align-items: center;
+    flex: 1;
+    min-height: 0;
     color: var(--c-dark-green-30);
     opacity: 0;
     filter: blur(10px);
@@ -403,8 +405,6 @@
 .cal-poster-wrap .badge-sold { width: min(120px, 35%); aspect-ratio: 1; }
 
 @media (max-width: 1024px) {
-    .calendar-coming-soon { display: none; }
-
     .calendar-page {
         position: relative;
         height: auto;

@@ -126,7 +126,7 @@
     border: none;
     box-shadow: inset 0 0 0 1px var(--c-dark-green-20);
     border-radius: 100px;
-    padding: var(--cta-padding);
+    padding: 12px 20px;
     outline: none;
     transition: box-shadow 0.3s ease;
     text-transform: uppercase;
@@ -157,7 +157,8 @@
     gap: 16px;
 }
 
-.contact-submit .ui-roll {
+.contact-submit .ui-roll,
+.contact-topic-btn .ui-roll {
     transform: translateY(0);
     opacity: 1;
 }
@@ -207,6 +208,7 @@ body.contact-is-open .nav-hamburger {
         z-index: 1012;
     }
 
+    body.contact-is-open .nav-left,
     body.contact-is-open .nav-center {
         opacity: 0;
         pointer-events: none;
@@ -319,6 +321,9 @@ body.contact-is-open .nav-hamburger {
     }
     .contact-panel {
         width: 100%;
+    }
+    .contact-panel-inner {
+        padding: calc(var(--space-for-nav) - 12px) var(--page-gutter) 40px;
     }
 
     .contact-title {

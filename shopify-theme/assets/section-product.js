@@ -2,7 +2,7 @@
 
 (() => {
     const { wait, transitionCta, transitionHeader, staggerTime, observeElementInOut } = window.AnimationUtils || {};
-    const MOBILE_BREAKPOINT = 480;
+    const MOBILE_BREAKPOINT = 1024;
 
     /* ── Shopify product data ── */
 
@@ -76,6 +76,17 @@
         if (!btns.length) return;
 
         btns.forEach(btn => {
+            if (!btn.querySelector('.ui-roll')) {
+                const label = btn.innerHTML.trim();
+                btn.innerHTML = '';
+                const roll = document.createElement('div');
+                roll.className = 'ui-roll roll-hover is-visible';
+                roll.innerHTML =
+                    '<span class="ui-roll-layer ui-roll-visible">' + label + '</span>' +
+                    '<span class="ui-roll-layer ui-roll-hidden">' + label + '</span>';
+                btn.appendChild(roll);
+            }
+
             btn.addEventListener('click', () => {
                 if (btn.disabled) return;
                 btns.forEach(b => b.classList.remove('active'));

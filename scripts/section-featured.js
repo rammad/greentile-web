@@ -36,6 +36,7 @@
         let cachedVH = window.innerHeight;
         let lastWidth = window.innerWidth;
         const isMobile = window.matchMedia('(max-width: 1024px)').matches;
+        let isNearViewport = true;
 
         const recalcLayout = () => {
             lastWidth = window.innerWidth;
@@ -55,7 +56,13 @@
             recalcLayout();
         });
 
+        const visObs = new IntersectionObserver(([e]) => { isNearViewport = e.isIntersecting; }, {
+            rootMargin: '25%'
+        });
+        visObs.observe(section);
+
         const applyPositions = (scrollY) => {
+            if (!isNearViewport) return;
             const delta = (scrollY + cachedVH * 0.5 - sectionCenterY) / sectionHeight;
             const marqueePx = isMobile ? POSTER_PX : MARQUEE_PX;
 

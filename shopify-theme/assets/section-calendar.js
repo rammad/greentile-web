@@ -89,8 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const comingSoon = document.querySelector('.calendar-coming-soon');
         if (comingSoon) {
-            await wait(staggerTime * 0.5);
-            comingSoon.classList.add('is-visible');
+            if (rows.length === 0) {
+                await wait(staggerTime * 0.5);
+                comingSoon.classList.add('is-visible');
+            } else {
+                comingSoon.style.display = 'none';
+            }
         }
     };
 
@@ -818,8 +822,13 @@ function initMonthFilters() {
                     await wait(staggerTime * 0.3);
                 }
                 if (comingSoon) {
-                    await wait(staggerTime * 0.3);
-                    comingSoon.classList.add('is-visible');
+                    if (visibleRows.length === 0) {
+                        comingSoon.style.display = '';
+                        await wait(staggerTime * 0.3);
+                        comingSoon.classList.add('is-visible');
+                    } else {
+                        comingSoon.style.display = 'none';
+                    }
                 }
             }
         });

@@ -6,7 +6,7 @@
     min-height: 100vh;
     height: auto !important; 
     overflow: visible !important;
-    padding-top: var(--space-for-nav); 
+    padding-top: calc(var(--space-for-nav) - 8px); 
     padding-bottom: clamp(80px, 4.167vw, 160px);
     padding-left: var(--page-gutter);
     padding-right: var(--page-gutter);
