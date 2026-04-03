@@ -3,9 +3,16 @@
 (() => {
     const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils;
 
+    function enableNativeScroll() {
+        document.documentElement.classList.add('native-scroll');
+        document.documentElement.style.setProperty('overflow', 'visible', 'important');
+        document.documentElement.style.setProperty('height', 'auto', 'important');
+        document.body.style.setProperty('overflow', 'visible', 'important');
+        document.body.style.setProperty('height', 'auto', 'important');
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-        document.documentElement.style.overflow = 'auto';
-        document.body.style.overflow = 'auto';
+        enableNativeScroll();
 
         const page = document.querySelector('.archives-page');
         if (page) setTimeout(() => page.classList.add('is-active'), 100);
@@ -24,6 +31,8 @@
         if(cta) transitionCta(cta, 'enter');
 
         initRowPacker();
+
+        (window.pageReady || Promise.resolve()).then(enableNativeScroll);
     });
 
     /* ── responsive grid packing ── */
@@ -129,6 +138,14 @@
         return flatItemList;
     }
 
+    function setRowVisibility(row, visible) {
+        if (visible) {
+            row.classList.remove('is-hidden');
+        } else {
+            row.classList.add('is-hidden');
+        }
+    }
+
     function applyPagination(flatItemList) {
         flatItemList.forEach((item, index) => {
             if (index >= _state.visibleCount) {
@@ -143,7 +160,7 @@
         document.querySelectorAll('#dynamic-archive-container .packed-row').forEach(row => {
             const cards = row.querySelectorAll('.grid-card');
             const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
-            row.style.display = hasVisible ? 'grid' : 'none';
+            setRowVisibility(row, hasVisible);
         });
 
         const loadBtn = document.getElementById('btn-load-more');
@@ -230,7 +247,7 @@
         document.querySelectorAll('#dynamic-archive-container .packed-row').forEach(row => {
             const cards = row.querySelectorAll('.grid-card');
             const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
-            row.style.display = hasVisible ? 'grid' : 'none';
+            setRowVisibility(row, hasVisible);
         });
 
         if (items.length <= BATCH_SIZE) {
@@ -254,7 +271,7 @@
                 document.querySelectorAll('#dynamic-archive-container .packed-row').forEach(row => {
                     const cards = row.querySelectorAll('.grid-card');
                     const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
-                    row.style.display = hasVisible ? 'grid' : 'none';
+                    setRowVisibility(row, hasVisible);
                 });
 
                 setTimeout(() => {

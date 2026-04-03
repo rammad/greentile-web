@@ -44,7 +44,7 @@
     opacity: 0.5;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .archives-page .grid-card:hover .grid-card-poster {
         filter: none;
         opacity: 1;
@@ -80,6 +80,10 @@
         flex-direction: column;
         gap: 40px;
         width: 100%;
+    }
+
+    .packed-row.is-hidden {
+        display: none !important;
     }
 
     .packed-chunk {

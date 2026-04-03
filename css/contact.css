@@ -29,6 +29,7 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: none;
+    pointer-events: none;
 }
 
 .contact-panel::-webkit-scrollbar {
@@ -37,6 +38,7 @@
 
 .contact-panel.is-open {
     transform: translateX(0);
+    pointer-events: auto;
 }
 
 .contact-panel-inner {
