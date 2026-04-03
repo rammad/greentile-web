@@ -3,30 +3,17 @@
     "contact_email": "hello@greentilesocialclub.com",
     "event_metafield_namespace": "event_ticketing",
     "event_metafield_key": "event_v2",
+    "nav_contact_label": "SAY HI",
+    "nav_back_label": "BACK",
+    "nav_link_1_label": "PLAY WITH US",
+    "nav_link_1_mobile_label": "Play with us",
+    "nav_link_2_label": "WORK WITH US",
+    "nav_link_2_mobile_label": "Work with us",
+    "footer_title": "Green Tile Social Club",
     "sections": {
       "header": {
         "type": "header",
-        "settings": {
-          "contact_label": "SAY HI",
-          "back_label": "BACK"
-        },
-        "blocks": {
-          "nav1": {
-            "type": "nav_link",
-            "settings": {
-              "label": "PLAY WITH US",
-              "mobile_label": "Play with us"
-            }
-          },
-          "nav2": {
-            "type": "nav_link",
-            "settings": {
-              "label": "WORK WITH US",
-              "mobile_label": "Work with us"
-            }
-          }
-        },
-        "block_order": ["nav1", "nav2"]
+        "settings": {}
       },
       "contact-panel": {
         "type": "contact-panel",

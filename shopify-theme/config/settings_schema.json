@@ -76,5 +76,161 @@
         "info": "Key of the JSON metafield containing date, time, venue, etc."
       }
     ]
+  },
+  {
+    "name": "Navigation",
+    "settings": [
+      { "type": "paragraph", "content": "Site-wide navigation shown in the header and mobile menu." },
+      { "type": "image_picker", "id": "nav_logo", "label": "Logo" },
+      { "type": "text", "id": "nav_contact_label", "label": "Contact link label", "default": "SAY HI" },
+      { "type": "text", "id": "nav_back_label", "label": "Back link label (subpages)", "default": "BACK" },
+      { "type": "url", "id": "nav_back_link", "label": "Back link URL (subpages)", "info": "Where the BACK button goes on product/archive pages" },
+
+      { "type": "header", "content": "Nav link 1" },
+      { "type": "text", "id": "nav_link_1_label", "label": "Label", "default": "PLAY WITH US" },
+      { "type": "text", "id": "nav_link_1_mobile_label", "label": "Mobile label", "info": "If different from desktop" },
+      { "type": "url", "id": "nav_link_1_url", "label": "URL" },
+
+      { "type": "header", "content": "Nav link 2" },
+      { "type": "text", "id": "nav_link_2_label", "label": "Label", "default": "WORK WITH US" },
+      { "type": "text", "id": "nav_link_2_mobile_label", "label": "Mobile label" },
+      { "type": "url", "id": "nav_link_2_url", "label": "URL" },
+
+      { "type": "header", "content": "Nav link 3" },
+      { "type": "text", "id": "nav_link_3_label", "label": "Label" },
+      { "type": "text", "id": "nav_link_3_mobile_label", "label": "Mobile label" },
+      { "type": "url", "id": "nav_link_3_url", "label": "URL" },
+
+      { "type": "header", "content": "Nav link 4" },
+      { "type": "text", "id": "nav_link_4_label", "label": "Label" },
+      { "type": "text", "id": "nav_link_4_mobile_label", "label": "Mobile label" },
+      { "type": "url", "id": "nav_link_4_url", "label": "URL" }
+    ]
+  },
+  {
+    "name": "Footer",
+    "settings": [
+      { "type": "paragraph", "content": "Footer title and links shown at the bottom of every page." },
+      { "type": "text", "id": "footer_title", "label": "Footer title", "default": "Green Tile Social Club" },
+
+      { "type": "header", "content": "Footer link 1" },
+      { "type": "text", "id": "footer_link_1_label", "label": "Label", "default": "Privacy Policy" },
+      { "type": "url", "id": "footer_link_1_url", "label": "URL" },
+      { "type": "checkbox", "id": "footer_link_1_is_contact_trigger", "label": "Opens contact panel", "default": false },
+      { "type": "text", "id": "footer_link_1_contact_topic", "label": "Contact topic", "info": "Preselect a topic when the contact panel opens. Only used when 'Opens contact panel' is checked." },
+      { "type": "checkbox", "id": "footer_link_1_open_new_tab", "label": "Open in new tab", "default": false },
+
+      { "type": "header", "content": "Footer link 2" },
+      { "type": "text", "id": "footer_link_2_label", "label": "Label", "default": "Go Fund Me" },
+      { "type": "url", "id": "footer_link_2_url", "label": "URL" },
+      { "type": "checkbox", "id": "footer_link_2_is_contact_trigger", "label": "Opens contact panel", "default": false },
+      { "type": "text", "id": "footer_link_2_contact_topic", "label": "Contact topic" },
+      { "type": "checkbox", "id": "footer_link_2_open_new_tab", "label": "Open in new tab", "default": false },
+
+      { "type": "header", "content": "Footer link 3" },
+      { "type": "text", "id": "footer_link_3_label", "label": "Label", "default": "FAQ" },
+      { "type": "url", "id": "footer_link_3_url", "label": "URL" },
+      { "type": "checkbox", "id": "footer_link_3_is_contact_trigger", "label": "Opens contact panel", "default": false },
+      { "type": "text", "id": "footer_link_3_contact_topic", "label": "Contact topic" },
+      { "type": "checkbox", "id": "footer_link_3_open_new_tab", "label": "Open in new tab", "default": false },
+
+      { "type": "header", "content": "Footer link 4" },
+      { "type": "text", "id": "footer_link_4_label", "label": "Label", "default": "Contact Us" },
+      { "type": "url", "id": "footer_link_4_url", "label": "URL" },
+      { "type": "checkbox", "id": "footer_link_4_is_contact_trigger", "label": "Opens contact panel", "default": true },
+      { "type": "text", "id": "footer_link_4_contact_topic", "label": "Contact topic" },
+      { "type": "checkbox", "id": "footer_link_4_open_new_tab", "label": "Open in new tab", "default": false },
+
+      { "type": "header", "content": "Footer link 5" },
+      { "type": "text", "id": "footer_link_5_label", "label": "Label", "default": "Follow Us" },
+      { "type": "url", "id": "footer_link_5_url", "label": "URL" },
+      { "type": "checkbox", "id": "footer_link_5_is_contact_trigger", "label": "Opens contact panel", "default": false },
+      { "type": "text", "id": "footer_link_5_contact_topic", "label": "Contact topic" },
+      { "type": "checkbox", "id": "footer_link_5_open_new_tab", "label": "Open in new tab", "default": false },
+
+      { "type": "header", "content": "Footer link 6" },
+      { "type": "text", "id": "footer_link_6_label", "label": "Label" },
+      { "type": "url", "id": "footer_link_6_url", "label": "URL" },
+      { "type": "checkbox", "id": "footer_link_6_is_contact_trigger", "label": "Opens contact panel", "default": false },
+      { "type": "text", "id": "footer_link_6_contact_topic", "label": "Contact topic" },
+      { "type": "checkbox", "id": "footer_link_6_open_new_tab", "label": "Open in new tab", "default": false }
+    ]
+  },
+  {
+    "name": "Social links",
+    "settings": [
+      { "type": "paragraph", "content": "Social media links and icons used across the site (e.g. in the Socials section)." },
+
+      { "type": "header", "content": "Social 1" },
+      {
+        "type": "select", "id": "social_1_platform", "label": "Platform", "default": "instagram",
+        "options": [
+          { "value": "instagram", "label": "Instagram" },
+          { "value": "tiktok", "label": "TikTok" },
+          { "value": "discord", "label": "Discord" },
+          { "value": "custom", "label": "Custom" }
+        ],
+        "info": "Selects the built-in icon. Choose Custom to upload your own."
+      },
+      { "type": "image_picker", "id": "social_1_icon", "label": "Custom icon", "info": "Overrides the built-in platform icon" },
+      { "type": "url", "id": "social_1_url", "label": "URL" },
+      { "type": "text", "id": "social_1_label", "label": "Label", "default": "Instagram", "info": "Used as alt text for accessibility" },
+
+      { "type": "header", "content": "Social 2" },
+      {
+        "type": "select", "id": "social_2_platform", "label": "Platform", "default": "tiktok",
+        "options": [
+          { "value": "instagram", "label": "Instagram" },
+          { "value": "tiktok", "label": "TikTok" },
+          { "value": "discord", "label": "Discord" },
+          { "value": "custom", "label": "Custom" }
+        ]
+      },
+      { "type": "image_picker", "id": "social_2_icon", "label": "Custom icon", "info": "Overrides the built-in platform icon" },
+      { "type": "url", "id": "social_2_url", "label": "URL" },
+      { "type": "text", "id": "social_2_label", "label": "Label", "default": "TikTok" },
+
+      { "type": "header", "content": "Social 3" },
+      {
+        "type": "select", "id": "social_3_platform", "label": "Platform", "default": "discord",
+        "options": [
+          { "value": "instagram", "label": "Instagram" },
+          { "value": "tiktok", "label": "TikTok" },
+          { "value": "discord", "label": "Discord" },
+          { "value": "custom", "label": "Custom" }
+        ]
+      },
+      { "type": "image_picker", "id": "social_3_icon", "label": "Custom icon", "info": "Overrides the built-in platform icon" },
+      { "type": "url", "id": "social_3_url", "label": "URL" },
+      { "type": "text", "id": "social_3_label", "label": "Label", "default": "Discord" },
+
+      { "type": "header", "content": "Social 4" },
+      {
+        "type": "select", "id": "social_4_platform", "label": "Platform", "default": "instagram",
+        "options": [
+          { "value": "instagram", "label": "Instagram" },
+          { "value": "tiktok", "label": "TikTok" },
+          { "value": "discord", "label": "Discord" },
+          { "value": "custom", "label": "Custom" }
+        ]
+      },
+      { "type": "image_picker", "id": "social_4_icon", "label": "Custom icon", "info": "Overrides the built-in platform icon" },
+      { "type": "url", "id": "social_4_url", "label": "URL" },
+      { "type": "text", "id": "social_4_label", "label": "Label" },
+
+      { "type": "header", "content": "Social 5" },
+      {
+        "type": "select", "id": "social_5_platform", "label": "Platform", "default": "instagram",
+        "options": [
+          { "value": "instagram", "label": "Instagram" },
+          { "value": "tiktok", "label": "TikTok" },
+          { "value": "discord", "label": "Discord" },
+          { "value": "custom", "label": "Custom" }
+        ]
+      },
+      { "type": "image_picker", "id": "social_5_icon", "label": "Custom icon", "info": "Overrides the built-in platform icon" },
+      { "type": "url", "id": "social_5_url", "label": "URL" },
+      { "type": "text", "id": "social_5_label", "label": "Label" }
+    ]
   }
 ]

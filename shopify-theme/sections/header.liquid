@@ -8,21 +8,21 @@
 <nav class="sticky-nav{% if is_subpage %} nav-subpage{% endif %}">
   {% if is_subpage %}
     <div class="nav-left">
-      <a href="{{ section.settings.back_link | default: routes.root_url }}" class="nav-back-link type-subRegular1 ui-roll roll-hover">
-        <span class="ui-roll-layer ui-roll-visible">{{ section.settings.back_label | default: 'BACK' }}</span>
-        <span class="ui-roll-layer ui-roll-hidden">{{ section.settings.back_label | default: 'BACK' }}</span>
+      <a href="{{ settings.nav_back_link | default: routes.root_url }}" class="nav-back-link type-subRegular1 ui-roll roll-hover">
+        <span class="ui-roll-layer ui-roll-visible">{{ settings.nav_back_label | default: 'BACK' }}</span>
+        <span class="ui-roll-layer ui-roll-hidden">{{ settings.nav_back_label | default: 'BACK' }}</span>
       </a>
     </div>
   {% else %}
     <div class="nav-left">
       <a href="{{ routes.root_url }}" class="logo-link">
-        {%- if section.settings.logo -%}
+        {%- if settings.nav_logo -%}
           <img
-            src="{{ section.settings.logo | image_url: width: 200 }}"
+            src="{{ settings.nav_logo | image_url: width: 200 }}"
             class="nav-logo"
             alt="{{ shop.name }}"
-            width="{{ section.settings.logo.width }}"
-            height="{{ section.settings.logo.height }}"
+            width="{{ settings.nav_logo.width }}"
+            height="{{ settings.nav_logo.height }}"
             loading="eager"
           >
         {%- else -%}
@@ -31,11 +31,13 @@
       </a>
     </div>
     <div class="nav-center">
-      {%- for block in section.blocks -%}
-        {%- if block.type == 'nav_link' -%}
-          <a href="{{ block.settings.url }}" class="type-subRegular1 ui-roll roll-hover" {{ block.shopify_attributes }}>
-            <span class="ui-roll-layer ui-roll-visible">{{ block.settings.label }}</span>
-            <span class="ui-roll-layer ui-roll-hidden">{{ block.settings.label }}</span>
+      {%- for i in (1..4) -%}
+        {%- assign nav_label_key = 'nav_link_' | append: i | append: '_label' -%}
+        {%- assign nav_url_key = 'nav_link_' | append: i | append: '_url' -%}
+        {%- if settings[nav_label_key] != blank -%}
+          <a href="{{ settings[nav_url_key] }}" class="type-subRegular1 ui-roll roll-hover">
+            <span class="ui-roll-layer ui-roll-visible">{{ settings[nav_label_key] }}</span>
+            <span class="ui-roll-layer ui-roll-hidden">{{ settings[nav_label_key] }}</span>
           </a>
         {%- endif -%}
       {%- endfor -%}
@@ -44,8 +46,8 @@
 
   <div class="nav-right">
     <a href="#" class="type-subRegular1 ui-roll roll-hover" data-contact-trigger>
-      <span class="ui-roll-layer ui-roll-visible">{{ section.settings.contact_label | default: 'SAY HI' }}</span>
-      <span class="ui-roll-layer ui-roll-hidden">{{ section.settings.contact_label | default: 'SAY HI' }}</span>
+      <span class="ui-roll-layer ui-roll-visible">{{ settings.nav_contact_label | default: 'SAY HI' }}</span>
+      <span class="ui-roll-layer ui-roll-hidden">{{ settings.nav_contact_label | default: 'SAY HI' }}</span>
     </a>
   </div>
 
@@ -59,12 +61,15 @@
   <div class="mobile-menu-inner">
     <div class="type-subBold1 mobile-menu-subhead">{{ 'general.menu' | t }}</div>
     <a href="{{ routes.root_url }}" class="type-h2 mobile-menu-link animate-cascade">{{ 'general.home' | t }}</a>
-    {%- for block in section.blocks -%}
-      {%- if block.type == 'nav_link' -%}
-        <a href="{{ block.settings.url }}" class="type-h2 mobile-menu-link animate-cascade">{{ block.settings.mobile_label | default: block.settings.label }}</a>
+    {%- for i in (1..4) -%}
+      {%- assign nav_label_key = 'nav_link_' | append: i | append: '_label' -%}
+      {%- assign nav_mobile_key = 'nav_link_' | append: i | append: '_mobile_label' -%}
+      {%- assign nav_url_key = 'nav_link_' | append: i | append: '_url' -%}
+      {%- if settings[nav_label_key] != blank -%}
+        <a href="{{ settings[nav_url_key] }}" class="type-h2 mobile-menu-link animate-cascade">{{ settings[nav_mobile_key] | default: settings[nav_label_key] }}</a>
       {%- endif -%}
     {%- endfor -%}
-    <a href="#" class="type-h2 mobile-menu-link animate-cascade" data-contact-trigger>{{ section.settings.contact_label | default: 'Say Hi' }}</a>
+    <a href="#" class="type-h2 mobile-menu-link animate-cascade" data-contact-trigger>{{ settings.nav_contact_label | default: 'Say Hi' }}</a>
   </div>
 </div>
 
@@ -74,73 +79,8 @@
   "class": "header-section",
   "settings": [
     {
-      "type": "image_picker",
-      "id": "logo",
-      "label": "Logo"
-    },
-    {
-      "type": "text",
-      "id": "contact_label",
-      "label": "Contact link label",
-      "default": "SAY HI"
-    },
-    {
-      "type": "text",
-      "id": "back_label",
-      "label": "Back link label (subpages)",
-      "default": "BACK"
-    },
-    {
-      "type": "url",
-      "id": "back_link",
-      "label": "Back link URL (subpages)",
-      "info": "Where the BACK button goes on product/archive pages"
-    }
-  ],
-  "blocks": [
-    {
-      "type": "nav_link",
-      "name": "Navigation link",
-      "settings": [
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Label",
-          "default": "PLAY WITH US"
-        },
-        {
-          "type": "text",
-          "id": "mobile_label",
-          "label": "Mobile label (optional)",
-          "info": "If different from desktop. E.g. 'Play with us' instead of 'PLAY WITH US'"
-        },
-        {
-          "type": "url",
-          "id": "url",
-          "label": "Link URL"
-        }
-      ]
-    }
-  ],
-  "presets": [
-    {
-      "name": "Header",
-      "blocks": [
-        {
-          "type": "nav_link",
-          "settings": {
-            "label": "PLAY WITH US",
-            "mobile_label": "Play with us"
-          }
-        },
-        {
-          "type": "nav_link",
-          "settings": {
-            "label": "WORK WITH US",
-            "mobile_label": "Work with us"
-          }
-        }
-      ]
+      "type": "paragraph",
+      "content": "Navigation links, logo, and labels are configured in Theme settings → Navigation."
     }
   ]
 }

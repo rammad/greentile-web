@@ -69,20 +69,6 @@
     display: none;
 }
 
-.icon-instagram {
-    mask-image: url('../images/graphics/Instagram_Glyph_White.svg');
-    -webkit-mask-image: url('../images/graphics/Instagram_Glyph_White.svg');
-}
-
-.icon-tiktok {
-    mask-image: url('../images/graphics/tiktok-circle.svg');
-    -webkit-mask-image: url('../images/graphics/tiktok-circle.svg');
-}
-
-.icon-discord {
-    mask-image: url('../images/graphics/discord-icon-svgrepo-com.svg');
-    -webkit-mask-image: url('../images/graphics/discord-icon-svgrepo-com.svg');
-}
 
 @media (hover: hover) {
     .icon-circle:hover {

@@ -28,23 +28,27 @@
     </div>
 
     <div class="footer-links">
-      {%- for block in section.blocks -%}
-        {%- if block.type == 'footer_link' -%}
-          <a href="{{ block.settings.url | default: '#' }}" class="type-subRegular1 ui-roll roll-hover"
-            {% if block.settings.is_contact_trigger %}data-contact-trigger{% endif %}
-            {% if block.settings.contact_topic != blank %}data-contact-topic="{{ block.settings.contact_topic }}"{% endif %}
-            {% if block.settings.open_new_tab %}target="_blank" rel="noopener"{% endif %}
-            {{ block.shopify_attributes }}
+      {%- for i in (1..6) -%}
+        {%- assign fl_label_key = 'footer_link_' | append: i | append: '_label' -%}
+        {%- assign fl_url_key = 'footer_link_' | append: i | append: '_url' -%}
+        {%- assign fl_contact_key = 'footer_link_' | append: i | append: '_is_contact_trigger' -%}
+        {%- assign fl_topic_key = 'footer_link_' | append: i | append: '_contact_topic' -%}
+        {%- assign fl_tab_key = 'footer_link_' | append: i | append: '_open_new_tab' -%}
+        {%- if settings[fl_label_key] != blank -%}
+          <a href="{{ settings[fl_url_key] | default: '#' }}" class="type-subRegular1 ui-roll roll-hover"
+            {% if settings[fl_contact_key] %}data-contact-trigger{% endif %}
+            {% if settings[fl_topic_key] != blank %}data-contact-topic="{{ settings[fl_topic_key] }}"{% endif %}
+            {% if settings[fl_tab_key] %}target="_blank" rel="noopener"{% endif %}
           >
-            <span class="ui-roll-layer ui-roll-visible">{{ block.settings.label }}</span>
-            <span class="ui-roll-layer ui-roll-hidden">{{ block.settings.label }}</span>
+            <span class="ui-roll-layer ui-roll-visible">{{ settings[fl_label_key] }}</span>
+            <span class="ui-roll-layer ui-roll-hidden">{{ settings[fl_label_key] }}</span>
           </a>
         {%- endif -%}
       {%- endfor -%}
     </div>
 
     <div class="type-display-hero animate-cascade fit-text">
-      {%- assign title_words = section.settings.title | default: 'Green Tile Social Club' | split: ' ' -%}
+      {%- assign title_words = settings.footer_title | default: 'Green Tile Social Club' | split: ' ' -%}
       {%- for word in title_words %}
         <span>{{ word }}</span>
       {%- endfor -%}
@@ -60,10 +64,8 @@
   "class": "footer-section-wrapper",
   "settings": [
     {
-      "type": "text",
-      "id": "title",
-      "label": "Footer title",
-      "default": "Green Tile Social Club"
+      "type": "paragraph",
+      "content": "Footer title and links are configured in Theme settings → Footer."
     },
     {
       "type": "header",
@@ -213,42 +215,6 @@
           "default": false
         }
       ]
-    },
-    {
-      "type": "footer_link",
-      "name": "Footer link",
-      "settings": [
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Label",
-          "default": "Link"
-        },
-        {
-          "type": "url",
-          "id": "url",
-          "label": "URL"
-        },
-        {
-          "type": "checkbox",
-          "id": "is_contact_trigger",
-          "label": "Opens contact panel",
-          "default": false,
-          "info": "If checked, clicking this link opens the contact panel instead of navigating"
-        },
-        {
-          "type": "text",
-          "id": "contact_topic",
-          "label": "Contact topic",
-          "info": "Preselect a topic when the contact panel opens (e.g. 'general', 'collaboration', 'sponsorship'). Only used when 'Opens contact panel' is checked."
-        },
-        {
-          "type": "checkbox",
-          "id": "open_new_tab",
-          "label": "Open in new tab",
-          "default": false
-        }
-      ]
     }
   ],
   "presets": [
@@ -267,26 +233,6 @@
             "text": "STREAM GTSC SOUNDS @ PARLOR",
             "reverse": true
           }
-        },
-        {
-          "type": "footer_link",
-          "settings": { "label": "Privacy Policy" }
-        },
-        {
-          "type": "footer_link",
-          "settings": { "label": "Go Fund Me" }
-        },
-        {
-          "type": "footer_link",
-          "settings": { "label": "FAQ" }
-        },
-        {
-          "type": "footer_link",
-          "settings": { "label": "Contact Us", "is_contact_trigger": true }
-        },
-        {
-          "type": "footer_link",
-          "settings": { "label": "Follow Us" }
         }
       ]
     }

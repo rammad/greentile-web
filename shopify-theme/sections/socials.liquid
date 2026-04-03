@@ -5,36 +5,43 @@
     <div class="type-subBold1 socials-subhead">{{ section.settings.subheading | default: 'hope we' }}</div>
     <div class="type-h1 animate-cascade">{{ section.settings.title | default: 'SEE YOU SOON!' }}</div>
     <div class="socials-icons">
-      {%- for block in section.blocks -%}
-        {%- if block.type == 'social_link' and block.settings.url != blank -%}
+      {%- for i in (1..5) -%}
+        {%- assign sp_platform_key = 'social_' | append: i | append: '_platform' -%}
+        {%- assign sp_icon_key = 'social_' | append: i | append: '_icon' -%}
+        {%- assign sp_url_key = 'social_' | append: i | append: '_url' -%}
+        {%- assign sp_label_key = 'social_' | append: i | append: '_label' -%}
+        {%- if settings[sp_url_key] != blank -%}
           {%- liquid
             assign icon_url = ''
-            assign alt_text = block.settings.label | default: 'Social'
-            case block.settings.platform
+            assign alt_text = settings[sp_label_key] | default: 'Social'
+            case settings[sp_platform_key]
               when 'instagram'
                 assign icon_url = 'Instagram_Glyph_White.svg' | asset_url
-                assign alt_text = block.settings.label | default: 'Instagram'
+                assign alt_text = settings[sp_label_key] | default: 'Instagram'
               when 'tiktok'
                 assign icon_url = 'tiktok-circle.svg' | asset_url
-                assign alt_text = block.settings.label | default: 'TikTok'
+                assign alt_text = settings[sp_label_key] | default: 'TikTok'
               when 'discord'
                 assign icon_url = 'discord-icon-svgrepo-com.svg' | asset_url
-                assign alt_text = block.settings.label | default: 'Discord'
+                assign alt_text = settings[sp_label_key] | default: 'Discord'
             endcase
-            if block.settings.icon
-              assign icon_url = block.settings.icon | image_url: width: 100
+            if settings[sp_icon_key]
+              assign icon_url = settings[sp_icon_key] | image_url: width: 100
             endif
           -%}
           {%- liquid
             assign is_custom = false
-            if block.settings.icon
+            if settings[sp_icon_key]
               assign is_custom = true
-            elsif block.settings.platform == 'custom'
+            elsif settings[sp_platform_key] == 'custom'
               assign is_custom = true
             endif
           -%}
           {%- if icon_url != blank -%}
-            <a class="icon-circle{% unless is_custom %} icon-{{ block.settings.platform }}{% endunless %}{% if is_custom %} icon-custom{% endif %}" href="{{ block.settings.url }}" target="_blank" rel="noopener" {{ block.shopify_attributes }}>
+            <a class="icon-circle{% unless is_custom %} icon-{{ settings[sp_platform_key] }}{% endunless %}{% if is_custom %} icon-custom{% endif %}"
+              href="{{ settings[sp_url_key] }}" target="_blank" rel="noopener"
+              style="mask-image: url('{{ icon_url }}'); -webkit-mask-image: url('{{ icon_url }}');"
+            >
               <img src="{{ icon_url }}" alt="{{ alt_text | escape }}">
             </a>
           {%- endif -%}
@@ -67,6 +74,10 @@
   "class": "socials-section-wrapper",
   "settings": [
     {
+      "type": "paragraph",
+      "content": "Social links and icons are configured in Theme settings → Social links."
+    },
+    {
       "type": "text",
       "id": "subheading",
       "label": "Subheading",
@@ -81,42 +92,6 @@
   ],
   "blocks": [
     {
-      "type": "social_link",
-      "name": "Social link",
-      "settings": [
-        {
-          "type": "select",
-          "id": "platform",
-          "label": "Platform",
-          "options": [
-            { "value": "instagram", "label": "Instagram" },
-            { "value": "tiktok", "label": "TikTok" },
-            { "value": "discord", "label": "Discord" },
-            { "value": "custom", "label": "Custom" }
-          ],
-          "default": "instagram",
-          "info": "Selects the built-in icon. Choose Custom to upload your own."
-        },
-        {
-          "type": "image_picker",
-          "id": "icon",
-          "label": "Custom icon",
-          "info": "Overrides the built-in platform icon"
-        },
-        {
-          "type": "url",
-          "id": "url",
-          "label": "Link URL"
-        },
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Label",
-          "info": "Used as alt text for accessibility"
-        }
-      ]
-    },
-    {
       "type": "image",
       "name": "Gallery image",
       "settings": [
@@ -130,30 +105,7 @@
   ],
   "presets": [
     {
-      "name": "Socials",
-      "blocks": [
-        {
-          "type": "social_link",
-          "settings": {
-            "platform": "instagram",
-            "label": "Instagram"
-          }
-        },
-        {
-          "type": "social_link",
-          "settings": {
-            "platform": "tiktok",
-            "label": "TikTok"
-          }
-        },
-        {
-          "type": "social_link",
-          "settings": {
-            "platform": "discord",
-            "label": "Discord"
-          }
-        }
-      ]
+      "name": "Socials"
     }
   ]
 }
