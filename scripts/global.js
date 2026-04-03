@@ -11,6 +11,14 @@ window.addEventListener('pageshow', () => {
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+function getLayoutScale() {
+    var w = window.innerWidth;
+    if (w <= 1920) return 1;
+    if (w >= 3840) return 2;
+    return w / 1920;
+}
+function scalePx(px) { return px * getLayoutScale(); }
+
 // returns current season based on month: spring/summer/fall/winter
 function getCurrentSeason() {
     const month = new Date().getMonth() + 1; // 1=jan … 12=dec
@@ -269,6 +277,8 @@ window.AnimationUtils = {
 window.AppUtils = {
     getCurrentSeason,
     fitTextToWidth,
+    getLayoutScale,
+    scalePx,
 };
 
 // exposed so section scripts can re-run split after setting text
@@ -474,15 +484,29 @@ const CURTAIN_TILE_SCATTER_MOBILE = {
         { x:  94, y: 18,  r:  18 },
     ],
 };
-const CURTAIN_TILE_SCATTER = window.innerWidth <= 1024 ? CURTAIN_TILE_SCATTER_MOBILE : CURTAIN_TILE_SCATTER_DESKTOP;
+
+function getScaledScatter(base) {
+    const s = getLayoutScale();
+    if (s === 1) return base;
+    const out = {};
+    for (const k in base) {
+        out[k] = base[k].map(p => ({ x: p.x * s, y: p.y * s, r: p.r }));
+    }
+    return out;
+}
+
+const CURTAIN_TILE_SCATTER = window.innerWidth <= 1024
+    ? CURTAIN_TILE_SCATTER_MOBILE
+    : getScaledScatter(CURTAIN_TILE_SCATTER_DESKTOP);
 
 // returns a fixed pixel value (breakpoint system replaced continuous vw scaling)
 function vwPx(px) { return px; }
 
 // tile width + gap 4px = stride; compute a centered row for any count
 function getTileSnapX(count) {
-    const tileW  = window.innerWidth <= 768 ? 56 : 88;
-    const stride = vwPx(tileW + 4);
+    const s      = getLayoutScale();
+    const tileW  = window.innerWidth <= 768 ? 56 : 88 * s;
+    const stride = vwPx(tileW + 4 * s);
     const start  = -((count - 1) / 2) * stride;
     return Array.from({ length: count }, (_, i) => Math.round(start + i * stride));
 }
@@ -550,7 +574,7 @@ async function playTileAnimation(wrap) {
     setTimeout(() => {
         const linesWrap = document.createElement('div');
         linesWrap.className = 'curtain-label-wrap';
-        const offsetPx = Math.round(vwPx(100));
+        const offsetPx = Math.round(vwPx(scalePx(100)));
         linesWrap.style.cssText = `transform: translate(-50%, -${offsetPx}px) scale(0.82); opacity: 0; transition: none;`;
 
         const lines = document.createElement('div');

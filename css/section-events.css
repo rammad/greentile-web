@@ -24,7 +24,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: stretch;
-    gap: 64px;
+    gap: clamp(64px, 3.333vw, 128px);
     box-sizing: border-box;
 }
 
@@ -64,7 +64,7 @@
 .events-grid {
     display: grid;
     grid-template-columns: repeat(var(--poster-count, 4), 1fr);
-    gap: 12px;
+    gap: clamp(12px, 0.625vw, 24px);
     padding: 0 var(--page-gutter);
     width: 100%;
     margin: 0 auto;
@@ -94,12 +94,12 @@
 }
 
 .events-content-footer {
-    position: absolute;
-    left: 0;
-    right: 0;
     display: flex;
     justify-content: center;
+    width: 100%;
 }
+
+/* 4K block removed — gaps now fluid via clamp in base rules */
 
 @media (max-width: 1024px) {
     .events-section {
@@ -132,10 +132,6 @@
 
     .events-grid {
         grid-template-columns: repeat(2, 1fr);
-    }
-
-    .events-content-footer {
-        position: static;
     }
 
     .event-card {

@@ -56,7 +56,8 @@
         if (!footerSection) return;
 
         if (typeof MarqueeManager !== 'undefined') {
-            new MarqueeManager('.marquee-content', scrollSpeed || 40, false);
+            const _fScale = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+            new MarqueeManager('.marquee-content', (scrollSpeed || 40) * _fScale, false);
         }
 
         const resetAndPlay = (element) => {

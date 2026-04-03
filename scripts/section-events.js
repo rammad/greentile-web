@@ -8,11 +8,16 @@
         const section = document.querySelector('.events-section');
         if (!section) return;
 
+        const cards = section.querySelectorAll('.event-card');
+        if (!cards.length) {
+            section.style.display = 'none';
+            return;
+        }
+
         const titleWrap = section.querySelector('.events-title-wrap');
         const desktopLine = section.querySelector('.events-title-lines.desktop-only .animate-line');
         const allLines = [...section.querySelectorAll('.events-title-wrap .animate-line')];
         const grid = section.querySelector('.events-grid');
-        const cards = section.querySelectorAll('.event-card');
         const btn = section.querySelector('.cta-btn');
         const ctaFooter = section.querySelector('.events-content-footer');
         const stickyInner = section.querySelector('.events-sticky-inner');
@@ -205,7 +210,8 @@
             const rootStyle = getComputedStyle(document.documentElement);
             const sectionSpacingPx = parseFloat(rootStyle.getPropertyValue('--section-spacing'));
             const navSpace = parseFloat(rootStyle.getPropertyValue('--space-for-nav'));
-            const s20 = 20;
+            const _evtScale = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+            const s20 = 20 * _evtScale;
 
             const nav = document.querySelector('.sticky-nav');
             const navInset = nav
@@ -246,7 +252,9 @@
 
                 stickyInner.style.paddingTop = (navInset + s20) + 'px';
 
-                const maxPosterH = ih - navInset - titleWrap.offsetHeight - flexGap - s20;
+                const ctaH = ctaFooter ? ctaFooter.offsetHeight || 60 * _evtScale : 0;
+                const padTop = navInset + s20;
+                const maxPosterH = ih - padTop - titleWrap.offsetHeight - 2 * flexGap - ctaH - s20;
                 const maxPosterW = maxPosterH * 4 / 5;
                 grid.style.maxWidth = Math.max(0, n * maxPosterW + (n - 1) * gridColGap + gridPad) + 'px';
 
@@ -275,13 +283,8 @@
             applyPositions(window.lenis ? window.lenis.scroll : window.scrollY);
 
             if (ctaFooter) {
-                if (currentlyMobile) {
-                    ctaFooter.style.top = '';
-                } else {
-                    const posterBottom = content.offsetTop + content.offsetHeight;
-                    ctaFooter.style.top    = (posterBottom + navSpace) + 'px';
-                    ctaFooter.style.bottom = 'auto';
-                }
+                ctaFooter.style.top = '';
+                ctaFooter.style.bottom = '';
                 syncCtaMargin();
             }
         };

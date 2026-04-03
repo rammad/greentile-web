@@ -55,8 +55,9 @@
         });
     }
 
-    const PRESS_SPEED = 50;
-    const PRESS_GAP = 64;
+    const _s = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+    const PRESS_SPEED = 50 * _s;
+    const PRESS_GAP = 64 * _s;
 
     function initPressMarquee() {
         document.querySelectorAll('.press-marquee-track').forEach(track => {

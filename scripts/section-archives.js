@@ -28,7 +28,8 @@
 
     /* ── responsive grid packing ── */
 
-    const GRID_CARD_MIN_W = 200;
+    const _archScale = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+    const GRID_CARD_MIN_W = 200 * _archScale;
     const GRID_MAX_COLS = 6;
     const BATCH_SIZE = 12;
     const _state = { monthGroups: null, activeCols: 0, visibleCount: 0, totalItems: 0, bound: false };
@@ -40,10 +41,10 @@
         if (container && container.clientWidth > 0) {
             width = container.clientWidth;
         } else {
-            const gutter = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-gutter')) || 20;
+            const gutter = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-gutter')) || (20 * _archScale);
             width = window.innerWidth - gutter * 2;
         }
-        const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--poster-gap')) || 20;
+        const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--poster-gap')) || (20 * _archScale);
         return Math.min(GRID_MAX_COLS, Math.max(2, Math.floor((width + gap) / (GRID_CARD_MIN_W + gap))));
     }
 

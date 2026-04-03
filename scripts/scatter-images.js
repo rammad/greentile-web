@@ -29,13 +29,22 @@
     // frameShiftPx:  px to shift top/bottom N images toward the gap
     // stagger:       fraction of vertical spacing to offset this column
 
+    function _scatterScale() {
+        return (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+    }
+
+    function _scaledDesktopCols() {
+        var s = _scatterScale();
+        return [
+            { id: 'fol', side: 'left',  offset: 240 * s, stagger:  0.08 },
+            { id: 'fil', side: 'left',  offset: -20 * s,  stagger: -0.25, frameShiftPx: 60 * s, flushTop: true },
+            { id: 'fir', side: 'right', offset: -20 * s,  stagger: -0.25, frameShiftPx: 60 * s },
+            { id: 'for', side: 'right', offset: 240 * s, stagger:  0.08 }
+        ];
+    }
+
     var COLUMNS = {
-        desktop: [
-            { id: 'fol', side: 'left',  offset: 240, stagger:  0.08 },
-            { id: 'fil', side: 'left',  offset: -20,  stagger: -0.25, frameShiftPx: 60, flushTop: true },
-            { id: 'fir', side: 'right', offset: -20,  stagger: -0.25, frameShiftPx: 60 },
-            { id: 'for', side: 'right', offset: 240, stagger:  0.08 }
-        ],
+        get desktop() { return _scaledDesktopCols(); },
         tablet: [
             { id: 'fl', side: 'left',  offset: 100, stagger: 0 },
             { id: 'fr', side: 'right', offset: 100, stagger: 0 }
@@ -109,6 +118,8 @@
             return 'desktop';
         }
 
+        var _s = _scatterScale();
+
         // ── layout ────────────────────────────────────────────────────────
 
         function initLayout() {
@@ -139,7 +150,7 @@
 
             var imgW = isMobile ? C.mobileImageWidth
                      : bp === 'tablet' ? C.tabletImageWidth
-                     : C.desktopImageWidth;
+                     : C.desktopImageWidth * _s;
 
             // ── distribute source images into columns (round-robin) ──────
 
@@ -198,7 +209,7 @@
                     if (compact) {
                         hJitter = ((i % 2 === 0) ? -1 : 1) * C.alternateOffsetPx;
                     } else {
-                        hJitter = (Math.random() - 0.5) * 2 * C.horizontalJitterPx;
+                        hJitter = (Math.random() - 0.5) * 2 * C.horizontalJitterPx * _s;
                     }
 
                     var frameShift = (frameN > 0 && (i < frameN || i >= count - frameN))

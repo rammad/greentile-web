@@ -65,7 +65,7 @@
         const lineCenters = lineTops.map((top, i) =>
             lineTops[i + 1] !== undefined
                 ? top + (lineTops[i + 1] - top) / 2
-                : top + (imageEls[0]?.getBoundingClientRect().height ?? 40) / 2
+                : top + (imageEls[0]?.getBoundingClientRect().height ?? (40 * ((window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1))) / 2
         );
 
         items.forEach(item => {

@@ -15,7 +15,7 @@
 
     position: absolute;
     top: auto;
-    bottom: 20px;
+    bottom: clamp(20px, 1.042vw, 40px);
     left: 50%;
     overflow: visible;
     transform: translateX(-50%);
@@ -35,6 +35,8 @@
         white-space: pre;
     }
 }
+
+/* 4K block removed — bottom now fluid via clamp in base rule */
 
 /* mobile — four lines, center-aligned */
 @media (max-width: 768px) {

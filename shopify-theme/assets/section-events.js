@@ -8,11 +8,16 @@
         const section = document.querySelector('.events-section');
         if (!section) return;
 
+        const cards = section.querySelectorAll('.event-card');
+        if (!cards.length) {
+            section.style.display = 'none';
+            return;
+        }
+
         const titleWrap = section.querySelector('.events-title-wrap');
         const desktopLine = section.querySelector('.events-title-lines.desktop-only .animate-line');
         const allLines = [...section.querySelectorAll('.events-title-wrap .animate-line')];
         const grid = section.querySelector('.events-grid');
-        const cards = section.querySelectorAll('.event-card');
         const btn = section.querySelector('.cta-btn');
         const ctaFooter = section.querySelector('.events-content-footer');
         const stickyInner = section.querySelector('.events-sticky-inner');

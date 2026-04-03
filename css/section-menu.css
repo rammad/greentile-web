@@ -46,8 +46,8 @@
     object-fit: cover; 
     aspect-ratio: 4 / 5;
     opacity: 0;
-    filter: blur(10px);    /* fixed — blur does not scale */
-    transform: translate3d(0, 40px, 0);
+    filter: blur(var(--blur-standard));
+    transform: translate3d(0, clamp(40px, 2.083vw, 80px), 0);
     transition: opacity 0.5s ease, filter 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -59,8 +59,8 @@
 
 .menu-group.prev .menu-photo {
     opacity: 0;
-    filter: blur(10px);    /* fixed — blur does not scale */
-    transform: translate3d(0, calc(-1 * 40px), 0);
+    filter: blur(var(--blur-standard));
+    transform: translate3d(0, calc(-1 * clamp(40px, 2.083vw, 80px)), 0);
 }
 
 .menu-container {
@@ -70,8 +70,8 @@
     display: flex; 
     flex-direction: column; 
     align-items: center;
-    gap: 40px;
-    max-width: 1000px;
+    gap: clamp(40px, 2.083vw, 80px);
+    max-width: clamp(1000px, 52.083vw, 2000px);
     width: 100%;
     padding: 0 var(--page-gutter);
 }
@@ -105,16 +105,16 @@
 }
 
 .cta-container {
-    position: relative; width: 100%; max-width: 600px; height: 150px;
+    position: relative; width: 100%; max-width: clamp(600px, 31.25vw, 1200px); height: clamp(150px, 7.813vw, 300px);
 }
 
 .cta-block {
     position: absolute; top: 0; left: 0; width: 100%;
     display: flex; flex-direction: column; align-items: center;
-    gap: 20px;
+    gap: clamp(20px, 1.042vw, 40px);
     opacity: 0; 
     pointer-events: none; 
-    transform: translateY(10px);
+    transform: translateY(clamp(10px, 0.521vw, 20px));
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
@@ -131,6 +131,8 @@
     color: var(--color-text-main); 
     text-align: center;
 }
+
+/* 4K block removed — blur, transforms, gaps, max-widths now fluid via clamp in base rules */
 
 @media (max-width: 1024px) {
     .menu-item { font-size: 36px; }

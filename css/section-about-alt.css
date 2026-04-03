@@ -76,7 +76,7 @@
 .about-alt-body .about-alt-block {
     grid-area: 1 / 1;
     width: 100%;
-    max-width: 600px;
+    max-width: clamp(600px, 31.25vw, 1200px);
     padding: 0 var(--page-gutter);
     text-align: center;
     will-change: transform, opacity, filter;
@@ -100,17 +100,19 @@
 .about-alt-body .about-content {
     position: relative;
     width: 100%;
-    max-width: 600px;
+    max-width: clamp(600px, 31.25vw, 1200px);
     text-align: center;
 }
 
 .about-alt-body .about-content .cta-btn {
     position: absolute;
-    top: calc(100% + 40px);
+    top: calc(100% + clamp(40px, 2.083vw, 80px));
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
 }
+
+/* 4K block removed — CTA top now fluid via clamp in base rule */
 
 @media (max-width: 1024px) {
     .about-alt-body .about-alt-block {

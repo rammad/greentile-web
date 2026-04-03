@@ -154,13 +154,30 @@
 
 .calendar-row .cal-date,
 .calendar-row .cal-name {
-    font-size: clamp(40px, 2.7vw + 12px, 64px);
+    font-size: clamp(40px, 2.7vw + 12px, var(--size-h2));
 }
 
 @media (hover: hover) {
     .calendar-row:hover {
         color: var(--color-text-main);
     }
+}
+
+.calendar-coming-soon {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    color: var(--c-dark-green-30);
+    opacity: 0;
+    filter: blur(10px);
+    transition: 
+        opacity var(--time-fade-in) ease, 
+        filter var(--time-fade-in) ease;
+}
+.calendar-coming-soon.is-visible { opacity: 1; filter: blur(0px); }
+
+.calendar-coming-soon .type-h2 {
+    font-size: clamp(40px, 2.7vw + 12px, var(--size-h2));
 }
 
 .calendar-poster-wrapper {
@@ -363,7 +380,87 @@
 
 .cal-poster-wrap .badge-sold { width: min(120px, 35%); aspect-ratio: 1; }
 
+/* 4K desktop — 2× scale */
+@media (min-width: 3840px) {
+    .calendar-controls {
+        margin: 64px 40px 0;
+    }
+
+    .filters-list { gap: 40px; }
+
+    .filter-btn, .view-btn {
+        padding-bottom: 8px;
+    }
+
+    .filter-btn::after,
+    .view-btn::after {
+        height: 2px;
+    }
+
+    .divider {
+        padding-bottom: 16px;
+    }
+
+    .calendar-body {
+        padding: 80px var(--page-gutter) 40px;
+    }
+
+    .calendar-grid-packed {
+        width: calc(100% + 48px);
+        margin-left: -24px;
+        padding-left: 24px;
+        padding-right: 24px;
+        gap: 128px;
+    }
+
+    .calendar-page.mode-grid .calendar-body {
+        padding-bottom: 160px;
+    }
+
+    .calendar-list {
+        gap: 48px;
+        padding-top: 80px;
+        padding-bottom: 40px;
+    }
+
+    .calendar-row,
+    .calendar-coming-soon {
+        filter: blur(20px);
+    }
+    .calendar-row.is-visible,
+    .calendar-coming-soon.is-visible { filter: blur(0px); }
+
+    /* font-size for .cal-date/.cal-name now auto-scales via fluid --size-h2 */
+
+    .calendar-poster-wrapper {
+        bottom: 20px;
+        filter: blur(20px);
+    }
+    .calendar-poster-wrapper.active { filter: blur(0px); }
+
+    .month-header {
+        margin-bottom: 40px;
+    }
+
+    .month-header::after, .spacer-line::after {
+        height: 2px;
+    }
+
+    .grid-card-label {
+        bottom: 40px;
+        left: 24px;
+        right: 24px;
+    }
+
+    #status-soon { width: 100%; height: 100%; }
+    #status-sold { width: min(560px, 60%); }
+    .grid-card .badge-sold { width: min(240px, 40%); }
+    .cal-poster-wrap .badge-sold { width: min(240px, 35%); }
+}
+
 @media (max-width: 1024px) {
+    .calendar-coming-soon { display: none; }
+
     .calendar-page {
         position: relative;
         height: auto;

@@ -16,9 +16,10 @@
  */
 
 (function () {
-    const BG_PX      =  480;
-    const MARQUEE_PX = -120;
-    const POSTER_PX  = -240;
+    const _s = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+    const BG_PX      =  480 * _s;
+    const MARQUEE_PX = -120 * _s;
+    const POSTER_PX  = -240 * _s;
 
     document.addEventListener('DOMContentLoaded', () => {
         const section      = document.querySelector('.featured-section');

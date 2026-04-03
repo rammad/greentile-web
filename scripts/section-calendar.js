@@ -87,6 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 await wait(staggerTime * 0.5);
             }
         }
+
+        const comingSoon = document.querySelector('.calendar-coming-soon');
+        if (comingSoon) {
+            await wait(staggerTime * 0.5);
+            comingSoon.classList.add('is-visible');
+        }
     };
 
     initEventInteractions();
@@ -485,7 +491,8 @@ function initMobileScrollSpy() {
 
 /* ── responsive grid packing ── */
 
-const GRID_CARD_MIN_W = 200;
+const _calScale = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+const GRID_CARD_MIN_W = 200 * _calScale;
 const GRID_MAX_COLS = 6;
 
 function getGridColCount() {
@@ -495,10 +502,10 @@ function getGridColCount() {
     if (container && container.clientWidth > 0) {
         width = container.clientWidth;
     } else {
-        const gutter = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-gutter')) || 20;
+        const gutter = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-gutter')) || (20 * _calScale);
         width = window.innerWidth - gutter * 2;
     }
-    const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--poster-gap')) || 20;
+    const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--poster-gap')) || (20 * _calScale);
     return Math.min(GRID_MAX_COLS, Math.max(2, Math.floor((width + gap) / (GRID_CARD_MIN_W + gap))));
 }
 
@@ -560,8 +567,8 @@ function renderPackedGrid(container, monthGroups, totalCols) {
                 card.href = item.href;
                 card.className = 'grid-card' + (item.status ? ` grid-${item.status}` : '');
                 if (item.status === 'coming-soon') {
-                    const ox = Math.round((Math.random() - 0.5) * 80);
-                    const oy = Math.round((Math.random() - 0.5) * 80 - 30);
+                    const ox = Math.round((Math.random() - 0.5) * 80 * _calScale);
+                    const oy = Math.round((Math.random() - 0.5) * 80 * _calScale - 30 * _calScale);
                     card.innerHTML = `
                         <div class="grid-card-placeholder">
                             <div class="status-badge badge-soon" style="left:calc(50% + ${ox}px);top:calc(40% + ${oy}px);transform:translate(-50%,-50%)">${buildBadgeHTML('coming-soon')}</div>

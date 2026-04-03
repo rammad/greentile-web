@@ -181,6 +181,23 @@
     }
 }
 
+.calendar-coming-soon {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    color: var(--c-dark-green-30);
+    opacity: 0;
+    filter: blur(10px);
+    transition: 
+        opacity var(--time-fade-in) ease, 
+        filter var(--time-fade-in) ease;
+}
+.calendar-coming-soon.is-visible { opacity: 1; filter: blur(0px); }
+
+.calendar-coming-soon .type-h2 {
+    font-size: clamp(40px, 2.7vw + 12px, 64px);
+}
+
 .calendar-poster-wrapper {
     position: absolute; 
     z-index: 1;
@@ -386,6 +403,8 @@
 .cal-poster-wrap .badge-sold { width: min(120px, 35%); aspect-ratio: 1; }
 
 @media (max-width: 1024px) {
+    .calendar-coming-soon { display: none; }
+
     .calendar-page {
         position: relative;
         height: auto;

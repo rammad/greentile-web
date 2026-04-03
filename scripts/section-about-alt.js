@@ -27,7 +27,8 @@
     var RANGE_FACTOR        = 0.6;
     var OPACITY_DWELL_START = 0.30;
     var OPACITY_DWELL_END   = 1.00;
-    var BLUR_MAX_PX         = 10;
+    var _altScale            = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+    var BLUR_MAX_PX         = 10 * _altScale;
     var BLUR_START           = 0.50;
     var BLUR_END             = 1.20;
     var READABLE_THRESHOLD  = 0.40;

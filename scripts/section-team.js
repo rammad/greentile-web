@@ -144,7 +144,8 @@
         }
 
         function getStickyTop() {
-            if (cachedStickyTop === null) cachedStickyTop = pxVar('calc(var(--space-for-nav) + 20px)');
+            const _tScale = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+            if (cachedStickyTop === null) cachedStickyTop = pxVar(`calc(var(--space-for-nav) + ${20 * _tScale}px)`);
             return cachedStickyTop;
         }
 
@@ -158,7 +159,7 @@
                     top:    `${top}px`,
                     left:   `${rect.left}px`,
                     width:  `${rect.width}px`,
-                    height: 'calc(100svh - var(--space-for-nav) - 40px)',
+                    height: `calc(100svh - var(--space-for-nav) - ${40 * ((window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1)}px)`,
                 });
             });
             pinned = true;

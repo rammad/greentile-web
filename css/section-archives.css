@@ -7,7 +7,7 @@
     height: auto !important; 
     overflow: visible !important;
     padding-top: var(--space-for-nav); 
-    padding-bottom: 80px;
+    padding-bottom: clamp(80px, 4.167vw, 160px);
     padding-left: var(--page-gutter);
     padding-right: var(--page-gutter);
 }
@@ -18,10 +18,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 40px;
-    margin-bottom: 40px;
+    gap: clamp(40px, 2.083vw, 80px);
+    margin-bottom: clamp(40px, 2.083vw, 80px);
     position: relative;
-    padding: 0 40px;
+    padding: 0 clamp(40px, 2.083vw, 80px);
     overflow: hidden;
 }
 
@@ -52,11 +52,13 @@
 }
 
 .load-more-container {
-    margin-top: 120px;
+    margin-top: clamp(120px, 6.25vw, 240px);
     display: flex;
     justify-content: center;
     width: 100%;
 }
+
+/* 4K block removed — padding, gap, margin now fluid via clamp in base rules */
 
 @media (max-width: 1024px) {
     .archives-page {

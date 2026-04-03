@@ -12,18 +12,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 64px;
+    gap: clamp(64px, 3.333vw, 128px);
 }
 
 /* subheader label above the manifesto text */
 .about-subhead {
-    margin-bottom: calc(var(--gap-text) - 64px);
+    margin-bottom: calc(var(--gap-text) - clamp(64px, 3.333vw, 128px));
 }
 
 /* text block — full width so JS line measurements are stable */
 .about-text.type-h1 {
     width: 100%;
-    font-size: clamp(64px, -14.77px + 7.69vw, 96px);
+    font-size: clamp(64px, -14.77px + 7.69vw, var(--size-h1));
     line-height: var(--lh-tight);
     text-align: center;
     text-box: normal;
@@ -91,6 +91,8 @@
 .about-cta {
     pointer-events: auto;
 }
+
+/* 4K block removed — gap, margin, font-size all scale via fluid clamp values */
 
 @media (max-width: 1024px) {
     .about {

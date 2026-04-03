@@ -10,12 +10,12 @@
     width: 100%;
     position: relative;
     margin-top: var(--section-spacing);
-    padding-bottom: 80px;
+    padding-bottom: clamp(80px, 4.167vw, 160px);
     overflow: hidden;
 }
 
 .socials-header {
-    padding: 0 var(--page-gutter) 140px;
+    padding: 0 var(--page-gutter) clamp(140px, 7.292vw, 280px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -37,9 +37,9 @@
 
 .socials-icons {
     display: flex;
-    gap: 20px;
+    gap: clamp(20px, 1.042vw, 40px);
     justify-content: center;
-    margin-top: 20px;
+    margin-top: clamp(20px, 1.042vw, 40px);
     opacity: 0;
     transform: translateY(var(--travel-reveal));
     transition: 
@@ -53,8 +53,8 @@
 }
 
 .icon-circle {
-    width: 52px;
-    height: 52px;
+    width: clamp(52px, 2.708vw, 104px);
+    height: clamp(52px, 2.708vw, 104px);
     background-color: var(--c-dark-green-30);
     mask-size: contain;
     mask-repeat: no-repeat;
@@ -98,7 +98,7 @@
 }
 
 .social-img {
-    width: 400px;
+    width: clamp(400px, 20.833vw, 800px);
     aspect-ratio: 4 / 5;
     object-fit: cover;
     flex-shrink: 0;
@@ -106,7 +106,7 @@
     will-change: transform, opacity;
 
     opacity: 0;
-    transform: translateY(calc(80px + 40px));
+    transform: translateY(clamp(120px, 6.25vw, 240px));
     transition:
         opacity var(--time-fade-in) var(--ease-standard),
         transform var(--time-fade-in) var(--ease-standard);
@@ -114,16 +114,18 @@
 
 .social-img.is-visible {
     opacity: 1;
-    transform: translateY(80px);
+    transform: translateY(clamp(80px, 4.167vw, 160px));
 }
 
 .social-img.push-down {
-    transform: translateY(64px);
+    transform: translateY(clamp(64px, 3.333vw, 128px));
 }
 
 .social-img.push-down.is-visible {
     transform: translateY(0);
 }
+
+/* 4K block removed — all values now fluid via clamp in base rules */
 
 @media (max-width: 1024px) {
 
