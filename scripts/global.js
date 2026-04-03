@@ -277,6 +277,7 @@ window.AnimationUtils = {
 window.AppUtils = {
     getCurrentSeason,
     fitTextToWidth,
+    fitTextGroupToWidth,
     getLayoutScale,
     scalePx,
 };

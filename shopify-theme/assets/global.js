@@ -257,6 +257,7 @@ window.AnimationUtils = {
 window.AppUtils = {
     getCurrentSeason,
     fitTextToWidth,
+    fitTextGroupToWidth,
 };
 
 window.initCascadeReveal = initCascadeReveal;

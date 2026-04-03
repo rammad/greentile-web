@@ -164,11 +164,11 @@
 }
 
 .calendar-coming-soon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    min-height: 0;
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    text-align: center;
     color: var(--c-dark-green-30);
     opacity: 0;
     filter: blur(10px);
@@ -186,11 +186,12 @@
     position: absolute; 
     z-index: 1;
     top: 0;
-    bottom: 10px;
+    bottom: 0;
     left: 10%;
     height: auto;
     display: flex;
     align-items: flex-end;
+    padding-bottom: 20px;
     pointer-events: none;
     opacity: 0;
     filter: blur(10px);                    /* fixed — blur does not scale */
@@ -432,8 +433,12 @@
 
     /* font-size for .cal-date/.cal-name now auto-scales via fluid --size-h2 */
 
+    .calendar-coming-soon {
+        bottom: 80px;
+    }
+
     .calendar-poster-wrapper {
-        bottom: 20px;
+        padding-bottom: 40px;
         filter: blur(20px);
     }
     .calendar-poster-wrapper.active { filter: blur(0px); }
@@ -467,6 +472,10 @@
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
+    }
+
+    .calendar-coming-soon {
+        bottom: 80px;
     }
 
     .calendar-header {
@@ -637,7 +646,13 @@
         align-items: stretch;
         gap: 0;
         width: 100%;
+        transition: margin-top 0.3s;
     }
+
+    .calendar-controls.filters-open {
+        margin-top: 50px;
+    }
+
 
     .calendar-controls .text-mask { display: none; }
     .divider { display: none; }
@@ -677,14 +692,14 @@
         gap: 20px;
         align-items: baseline;
         overflow: hidden;
-        max-height: 0;
+        height: 0;
         opacity: 0;
-        transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
+        transition: height 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
         margin-top: 0;
     }
 
     .calendar-controls.filters-open .mobile-filter-options {
-        max-height: 40px;
+        height: 18px;
         opacity: 1;
         margin-top: 12px;
     }

@@ -51,6 +51,26 @@
     }
 }
 
+.archives-coming-soon {
+    display: none;
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--c-dark-green-30);
+    opacity: 0;
+    filter: blur(10px);
+    transition:
+        opacity var(--time-fade-in) ease,
+        filter var(--time-fade-in) ease;
+}
+.archives-coming-soon.is-visible { opacity: 1; filter: blur(0px); display: block; }
+
+.archives-coming-soon .type-h2 {
+    font-size: clamp(40px, 2.7vw + 12px, var(--size-h2));
+}
+
 .load-more-container {
     margin-top: clamp(120px, 6.25vw, 240px);
     display: flex;
@@ -58,10 +78,21 @@
     width: 100%;
 }
 
+@media (min-width: 3840px) {
+    .archives-coming-soon {
+        bottom: 80px;
+    }
+}
+
 @media (max-width: 1024px) {
     .archives-page {
         padding-bottom: 0;
     }
+
+    .archives-coming-soon {
+        bottom: 80px;
+    }
+
     .archives-title-mobile {
         padding: 0 12px 32px;
         overflow: visible;

@@ -30,7 +30,7 @@
               <a href="{{ block.settings.url | default: '#' }}" target="_blank" rel="noopener"
                 class="press-logo-link press-{{ block.settings.slug }}"
                 aria-label="{{ block.settings.name }}"
-                {% if block.settings.logo %}style="mask-image: url('{{ block.settings.logo | image_url: width: 400 }}'); -webkit-mask-image: url('{{ block.settings.logo | image_url: width: 400 }}');"{% endif %}
+                {% if block.settings.logo %}style="mask-image: url('{{ block.settings.logo | image_url: width: 400 }}'); -webkit-mask-image: url('{{ block.settings.logo | image_url: width: 400 }}'); aspect-ratio: {{ block.settings.logo.width }} / {{ block.settings.logo.height }};"{% endif %}
                 {{ block.shopify_attributes }}
               ></a>
             {%- endif -%}
@@ -44,7 +44,7 @@
               <a href="{{ block.settings.url | default: '#' }}" target="_blank" rel="noopener"
                 class="press-logo-link press-{{ block.settings.slug }}"
                 aria-label="{{ block.settings.name }}"
-                {% if block.settings.logo %}style="mask-image: url('{{ block.settings.logo | image_url: width: 400 }}'); -webkit-mask-image: url('{{ block.settings.logo | image_url: width: 400 }}');"{% endif %}
+                {% if block.settings.logo %}style="mask-image: url('{{ block.settings.logo | image_url: width: 400 }}'); -webkit-mask-image: url('{{ block.settings.logo | image_url: width: 400 }}'); aspect-ratio: {{ block.settings.logo.width }} / {{ block.settings.logo.height }};"{% endif %}
                 {{ block.shopify_attributes }}
               ></a>
             {%- endif -%}

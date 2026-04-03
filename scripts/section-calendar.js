@@ -48,13 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const rows = document.querySelectorAll('.calendar-row');
 
         if (isMobile && mobileTitleLines.length) {
-            const { fitTextToWidth } = window.AppUtils || {};
+            const { fitTextGroupToWidth, fitTextToWidth } = window.AppUtils || {};
             await document.fonts.ready;
-            if (fitTextToWidth) {
-                Array.from(mobileTitleLines).forEach(line => {
-                    line.style.fontSize = '';
-                    fitTextToWidth(line);
-                });
+            const lines = Array.from(mobileTitleLines);
+            lines.forEach(line => { line.style.fontSize = ''; });
+            if (fitTextGroupToWidth && lines.length > 1) {
+                fitTextGroupToWidth(lines);
+            } else if (fitTextToWidth) {
+                lines.forEach(line => fitTextToWidth(line));
             }
             for (let i = 0; i < mobileTitleLines.length; i++) {
                 mobileTitleLines[i].classList.add('is-initialized');
@@ -123,6 +124,7 @@ function initEventInteractions() {
             pageContainer.classList.add('mode-grid');
             btnGrid.classList.add('active');
             btnList.classList.remove('active');
+            randomizeGridStickers();
         });
     }
 
@@ -738,6 +740,7 @@ function initMobileFilterToggle() {
             gridRolling = true;
 
             const isGrid = pageContainer.classList.toggle('mode-grid');
+            if (isGrid) randomizeGridStickers();
             const visible = newBtnGrid.querySelector('.ui-roll-visible');
             const hidden = newBtnGrid.querySelector('.ui-roll-hidden');
             const newLabel = isGrid ? 'List' : 'Grid';

@@ -58,7 +58,7 @@
     const _s = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
     const PRESS_SPEED = 50 * _s;
     const isMobile = window.innerWidth <= 1024;
-    const PRESS_GAP = (isMobile ? 24 : 64) * _s;
+    const PRESS_GAP = (isMobile ? 16 : 40) * _s;
 
     function initPressMarquee() {
         document.querySelectorAll('.press-marquee-track').forEach(track => {
@@ -71,7 +71,7 @@
             void first.offsetWidth;
 
             let patternWidth = 0;
-            items.forEach(item => { patternWidth += item.offsetWidth; });
+            items.forEach(item => { patternWidth += item.getBoundingClientRect().width; });
             patternWidth += PRESS_GAP * items.length;
 
             const copies = Math.ceil(window.innerWidth / patternWidth) + 2;

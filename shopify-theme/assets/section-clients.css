@@ -167,7 +167,7 @@
 .press-marquee-track {
     display: flex;
     align-items: center;
-    gap: clamp(64px, 3.333vw, 128px);
+    gap: clamp(40px, 2.083vw, 80px);
     flex-shrink: 0;
     transform: translateX(0);
     will-change: transform;
@@ -206,7 +206,7 @@
 
     .clients-col {
         width: 85%;
-        gap: 64px;
+        gap: var(--gap-text);
     }
 
     .press-logos {
@@ -226,7 +226,7 @@
     }
 
     .press-marquee-track {
-        gap: 24px;
+        gap: 16px;
     }
 
     .press-marquee-track .press-logo-link {

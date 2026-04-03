@@ -14,10 +14,10 @@
     function _scaledDesktopCols() {
         var s = _scatterScale();
         return [
-            { id: 'fol', side: 'left',  offset: 200 * s, stagger:  0.08 },
-            { id: 'fil', side: 'left',  offset: -40 * s,  stagger: -0.25, frameShiftPx: 60 * s, flushTop: true },
-            { id: 'fir', side: 'right', offset: -40 * s,  stagger: -0.25, frameShiftPx: 60 * s },
-            { id: 'for', side: 'right', offset: 200 * s, stagger:  0.08 }
+            { id: 'fol', side: 'left',  offset: 300 * s, stagger:  0.08 },
+            { id: 'fil', side: 'left',  offset: -70 * s,  stagger: -0.25, frameShiftPx: 60 * s, flushTop: true },
+            { id: 'fir', side: 'right', offset: -70 * s,  stagger: -0.25, frameShiftPx: 60 * s },
+            { id: 'for', side: 'right', offset: 300 * s, stagger:  0.08 }
         ];
     }
 
@@ -44,7 +44,7 @@
         tabletImageWidth:       200,
         mobileImageWidth:       125,
 
-        verticalJitter:         0.20,
+        verticalJitter:         0.30,
         compactVerticalJitter:  0,
 
         horizontalJitterPx:     40,

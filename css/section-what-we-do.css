@@ -211,7 +211,7 @@
 
 @media (max-width: 768px) {
     .about-menu-persistent .menu-item { word-spacing: 100vw; line-height: var(--lh-display); }
-    .about-menu-persistent .menu-item .ws-normal { word-spacing: normal; }
+    .about-menu-persistent .menu-item .ws-normal { word-spacing: normal; white-space: nowrap; }
 
     .about-menu-persistent .menu-label {
         line-height: var(--lh-tight);

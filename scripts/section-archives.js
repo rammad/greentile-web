@@ -31,9 +31,20 @@
         if(cta) transitionCta(cta, 'enter');
 
         initRowPacker();
+        initEmptyState();
 
         (window.pageReady || Promise.resolve()).then(enableNativeScroll);
     });
+
+    function initEmptyState() {
+        const comingSoon = document.querySelector('.archives-coming-soon');
+        if (!comingSoon) return;
+        if (_state.totalItems === 0) {
+            const loadBtn = document.getElementById('btn-load-more');
+            if (loadBtn) loadBtn.closest('.load-more-container').style.display = 'none';
+            setTimeout(() => comingSoon.classList.add('is-visible'), staggerTime);
+        }
+    }
 
     /* responsive grid packing */
 
