@@ -103,6 +103,28 @@
     grid-template-columns: 1fr;
 }
 
+/* single event: use simple fade-in entrance instead of scroll-driven animation */
+.events-section.single-event {
+    min-height: 0;
+}
+
+.events-section.single-event .events-sticky {
+    position: static;
+    height: auto;
+}
+
+.events-section.single-event .event-card {
+    transform: translateY(clamp(80px, 4.167vw, 160px));
+    transition:
+        opacity var(--time-fade-in) var(--ease-standard),
+        transform var(--time-fade-in) var(--ease-standard);
+}
+
+.events-section.single-event .event-card.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 @media (max-width: 1024px) {
     .events-section {
         margin-top: calc(var(--section-spacing) * 2);

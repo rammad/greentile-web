@@ -53,6 +53,9 @@
         document.querySelectorAll('.buy-price').forEach(el => { el.textContent = formatPrice(total); });
     }
 
+    const buyLabel = document.querySelector('.pdp-section')?.dataset.buyLabel || 'Buy Now';
+    let wasSoldOut = false;
+
     function updateBuyButton() {
         const buyBtn = document.getElementById('pdp-add-to-cart');
         const activeBtn = document.querySelector('.pdp-ticket-btn.active');
@@ -66,6 +69,35 @@
         } else if (buyBtn) {
             currentVariantId = parseInt(buyBtn.dataset.variantId, 10);
             currentUnitPrice = parseInt(buyBtn.dataset.price, 10) || 0;
+        }
+
+        if (buyBtn && productData) {
+            const variant = productData.variants.find(v => v.id === currentVariantId);
+            const available = variant ? variant.available : false;
+            const hasMultiple = productData.variants.length > 1;
+
+            buyBtn.disabled = !available;
+            buyBtn.classList.toggle('is-sold-out', !available);
+
+            const qtyWrapper = document.querySelector('.qty-wrapper');
+            if (qtyWrapper) qtyWrapper.style.display = available ? '' : 'none';
+
+            if (!available) {
+                buyBtn.querySelectorAll('.ui-roll-layer').forEach(layer => {
+                    layer.innerHTML = '<span class="buy-label">Sold Out</span>';
+                });
+                wasSoldOut = true;
+            } else if (wasSoldOut) {
+                const abbr = hasMultiple
+                    ? '<span class="buy-abbr">' + (activeBtn?.dataset.abbr || '') + '</span> &ndash; '
+                    : '';
+                buyBtn.querySelectorAll('.ui-roll-layer').forEach(layer => {
+                    layer.innerHTML =
+                        '<span>' + abbr + '<span class="buy-price">' + formatPrice(currentUnitPrice * qty) + '</span></span>' +
+                        '<span class="buy-label">' + buyLabel + '</span>';
+                });
+                wasSoldOut = false;
+            }
         }
 
         syncPriceDisplay();
@@ -291,6 +323,12 @@
                 if (roll) roll.classList.add('is-visible');
             }
 
+            const usesLenis = !document.documentElement.classList.contains('native-scroll');
+            const scrollViewport = document.getElementById('scroll-viewport');
+            if (usesLenis && scrollViewport) {
+                document.body.appendChild(ticketActions);
+            }
+
             const info = section.querySelector('.pdp-info');
             let prevBarH = 0;
             let rafId = 0;
@@ -301,7 +339,10 @@
                 info.style.paddingBottom = h ? h + 'px' : '';
                 if (scroll && prevBarH > 0) {
                     const delta = h - prevBarH;
-                    if (delta !== 0) window.scrollBy(0, delta);
+                    if (delta !== 0) {
+                        if (window.lenis) window.lenis.scrollTo(window.lenis.scroll + delta, { immediate: true });
+                        else window.scrollBy(0, delta);
+                    }
                 }
                 prevBarH = h;
             };
@@ -328,9 +369,10 @@
                 window.visualViewport.addEventListener('scroll', syncBottom);
             }
 
+            const ioRoot = usesLenis ? (scrollViewport || null) : null;
             if (descWrapper) {
                 observeElementInOut(descWrapper, {
-                    root: null,
+                    root: ioRoot,
                     enterThreshold: 0.05,
                     repeat: true,
                     onEnter: () => { ticketActions.classList.add('is-sticky-visible'); syncPad(); },

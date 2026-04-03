@@ -15,7 +15,7 @@
     right: 0;
     width: 100%;
     height: calc(100vh - var(--space-for-nav));
-    padding: 0 var(--page-gutter) 40px;
+    padding: 0 max(var(--page-gutter), 5vw) 40px;
     box-sizing: border-box;
 }
 
@@ -548,4 +548,19 @@
         width: 20px;
         background-color: var(--c-dark-green);
     }
+}
+
+#pdp-add-to-cart.is-sold-out {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#pdp-add-to-cart.is-sold-out .ui-roll-layer {
+    justify-content: center;
+    text-align: center;
+}
+
+#pdp-add-to-cart.is-sold-out .ui-roll-layer > span {
+    flex: none;
+    text-align: center;
 }

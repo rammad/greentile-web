@@ -99,6 +99,9 @@
         const MOBILE_START_RATIO    = 0.5;  // startOffset = vh × this
 
         const n = cards.length;
+        const singleCard = n === 1;
+        if (singleCard) section.classList.add('single-event');
+
         let availableRange = 1 - ENTRANCE_DELAY;
         let totalDelay     = availableRange * STAGGER_SPLIT;
         let travelDuration = availableRange * (1 - STAGGER_SPLIT);
@@ -143,7 +146,7 @@
 
         if (grid && observeElementInOut) {
             observeElementInOut(grid, {
-                onEnter() { if (currentlyMobile) revealMobileCards(); }
+                onEnter() { if (currentlyMobile || singleCard) revealMobileCards(); }
             });
         }
 
@@ -163,7 +166,7 @@
         function applyPositions(scrollY) {
             const progress = Math.min(1, (scrollY - phase2Start) / phase2Len);
 
-            if (!currentlyMobile) {
+            if (!currentlyMobile && !singleCard) {
                 const stickLen    = 1 - stickProgress;
                 const easeLen     = STICK_EASE * stickLen;
                 const stickyMax   = easeLen * phase2Len / 2;
@@ -181,7 +184,7 @@
                 stickyInner.style.transform = '';
             }
 
-            if (!currentlyMobile) {
+            if (!currentlyMobile && !singleCard) {
                 cards.forEach((card, i) => {
                     const localP = Math.max(0, Math.min(1, (progress - cardStarts[i]) / travelDuration));
                     const y = Math.round(startOffset * (1 - easeDecel(localP)));
@@ -245,8 +248,10 @@
                 stickProgress = 0;
                 startOffset   = ih * MOBILE_START_RATIO;
             } else {
-                mobileCardsRevealed = false;
-                cards.forEach(card => card.classList.remove('is-visible'));
+                if (!singleCard) {
+                    mobileCardsRevealed = false;
+                    cards.forEach(card => card.classList.remove('is-visible'));
+                }
 
                 stickyInner.style.paddingTop = (navInset + s20) + 'px';
 
@@ -260,7 +265,7 @@
 
                 section.style.marginTop  = '0px';
                 section.style.paddingTop = '0px';
-                section.style.minHeight  = (SECTION_VH * ih) + 'px';
+                section.style.minHeight  = singleCard ? '' : (SECTION_VH * ih) + 'px';
                 void section.offsetHeight;
 
                 let prevSec = null;
@@ -279,6 +284,13 @@
                 const adjustedPT = Math.max(0, desiredGap - baselineGap);
 
                 section.style.paddingTop = adjustedPT + 'px';
+
+                if (singleCard) {
+                    cards.forEach(card => {
+                        card.style.transform = '';
+                        card.style.opacity   = '';
+                    });
+                }
 
                 phase2Start   = section.offsetTop;
                 phase2Len     = section.offsetHeight - ih;
@@ -304,8 +316,11 @@
         const sectionShopifyWrap = section.closest('.shopify-section');
         if (sectionShopifyWrap) {
             let nextWrapper = sectionShopifyWrap.nextElementSibling;
-            while (nextWrapper && !nextWrapper.querySelector('section')) nextWrapper = nextWrapper.nextElementSibling;
-            if (nextWrapper) nextSection = nextWrapper.querySelector('section');
+            while (nextWrapper) {
+                const el = nextWrapper.querySelector('section, [id]');
+                if (el) { nextSection = el; break; }
+                nextWrapper = nextWrapper.nextElementSibling;
+            }
         } else {
             nextSection = section.nextElementSibling;
             while (nextSection && nextSection.tagName !== 'SECTION') nextSection = nextSection.nextElementSibling;
@@ -319,9 +334,12 @@
             const mobile = window.matchMedia('(max-width: 1024px)').matches;
             const desired = mobile ? spacing * 1.5 : spacing;
             const ctaBottom = ctaFooter.offsetTop + ctaFooter.offsetHeight;
-            const nextPad = nextSection ? parseFloat(getComputedStyle(nextSection).paddingTop) || 0 : 0;
+            const nextStyles = nextSection ? getComputedStyle(nextSection) : null;
+            const nextPad = nextStyles
+                ? (parseFloat(nextStyles.paddingTop) || 0) + (parseFloat(nextStyles.marginTop) || 0)
+                : 0;
 
-            const stickyMaxAtRelease = currentlyMobile
+            const stickyMaxAtRelease = (currentlyMobile || singleCard)
                 ? 0
                 : STICK_EASE * (1 - stickProgress) * phase2Len / 2;
 

@@ -173,7 +173,6 @@ function initEventInteractions() {
             row.addEventListener('mouseleave', () => {
                 if (window.innerWidth > 1024) {
                     posterWrapper.classList.remove('active');
-                    posterImg.classList.remove('is-sold-out');
                 }
             });
 
