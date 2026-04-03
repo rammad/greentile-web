@@ -152,7 +152,7 @@ function initEventInteractions() {
                         if (statusSold) {
                             populateBadge(statusSold, 'sold-out');
                             statusSold.style.opacity = '1';
-                            randomizeSticker(statusSold);
+                            randomizeSticker(statusSold, posterImg);
                         }
                         posterImg.classList.add('is-sold-out');
                         posterImg.style.opacity = '0.5';
@@ -175,22 +175,45 @@ function initEventInteractions() {
         });
     }
 
-    randomizeGridStickers();
 }
 
 function randomizeGridStickers() {
-    const gridStickers = document.querySelectorAll('.grid-item .badge-sold');
-    gridStickers.forEach(el => {
-        randomizeSticker(el);
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.grid-card .badge-sold').forEach(el => {
+            randomizeSticker(el);
+        });
     });
 }
 
-function randomizeSticker(element) {
-    const top = Math.random() * 75 + 10;
-    const left = 80;
+function randomizeSticker(element, referenceEl) {
+    const parent = element.offsetParent || element.parentElement;
+    if (!parent) return;
 
-    element.style.top = `${top}%`;
-    element.style.left = `${left}%`;
+    const parentRect = parent.getBoundingClientRect();
+    const ref = referenceEl || parent;
+    const refRect = ref.getBoundingClientRect();
+
+    const oTop = refRect.top - parentRect.top;
+    const oLeft = refRect.left - parentRect.left;
+    const rw = refRect.width;
+    const rh = refRect.height;
+    const sw = element.offsetWidth;
+    const sh = element.offsetHeight;
+
+    if (!rw || !rh || !sw || !sh) return;
+
+    const pad = Math.min(rw, rh) * 0.05;
+    const minY = oTop + sh / 2 + pad;
+    const maxY = oTop + rh - sh / 2 - pad;
+    const minX = oLeft + sw / 2 + pad;
+    const maxX = oLeft + rw - sw / 2 - pad;
+
+    const top = maxY > minY ? Math.random() * (maxY - minY) + minY : oTop + rh / 2;
+    const left = maxX > minX ? Math.random() * (maxX - minX) + minX : oLeft + rw / 2;
+
+    element.style.top = `${top}px`;
+    element.style.left = `${left}px`;
+    element.style.right = '';
 
     const rotation = Math.floor(Math.random() * 60) - 30;
     element.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
@@ -281,14 +304,17 @@ function initMobileScrollSpy() {
             const badge = document.createElement('div');
             badge.className = 'status-badge badge-sold';
             badge.innerHTML = buildBadgeHTML('sold-out');
-            Object.assign(badge.style, {
-                top: '10%', right: '10%', width: '120px', height: '120px',
-                transform: 'rotate(-15deg)', opacity: '1'
-            });
+            badge.style.opacity = '1';
             wrap.appendChild(badge);
         }
 
         item.insertBefore(wrap, calName);
+    });
+
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.cal-poster-wrap .badge-sold').forEach(el => {
+            randomizeSticker(el);
+        });
     });
 
     /* ── sync: when centered date changes, lerp poster into place ── */
@@ -393,16 +419,48 @@ function initMobileScrollSpy() {
         });
     }
 
-    /* ── forward taps from the rail's extended touch area to poster links ── */
-    let railTouchScroll = 0;
-    datesRail.addEventListener('touchstart', () => {
-        railTouchScroll = datesRail.scrollLeft;
+    /* ── forward taps from the rail's extended touch area to poster links ──
+       touch-action:pan-y on the rail can swallow click events when the
+       browser interprets even tiny vertical finger movement as a page
+       scroll.  Detect taps in touchend directly so navigation is reliable. */
+    let tapStartX = 0;
+    let tapStartY = 0;
+    let tapStartScroll = 0;
+    let tapHandledByTouch = false;
+    const TAP_SLOP = 12;
+
+    datesRail.addEventListener('touchstart', (e) => {
+        tapStartX = e.touches[0].clientX;
+        tapStartY = e.touches[0].clientY;
+        tapStartScroll = datesRail.scrollLeft;
+        tapHandledByTouch = false;
+    }, { passive: true });
+
+    datesRail.addEventListener('touchend', (e) => {
+        const dx = e.changedTouches[0].clientX - tapStartX;
+        const dy = e.changedTouches[0].clientY - tapStartY;
+        if (Math.abs(dx) > TAP_SLOP || Math.abs(dy) > TAP_SLOP) return;
+        if (Math.abs(datesRail.scrollLeft - tapStartScroll) > 5) return;
+
+        const trackRect = datesTrack.getBoundingClientRect();
+        if (e.changedTouches[0].clientY <= trackRect.bottom) return;
+
+        datesRail.style.pointerEvents = 'none';
+        const below = document.elementFromPoint(
+            e.changedTouches[0].clientX,
+            e.changedTouches[0].clientY
+        );
+        datesRail.style.pointerEvents = '';
+        if (below) {
+            const link = below.closest('a');
+            if (link) { tapHandledByTouch = true; link.click(); }
+        }
     }, { passive: true });
 
     datesRail.addEventListener('click', (e) => {
+        if (tapHandledByTouch) { tapHandledByTouch = false; return; }
         const trackRect = datesTrack.getBoundingClientRect();
         if (e.clientY <= trackRect.bottom) return;
-        if (Math.abs(datesRail.scrollLeft - railTouchScroll) > 5) return;
         datesRail.style.pointerEvents = 'none';
         const below = document.elementFromPoint(e.clientX, e.clientY);
         datesRail.style.pointerEvents = '';
@@ -425,62 +483,30 @@ function initMobileScrollSpy() {
     });
 }
 
-/* pack list rows into a grid grouped by month */
-function initRowPacker() {
+/* ── responsive grid packing ── */
+
+const GRID_CARD_MIN_W = 200;
+const GRID_MAX_COLS = 6;
+
+function getGridColCount() {
+    if (window.innerWidth <= 1024) return GRID_MAX_COLS;
     const container = document.getElementById('dynamic-grid-container');
-    const listRows = document.querySelectorAll('.calendar-row');
+    let width;
+    if (container && container.clientWidth > 0) {
+        width = container.clientWidth;
+    } else {
+        const gutter = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-gutter')) || 20;
+        width = window.innerWidth - gutter * 2;
+    }
+    const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--poster-gap')) || 20;
+    return Math.min(GRID_MAX_COLS, Math.max(2, Math.floor((width + gap) / (GRID_CARD_MIN_W + gap))));
+}
 
-    if (!container || listRows.length === 0) return;
-
+function renderPackedGrid(container, monthGroups, totalCols) {
     container.innerHTML = '';
 
-    const monthGroups = [];
-    let currentMonthName = null;
-    let currentGroup = null;
-
-    const getMonthName = (dateStr) => {
-        const monthNum = dateStr.split('.')[0];
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        return months[parseInt(monthNum) - 1] || "Upcoming";
-    };
-
-    listRows.forEach(row => {
-        const dateText = row.querySelector('.cal-date').innerText.trim();
-        const monthName = getMonthName(dateText);
-        const imgUrl = row.getAttribute('data-img');
-        const href = row.getAttribute('href');
-        const status = row.getAttribute('data-status');
-
-        if (monthName !== currentMonthName) {
-            currentGroup = { name: monthName, items: [] };
-            monthGroups.push(currentGroup);
-            currentMonthName = monthName;
-        }
-
-        const card = document.createElement('a');
-        card.href = href;
-        card.className = 'grid-card' + (status ? ` grid-${status}` : '');
-        if (status === 'coming-soon') {
-            const ox = Math.round((Math.random() - 0.5) * 80);
-            const oy = Math.round((Math.random() - 0.5) * 80 - 30);
-            card.innerHTML = `
-                <div class="grid-card-placeholder">
-                    <div class="status-badge badge-soon" style="left:calc(50% + ${ox}px);top:calc(40% + ${oy}px);transform:translate(-50%,-50%)">${buildBadgeHTML('coming-soon')}</div>
-                    <span class="grid-card-label type-subBold1">${row.getAttribute('data-title') || ''}</span>
-                </div>
-            `;
-        } else {
-            card.innerHTML = `
-                <img src="${imgUrl}" class="grid-card-poster">
-                ${status === 'sold-out' ? `<div class="status-badge badge-sold">${buildBadgeHTML('sold-out')}</div>` : ''}
-            `;
-        }
-
-        currentGroup.items.push(card);
-    });
-
     const ROWS = [];
-    let currentRow = { capacity: 6, chunks: [] };
+    let currentRow = { capacity: totalCols, chunks: [] };
 
     monthGroups.forEach(group => {
         let itemsToPlace = [...group.items];
@@ -489,7 +515,7 @@ function initRowPacker() {
         while (itemsToPlace.length > 0) {
             if (currentRow.capacity === 0) {
                 ROWS.push(currentRow);
-                currentRow = { capacity: 6, chunks: [] };
+                currentRow = { capacity: totalCols, chunks: [] };
             }
 
             const count = Math.min(itemsToPlace.length, currentRow.capacity);
@@ -511,14 +537,14 @@ function initRowPacker() {
     ROWS.forEach(rowData => {
         const rowEl = document.createElement('div');
         rowEl.className = 'packed-row';
+        rowEl.style.gridTemplateColumns = `repeat(${totalCols}, 1fr)`;
 
         rowData.chunks.forEach((chunk, chunkIdx) => {
             const chunkEl = document.createElement('div');
             chunkEl.className = `packed-chunk span-${chunk.span}`;
 
             const header = document.createElement('div');
-            header.className = 'month-header';
-            header.classList.add('type-subBold2');
+            header.className = 'month-header type-subBold2';
             if (chunk.isContinuation && chunkIdx > 0) {
                 header.innerHTML = '<span class="spacer-line"></span>';
                 header.classList.add('continuation-header');
@@ -529,7 +555,27 @@ function initRowPacker() {
 
             const gridEl = document.createElement('div');
             gridEl.className = `chunk-grid cols-${chunk.span}`;
-            chunk.items.forEach(item => gridEl.appendChild(item));
+            chunk.items.forEach(item => {
+                const card = document.createElement('a');
+                card.href = item.href;
+                card.className = 'grid-card' + (item.status ? ` grid-${item.status}` : '');
+                if (item.status === 'coming-soon') {
+                    const ox = Math.round((Math.random() - 0.5) * 80);
+                    const oy = Math.round((Math.random() - 0.5) * 80 - 30);
+                    card.innerHTML = `
+                        <div class="grid-card-placeholder">
+                            <div class="status-badge badge-soon" style="left:calc(50% + ${ox}px);top:calc(40% + ${oy}px);transform:translate(-50%,-50%)">${buildBadgeHTML('coming-soon')}</div>
+                            <span class="grid-card-label type-subBold1">${item.title}</span>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <img src="${item.imgUrl}" class="grid-card-poster">
+                        ${item.status === 'sold-out' ? `<div class="status-badge badge-sold">${buildBadgeHTML('sold-out')}</div>` : ''}
+                    `;
+                }
+                gridEl.appendChild(card);
+            });
 
             chunkEl.appendChild(gridEl);
             rowEl.appendChild(chunkEl);
@@ -543,6 +589,67 @@ function initRowPacker() {
         const deg  = sign * (2 + Math.random() * 2);
         card.style.setProperty('--hover-rotate', `${deg.toFixed(1)}deg`);
     });
+
+    randomizeGridStickers();
+}
+
+const _gridPacker = { monthGroups: null, activeCols: 0, bound: false };
+
+/* pack list rows into a grid grouped by month */
+function initRowPacker() {
+    const container = document.getElementById('dynamic-grid-container');
+    const listRows = document.querySelectorAll('.calendar-row');
+
+    if (!container || listRows.length === 0) return;
+
+    const getMonthName = (dateStr) => {
+        const monthNum = dateStr.split('.')[0];
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        return months[parseInt(monthNum) - 1] || "Upcoming";
+    };
+
+    const monthGroups = [];
+    let currentMonthName = null;
+    let currentGroup = null;
+
+    listRows.forEach(row => {
+        const dateText = row.querySelector('.cal-date').innerText.trim();
+        const monthName = getMonthName(dateText);
+
+        if (monthName !== currentMonthName) {
+            currentGroup = { name: monthName, items: [] };
+            monthGroups.push(currentGroup);
+            currentMonthName = monthName;
+        }
+
+        currentGroup.items.push({
+            imgUrl: row.getAttribute('data-img'),
+            href: row.getAttribute('href'),
+            status: row.getAttribute('data-status'),
+            title: row.getAttribute('data-title') || ''
+        });
+    });
+
+    _gridPacker.monthGroups = monthGroups;
+    _gridPacker.activeCols = getGridColCount();
+    renderPackedGrid(container, monthGroups, _gridPacker.activeCols);
+
+    if (!_gridPacker.bound) {
+        _gridPacker.bound = true;
+        let timer;
+        window.addEventListener('resize', () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                if (!_gridPacker.monthGroups) return;
+                const newCols = getGridColCount();
+                if (newCols !== _gridPacker.activeCols) {
+                    _gridPacker.activeCols = newCols;
+                    const c = document.getElementById('dynamic-grid-container');
+                    if (c) renderPackedGrid(c, _gridPacker.monthGroups, newCols);
+                }
+            }, 150);
+        });
+    }
 }
 
 function initMobileFilterToggle() {

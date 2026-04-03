@@ -303,10 +303,12 @@
 
         function handleCarouselScroll() {
             const imagesCol = section.querySelector('.team-images-col');
-            const sl = imagesCol.scrollLeft;
+            const viewCenter = imagesCol.scrollLeft + imagesCol.offsetWidth / 2;
             let closest = 0;
             posters.forEach((p, i) => {
-                if (Math.abs(p.offsetLeft - sl) < Math.abs(posters[closest].offsetLeft - sl)) closest = i;
+                const pMid = p.offsetLeft + p.offsetWidth / 2;
+                const cMid = posters[closest].offsetLeft + posters[closest].offsetWidth / 2;
+                if (Math.abs(pMid - viewCenter) < Math.abs(cMid - viewCenter)) closest = i;
             });
 
             const dots = section.querySelectorAll('.team-dot');

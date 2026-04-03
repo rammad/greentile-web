@@ -88,7 +88,7 @@
 
     .chunk-grid {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
         gap: 8px;
     }
 

@@ -48,16 +48,51 @@
             });
         }
 
-        if (gallery) {
-            const imgs = gallery.querySelectorAll('.social-img');
-            observeElementInOut(gallery, {
-                enterThreshold: 0.01,
-                onEnter() {
-                    imgs.forEach((img, i) => {
-                        setTimeout(() => img.classList.add('is-visible'), stagger * i);
-                    });
-                }
+        if (!gallery) return;
+
+        const imgs = gallery.querySelectorAll('.social-img');
+        if (imgs.length === 0) return;
+
+        const desktopMQ = window.matchMedia('(min-width: 1025px)');
+
+        function updatePushDown() {
+            const imgWidth = imgs[0].offsetWidth;
+            const gap = parseFloat(getComputedStyle(gallery).columnGap) || 0;
+            const total = imgs.length;
+
+            const visibleCount = Math.min(
+                total,
+                Math.floor((window.innerWidth + gap) / (imgWidth + (gap * 2)) + 1 )
+            );
+            const firstVisible = Math.floor((total - visibleCount) / 2);
+
+            // Desktop CSS: push-down → translateY(0) = HIGH position
+            // Mobile CSS:  push-down → translateY(40px) = LOW position
+            // We want edges HIGH and middles LOW at every width,
+            // so the class assignment flips at the 1024px breakpoint.
+            const isDesktop = desktopMQ.matches;
+
+            imgs.forEach((img, i) => {
+                const isEdgePos = ((i - firstVisible) & 1) === 0;
+                img.classList.toggle('push-down', isDesktop ? isEdgePos : !isEdgePos);
             });
         }
+
+        let resizeId;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeId);
+            resizeId = setTimeout(updatePushDown, 100);
+        });
+
+        updatePushDown();
+
+        observeElementInOut(gallery, {
+            enterThreshold: 0.01,
+            onEnter() {
+                imgs.forEach((img, i) => {
+                    setTimeout(() => img.classList.add('is-visible'), stagger * i);
+                });
+            }
+        });
     });
 })();

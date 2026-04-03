@@ -6,6 +6,7 @@
 
 <section id="about" class="what-we-do"
   data-colors="{{ section.settings.gradient_color_1 | default: '#FFFCFA' }}, {{ section.settings.gradient_color_2 | default: '#C1FEC1' }}, {{ section.settings.gradient_color_3 | default: '#FFFCFA' }}"
+  data-colors-mobile="{{ section.settings.gradient_color_1_mobile | default: '#FFFCFA' }}, {{ section.settings.gradient_color_2_mobile | default: '#A8F0A8' }}, {{ section.settings.gradient_color_3_mobile | default: '#FFFCFA' }}"
   data-edge="0"
   data-touch-speed="0.5"
 >
@@ -110,6 +111,28 @@
       "type": "color",
       "id": "gradient_color_3",
       "label": "Gradient color 3",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "header",
+      "content": "Mobile gradient"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1_mobile",
+      "label": "Mobile gradient color 1",
+      "default": "#FFFCFA"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2_mobile",
+      "label": "Mobile gradient color 2",
+      "default": "#A8F0A8"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3_mobile",
+      "label": "Mobile gradient color 3",
       "default": "#FFFCFA"
     }
   ],

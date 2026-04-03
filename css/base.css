@@ -698,21 +698,21 @@ body::after {
 @media (min-width: 2560px) {
 }
 
-/* touch — ≤1024px (tablet + mobile share touch-first layout) */
+/* touch — ≤1024px (tablet) */
 @media (max-width: 1024px) {
     :root {
-        --size-display-hero:  80px;
-        --size-display-xl:    80px;
-        --size-h1:            32px;
-        --size-h2:            28px;
-        --size-h3:            28px;
-        --size-subBold1:      14px;
+        --size-display-hero:  120px;
+        --size-display-xl:    120px;
+        --size-h1:            64px;
+        --size-h2:            48px;
+        --size-h3:            36px;
+        --size-subBold1:      16px;
         --size-subBold2:      14px;
         --size-subRegular1:   14px;
         --size-subRegular2:   12px;
         --size-body1:         16px;
-        --size-body2:         14px;
-        --size-body3:         16px;
+        --size-body2:         16px;
+        --size-body3:         24px;
 
         --lh-tight:   0.85;
         --lh-display: 0.9;
@@ -751,6 +751,15 @@ body::after {
 /* small mobile — ≤768px */
 @media (max-width: 768px) {
     :root {
+        --size-display-hero:  80px;
+        --size-display-xl:    80px;
+        --size-h1:            32px;
+        --size-h2:            28px;
+        --size-h3:            28px;
+        --size-subBold1:      14px;
+        --size-body2:         14px;
+        --size-body3:         16px;
+
         --page-gutter: 20px;
     }
 }

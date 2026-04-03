@@ -121,6 +121,10 @@
         text-box: normal;
     }
 
+    .events-section .animate-line {
+        white-space: normal;
+    }
+
     .events-sticky-inner {
         justify-content: safe center;
         gap: 40px;
@@ -143,5 +147,15 @@
     .event-card.is-visible {
         opacity: 1;
         filter: blur(0);
+    }
+}
+
+/* larger tablet — cap title at variable size like hero & footer */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .events-title-wrap .type-display-hero {
+        font-size: var(--size-display-hero) !important;
+        white-space: normal;
+        line-height: var(--lh-display);
+        text-box: normal;
     }
 }

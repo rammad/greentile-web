@@ -28,6 +28,11 @@
     will-change: transform;
     overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-width: none;
+}
+
+.contact-panel::-webkit-scrollbar {
+    display: none;
 }
 
 .contact-panel.is-open {
@@ -104,6 +109,12 @@
     gap: 12px;
 }
 
+.contact-extra-field .contact-input,
+.contact-extra-field .contact-textarea,
+.contact-extra-field select {
+    width: 100%;
+}
+
 .contact-input,
 .contact-textarea {
     font-family: var(--font-subheader);
@@ -178,6 +189,10 @@ body.contact-is-open .nav-hamburger {
 }
 
 @media (min-width: 1025px) {
+    .contact-backdrop {
+        z-index: 1010;
+    }
+
     .contact-panel {
         top: 12px;
         right: 20px;
@@ -185,6 +200,16 @@ body.contact-is-open .nav-hamburger {
         height: auto;
         border-radius: 27px;
         transform: translateX(calc(100% + var(--page-gutter)));
+        z-index: 1011;
+    }
+
+    body.contact-is-open .sticky-nav {
+        z-index: 1012;
+    }
+
+    body.contact-is-open .nav-center {
+        opacity: 0;
+        pointer-events: none;
     }
 
     body.contact-is-open .nav-hamburger {

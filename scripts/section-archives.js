@@ -26,6 +26,137 @@
         initRowPacker();
     });
 
+    /* ── responsive grid packing ── */
+
+    const GRID_CARD_MIN_W = 200;
+    const GRID_MAX_COLS = 6;
+    const BATCH_SIZE = 12;
+    const _state = { monthGroups: null, activeCols: 0, visibleCount: 0, totalItems: 0, bound: false };
+
+    function getGridColCount() {
+        if (window.innerWidth <= 1024) return GRID_MAX_COLS;
+        const container = document.getElementById('dynamic-archive-container');
+        let width;
+        if (container && container.clientWidth > 0) {
+            width = container.clientWidth;
+        } else {
+            const gutter = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-gutter')) || 20;
+            width = window.innerWidth - gutter * 2;
+        }
+        const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--poster-gap')) || 20;
+        return Math.min(GRID_MAX_COLS, Math.max(2, Math.floor((width + gap) / (GRID_CARD_MIN_W + gap))));
+    }
+
+    function renderArchiveGrid(container, monthGroups, totalCols) {
+        container.innerHTML = '';
+
+        const ROWS = [];
+        let currentRow = { capacity: totalCols, chunks: [] };
+
+        monthGroups.forEach(group => {
+            let itemsToPlace = [...group.items];
+            let isContinuation = false;
+
+            while (itemsToPlace.length > 0) {
+                if (currentRow.capacity === 0) {
+                    ROWS.push(currentRow);
+                    currentRow = { capacity: totalCols, chunks: [] };
+                }
+
+                const count = Math.min(itemsToPlace.length, currentRow.capacity);
+                const chunkItems = itemsToPlace.splice(0, count);
+
+                currentRow.chunks.push({
+                    monthName: group.name,
+                    items: chunkItems,
+                    span: count,
+                    isContinuation: isContinuation
+                });
+
+                currentRow.capacity -= count;
+                isContinuation = true;
+            }
+        });
+        if (currentRow.chunks.length > 0) ROWS.push(currentRow);
+
+        const flatItemList = [];
+
+        ROWS.forEach(rowData => {
+            const rowEl = document.createElement('div');
+            rowEl.className = 'packed-row';
+            rowEl.style.gridTemplateColumns = `repeat(${totalCols}, 1fr)`;
+
+            rowData.chunks.forEach((chunk, chunkIdx) => {
+                const chunkEl = document.createElement('div');
+                chunkEl.className = `packed-chunk span-${chunk.span}`;
+
+                const header = document.createElement('div');
+                header.className = 'month-header type-subBold2';
+                if (chunk.isContinuation && chunkIdx > 0) {
+                    header.innerHTML = '<span class="spacer-line"></span>';
+                    header.classList.add('continuation-header');
+                } else {
+                    header.innerText = chunk.monthName;
+                }
+                chunkEl.appendChild(header);
+
+                const gridEl = document.createElement('div');
+                gridEl.className = `chunk-grid cols-${chunk.span}`;
+
+                chunk.items.forEach(item => {
+                    const card = document.createElement('a');
+                    card.href = item.href;
+                    card.className = 'grid-card';
+                    card.innerHTML = `<img src="${item.imgSrc}" class="grid-card-poster">`;
+                    gridEl.appendChild(card);
+                    flatItemList.push(card);
+                });
+
+                chunkEl.appendChild(gridEl);
+                rowEl.appendChild(chunkEl);
+            });
+
+            container.appendChild(rowEl);
+        });
+
+        container.querySelectorAll('.grid-card').forEach(card => {
+            const sign = Math.random() < 0.5 ? -1 : 1;
+            const deg  = sign * (2 + Math.random() * 2);
+            card.style.setProperty('--hover-rotate', `${deg.toFixed(1)}deg`);
+        });
+
+        return flatItemList;
+    }
+
+    function applyPagination(flatItemList) {
+        flatItemList.forEach((item, index) => {
+            if (index >= _state.visibleCount) {
+                item.style.display = 'none';
+                item.style.opacity = '0';
+            } else {
+                item.style.display = '';
+                item.style.opacity = '1';
+            }
+        });
+
+        document.querySelectorAll('#dynamic-archive-container .packed-row').forEach(row => {
+            const cards = row.querySelectorAll('.grid-card');
+            const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
+            row.style.display = hasVisible ? 'grid' : 'none';
+        });
+
+        const loadBtn = document.getElementById('btn-load-more');
+        if (loadBtn) {
+            if (_state.visibleCount >= _state.totalItems) {
+                loadBtn.style.opacity = '0';
+                loadBtn.style.pointerEvents = 'none';
+            } else {
+                loadBtn.style.opacity = '';
+                loadBtn.style.pointerEvents = '';
+            }
+        }
+    }
+
     function initRowPacker() {
         const container = document.getElementById('dynamic-archive-container');
         if (!container) return;
@@ -51,101 +182,40 @@
                 currentMonthName = m;
             }
 
-            const card = document.createElement('a');
-            card.href = href;
-            card.className = 'grid-card';
-            card.innerHTML = `<img src="${imgSrc}" class="grid-card-poster">`;
-
-            currentGroup.items.push(card);
+            currentGroup.items.push({ imgSrc, href });
         });
 
-        const ROWS = [];
-        let currentRow = { capacity: 6, chunks: [] };
+        _state.monthGroups = monthGroups;
+        _state.totalItems = allCells.length;
+        _state.activeCols = getGridColCount();
 
-        monthGroups.forEach(group => {
-            let itemsToPlace = [...group.items];
-            let isContinuation = false; 
-
-            while (itemsToPlace.length > 0) {
-                if (currentRow.capacity === 0) {
-                    ROWS.push(currentRow);
-                    currentRow = { capacity: 6, chunks: [] };
-                }
-
-                const count = Math.min(itemsToPlace.length, currentRow.capacity);
-                const chunkItems = itemsToPlace.splice(0, count);
-
-                currentRow.chunks.push({
-                    monthName: group.name,
-                    items: chunkItems,
-                    span: count,
-                    isContinuation: isContinuation
-                });
-
-                currentRow.capacity -= count;
-                isContinuation = true;
-            }
-        });
-        if (currentRow.chunks.length > 0) ROWS.push(currentRow);
-
-        const flatItemList = [];
-
-        ROWS.forEach(rowData => {
-            const rowEl = document.createElement('div');
-            rowEl.className = 'packed-row';
-            
-            rowData.chunks.forEach((chunk, chunkIdx) => {
-                const chunkEl = document.createElement('div');
-                chunkEl.className = `packed-chunk span-${chunk.span}`;
-                
-                const header = document.createElement('div');
-                header.className = 'month-header';
-                header.classList.add('type-subBold2');
-                if (chunk.isContinuation && chunkIdx > 0) {
-                    header.innerHTML = '<span class="spacer-line"></span>';
-                    header.classList.add('continuation-header');
-                } else {
-                    header.innerText = chunk.monthName;
-                }
-                chunkEl.appendChild(header);
-
-                const gridEl = document.createElement('div');
-                gridEl.className = `chunk-grid cols-${chunk.span}`;
-                
-                chunk.items.forEach(item => {
-                    gridEl.appendChild(item);
-                    flatItemList.push(item);
-                });
-
-                chunkEl.appendChild(gridEl);
-                rowEl.appendChild(chunkEl);
-            });
-
-            container.appendChild(rowEl);
-        });
-
-        container.querySelectorAll('.grid-card').forEach(card => {
-            const sign = Math.random() < 0.5 ? -1 : 1;
-            const deg  = sign * (2 + Math.random() * 2);
-            card.style.setProperty('--hover-rotate', `${deg.toFixed(1)}deg`);
-        });
-
+        const flatItemList = renderArchiveGrid(container, monthGroups, _state.activeCols);
         initPagination(flatItemList);
+
+        if (!_state.bound) {
+            _state.bound = true;
+            let timer;
+            window.addEventListener('resize', () => {
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                    if (!_state.monthGroups) return;
+                    const newCols = getGridColCount();
+                    if (newCols !== _state.activeCols) {
+                        _state.activeCols = newCols;
+                        const c = document.getElementById('dynamic-archive-container');
+                        if (c) {
+                            const items = renderArchiveGrid(c, _state.monthGroups, newCols);
+                            applyPagination(items);
+                        }
+                    }
+                }, 150);
+            });
+        }
     }
 
     function initPagination(items) {
         const loadBtn = document.getElementById('btn-load-more');
-        const BATCH_SIZE = 12;
-        let visibleCount = 0;
-
-        const updateLayoutVisibility = () => {
-            const rows = document.querySelectorAll('.packed-row');
-            rows.forEach(row => {
-                const cards = row.querySelectorAll('.grid-card');
-                const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
-                row.style.display = hasVisible ? 'grid' : 'none';
-            });
-        };
+        _state.visibleCount = Math.min(BATCH_SIZE, items.length);
 
         items.forEach((item, index) => {
             if (index >= BATCH_SIZE) {
@@ -156,27 +226,35 @@
             }
         });
 
-        visibleCount = BATCH_SIZE;
-        updateLayoutVisibility();
+        document.querySelectorAll('#dynamic-archive-container .packed-row').forEach(row => {
+            const cards = row.querySelectorAll('.grid-card');
+            const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
+            row.style.display = hasVisible ? 'grid' : 'none';
+        });
 
         if (items.length <= BATCH_SIZE) {
-            if(loadBtn) loadBtn.style.display = 'none';
+            if (loadBtn) loadBtn.style.display = 'none';
             return;
         }
 
         if (loadBtn) {
             loadBtn.addEventListener('click', () => {
-                const nextLimit = visibleCount + BATCH_SIZE;
+                const currentCards = Array.from(document.querySelectorAll('#dynamic-archive-container .grid-card'));
+                const nextLimit = Math.min(_state.visibleCount + BATCH_SIZE, _state.totalItems);
                 let newlyVisible = [];
-                
-                for (let i = visibleCount; i < nextLimit && i < items.length; i++) {
-                    const item = items[i];
-                    item.style.display = 'block';
-                    newlyVisible.push(item);
+
+                for (let i = _state.visibleCount; i < nextLimit && i < currentCards.length; i++) {
+                    currentCards[i].style.display = '';
+                    newlyVisible.push(currentCards[i]);
                 }
-                
-                visibleCount = nextLimit;
-                updateLayoutVisibility();
+
+                _state.visibleCount = nextLimit;
+
+                document.querySelectorAll('#dynamic-archive-container .packed-row').forEach(row => {
+                    const cards = row.querySelectorAll('.grid-card');
+                    const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
+                    row.style.display = hasVisible ? 'grid' : 'none';
+                });
 
                 setTimeout(() => {
                     newlyVisible.forEach(item => {
@@ -185,7 +263,7 @@
                     });
                 }, 50);
 
-                if (visibleCount >= items.length) {
+                if (_state.visibleCount >= _state.totalItems) {
                     loadBtn.style.opacity = '0';
                     loadBtn.style.pointerEvents = 'none';
                 }

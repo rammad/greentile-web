@@ -12,8 +12,6 @@
     // Text is narrower than what-we-do so images can come closer to center.
 
     var SCATTER_CONFIG = {
-        colLeftXMax:          20,
-        colRightXMin:         64,
         slideHeightVhDesktop: 0.9,
         slideHeightVhMobile:  1.1
     };

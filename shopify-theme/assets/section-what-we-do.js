@@ -296,12 +296,16 @@
             // ── text block transitions ──────────────────────────────
             if (justBecameActive) {
                 exitFaded = false;
+                if (menuEl) { menuEl.style.transition = 'none'; menuEl.style.opacity = '1'; }
+                if (bodyEl) { bodyEl.style.transition = 'none'; bodyEl.style.opacity = '1'; }
                 showBlock(blocks[activeIdx]);
                 if (scrollHasFired) showCtas(blocks[activeIdx]);
             }
             if (justBecameInactive) {
                 blocks.forEach(b => { hideBlock(b); hideCtas(b); });
                 exitFaded = false;
+                if (menuEl) { menuEl.style.transition = 'none'; menuEl.style.opacity = '1'; }
+                if (bodyEl) { bodyEl.style.transition = 'none'; bodyEl.style.opacity = '1'; }
             }
 
             wasActive = isActive;

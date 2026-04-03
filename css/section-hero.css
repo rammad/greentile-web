@@ -21,7 +21,23 @@
     transform: translateX(-50%);
 }
 
-@media (max-width: 1024px) {
+/* tablet — two lines, bottom-aligned */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .hero .type-display-hero {
+        font-size: var(--size-display-hero) !important;
+        white-space: normal;
+        line-height: var(--lh-display);
+        text-box: normal;
+    }
+
+    .hero .type-display-hero > span:nth-child(2)::after {
+        content: '\A';
+        white-space: pre;
+    }
+}
+
+/* mobile — four lines, center-aligned */
+@media (max-width: 768px) {
     .hero .type-display-hero {
         top: calc(48% + var(--space-for-nav) / 2);
         bottom: auto;

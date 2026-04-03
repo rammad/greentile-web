@@ -85,7 +85,7 @@
     border-radius: 100px;
     border: none;
     cursor: pointer;
-    padding: 12px 20px;
+    padding: 12px 24px calc(12px - 4px); /* drop slightly for better alignment */
     justify-self: end;
     align-self: stretch;
     flex-direction: column;
@@ -200,6 +200,10 @@
 
     .nav-left {
         padding: 12px 14px;
+    }
+
+    .nav-hamburger {
+        padding: 12px 20px;
     }
 
     .nav-logo {

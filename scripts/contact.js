@@ -15,6 +15,8 @@
 
     const form = panel.querySelector('#contact-form');
     const topicBtns = panel.querySelectorAll('.contact-topic-btn');
+    const messageEl = panel.querySelector('textarea[name="message"]');
+    const defaultPlaceholder = messageEl ? messageEl.getAttribute('placeholder') : '';
     const statusEl = panel.querySelector('.contact-status');
     const infoFields = panel.querySelectorAll('.contact-info-field');
     const extraFields = panel.querySelectorAll('.contact-extra-field');
@@ -27,6 +29,7 @@
     if (defaultBtn) {
         selectedTopic = defaultBtn.dataset.topic || '';
         if (defaultBtn.dataset.email) selectedEmail = defaultBtn.dataset.email;
+        updateMessagePlaceholder(defaultBtn);
     }
 
     function selectTopic(value) {
@@ -37,7 +40,13 @@
         btn.classList.add('active');
         selectedTopic = btn.dataset.topic;
         selectedEmail = btn.dataset.email || CONFIG.recipientEmail;
+        updateMessagePlaceholder(btn);
         updateExtraFields();
+    }
+
+    function updateMessagePlaceholder(btn) {
+        if (!messageEl) return;
+        messageEl.setAttribute('placeholder', btn?.dataset.placeholder || defaultPlaceholder);
     }
 
     function updateExtraFields() {
@@ -103,6 +112,7 @@
             btn.classList.add('active');
             selectedTopic = btn.dataset.topic;
             selectedEmail = btn.dataset.email || CONFIG.recipientEmail;
+            updateMessagePlaceholder(btn);
             updateExtraFields();
         });
     });

@@ -9,9 +9,9 @@
    automatically — no extra assets needed.
 
    Responsive tiers:
-     desktop  (≥1200):   4 front + 4 back  = 8 columns
-     tablet   (1024–1199): 2 front + 2 back = 4 columns
-     mobile   (<1024):   2 front + 2 back  = 4 columns
+     desktop  (>1024):  4 front columns, large center gap
+     tablet   (769–1024): 4 front columns, medium center gap
+     mobile   (≤768):   2 front columns, smallest center gap
 
    Usage (same API as the previous scatter module):
      var scatter = ScatterImages.init(sectionEl, viewportEl, numSlides, {});
@@ -37,13 +37,11 @@
             { id: 'for', x: 91,  layer: 'front', stagger:  0.08 }
         ],
         tablet: [
-            { id: 'fl',  x: 0,   layer: 'front', stagger: -0.20 },
-            { id: 'bl',  x: 12,  layer: 'back',  stagger:  0.20 },
-            { id: 'br',  x: 76,  layer: 'back',  stagger:  0.20 },
-            { id: 'fr',  x: 86,  layer: 'front', stagger: -0.20 }
+            { id: 'fl',  x: -24, layer: 'front', stagger: 0 },
+            { id: 'fr',  x: 90,  layer: 'front', stagger: 0 }
         ],
         mobile: [
-            { id: 'fl',  x: -20, layer: 'front', stagger: 0 },
+            { id: 'fl',  x: -24, layer: 'front', stagger: 0 },
             // { id: 'bl',  x: 13,   layer: 'back',  stagger: -0.15, frameInset: 5 },
             // { id: 'br',  x: 71,  layer: 'back',  stagger: -0.15, frameInset: -5 },
             { id: 'fr',  x: 90,  layer: 'front', stagger: 0 }
@@ -52,18 +50,17 @@
 
     var DEFAULTS = {
         // ── breakpoints ────────────────────────────────────────────────────
-        mobileBreakpoint:       1024,  // px — below this = mobile layout
-        tabletBreakpoint:       1200,  // px — below this = tablet, above = desktop
+        mobileBreakpoint:       768,   // px — at or below = mobile layout
+        tabletBreakpoint:       1024,  // px — at or below (and above mobile) = tablet layout
 
         // ── section height ─────────────────────────────────────────────────
         slideHeightVhDesktop:   0.85,  // vh per slide — controls total section height (desktop)
         slideHeightVhMobile:    0.85,  // vh per slide — same for mobile
 
-        // ── image sizing — vw-based with px clamp ────────────────────────
-        //   width = clamp(min, vw × viewport-width, max)
-        desktopImages: { frontVw: 0.10, frontMin: 120, frontMax: 200, backVw: 0.07, backMin: 80,  backMax: 140 },
-        tabletImages:  { frontVw: 0.10, frontMin: 90,  frontMax: 160, backVw: 0.07, backMin: 60,  backMax: 100 },
-        mobileImages:  { frontVw: 0.25, frontMin: 80,  frontMax: 140, backVw: 0.16, backMin: 50,  backMax: 90  },
+        // ── image sizing — fixed px per breakpoint ──────────────────────
+        desktopImages: { front: 180, back: 120 },
+        tabletImages:  { front: 150, back: 100 },
+        mobileImages:  { front: 120, back: 90  },
 
         // ── vertical & horizontal scatter ──────────────────────────────────
         verticalJitter:         0.12,  // 0–1 — random vertical offset for front images (fraction of spacing)
@@ -90,7 +87,11 @@
         // ── spacing ────────────────────────────────────────────────────────
         edgePadding:            0,     // 0–1 — fraction of section height reserved at top and bottom edges
 
-        overhangTopVh:          0      // vh — extra height above the section (desktop only)
+        overhangTopVh:          0,     // vh — extra height above the section (desktop only)
+
+        centerAnchorRef:        1440,  // px — reference viewport width for center-anchored desktop columns
+        centerAnchorRefTablet:  900,   // px — same for tablet
+        centerAnchorRefMobile:  390    // px — same for mobile
     };
 
     // ── utilities ─────────────────────────────────────────────────────────
@@ -134,8 +135,8 @@
 
         function getBreakpoint() {
             var w = window.innerWidth;
-            if (w < C.mobileBreakpoint)  return 'mobile';
-            if (w < C.tabletBreakpoint)  return 'tablet';
+            if (w <= C.mobileBreakpoint)  return 'mobile';
+            if (w <= C.tabletBreakpoint)  return 'tablet';
             return 'desktop';
         }
 
@@ -149,6 +150,7 @@
 
             var bp       = getBreakpoint();
             var isMobile = bp === 'mobile';
+            var compact  = bp !== 'desktop';
             var vpW      = window.innerWidth;
             var vpH      = window.innerHeight;
             var columns  = COLUMNS[bp];
@@ -156,7 +158,7 @@
             var slideVH          = isMobile ? C.slideHeightVhMobile : C.slideHeightVhDesktop;
             var totalSlideHeight = numSlides * slideVH * vpH;
             var sectionPadding   = parseFloat(getComputedStyle(section).paddingTop) || 0;
-            var overhangPx       = isMobile ? 0 : C.overhangTopVh * vpH;
+            var overhangPx       = compact ? 0 : C.overhangTopVh * vpH;
             var fullSectionHeight = overhangPx + sectionPadding + totalSlideHeight;
 
             var frontCols = columns.filter(function (c) { return c.layer === 'front'; });
@@ -167,7 +169,7 @@
             var frontBuckets = {};
             frontCols.forEach(function (c) { frontBuckets[c.id] = []; });
 
-            var maxPerCol = isMobile ? C.maxImagesPerColMobile : 999;
+            var maxPerCol = compact ? C.maxImagesPerColMobile : 999;
 
             sourceImages.forEach(function (img, i) {
                 var col = frontCols[i % frontCols.length];
@@ -195,11 +197,11 @@
             if (backCols.length > 0 && sourceImages.length > 0) {
                 var srcPool = shuffle(sourceImages.map(function (img) { return img.src; }));
                 var poolIdx = 0;
-                var backPerCol = isMobile ? C.mobileBackImagesPerCol : C.backImagesPerCol;
+                var backPerCol = compact ? C.mobileBackImagesPerCol : C.backImagesPerCol;
                 backCols.forEach(function (col) {
                     for (var i = 0; i < backPerCol; i++) {
                         var clone;
-                        if (isMobile) {
+                        if (compact) {
                             clone = document.createElement('div');
                             clone.className = 'scatter-img back-layer back-card';
                         } else {
@@ -216,17 +218,15 @@
                 });
             }
 
-            // ── size ranges ────────────────────────────────────────────────
+            // ── image sizes (fixed px per breakpoint) ────────────────────
 
-            var imgCfg   = isMobile ? C.mobileImages
-                         : bp === 'tablet' ? C.tabletImages
-                         : C.desktopImages;
-            var frontVw   = imgCfg.frontVw,  frontMinW = imgCfg.frontMin, frontMaxW = imgCfg.frontMax;
-            var backVw    = imgCfg.backVw,   backMinW  = imgCfg.backMin,  backMaxW  = imgCfg.backMax;
+            var imgCfg = isMobile ? C.mobileImages
+                       : bp === 'tablet' ? C.tabletImages
+                       : C.desktopImages;
 
             // ── position each column's images ──────────────────────────────
 
-            function positionColumn(colDef, images, minW, maxW, vwScale, isBack) {
+            function positionColumn(colDef, images, imgW, isBack) {
                 var count = images.length;
                 if (count === 0) return;
 
@@ -234,38 +234,42 @@
                 var usable     = fullSectionHeight * (1 - 2 * C.edgePadding);
                 var spacing    = usable / Math.max(1, count);
                 var staggerPx  = (colDef.stagger || 0) * spacing;
-                var jitterVal  = isMobile
+                var jitterVal  = compact
                     ? (isBack ? C.mobileBackVerticalJitter : C.mobileVerticalJitter)
                     : (isBack ? C.backVerticalJitter : C.verticalJitter);
                 var jitterAmt  = spacing * jitterVal;
                 var frameInset = colDef.frameInset || 0;
-                var frameN     = frameInset ? (isMobile ? C.mobileFrameCount : C.frameCount) : 0;
-                var imgW       = Math.round(Math.max(minW, Math.min(maxW, vpW * vwScale)));
+                var frameN     = frameInset ? (compact ? C.mobileFrameCount : C.frameCount) : 0;
                 var imgH       = imgW * (5 / 4);
 
                 images.forEach(function (img, i) {
                     var centerOffset = (colDef.flushTop && i === 0) ? 0 : 0.5;
                     var baseTop = edgeTop + spacing * (i + centerOffset) + staggerPx;
-                    var jitter  = isMobile ? 0 : (Math.random() - 0.5) * 2 * jitterAmt;
+                    var jitter  = compact ? 0 : (Math.random() - 0.5) * 2 * jitterAmt;
                     var rawTop  = baseTop + jitter;
 
                     var top = Math.max(0, Math.min(fullSectionHeight - imgH, rawTop));
 
-                    var speed = isMobile ? 1.0
+                    var speed = compact ? 1.0
                         : isBack ? randRange(C.backSpeedMin, C.backSpeedMax)
                         : randRange(C.frontSpeedMin, C.frontSpeedMax);
 
                     var inwardSign = colDef.x < 50 ? 1 : -1;
-                    var xJitter = isMobile
+                    var xJitter = compact
                         ? ((i % 2 === 0 ? -inwardSign : inwardSign) * C.mobileAlternateOffsetPct)
                         : (Math.random() - 0.5) * 2 * C.horizontalJitterPct;
                     var insetX  = (frameN > 0 && (i < frameN || i >= count - frameN))
                         ? frameInset : 0;
 
+                    var totalPct = colDef.x + xJitter + insetX;
+
                     img.style.display  = (isBack && i === count - 1) ? 'none' : '';
                     img.style.position = 'absolute';
                     img.style.width    = imgW + 'px';
-                    img.style.left     = (colDef.x + xJitter + insetX) + '%';
+                    var anchorRef = compact ? C.centerAnchorRefMobile
+                                  : C.centerAnchorRef;
+                    var offsetPx = anchorRef * (totalPct - 50) / 100;
+                    img.style.left = 'calc(50% + ' + offsetPx.toFixed(1) + 'px)';
                     img.style.top      = top + 'px';
                     img.style.zIndex   = isBack ? 2 : 10;
                     img.dataset.naturalTop  = String(top);
@@ -283,10 +287,10 @@
             }
 
             frontCols.forEach(function (col) {
-                positionColumn(col, frontBuckets[col.id], frontMinW, frontMaxW, frontVw, false);
+                positionColumn(col, frontBuckets[col.id], imgCfg.front, false);
             });
             backCols.forEach(function (col) {
-                positionColumn(col, backBuckets[col.id], backMinW, backMaxW, backVw, true);
+                positionColumn(col, backBuckets[col.id], imgCfg.back, true);
             });
 
             state.trackHeight = totalSlideHeight;

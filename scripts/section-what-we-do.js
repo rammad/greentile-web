@@ -32,11 +32,10 @@
         enterTravel:   75,      // vh below pinned position at start
         firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
         lastSlideEnd:  85,      // last slide ends
-        exitStart:     75,      // begin sliding upward off screen
-        exitEnd:       130,     // fully offscreen + fade last body/CTA
+        exitStart:     70,      // begin sliding upward off screen
+        exitEnd:       120,     // fully offscreen + fade last body/CTA
         exitTravel:    80,      // vh above pinned position at end
         hideAt:        110,     // menu items fade out
-        edgeWeight:    0.80,    // edge items get 80% of equal share
     };
 
     function easeOutCubic(t) { return 1 - (1 - t) * (1 - t) * (1 - t); }
@@ -54,19 +53,12 @@
         exitEnd:       140,     // fully offscreen + fade last body/CTA
         exitTravel:    150,  // vh above pinned position at end
         hideAt:        120,     // menu items fade out
-        edgeWeight:    1,       // equal time per slide
     };
 
-    // ── image sizing — vw-based with px clamp ────────────────────────
-    //   width = clamp(min, vw × viewport-width, max)
-    const DESKTOP_IMAGE_SIZE = {
-        frontVw: 0.10,  frontMin: 120,  frontMax: 200,
-        backVw:  0.07,  backMin:  80,   backMax:  140,
-    };
-    const MOBILE_IMAGE_SIZE = {
-        frontVw: 0.30,  frontMin: 80,   frontMax: 140,
-        backVw:  0.26,  backMin:  50,   backMax:  90,
-    };
+    // ── image sizing — fixed px per breakpoint ────────────────────────
+    const DESKTOP_IMAGE_SIZE = { front: 180, back: 120 };
+    const TABLET_IMAGE_SIZE  = { front: 150, back: 100 };
+    const MOBILE_IMAGE_SIZE  = { front: 120, back: 90  };
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('about');
@@ -81,6 +73,7 @@
 
         const scatter = window.ScatterImages.init(section, viewport, numSlides, {
             desktopImages: DESKTOP_IMAGE_SIZE,
+            tabletImages:  TABLET_IMAGE_SIZE,
             mobileImages:  MOBILE_IMAGE_SIZE,
         });
 
@@ -296,19 +289,22 @@
             // ── text block transitions ──────────────────────────────
             if (justBecameActive) {
                 exitFaded = false;
+                if (menuEl) { menuEl.style.transition = 'none'; menuEl.style.opacity = '1'; }
+                if (bodyEl) { bodyEl.style.transition = 'none'; bodyEl.style.opacity = '1'; }
                 showBlock(blocks[activeIdx]);
                 if (scrollHasFired) showCtas(blocks[activeIdx]);
             }
             if (justBecameInactive) {
                 blocks.forEach(b => { hideBlock(b); hideCtas(b); });
                 exitFaded = false;
+                if (menuEl) { menuEl.style.transition = 'none'; menuEl.style.opacity = '1'; }
+                if (bodyEl) { bodyEl.style.transition = 'none'; bodyEl.style.opacity = '1'; }
             }
 
             wasActive = isActive;
 
             // ── active slide index ──────────────────────────────────
             const n  = menuItems.length;
-            const ew = cfg.edgeWeight ?? 1;
             let closestIdx;
 
             if (sectionProg < cfg.firstSlideEnd) {
@@ -318,18 +314,9 @@
                     ? Math.max(0, Math.min(1, (sectionProg - cfg.firstSlideEnd) / (cfg.lastSlideEnd - cfg.firstSlideEnd)))
                     : 0;
                 const remaining = n - 1;
-                closestIdx = n - 1;
-                if (remaining > 2 && ew < 1) {
-                    const edge = ew / remaining;
-                    const mid  = (1 - 2 * edge) / (remaining - 2);
-                    let acc = 0;
-                    for (let j = 0; j < remaining; j++) {
-                        acc += (j === 0 || j === remaining - 1) ? edge : mid;
-                        if (sp < acc) { closestIdx = j + 1; break; }
-                    }
-                } else if (remaining > 0) {
-                    closestIdx = 1 + Math.min(remaining - 1, Math.floor(sp * remaining));
-                }
+                closestIdx = remaining > 0
+                    ? 1 + Math.min(remaining - 1, Math.floor(sp * remaining))
+                    : n - 1;
             }
 
             menuItems.forEach((item, i) => item.classList.toggle('is-active', i === closestIdx));

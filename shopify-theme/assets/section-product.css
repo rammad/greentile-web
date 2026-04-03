@@ -68,8 +68,9 @@
 
 .pdp-image-col,
 .pdp-info {
-    width: var(--pdp-col-width);
-    flex: 0 0 auto;
+    flex: 0 1 var(--pdp-col-width);
+    max-width: var(--pdp-col-width);
+    min-width: 0;
     height: 100%;
 }
 
@@ -118,6 +119,7 @@
 .ticket-actions {
     position: relative;
     display: flex;
+    flex-wrap: wrap;
     align-items: stretch;
     gap: 8px;
     width: 100%;
@@ -169,6 +171,7 @@
     border-radius: 100px;
     padding: var(--cta-padding);
     min-width: 140px;
+    height: 100%;
     box-sizing: border-box;
 }
 
@@ -186,9 +189,6 @@
     line-height: var(--lh-single);
 }
 
-.buy-btn-override {
-    align-self: flex-end;
-}
 
 .pdp-tag {
     display: inline-block;
@@ -211,14 +211,22 @@
 
 .pdp-ticket-types {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
     margin-bottom: 20px;
     width: 100%;
     flex-shrink: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.pdp-ticket-types::-webkit-scrollbar {
+    display: none;
 }
 
 .pdp-ticket-btn {
+    flex-shrink: 0;
     background: none;
     border: none;
     box-shadow: inset 0 0 0 1px var(--c-dark-green-20);
@@ -250,7 +258,7 @@
     display: none;
 }
 
-/* mobile: native stacking layout, no scroll swipe animation */
+/* tablet + mobile: vertical column layout */
 @media (max-width: 1024px) {
     .pdp-section {
         height: auto !important;
@@ -277,63 +285,15 @@
 
     .pdp-image-col,
     .pdp-info {
+        flex: 0 0 auto;
         width: 100%;
+        max-width: none;
         height: auto;
         overflow: visible;
     }
 
     .pdp-image-col {
         overflow: visible;
-    }
-
-    .pdp-image-track {
-        transform: none !important;
-        display: flex;
-        gap: 20px;
-        width: 100vw;
-        margin-left: calc(-1 * var(--page-gutter));
-        padding-left: 20px;
-        padding-right: 20px;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        scroll-padding-inline-start: 20px;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        box-sizing: border-box;
-    }
-
-    .pdp-image-track::-webkit-scrollbar {
-        display: none;
-    }
-
-    .pdp-poster {
-        display: block;
-        width: calc(100vw - 40px);
-        height: auto;
-        flex: 0 0 calc(100vw - 40px);
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
-        margin-bottom: 0;
-    }
-
-    .pdp-dots {
-        display: flex;
-        justify-content: center;
-        gap: 6px;
-        padding-top: 16px;
-    }
-
-    .pdp-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 3px;
-        background-color: var(--c-dark-green-30);
-        transition: width 0.3s ease, background-color 0.3s ease;
-    }
-
-    .pdp-dot.is-active {
-        width: 20px;
-        background-color: var(--c-dark-green);
     }
 
     .pdp-desc {
@@ -358,15 +318,16 @@
     .pdp-date-full { display: none; }
     .pdp-date-short { display: inline; }
 
-    .pdp-info {
-        padding-bottom: 0; /* overridden dynamically by JS to match ticket-actions height */
-    }
     .pdp-info .type-subBold1,
     .pdp-info .type-subBold2,
     .pdp-info .type-subRegular1,
     .pdp-info .type-subRegular2 {
         text-box: normal;
         line-height: var(--lh-body);
+    }
+
+    .pdp-info {
+        padding-bottom: 0;
     }
 
     .ticket-actions {
@@ -376,8 +337,6 @@
         right: 0;
         z-index: 100;
         background-color: var(--c-off-white);
-        /* backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px); */
         padding: var(--page-gutter);
         padding-bottom: calc(var(--page-gutter) + env(safe-area-inset-bottom, 0px));
         transform: translateY(100%);
@@ -466,5 +425,58 @@
         left: 50%;
         transform: translateX(-50%);
         margin-bottom: 0;
+    }
+}
+
+/* mobile: image carousel */
+@media (max-width: 480px) {
+    .pdp-image-track {
+        transform: none !important;
+        display: flex;
+        gap: 20px;
+        width: 100vw;
+        margin-left: calc(-1 * var(--page-gutter));
+        padding-left: 20px;
+        padding-right: 20px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline-start: 20px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        box-sizing: border-box;
+    }
+
+    .pdp-image-track::-webkit-scrollbar {
+        display: none;
+    }
+
+    .pdp-poster {
+        display: block;
+        width: calc(100vw - 40px);
+        height: auto;
+        flex: 0 0 calc(100vw - 40px);
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        margin-bottom: 0;
+    }
+
+    .pdp-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        padding-top: 16px;
+    }
+
+    .pdp-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background-color: var(--c-dark-green-30);
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    .pdp-dot.is-active {
+        width: 20px;
+        background-color: var(--c-dark-green);
     }
 }

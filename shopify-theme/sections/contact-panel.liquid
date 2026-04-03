@@ -23,6 +23,7 @@
               class="contact-topic-btn cta-btn is-visible type-subRegular1{% if block.settings.default %} active{% endif %}"
               data-topic="{{ block.settings.value }}"
               data-email="{{ block.settings.email }}"
+              {% if block.settings.message_placeholder != blank %}data-placeholder="{{ block.settings.message_placeholder }}"{% endif %}
               {{ block.shopify_attributes }}
             >
               {{ block.settings.label }}
@@ -45,51 +46,51 @@
               {{ block.shopify_attributes }}
             >
           {%- endfor -%}
-        </div>
 
-        {%- comment -%} Extra fields (conditionally shown per topic via JS) {%- endcomment -%}
-        {%- for block in extra_fields -%}
-          <div class="contact-extra-field"
-            data-show-for-topics="{{ block.settings.show_for_topics }}"
-            {{ block.shopify_attributes }}
-          >
-            {%- case block.settings.type -%}
-              {%- when 'textarea' -%}
-                <textarea
-                  class="contact-textarea type-subRegular1"
-                  name="{{ block.settings.name }}"
-                  placeholder="{{ block.settings.placeholder }}"
-                  {% if block.settings.required %}required{% endif %}
-                ></textarea>
+          {%- comment -%} Extra fields (conditionally shown per topic via JS) {%- endcomment -%}
+          {%- for block in extra_fields -%}
+            <div class="contact-extra-field"
+              data-show-for-topics="{{ block.settings.show_for_topics }}"
+              {{ block.shopify_attributes }}
+            >
+              {%- case block.settings.type -%}
+                {%- when 'textarea' -%}
+                  <textarea
+                    class="contact-textarea type-subRegular1"
+                    name="{{ block.settings.name }}"
+                    placeholder="{{ block.settings.placeholder }}"
+                    {% if block.settings.required %}required{% endif %}
+                  ></textarea>
 
-              {%- when 'select' -%}
-                <select
-                  class="contact-input type-subRegular1"
-                  name="{{ block.settings.name }}"
-                  {% if block.settings.required %}required{% endif %}
-                >
-                  <option value="" disabled selected>{{ block.settings.placeholder }}</option>
-                  {%- assign options = block.settings.options | split: '
+                {%- when 'select' -%}
+                  <select
+                    class="contact-input type-subRegular1"
+                    name="{{ block.settings.name }}"
+                    {% if block.settings.required %}required{% endif %}
+                  >
+                    <option value="" disabled selected>{{ block.settings.placeholder }}</option>
+                    {%- assign options = block.settings.options | split: '
 ' -%}
-                  {%- for option in options -%}
-                    {%- assign trimmed = option | strip -%}
-                    {%- if trimmed != blank -%}
-                      <option value="{{ trimmed }}">{{ trimmed }}</option>
-                    {%- endif -%}
-                  {%- endfor -%}
-                </select>
+                    {%- for option in options -%}
+                      {%- assign trimmed = option | strip -%}
+                      {%- if trimmed != blank -%}
+                        <option value="{{ trimmed }}">{{ trimmed }}</option>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </select>
 
-              {%- else -%}
-                <input
-                  type="{{ block.settings.type | default: 'text' }}"
-                  class="contact-input type-subRegular1"
-                  name="{{ block.settings.name }}"
-                  placeholder="{{ block.settings.placeholder }}"
-                  {% if block.settings.required %}required{% endif %}
-                >
-            {%- endcase -%}
-          </div>
-        {%- endfor -%}
+                {%- else -%}
+                  <input
+                    type="{{ block.settings.type | default: 'text' }}"
+                    class="contact-input type-subRegular1"
+                    name="{{ block.settings.name }}"
+                    placeholder="{{ block.settings.placeholder }}"
+                    {% if block.settings.required %}required{% endif %}
+                  >
+              {%- endcase -%}
+            </div>
+          {%- endfor -%}
+        </div>
 
         <textarea class="contact-textarea type-subRegular1" name="message"
           placeholder="{{ section.settings.message_placeholder | default: 'WRITE YOUR MESSAGE HERE' }}" required></textarea>
@@ -228,6 +229,12 @@
           "id": "default",
           "label": "Selected by default",
           "default": false
+        },
+        {
+          "type": "text",
+          "id": "message_placeholder",
+          "label": "Message placeholder override",
+          "info": "Custom placeholder for the message body when this topic is selected. Leave blank to use the default."
         }
       ]
     },

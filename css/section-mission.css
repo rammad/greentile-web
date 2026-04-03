@@ -40,7 +40,9 @@
 
 .mission-section .type-display-hero {
     width: 100%;
-    margin: 0 auto var(--gap-text);
+    line-height: 1.2;
+    text-box: normal;
+    margin: 0 auto;
 }
 
 .mission-section .animate-line {
@@ -66,7 +68,7 @@
         width: 80%;
     }
     .mission-section .type-display-hero {
-        font-size: 32px !important;
+        font-size: clamp(36px, 5vw + 16px, 64px) !important;
         line-height: 1.2;
         text-box: normal;
         margin-bottom: 0;

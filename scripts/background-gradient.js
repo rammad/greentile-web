@@ -263,10 +263,18 @@ class GradientEngine {
 
         if (cfg.useSectionObserver && cfg.updateMode === 'observer') this.setupObserver();
         else if (this.canvas.parentElement && this.canvas.parentElement.hasAttribute('data-colors')) {
-            this.updateColors(this.canvas.parentElement.getAttribute('data-colors'));
+            this.updateColors(GradientEngine.getColors(this.canvas.parentElement));
         }
 
         this.animate();
+    }
+
+    static _isMobile = window.innerWidth <= 1024;
+
+    static getColors(el) {
+        if (GradientEngine._isMobile && el.hasAttribute('data-colors-mobile'))
+            return el.getAttribute('data-colors-mobile');
+        return el.getAttribute('data-colors');
     }
 
     setupObserver() {
@@ -275,7 +283,7 @@ class GradientEngine {
                 if (m.type === 'attributes' && m.attributeName === 'class') {
                     const el = m.target;
                     if (el.classList.contains('is-active')) {
-                        if (el.hasAttribute('data-colors')) this.updateColors(el.getAttribute('data-colors'));
+                        if (el.hasAttribute('data-colors')) this.updateColors(GradientEngine.getColors(el));
                         if (el.hasAttribute('data-edge'))  this.updateEdge(parseFloat(el.getAttribute('data-edge')));
                     }
                 }
@@ -284,7 +292,7 @@ class GradientEngine {
         document.querySelectorAll('section[data-colors]').forEach(s => observer.observe(s, { attributes: true }));
         const active = document.querySelector('section.is-active[data-colors]');
         if (active) {
-            this.updateColors(active.getAttribute('data-colors'));
+            this.updateColors(GradientEngine.getColors(active));
             if (active.hasAttribute('data-edge')) this.updateEdge(parseFloat(active.getAttribute('data-edge')));
         }
     }
@@ -352,7 +360,7 @@ class GradientEngine {
 document.addEventListener('DOMContentLoaded', () => {
     const pageSection = document.querySelector('section[data-colors]');
     const pageSectionColors = pageSection
-        ? pageSection.getAttribute('data-colors').split(',').map(s => s.trim())
+        ? GradientEngine.getColors(pageSection).split(',').map(s => s.trim())
         : ['#47ff54', '#f1ffe8', '#f0fd7c'];
     const mobileGpu = window.innerWidth <= 1024;
 

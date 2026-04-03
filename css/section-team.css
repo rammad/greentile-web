@@ -38,9 +38,8 @@
 }
 
 .team-poster-wrap {
-    height: var(--poster-full-height);
+    height: clamp(500px, 55vw, var(--poster-full-height));
     aspect-ratio: 4 / 5;
-    max-width: 100%;
     overflow: hidden;
     border-radius: var(--poster-radius);
     flex-shrink: 0;
@@ -139,6 +138,7 @@
 .team-body .type-body2 {
     opacity: 1;
     filter: none;
+    font-size: clamp(16px, 1.4vw, var(--size-body2));
 }
 
 /* @media (prefers-reduced-motion: reduce) {
@@ -151,6 +151,7 @@
 
 .team-dots { display: none; }
 
+/* tablet + mobile — single-column carousel */
 @media (max-width: 1024px) {
     .team-section {
         min-height: 0;
@@ -158,7 +159,6 @@
     }
     .team-layout {
         grid-template-columns: 1fr;
-        
         row-gap: 0;
     }
 
@@ -184,29 +184,27 @@
         white-space: nowrap;
     }
 
-    /* horizontal swipe carousel — container breaks out to screen edges */
     .team-images-col {
         display: flex;
         flex-direction: row;
         gap: var(--page-gutter);
         margin-left: calc(-1 * var(--page-gutter));
         margin-right: calc(-1 * var(--page-gutter));
-        padding-left: var(--page-gutter);
-        padding-right: var(--page-gutter);
+        padding-left: max(var(--page-gutter), calc(50vw - 250px));
+        padding-right: max(var(--page-gutter), calc(50vw - 250px));
         overflow-x: auto;
         scroll-snap-type: x mandatory;
-        scroll-padding-inline-start: var(--page-gutter);
         scrollbar-width: none;
         -ms-overflow-style: none;
     }
     .team-images-col::-webkit-scrollbar { display: none; }
 
     .team-poster-wrap {
-        flex: 0 0 100%;
-        scroll-snap-align: start;
+        flex: 0 0 500px;
+        max-width: 500px;
+        scroll-snap-align: center;
         scroll-snap-stop: always;
         height: auto;
-        width: 100%;
         opacity: 1;
         transform: none;
         margin-top: 0;
@@ -234,10 +232,9 @@
         background-color: var(--c-dark-green);
     }
 
-    /* body text below carousel — crossfade with blur like desktop */
     .team-text-col {
         display: block;
-        padding: 0;
+        padding: 0 max(0px, calc(50% - 250px));
         margin-top: 24px;
     }
 
@@ -257,5 +254,18 @@
         bottom: auto;
         text-align: center;
         margin-top: 0;
+    }
+}
+
+/* mobile — posters go full-width */
+@media (max-width: 480px) {
+    .team-images-col {
+        padding-left: var(--page-gutter);
+        padding-right: var(--page-gutter);
+    }
+
+    .team-poster-wrap {
+        flex: 0 0 100%;
+        max-width: none;
     }
 }

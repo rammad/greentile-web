@@ -2,7 +2,7 @@
 
 (() => {
     const { wait, transitionCta, transitionHeader, staggerTime, observeElementInOut } = window.AnimationUtils;
-    const MOBILE_BREAKPOINT = 1024;
+    const MOBILE_BREAKPOINT = 480;
 
     document.addEventListener('DOMContentLoaded', () => {
         const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;

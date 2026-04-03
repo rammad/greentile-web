@@ -97,17 +97,27 @@
     margin-left: -12px;
     padding-left: 12px;
     padding-right: 12px;
-    height: 100%;
-    overflow-y: auto;
-    scrollbar-width: none;
     flex-direction: column;
     gap: 64px;
     display: none; 
 }
-.calendar-grid-packed::-webkit-scrollbar { display: none; }
 
 .calendar-page.mode-grid .calendar-interface-wrapper { display: none !important; }
 .calendar-page.mode-grid .calendar-grid-packed { display: flex !important; }
+
+.calendar-page.mode-grid {
+    position: relative;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    overflow-x: hidden;
+}
+
+.calendar-page.mode-grid .calendar-body {
+    flex: 0 0 auto;
+    overflow: visible;
+    padding-bottom: 80px;
+}
 
 .calendar-list {
     position: relative;
@@ -141,6 +151,12 @@
     color var(--time-fade-in) ease;
 }
 .calendar-row.is-visible { opacity: 1; filter: blur(0px); }
+
+.calendar-row .cal-date,
+.calendar-row .cal-name {
+    font-size: clamp(40px, 2.7vw + 12px, 64px);
+}
+
 @media (hover: hover) {
     .calendar-row:hover {
         color: var(--color-text-main);
@@ -155,7 +171,7 @@
     left: 10%;
     height: auto;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     pointer-events: none;
     opacity: 0;
     filter: blur(10px);                    /* fixed — blur does not scale */
@@ -169,8 +185,8 @@
 }
 
 .calendar-poster-img {
-    height: calc(100% - var(--page-gutter));
-    width: auto;
+    height: min(calc(100% - var(--page-gutter)), 35vw);
+    aspect-ratio: 4/5;
     object-fit: cover;
     border-radius: var(--poster-radius);
     opacity: 1; 
@@ -341,9 +357,11 @@
 }
 
 #status-soon { top: 50%; left: 50%; width: 100%; height: 100%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease; }
-#status-sold { top: 50%; left: 50%; width: 280px; height: 280px; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease; }
+#status-sold { top: 50%; left: 50%; width: min(280px, 60%); aspect-ratio: 1; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease; }
 
-.grid-card .badge-sold { top: 10%; right: 10%; width: 120px; height: 120px; transform: rotate(-15deg); }
+.grid-card .badge-sold { width: min(120px, 40%); aspect-ratio: 1; }
+
+.cal-poster-wrap .badge-sold { width: min(120px, 35%); aspect-ratio: 1; }
 
 @media (max-width: 1024px) {
     .calendar-page {
@@ -365,6 +383,11 @@
 
     .calendar-header .animate-cascade {
         white-space: normal;
+    }
+
+    .calendar-title-mobile {
+        max-width: 500px;
+        margin: 0 auto;
     }
 
     .calendar-title-mobile .fit-text {
@@ -493,6 +516,7 @@
         justify-content: center;
         position: relative;
         width: 100%;
+        max-width: 500px;
         aspect-ratio: 4/5;
         overflow: hidden;
     }
@@ -602,12 +626,27 @@
 
     .chunk-grid {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: --poster-gap;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+        gap: var(--poster-gap);
     }
 
     .grid-card {
         aspect-ratio: 4/5;
         width: 100%;
+    }
+}
+
+/* ── tablet overrides ── */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .calendar-title-mobile {
+        max-width: 680px;
+    }
+
+    .cal-date-item {
+        font-size: 64px;
+    }
+
+    .cal-poster-wrap {
+        max-width: 680px;
     }
 }
