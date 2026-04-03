@@ -1,19 +1,6 @@
-/* featured section – three-layer parallax
- *
- * The section scrolls normally with the page.  Each layer travels at a
- * different speed relative to the viewport, creating the illusion of depth.
- * All layers are at their natural (centred) position when the section centre
- * sits at the viewport centre; they diverge symmetrically as the section
- * enters and exits.
- *
- * delta is normalised by section height (–1 … +1 across the visible range),
- * so the offsets below are in px and stay consistent across screen sizes.
- *
- * Positive px  →  layer lags behind scroll  (feels far away)
- * Negative px  →  layer leads the scroll    (feels closest)
- *
- * Tune only these three values:
- */
+/* featured section — three-layer parallax
+   delta normalised by section height (-1..+1), offsets in px.
+   positive = layer lags (far), negative = layer leads (close) */
 
 (function () {
     const _s = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;

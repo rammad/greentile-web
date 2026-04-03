@@ -286,7 +286,6 @@ window.initCascadeReveal = initCascadeReveal;
 
 document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
-    // initCTA(); /* section scripts handle ctas */
     initCascadeReveal();
     initFitText();
     initPageTransition();

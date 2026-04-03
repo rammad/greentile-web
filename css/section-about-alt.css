@@ -1,6 +1,6 @@
 /* about-alt section — scatter images + Doppler-scrolling body blocks (no menu) */
 
-/* ── scatter image track ────────────────────────────────────────────────── */
+/* scatter image track */
 
 .about-alt .about-image-track {
     position: relative;
@@ -33,7 +33,7 @@
     will-change: transform;
 }
 
-/* ── section container ──────────────────────────────────────────────────── */
+/* section container */
 
 .about-alt {
     position: relative;
@@ -55,9 +55,8 @@
     width: 100%;
 }
 
-/* ── fixed Doppler-scroll body container ─────────────────────────────── */
-/* Lives outside #scroll-content (appended by JS) so Lenis transform
-   context doesn't affect fixed positioning. */
+/* fixed doppler-scroll body — lives outside #scroll-content so lenis
+   transform context doesn't affect fixed positioning */
 
 .about-alt-body {
     position: fixed;

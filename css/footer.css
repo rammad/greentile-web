@@ -68,10 +68,7 @@
     transform: scaleX(-1);
 }
 
-/* vvv come back to this, not working how i want >:( */
-/* .marquee-content.has-seamless-animation:hover {
-    animation: seamless-scroll calc(var(--marquee-duration) * 2) linear infinite;
-} */
+/* todo: marquee hover slow-down — not working right yet */
 
 @keyframes seamless-scroll {
     0% { transform: translateX(-50%); }

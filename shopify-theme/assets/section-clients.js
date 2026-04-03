@@ -55,9 +55,10 @@
         });
     }
 
-    const PRESS_SPEED = 50;
+    const _s = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+    const PRESS_SPEED = 50 * _s;
     const isMobile = window.innerWidth <= 1024;
-    const PRESS_GAP = isMobile ? 24 : 64;
+    const PRESS_GAP = (isMobile ? 24 : 64) * _s;
 
     function initPressMarquee() {
         document.querySelectorAll('.press-marquee-track').forEach(track => {

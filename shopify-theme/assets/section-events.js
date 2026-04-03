@@ -86,7 +86,7 @@
             });
         }
 
-        // ── TUNING ────────────────────────────────────────────────
+        // tuning
         const SECTION_VH         = 2.0;   // section height in viewports (bigger = slower overall scroll)
         const ENTRANCE_DELAY = -2.5;   // negative = cards start moving before progress reaches 0
         const STAGGER_SPLIT  = 0.2;  // 0–1, how much of the remaining range is card-to-card delay
@@ -97,7 +97,6 @@
         const ENTRANCE_DELAY_MOBILE = -0.3;
         const STAGGER_SPLIT_MOBILE  = 0.3;
         const MOBILE_START_RATIO    = 0.5;  // startOffset = vh × this
-        // ──────────────────────────────────────────────────────────
 
         const n = cards.length;
         let availableRange = 1 - ENTRANCE_DELAY;
@@ -126,7 +125,7 @@
         let currentlyMobile = window.matchMedia('(max-width: 1024px)').matches;
         let stickProgress = 0;
 
-        // ── Mobile: sequential slide-fade-in (matches socials entrance) ──
+        // mobile: sequential slide-fade-in (matches socials entrance)
         let mobileCardsRevealed = false;
 
         function revealMobileCards() {
@@ -209,7 +208,8 @@
             const rootStyle = getComputedStyle(document.documentElement);
             const sectionSpacingPx = parseFloat(rootStyle.getPropertyValue('--section-spacing'));
             const navSpace = parseFloat(rootStyle.getPropertyValue('--space-for-nav'));
-            const s20 = 20;
+            const _evtScale = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+            const s20 = 20 * _evtScale;
 
             const nav = document.querySelector('.sticky-nav');
             const navInset = nav
@@ -250,7 +250,9 @@
 
                 stickyInner.style.paddingTop = (navInset + s20) + 'px';
 
-                const maxPosterH = ih - navInset - titleWrap.offsetHeight - flexGap - s20;
+                const ctaH = ctaFooter ? ctaFooter.offsetHeight || 60 * _evtScale : 0;
+                const padTop = navInset + s20;
+                const maxPosterH = ih - padTop - titleWrap.offsetHeight - 2 * flexGap - ctaH - s20;
                 const maxPosterW = maxPosterH * 4 / 5;
                 grid.style.maxWidth = Math.max(0, n * maxPosterW + (n - 1) * gridColGap + gridPad) + 'px';
 

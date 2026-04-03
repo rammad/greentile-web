@@ -382,7 +382,7 @@
 
 .cal-poster-wrap .badge-sold { width: min(120px, 35%); aspect-ratio: 1; }
 
-/* 4K desktop — 2× scale */
+/* 4K desktop */
 @media (min-width: 3840px) {
     .calendar-controls {
         margin: 64px 40px 0;
@@ -511,7 +511,7 @@
         display: none !important;
     }
 
-    /* ── dates rail (padding extends touch area over poster) ── */
+    /* dates rail */
     .calendar-dates-rail {
         position: relative;
         flex-shrink: 0;
@@ -553,7 +553,7 @@
         color: var(--c-dark-green);
     }
 
-    /* ── poster + title slides ── */
+    /* poster + title slides */
     .calendar-list {
         position: relative;
         z-index: 10;
@@ -628,7 +628,7 @@
         opacity: 0.5;
     }
 
-    /* ── mobile controls layout ── */
+    /* mobile controls */
     .calendar-controls {
         position: relative;
         z-index: 30;
@@ -654,7 +654,7 @@
         text-align: center;
     }
 
-    /* ── restructured single-line controls ── */
+    /* single-line controls */
     .mobile-controls-top {
         display: flex;
         justify-content: center;
@@ -689,7 +689,7 @@
         margin-top: 12px;
     }
 
-    /* ── grid mode overrides ── */
+    /* grid mode overrides */
     .calendar-page.mode-grid .calendar-body {
         height: auto;
         overflow: visible;
@@ -735,7 +735,7 @@
     }
 }
 
-/* ── tablet overrides ── */
+/* tablet overrides */
 @media (min-width: 768px) and (max-width: 1024px) {
     .calendar-title-mobile {
         max-width: 680px;

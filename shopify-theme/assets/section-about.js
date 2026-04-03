@@ -2,7 +2,7 @@
 (() => {
     const { observeElementInOut } = window.AnimationUtils || {};
 
-    // ── build ─────────────────────────────────────────────────────────────────
+    // build
     //
     // Each image carries data-word: the number of words from the start of the
     // text block after which the image is inserted. This is viewport-agnostic —
@@ -11,7 +11,7 @@
     function buildLines(textEl, originalText, imageEls) {
         const words = originalText.split(/\s+/).filter(Boolean);
 
-        // ── Insert images into word list at their data-word positions ────────
+        // insert images into word list at their data-word positions
         // Sort highest-offset first so splicing doesn't shift later indices.
         const placements = imageEls
             .map(el => ({
@@ -25,7 +25,7 @@
             items.splice(p.after, 0, { kind: 'img', el: p.el });
         }
 
-        // ── Render with probe spans for line measurement ────────────────────
+        // render with probe spans for line measurement
         function render() {
             textEl.innerHTML = '';
             items.forEach((item, i) => {
@@ -42,7 +42,7 @@
             });
         }
 
-        // ── Measure + assign line indices ───────────────────────────────────
+        // measure + assign line indices
         render();
 
         let lineIdx = 0;
@@ -80,7 +80,7 @@
             item.lineIdx = bestIdx;
         });
 
-        // ── Reconstruct: one display:block .animate-line span per line ──────
+        // reconstruct: one display:block .animate-line span per line
         const lineGroups = Array.from({ length: totalLines }, () => []);
         items.forEach(item => lineGroups[item.lineIdx].push(item));
 
@@ -104,7 +104,7 @@
         });
     }
 
-    // ── observe ───────────────────────────────────────────────────────────────
+    // observe
 
     function observeLines(section) {
         if (!observeElementInOut) return;
@@ -116,7 +116,7 @@
         });
     }
 
-    // ── init ──────────────────────────────────────────────────────────────────
+    // init
 
     document.addEventListener('DOMContentLoaded', () => {
         const section      = document.getElementById('about');

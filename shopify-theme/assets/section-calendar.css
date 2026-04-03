@@ -154,7 +154,7 @@
 
 .calendar-row .cal-date,
 .calendar-row .cal-name {
-    font-size: clamp(40px, 2.7vw + 12px, 64px);
+    font-size: clamp(40px, 2.7vw + 12px, var(--size-h2));
 }
 
 .cal-status {
@@ -197,7 +197,7 @@
 .calendar-coming-soon.is-visible { opacity: 1; filter: blur(0px); }
 
 .calendar-coming-soon .type-h2 {
-    font-size: clamp(40px, 2.7vw + 12px, 64px);
+    font-size: clamp(40px, 2.7vw + 12px, var(--size-h2));
 }
 
 .calendar-poster-wrapper {
@@ -363,7 +363,7 @@
     position: relative;
     width: 100%;
     height: 100%;
-    background: var(--placeholder-bg, #B7C9B7);
+    background: linear-gradient(160deg, rgba(183, 201, 183, 0.5), rgba(255, 252, 250, 0.5), rgba(135, 165, 135, 0.5));
     border-radius: var(--poster-radius);
     overflow: hidden;
     container-type: inline-size;
@@ -377,7 +377,7 @@
 .grid-card-label {
     position: absolute;
     bottom: 20px; left: 12px; right: 12px;
-    color: var(--placeholder-font, var(--c-dark-green-50));
+    color: var(--c-dark-green-50);
     font-family: var(--font-header);
     font-size: clamp(14px, 14cqi, var(--size-h1));
     font-weight: 800;
@@ -403,6 +403,82 @@
 .grid-card .badge-sold { width: min(120px, 40%); aspect-ratio: 1; }
 
 .cal-poster-wrap .badge-sold { width: min(120px, 35%); aspect-ratio: 1; }
+
+/* 4K desktop */
+@media (min-width: 3840px) {
+    .calendar-controls {
+        margin: 64px 40px 0;
+    }
+
+    .filters-list { gap: 40px; }
+
+    .filter-btn, .view-btn {
+        padding-bottom: 8px;
+    }
+
+    .filter-btn::after,
+    .view-btn::after {
+        height: 2px;
+    }
+
+    .divider {
+        padding-bottom: 16px;
+    }
+
+    .calendar-body {
+        padding: 80px var(--page-gutter) 40px;
+    }
+
+    .calendar-grid-packed {
+        width: calc(100% + 48px);
+        margin-left: -24px;
+        padding-left: 24px;
+        padding-right: 24px;
+        gap: 128px;
+    }
+
+    .calendar-page.mode-grid .calendar-body {
+        padding-bottom: 160px;
+    }
+
+    .calendar-list {
+        gap: 48px;
+        padding-top: 80px;
+        padding-bottom: 40px;
+    }
+
+    .calendar-row {
+        filter: blur(20px);
+    }
+    .calendar-row.is-visible { filter: blur(0px); }
+
+    /* font-size for .cal-date/.cal-name now auto-scales via fluid --size-h2 */
+
+    .calendar-poster-wrapper {
+        bottom: 20px;
+        filter: blur(20px);
+    }
+    .calendar-poster-wrapper.active { filter: blur(0px); }
+
+    .month-header {
+        margin-bottom: 40px;
+    }
+
+    .month-header::after, .spacer-line::after {
+        height: 2px;
+    }
+
+    .grid-card-label {
+        bottom: 40px;
+        left: 24px;
+        right: 24px;
+    }
+
+    #status-soon { width: 100%; height: 100%; }
+    #status-sold { width: min(560px, 60%); }
+    .grid-card .badge-sold { width: min(240px, 40%); }
+    .cal-poster-wrap .badge-sold { width: min(240px, 35%); }
+}
 
 @media (max-width: 1024px) {
     .calendar-page {
@@ -457,7 +533,7 @@
         display: none !important;
     }
 
-    /* ── dates rail (padding extends touch area over poster) ── */
+    /* dates rail */
     .calendar-dates-rail {
         position: relative;
         flex-shrink: 0;
@@ -499,7 +575,7 @@
         color: var(--c-dark-green);
     }
 
-    /* ── poster + title slides ── */
+    /* poster + title slides */
     .calendar-list {
         position: relative;
         z-index: 10;
@@ -574,7 +650,7 @@
         opacity: 0.5;
     }
 
-    /* ── mobile controls layout ── */
+    /* mobile controls */
     .calendar-controls {
         position: relative;
         z-index: 30;
@@ -600,7 +676,7 @@
         text-align: center;
     }
 
-    /* ── restructured single-line controls ── */
+    /* single-line controls */
     .mobile-controls-top {
         display: flex;
         justify-content: center;
@@ -635,7 +711,7 @@
         margin-top: 12px;
     }
 
-    /* ── grid mode overrides ── */
+    /* grid mode overrides */
     .calendar-page.mode-grid .calendar-body {
         height: auto;
         overflow: visible;
@@ -677,7 +753,7 @@
     }
 }
 
-/* ── tablet overrides ── */
+/* tablet overrides */
 @media (min-width: 768px) and (max-width: 1024px) {
     .calendar-title-mobile {
         max-width: 680px;

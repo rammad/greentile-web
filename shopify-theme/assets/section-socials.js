@@ -59,7 +59,7 @@
         let galleryRevealed = false;
         let pushDownPhase = 0;
 
-        /* ── desktop push-down alternation ── */
+        /* desktop push-down alternation */
 
         function updatePushDown() {
             if (carouselActive) return;
@@ -79,7 +79,7 @@
             });
         }
 
-        /* ── gallery entrance reveal ── */
+        /* gallery entrance reveal */
 
         observeElementInOut(gallery, {
             enterThreshold: 0.01,
@@ -96,7 +96,7 @@
             }
         });
 
-        /* ── carousel stagger (absolute-position based) ── */
+        /* carousel stagger (absolute-position based) */
 
         function applyStagger() {
             allImgs.forEach((img, i) => {
@@ -104,7 +104,7 @@
             });
         }
 
-        /* ── carousel helpers ── */
+        /* carousel helpers */
 
         function getClosestIndex() {
             const center = gallery.scrollLeft + gallery.offsetWidth / 2;
@@ -175,7 +175,7 @@
             }
         }
 
-        /* ── carousel setup / teardown ── */
+        /* carousel setup / teardown */
 
         function setupCarousel() {
             if (carouselActive) return;
@@ -250,7 +250,7 @@
             updatePushDown();
         }
 
-        /* ── init + resize ── */
+        /* init + resize */
 
         let resizeTimer;
         window.addEventListener('resize', () => {

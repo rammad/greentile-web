@@ -180,13 +180,13 @@
     cursor: pointer;
     padding: 0;
     color: var(--c-dark-green);
-    line-height: var(--lh-single);
+    line-height: 1.2;
 }
 
 .qty-val {
     min-width: 24px; text-align: center;
     color: var(--c-dark-green);
-    line-height: var(--lh-single);
+    line-height: 1.2;
 }
 
 
@@ -211,7 +211,7 @@
 
 .pdp-ticket-types {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 20px;
     width: 100%;
@@ -261,6 +261,69 @@
 
 .pdp-dots {
     display: none;
+}
+
+/* 4K desktop */
+@media (min-width: 3840px) {
+    .pdp-sticky-wrapper {
+        padding-bottom: 80px;
+    }
+
+    .pdp-meta-row,
+    .pdp-hero-title {
+        margin-bottom: 40px;
+    }
+
+    .pdp-desc {
+        padding: 40px 0;
+    }
+
+    .pdp-desc-wrapper {
+        margin-bottom: 128px;
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40px, black calc(100% - 40px), transparent 100%);
+        mask-image: linear-gradient(to bottom, transparent 0%, black 40px, black calc(100% - 40px), transparent 100%);
+    }
+
+    .ticket-actions {
+        gap: 16px;
+    }
+
+    .qty-wrapper.is-visible {
+        max-width: 400px;
+    }
+
+    .max-qty-label {
+        margin-bottom: 16px;
+    }
+
+    .qty-selector {
+        min-width: 280px;
+    }
+
+    .qty-val {
+        min-width: 48px;
+    }
+
+    .pdp-tag {
+        padding: 8px 16px calc(8px / 2);
+        border-radius: 8px;
+        margin: 0 8px 16px 0;
+    }
+
+    .pdp-ticket-types {
+        gap: 16px;
+        margin-bottom: 40px;
+    }
+
+    .pdp-ticket-btn {
+        box-shadow: inset 0 0 0 2px var(--c-dark-green-20);
+    }
+    .pdp-ticket-btn:hover {
+        box-shadow: inset 0 0 0 2px var(--c-dark-green-50);
+    }
+    .pdp-ticket-btn.active {
+        box-shadow: inset 0 0 0 2px var(--c-bright-green);
+    }
 }
 
 /* tablet + mobile: vertical column layout */

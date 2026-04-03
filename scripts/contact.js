@@ -207,9 +207,9 @@
             data._cc = selectedEmail;
         }
 
-        /* ── Form submission integration ──
-           Plug in your preferred form backend here (e.g. Formspree, Basin,
-           Shopify form action, etc.). Until then, falls back to mailto. */
+        /* form submission integration
+           plug in your preferred form backend here (e.g. formspree, basin,
+           shopify form action, etc.). until then, falls back to mailto. */
 
         sendViaMailto(data);
     });

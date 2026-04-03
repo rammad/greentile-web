@@ -1,6 +1,6 @@
 /* what we do section (about-us.html) — zone-based images + fixed body text + persistent menu */
 
-/* ── image track ──────────────────────────────────────────────────── */
+/* image track */
 
 .about-image-track {
     position: relative;
@@ -32,7 +32,7 @@
     backface-visibility: hidden;
 }
 
-/* ── what we do section ───────────────────────────────────────────────────── */
+/* what we do section */
 
 .what-we-do {
     position: relative;
@@ -54,10 +54,8 @@
     width: 100%;
 }
 
-/* ── fixed body text container ───────────────────────────────────────────── */
-
-/* Always fixed — lives outside #scroll-content to avoid Lenis transform context.
-   `top` is set dynamically by JS relative to the menu's bottom edge. */
+/* fixed body text — outside #scroll-content to avoid lenis transform context,
+   top is set by js relative to menu's bottom edge */
 .what-we-do-body {
     position: fixed;
     left: 0;
@@ -115,7 +113,7 @@
         width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-/* ── persistent menu ─────────────────────────────────────────────────────── */
+/* persistent menu */
 
 .about-menu-persistent {
     position: absolute;
@@ -182,7 +180,7 @@
     }
 }
 
-/* 4K desktop — remaining spacing overrides */
+/* 4K desktop */
 @media (min-width: 3840px) {
     .about-menu-persistent {
         gap: 48px;

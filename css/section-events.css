@@ -71,8 +71,7 @@
     box-sizing: border-box;
 }
 
-/* transform and opacity are driven by scroll position via inline styles —
-   will-change promotes to gpu compositor */
+/* transform/opacity driven by scroll — will-change for gpu */
 .event-card {
     opacity: 0;
     will-change: transform, opacity;

@@ -86,18 +86,17 @@
             });
         }
 
-        // ── TUNING ────────────────────────────────────────────────
-        const SECTION_VH         = 2.0;   // section height in viewports (bigger = slower overall scroll)
-        const ENTRANCE_DELAY = -2.5;   // negative = cards start moving before progress reaches 0
-        const STAGGER_SPLIT  = 0.2;  // 0–1, how much of the remaining range is card-to-card delay
-        const FADE_Y_HI       = 0.30;  // card invisible when y > this × startOffset (travel distance)
-        const FADE_Y_LO       = 0.10;  // card fully opaque when y < this × startOffset
-        const STICK_EASE     = 0.35;  // fraction of stick zone for entry/exit deceleration
-        // mobile — no sticky; cards slide in as the title scrolls through viewport
+        // tuning
+        const SECTION_VH         = 2.0;
+        const ENTRANCE_DELAY     = -2.5;
+        const STAGGER_SPLIT      = 0.2;
+        const FADE_Y_HI          = 0.30;  // card invisible above this fraction of travel
+        const FADE_Y_LO          = 0.10;  // card fully opaque below this fraction
+        const STICK_EASE         = 0.35;  // fraction of stick zone for entry/exit decel
+        // mobile — no sticky, cards slide in as title scrolls through
         const ENTRANCE_DELAY_MOBILE = -0.3;
         const STAGGER_SPLIT_MOBILE  = 0.3;
-        const MOBILE_START_RATIO    = 0.5;  // startOffset = vh × this
-        // ──────────────────────────────────────────────────────────
+        const MOBILE_START_RATIO    = 0.5;
 
         const n = cards.length;
         let availableRange = 1 - ENTRANCE_DELAY;
@@ -126,7 +125,7 @@
         let currentlyMobile = window.matchMedia('(max-width: 1024px)').matches;
         let stickProgress = 0;
 
-        // ── Mobile: sequential slide-fade-in (matches socials entrance) ──
+        // mobile: sequential slide-fade-in
         let mobileCardsRevealed = false;
 
         function revealMobileCards() {

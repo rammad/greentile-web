@@ -31,7 +31,7 @@
     align-items: center;
     text-align: center;
     gap: var(--gap-text);
-    max-width: 740px;
+    max-width: clamp(740px, 38.542vw, 1480px);
 }
 
 .clients-col .type-subBold2 {
@@ -76,19 +76,19 @@
     transform: translateY(-3px);
 }
 
-/* ── press logos ──────────────────────────────────────────── */
+/* press logos */
 
 .press-logos {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 48px;
+    gap: clamp(48px, 2.5vw, 96px);
     flex-wrap: nowrap;
 }
 
 .press-logo-link {
     display: block;
-    height: 24px;
+    height: clamp(24px, 1.25vw, 48px);
     flex-shrink: 0;
     background-color: var(--c-dark-green-50);
     mask-size: contain;
@@ -148,7 +148,7 @@
     aspect-ratio: 418 / 87;
 }
 
-/* ── press marquee ────────────────────────────────────────── */
+/* press marquee */
 
 .press-marquee {
     display: flex;
@@ -167,7 +167,7 @@
 .press-marquee-track {
     display: flex;
     align-items: center;
-    gap: 64px;
+    gap: clamp(64px, 3.333vw, 128px);
     flex-shrink: 0;
     transform: translateX(0);
     will-change: transform;
@@ -184,6 +184,13 @@
 @keyframes seamless-scroll-press {
     0%   { transform: translateX(var(--press-scroll-dist)); }
     100% { transform: translateX(0); }
+}
+
+/* 4K desktop */
+@media (min-width: 3840px) {
+    .clients-plain {
+        transform: translateY(-6px);
+    }
 }
 
 @media (max-width: 1024px) {
@@ -211,7 +218,6 @@
 
     .press-logo-link{
         height: 48px;
-        /* height: 24px; */
     }
 
     .press-logos .press-logo-link:last-child:nth-child(odd) {

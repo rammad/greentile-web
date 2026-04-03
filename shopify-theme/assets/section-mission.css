@@ -60,7 +60,7 @@
     margin-bottom: var(--gap-text);
 }
 
-/* 4K desktop — remaining transform override */
+/* 4K desktop */
 @media (min-width: 3840px) {
     .mission-section .animate-line {
         transform: translateY(80px);

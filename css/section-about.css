@@ -29,8 +29,7 @@
     text-box: normal;
 }
 
-/* after JS splits text into lines, margin controls inter-line spacing
-   (flex-column can't be used here — it breaks pre-split inline flow) */
+/* margin for inter-line spacing after js splits text into lines */
 .about .animate-line + .animate-line {
     margin-top: var(--gap-text);
 }
@@ -47,8 +46,7 @@
     transform: translateY(0);
 }
 
-/* inline photo thumbnails — 4:5 ratio flipped horizontal (5:4), wider than tall */
-/* Default: inline-block during JS probe phase (images must be in flow for accurate measurement) */
+/* inline photo thumbnails — 5:4 wider than tall, inline-block for js probe phase */
 .about-inline-img {
     display: inline-block;
     height: 1.1em;
@@ -60,10 +58,9 @@
     flex-shrink: 0;
 }
 
-/* Wrapper: sits in-flow (holds horizontal space) but contributes only ~cap-height to line box.
-   The image overflows visually without pushing adjacent lines apart.
-   top: -0.1em compensates for vertical-align:middle targeting x-height center,
-   which sits too low for the all-caps text used here. */
+/* wrapper holds horizontal space but only ~cap-height to line box,
+   image overflows without pushing lines apart. top: -0.1em adjusts
+   for vertical-align:middle sitting too low on all-caps text */
 .about-img-wrap {
     display: inline-block;
     vertical-align: middle;

@@ -1,6 +1,6 @@
 /* what we do section (about-us.html) — zone-based images + fixed body text + persistent menu */
 
-/* ── image track ──────────────────────────────────────────────────── */
+/* image track */
 
 .about-image-track {
     position: relative;
@@ -32,7 +32,7 @@
     backface-visibility: hidden;
 }
 
-/* ── what we do section ───────────────────────────────────────────────────── */
+/* what we do section */
 
 .what-we-do {
     position: relative;
@@ -54,10 +54,8 @@
     width: 100%;
 }
 
-/* ── fixed body text container ───────────────────────────────────────────── */
-
-/* Always fixed — lives outside #scroll-content to avoid Lenis transform context.
-   `top` is set dynamically by JS relative to the menu's bottom edge. */
+/* fixed body text — outside #scroll-content to avoid lenis transform context,
+   top is set by js relative to menu's bottom edge */
 .what-we-do-body {
     position: fixed;
     left: 0;
@@ -74,7 +72,7 @@
 .what-we-do-body .about-text-block {
     grid-area: 1 / 1;
     width: 100%;
-    max-width: 600px;
+    max-width: clamp(600px, 31.25vw, 1200px);
     padding: 0 var(--page-gutter);
     text-align: center;
     position: relative;
@@ -96,21 +94,26 @@
 .what-we-do-body .about-content {
     position: relative;
     width: 100%;
-    max-width: 600px;
+    max-width: clamp(600px, 31.25vw, 1200px);
     text-align: center;
 }
 
-.what-we-do-body .about-content .cta-btn {
-    position: absolute;
-    top: calc(100% + 40px);
-    left: 50%;
-    transform: translateX(-50%);
+/* per-block CTAs removed at runtime — shared CTA lives as a direct child of .what-we-do-body */
+.what-we-do-body .wwd-shared-cta {
+    justify-self: center;
+    margin-top: clamp(40px, 2.083vw, 80px);
     white-space: nowrap;
     pointer-events: auto;
     touch-action: pan-y;
+    transition:
+        opacity 0.4s ease,
+        max-width 0.8s ease,
+        padding 0.8s cubic-bezier(0.19, 1, 0.22, 1),
+        color 0.3s linear,
+        width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-/* ── persistent menu ─────────────────────────────────────────────────────── */
+/* persistent menu */
 
 .about-menu-persistent {
     position: absolute;
@@ -173,7 +176,18 @@
 
 @media (min-width: 1025px) {
     .about-menu-persistent .menu-item {
-        font-size: clamp(42px, 4.5vw, 64px);
+        font-size: clamp(42px, 4.5vw, var(--size-h2));
+    }
+}
+
+/* 4K desktop */
+@media (min-width: 3840px) {
+    .about-menu-persistent {
+        gap: 48px;
+    }
+
+    .about-menu-persistent ul {
+        gap: 48px;
     }
 }
 

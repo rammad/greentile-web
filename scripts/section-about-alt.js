@@ -1,5 +1,4 @@
 /* about-alt section — scatter images + Doppler-scrolling body blocks
-   ───────────────────────────────────────────────────────────────────
    Same image scatter behaviour as "What We Do" (via shared
    scatter-images.js) but with tighter horizontal bounds so photos
    can drift closer to center.  The persistent menu is replaced by
@@ -8,7 +7,7 @@
 
 (function () {
 
-    // ── scatter overrides for this section ─────────────────────────────────
+    // scatter overrides for this section
     // Text is narrower than what-we-do so images can come closer to center.
 
     var SCATTER_CONFIG = {
@@ -16,7 +15,7 @@
         slideHeightVhMobile:  1.1
     };
 
-    // ── Doppler-scroll tuning ──────────────────────────────────────────────
+    // doppler-scroll tuning
     // DOPPLER_EXPONENT  — power curve.  Higher = stronger center dwell.
     // TRAVEL_VH         — max Y displacement from center (× vpH).
     // RANGE_FACTOR      — fraction of slideHeight used to normalize progress.
@@ -35,7 +34,7 @@
 
     var MOBILE_BREAKPOINT   = 1024;
 
-    // ── helpers ────────────────────────────────────────────────────────────
+    // helpers
 
     function smoothstep(x, edge0, edge1) {
         var t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
@@ -47,7 +46,7 @@
         return sign * Math.pow(Math.abs(t), exponent);
     }
 
-    // ── section bootstrap ──────────────────────────────────────────────────
+    // section bootstrap
 
     document.addEventListener('DOMContentLoaded', function () {
         var section = document.querySelector('.about-alt');
@@ -64,7 +63,7 @@
         var scatter = window.ScatterImages.init(section, viewport, numSlides, SCATTER_CONFIG);
         var _cachedSlides = null;
 
-        // ── build: fixed body container + scroll-track slides ──────────────
+        // build: fixed body container + scroll-track slides
 
         var bodyEl    = null;
         var bodyShown = false;
@@ -108,7 +107,7 @@
             block.style.transform = 'translate3d(0,' + (vpH * TRAVEL_VH) + 'px,0)';
         });
 
-        // ── Doppler scroll ─────────────────────────────────────────────────
+        // doppler scroll
 
         function updateDopplerScroll() {
             if (!bodyEl) return;
@@ -191,7 +190,7 @@
             });
         }
 
-        // ── kick off ───────────────────────────────────────────────────────
+        // kick off
 
         scatter.updateImageScales();
         updateDopplerScroll();
@@ -201,7 +200,7 @@
             updateDopplerScroll();
         });
 
-        // ── resize ─────────────────────────────────────────────────────────
+        // resize
 
         var resizeTimer;
         var lastResizeWidth = window.innerWidth;

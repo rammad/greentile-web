@@ -13,7 +13,7 @@
         initGradientSectionObserver();
     }
 
-    /* ── mobile: native document scroll, no wrapper ──────────────────────── */
+    /* mobile: native document scroll, no wrapper */
 
     function initMobile() {
         const viewport = document.getElementById('scroll-viewport');
@@ -107,7 +107,7 @@
         }
     }
 
-    /* ── desktop: Lenis on wrapper for wheel dampening ───────────────────── */
+    /* desktop: lenis on wrapper for wheel dampening */
 
     function initDesktop() {
         const viewport = document.getElementById('scroll-viewport');

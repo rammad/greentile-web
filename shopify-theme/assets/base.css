@@ -1,7 +1,7 @@
 /* Shopify theme: fonts loaded in theme.liquid, typekit imported in theme.liquid */
 
 /* variables */
-/* design base: 1920px — breakpoints at 1024 (touch/tablet+mobile), 768 (small mobile), 2560 (ultra-wide) */
+/* design base: 1920px — breakpoints at 1024 (touch/tablet+mobile), 768 (small mobile), 3840 (4K desktop) */
 :root {
     --c-off-white: #FFFCFA;
     --c-bright-green: #30FA30;
@@ -188,6 +188,7 @@ section {
 .type-display-hero.is-initialized { opacity: 1; }
 .type-display-hero span { display: inline; }
 
+/* font-size set by fitTextToWidth() — stays hidden until js adds .is-initialized */
 .fit-text {
     display: block;
     white-space: nowrap;
@@ -236,6 +237,7 @@ section {
     text-box: trim-both cap alphabetic;
 }
 
+/* type-sub: Bold = wdth 525 / wght 400, Regular = wdth 450 / wght 300 */
 .type-subBold1 {
     font-family: var(--font-subheader);
     font-size: var(--size-subBold1);
@@ -316,20 +318,20 @@ section {
 }
 .type-body3.is-visible { opacity: 1; filter: blur(0); }
 
-.standard-margins { padding: var(--space-for-nav) var(--page-gutter) 20px; }
+.standard-margins { padding: var(--space-for-nav) var(--page-gutter) clamp(20px, 1.042vw, 40px); }
 .section-spacer { padding-top: var(--section-spacing); }
 
 .section-standard {
     position: relative;
     width: 100%;
-    padding: var(--space-for-nav) var(--page-gutter) 20px;
+    padding: var(--space-for-nav) var(--page-gutter) clamp(20px, 1.042vw, 40px);
 }
 
 /* utils */
 .header-hidden {
     opacity: 0 !important;
     filter: blur(var(--blur-standard));
-    transform: translateY(-15px);
+    transform: translateY(calc(-1 * clamp(15px, 0.781vw, 30px)));
     transition:
         opacity var(--time-fade-out) ease,
         filter var(--time-fade-out) ease,
@@ -415,9 +417,9 @@ section {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px;
-    min-width: calc(1em + 20px);
-    max-width: calc(1em + 20px);
+    padding: clamp(12px, 0.625vw, 24px);
+    min-width: calc(1em + clamp(20px, 1.042vw, 40px));
+    max-width: calc(1em + clamp(20px, 1.042vw, 40px));
     border-radius: 100px;
     background-color: var(--color-accent);
     color: transparent;
@@ -437,7 +439,7 @@ section {
 
 .cta-btn.is-visible {
     opacity: 1;
-    max-width: 400px;
+    max-width: clamp(400px, 20.833vw, 800px);
     padding: var(--cta-padding);
     color: var(--color-text-btn);
 }
@@ -462,7 +464,7 @@ section {
 .cta-btn .ui-roll-layer {
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: clamp(40px, 2.083vw, 80px);
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
@@ -533,13 +535,13 @@ section {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 88px;
-    height: 120px;
-    margin: -60px 0 0 -44px;
+    width: clamp(88px, 4.583vw, 176px);
+    height: clamp(120px, 6.25vw, 240px);
+    margin: calc(-1 * clamp(60px, 3.125vw, 120px)) 0 0 calc(-1 * clamp(44px, 2.292vw, 88px));
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    border-radius: 8px;
+    border-radius: clamp(8px, 0.417vw, 16px);
     will-change: transform, opacity;
 }
 
@@ -564,20 +566,20 @@ section {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
-    gap: 8px;
+    gap: clamp(8px, 0.417vw, 16px);
 }
 
 .curtain-action-line {
-    width: 2px;
+    width: clamp(2px, 0.104vw, 4px);
     background: var(--c-bright-green);
-    border-radius: 2px;
+    border-radius: clamp(2px, 0.104vw, 4px);
     opacity: 0;
     transition: transform 0.05s cubic-bezier(0, 0, 0.2, 1), opacity 0.03s ease;
 }
 
 .curtain-action-line:nth-child(1),
-.curtain-action-line:nth-child(3) { height: 14px; }
-.curtain-action-line:nth-child(2) { height: 22px; }
+.curtain-action-line:nth-child(3) { height: clamp(14px, 0.729vw, 28px); }
+.curtain-action-line:nth-child(2) { height: clamp(22px, 1.146vw, 44px); }
 
 .curtain-action-line:nth-child(1) { transform: rotate(-40deg) scaleY(0); transform-origin: center bottom; }
 .curtain-action-line:nth-child(2) { transform: rotate(0deg)   scaleY(0); transform-origin: center bottom; }
@@ -595,7 +597,7 @@ section {
 body::after {
     content: '';
     position: fixed;
-    inset: -100px;
+    inset: calc(-1 * clamp(100px, 5.208vw, 200px));
     pointer-events: none;
     z-index: 9999;
     opacity: .3;
@@ -603,7 +605,7 @@ body::after {
     will-change: transform;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
     background-repeat: repeat;
-    background-size: 400px 400px;
+    background-size: clamp(400px, 20.833vw, 800px) clamp(400px, 20.833vw, 800px);
     animation: grain 0.8s steps(1) infinite;
 }
 @media (max-width: 1024px) {
@@ -634,21 +636,53 @@ body::after {
     justify-content: center;
     top: 0;
     left: 0;
-    padding: 20px 0;
+    padding: clamp(20px, 1.042vw, 40px) 0;
     transform: scale(-100%);
     cursor: pointer;
 }
 
 .back-arrow img {
-    height: 7px;
+    height: clamp(7px, 0.365vw, 14px);
     width: auto;
     filter: brightness(0) saturate(100%) invert(22%) sepia(50%) saturate(800%) hue-rotate(80deg) brightness(88%);
 }
 
-/* ─── BREAKPOINTS ─────────────────────────────────────────────────── */
+/* breakpoints */
 
-@media (min-width: 2560px) {
+/* widescreen fluid scaling — above 1920, grows proportionally up to 2x at 3840 */
+@media (min-width: 1921px) {
+    :root {
+        --size-display-hero:  clamp(165px, 8.594vw, 330px);
+        --size-display-xl:    clamp(160px, 8.333vw, 320px);
+        --size-h1:            clamp(96px,  5.000vw, 192px);
+        --size-h2:            clamp(64px,  3.333vw, 128px);
+        --size-h3:            clamp(48px,  2.500vw, 96px);
+        --size-subBold1:      clamp(20px,  1.042vw, 40px);
+        --size-subBold2:      clamp(14px,  0.729vw, 28px);
+        --size-subRegular1:   clamp(14px,  0.729vw, 28px);
+        --size-subRegular2:   clamp(10px,  0.521vw, 20px);
+        --size-body1:         clamp(14px,  0.729vw, 28px);
+        --size-body2:         clamp(20px,  1.042vw, 40px);
+        --size-body3:         clamp(32px,  1.667vw, 64px);
+
+        --space-for-nav:          clamp(78px,  4.063vw, 156px);
+        --page-gutter:            clamp(20px,  1.042vw, 40px);
+        --gap-text:               clamp(40px,  2.083vw, 80px);
+        --gap-display-lines:      clamp(16px,  0.833vw, 32px);
+        --travel-reveal:          clamp(20px,  1.042vw, 40px);
+        --cta-padding:            clamp(14px, 0.729vw, 28px) clamp(20px, 1.042vw, 40px) clamp(10px, 0.521vw, 20px);
+        --nav-cluster-gap:        clamp(32px,  1.667vw, 64px);
+        --active-indicator-width: clamp(20px,  1.042vw, 40px);
+        --section-spacing:        clamp(240px, 12.500vw, 480px);
+        --poster-gap:             clamp(20px,  1.042vw, 40px);
+        --blur-standard:          clamp(10px,  0.521vw, 20px);
+        --poster-full-height:     calc(100vh - var(--space-for-nav) - clamp(40px, 2.083vw, 80px));
+    }
+
+    html { font-size: clamp(16px, 0.833vw, 32px); }
 }
+
+/* 4K 3840px block fully removed — all values now fluid via clamp in base rules */
 
 /* touch — ≤1024px (tablet) */
 @media (max-width: 1024px) {
@@ -725,11 +759,11 @@ body::after {
     position: fixed;
     top: 0;
     left: 50%;
-    margin-left: -20px;
+    margin-left: calc(-1 * clamp(20px, 1.042vw, 40px));
     transform: translateY(-100%);
-    width: 40px;
-    height: 40px;
-    border: 1px solid var(--c-dark-green);
+    width: clamp(40px, 2.083vw, 80px);
+    height: clamp(40px, 2.083vw, 80px);
+    border: clamp(1px, 0.052vw, 2px) solid var(--c-dark-green);
     border-bottom-color: transparent;
     border-radius: 50%;
     z-index: 10000;

@@ -5,7 +5,7 @@
     const LINE_STAGGER_MS = 80;
     const MOBILE_BP = 1024;
 
-    // ── desktop title fade (scroll-driven opacity) ──────────────────────
+    // desktop title fade (scroll-driven opacity)
     // Section progress: 0 = section top at viewport top,
     //                 100 = section bottom at viewport bottom.
     // Negative / >100 values represent scroll outside that range.
@@ -34,7 +34,7 @@
         let titleAnimId  = 0;
         let mobileCarousel = false;
 
-        /* ── fallback ── */
+        /* fallback */
 
         if (!observeElementInOut) {
             titleLines.forEach(l => l.classList.add('is-visible'));
@@ -44,7 +44,7 @@
             return;
         }
 
-        /* ── helpers ── */
+        /* helpers */
 
         function getMaxBodyHeight() {
             return Math.max(...bodies.map(b => b.scrollHeight));
@@ -83,7 +83,7 @@
         const firstPoster = posters[0];
         if (!firstPoster) return;
 
-        /* ── poster scroll-in (desktop visual slide-up) ── */
+        /* poster scroll-in (desktop visual slide-up) */
 
         posters.forEach((wrap, i) => {
             wrap.style.transitionDelay = `${i * 80}ms`;
@@ -92,7 +92,7 @@
             });
         });
 
-        /* ── desktop: body activates when image > 50% visible ── */
+        /* desktop: body activates when image > 50% visible */
 
         const desktopBodyObs = new IntersectionObserver((entries) => {
             if (isMobile) return;
@@ -105,7 +105,7 @@
 
         posters.forEach(p => desktopBodyObs.observe(p));
 
-        /* ── mobile: title + body animate in with observer ── */
+        /* mobile: title + body animate in with observer */
 
         observeElementInOut(titleCol, {
             onEnter: () => {
@@ -125,7 +125,7 @@
             });
         });
 
-        /* ── desktop: scroll-driven state machine (position + visibility) ── */
+        /* desktop: scroll-driven state machine (position + visibility) */
 
         const els = [titleInner, textSticky];
         let pinned = false;
@@ -234,7 +234,7 @@
             const visBot = Math.min(rect.bottom, vh);
             const visPx  = Math.max(0, visBot - visTop);
 
-            /* ── gone: section barely / not visible ── */
+            /* gone: section barely / not visible */
             if (visPx < vh * GONE_THRESHOLD) {
                 clearFixed();
                 hideTitle();
@@ -243,14 +243,14 @@
                 return;
             }
 
-            /* ── positioning: fixed while section top is below sticky threshold ── */
+            /* positioning: fixed while section top is below sticky threshold */
             if (rect.top > stickyTop) {
                 applyFixed();
             } else {
                 clearFixed();
             }
 
-            /* ── wait for first poster to be 25 % on-screen before showing title/body ── */
+            /* wait for first poster to be 25 % on-screen before showing title/body */
             const posterRect = firstPoster.getBoundingClientRect();
             const posterEnteredBy = vh - posterRect.top;
             if (posterEnteredBy < posterRect.height * 0.75) {
@@ -260,10 +260,10 @@
                 return;
             }
 
-            /* ── title entrance ── */
+            /* title entrance */
             showTitle();
 
-            /* ── body fades sooner than title on exit ── */
+            /* body fades sooner than title on exit */
             if (visPx < vh * BODY_THRESHOLD) {
                 hideBody();
                 bodyAllowed = false;
@@ -285,7 +285,7 @@
             window.addEventListener('lenis-scroll', updateDesktop);
         });
 
-        /* ── resize ── */
+        /* resize */
 
         let resizeTimer;
         window.addEventListener('resize', () => {
@@ -300,7 +300,7 @@
             }, 50);
         });
 
-        /* ── mobile ↔ desktop layout switching ── */
+        /* mobile ↔ desktop layout switching */
 
         function handleCarouselScroll() {
             const imagesCol = section.querySelector('.team-images-col');

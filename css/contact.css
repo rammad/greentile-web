@@ -19,7 +19,7 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: calc(1024px - var(--page-gutter) * 2); /* TODO apply to shopify theme */
+    width: calc(1024px - var(--page-gutter) * 2); /* todo: apply to shopify theme */
     height: 100%;
     background: var(--c-off-white);
     z-index: 1002;
@@ -44,7 +44,7 @@
 .contact-panel-inner {
     display: flex;
     flex-direction: column;
-    padding: calc(var(--space-for-nav) - 12px) calc(var(--page-gutter) * 2) 40px; /* TODO apply to shopify theme */
+    padding: calc(var(--space-for-nav) - 12px) calc(var(--page-gutter) * 2) 40px; /* todo: apply to shopify theme */
     min-height: 100%;
 }
 

@@ -263,7 +263,7 @@
     display: none;
 }
 
-/* 4K desktop — 2× scale */
+/* 4K desktop */
 @media (min-width: 3840px) {
     .pdp-sticky-wrapper {
         padding-bottom: 80px;

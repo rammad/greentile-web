@@ -4,7 +4,7 @@
     const { wait, transitionCta, transitionHeader, staggerTime, observeElementInOut } = window.AnimationUtils || {};
     const MOBILE_BREAKPOINT = 1024;
 
-    /* ── Shopify product data ── */
+    /* shopify product data */
 
     let productData = null;
     const productJsonEl = document.getElementById('product-json');
@@ -21,7 +21,7 @@
     let currentVariantId = null;
     let currentUnitPrice = 0;
 
-    /* ── Cart helpers ── */
+    /* cart helpers */
 
     function formatPrice(cents) {
         if (productData) {
@@ -146,7 +146,7 @@
         });
     }
 
-    /* ── Qty buttons via data attributes ── */
+    /* qty buttons via data attributes */
 
     function initQtyButtons() {
         const section = document.querySelector('.pdp-section');
@@ -158,7 +158,7 @@
         });
     }
 
-    /* ── Desktop animations (from original) ── */
+    /* desktop animations (from original) */
 
     async function initDesktopAnimations(section) {
         if (!transitionHeader) return;
@@ -210,7 +210,7 @@
         if (cta) transitionCta(cta, 'enter');
     }
 
-    /* ── Mobile animations (from original) ── */
+    /* mobile animations (from original) */
 
     function initMobileAnimations(section) {
         if (!observeElementInOut) return;
@@ -340,7 +340,7 @@
         }
     }
 
-    /* ── Image scroll (desktop) ── */
+    /* image scroll (desktop) */
 
     function initImageScroll() {
         if (window.innerWidth <= MOBILE_BREAKPOINT) return;
@@ -404,7 +404,7 @@
         });
     }
 
-    /* ── Mobile image dots ── */
+    /* mobile image dots */
 
     function initMobileDots() {
         if (window.innerWidth > MOBILE_BREAKPOINT) return;
@@ -435,7 +435,7 @@
         }, { passive: true });
     }
 
-    /* ── Init ── */
+    /* init */
 
     document.addEventListener('DOMContentLoaded', () => {
         const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;

@@ -26,7 +26,7 @@
         initRowPacker();
     });
 
-    /* ── responsive grid packing ── */
+    /* responsive grid packing */
 
     const GRID_CARD_MIN_W = 200;
     const GRID_MAX_COLS = 6;

@@ -5,9 +5,9 @@
 (function () {
     const { staggerTime } = window.AnimationUtils || {};
 
-    // ── section logic ─────────────────────────────────────────────────────────
+    // section logic
 
-    // ── text block transitions ────────────────────────────────────────────
+    // text block transitions
     const TIME_FADE_IN        = 0.6;   // seconds — body text fade-in duration
     const TIME_FADE_OUT       = 0.25;  // seconds — body text fade-out duration
     const _wwdScale           = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
@@ -15,7 +15,7 @@
     const BODY_GAP_VH         = 0.05;  // vh — gap between menu bottom and body text top
     const _wwd_isMobile       = window.innerWidth <= 1024;
 
-    // ── desktop menu animation sequence (progress 0–100) ───────────────
+    // desktop menu animation sequence (progress 0–100)
     //   ①  revealAt                    — menu items fade in (stagger)
     //   ②  enterStart → end            — slide from below to pinned pos  (easeOut)
     //   ③  firstSlideEnd → lastSlideEnd — cycle through remaining items
@@ -42,7 +42,7 @@
     function easeOutCubic(t) { return 1 - (1 - t) * (1 - t) * (1 - t); }
     function easeInCubic(t)  { return t * t * t; }
 
-    // ── mobile menu animation sequence (progress 0–100) ─────────────
+    // mobile menu animation sequence (progress 0–100)
     const MOBILE_MENU = {
         revealAt:      0,     // menu items fade in (stagger)
         enterStart:    -20,     // begin sliding up from below
@@ -69,7 +69,7 @@
 
         const scatter = window.ScatterImages.init(section, viewport, numSlides);
 
-        // ── persistent menu ───────────────────────────────────────────────────
+        // persistent menu
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
 
         const MENU_ITEM_STAGGER_MS = 120;
@@ -92,7 +92,7 @@
             });
         }
 
-        // ── build: fixed body text container + scroll track slides ────────────
+        // build: fixed body text container + scroll track slides
 
         let bodyEl         = null;
         let activeIdx      = 0;
@@ -177,7 +177,7 @@
 
         initBlockStates();
 
-        // ── center menu + body vertically ───────────────────────────────────
+        // center menu + body vertically
 
         function positionMenuCenter(vpH) {
             if (!menuEl || !bodyEl) return;
@@ -210,7 +210,7 @@
             : window.innerHeight;
         positionMenuCenter(initVpH);
 
-        // ── measure center clearance for image zones ──────────────────────────
+        // measure center clearance for image zones
 
         function measureCenterClearance() {
             let maxW = 0;
@@ -236,7 +236,7 @@
         measureCenterClearance();
         scatter.initLayout();
 
-        // ── block show / hide ─────────────────────────────────────────────────
+        // block show / hide
 
         function showBlock(block) {
             if (!block) return;
@@ -328,11 +328,11 @@
             }, 450);
         }
 
-        // ── scroll track ──────────────────────────────────────────────────────
+        // scroll track
 
         let scrollHasFired = false;
 
-        // ── menu activation trigger ─────────────────────────────────────────
+        // menu activation trigger
         const MENU_REVEAL_VH_DESKTOP = 0.05;  // vh — section top must reach this far down viewport to activate (desktop)
         const MENU_REVEAL_VH_MOBILE  = 0.35;  // vh — same trigger for mobile
 
@@ -341,7 +341,7 @@
             const revealVH  = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
             const cfg       = isMobile ? MOBILE_MENU : DESKTOP_MENU;
 
-            // ── section progress ────────────────────────────────────
+            // section progress
             const scrollStart  = revealVH * vpH;
             const scrollEnd    = vpH - secRect.height;
             const scrollRange  = scrollStart - scrollEnd;
@@ -353,7 +353,7 @@
             const justBecameActive   = isActive && !wasActive;
             const justBecameInactive = !isActive && wasActive;
 
-            // ── menu reveal / transform ─────────────────────────────
+            // menu reveal / transform
             if (menuEl) {
                 const shouldShow = sectionProg >= cfg.revealAt && sectionProg <= cfg.hideAt;
                 if (shouldShow && !menuIsRevealed)  { revealMenuItems(); menuIsRevealed = true;  }
@@ -383,7 +383,7 @@
                 bodyEl.style.top = `${menuEl.getBoundingClientRect().bottom + gap}px`;
             }
 
-            // ── text block transitions ──────────────────────────────
+            // text block transitions
             if (justBecameActive) {
                 exitFaded = false;
                 if (menuEl) { menuEl.style.transition = 'none'; menuEl.style.opacity = '1'; }
@@ -402,7 +402,7 @@
 
             wasActive = isActive;
 
-            // ── active slide index ──────────────────────────────────
+            // active slide index
             const n  = menuItems.length;
             let closestIdx;
 
@@ -478,7 +478,7 @@
             scatter.updateImageScales(vpH, secRect.top);
         });
 
-        // ── resize ────────────────────────────────────────────────────────────
+        // resize
 
         const resizeDebounceMs = typeof staggerTime === 'number' ? staggerTime : 200;
         let resizeTimer;

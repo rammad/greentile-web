@@ -239,7 +239,7 @@ function initMobileScrollSpy() {
 
     if (!wrapper || !list || items.length === 0) return;
 
-    /* ── build top rail of dates ── */
+    /* build top rail of dates */
     const datesRail = document.createElement('div');
     datesRail.className = 'calendar-dates-rail';
 
@@ -283,7 +283,7 @@ function initMobileScrollSpy() {
         datesRail.style.marginBottom  = -h + 'px';
     };
 
-    /* ── inject inline poster + badges into each slide ── */
+    /* inject inline poster + badges into each slide */
     items.forEach(item => {
         const imgUrl = item.getAttribute('data-img');
         const status = item.getAttribute('data-status');
@@ -327,7 +327,7 @@ function initMobileScrollSpy() {
         });
     });
 
-    /* ── sync: when centered date changes, lerp poster into place ── */
+    /* sync — when centered date changes, lerp poster into place */
     let activeIndex = -1;
     let lerpRaf = 0;
 
@@ -371,7 +371,7 @@ function initMobileScrollSpy() {
 
     datesRail.addEventListener('scroll', onDateScroll, { passive: true });
 
-    /* ── swipe handler: detect direction, scrollTo ±1 ── */
+    /* swipe handler — detect direction, scrollTo ±1 */
     {
         let swStartX = 0;
         let swStartScroll = 0;
@@ -429,10 +429,7 @@ function initMobileScrollSpy() {
         });
     }
 
-    /* ── forward taps from the rail's extended touch area to poster links ──
-       touch-action:pan-y on the rail can swallow click events when the
-       browser interprets even tiny vertical finger movement as a page
-       scroll.  Detect taps in touchend directly so navigation is reliable. */
+    /* forward rail taps to poster links — pan-y can swallow clicks on small moves; handle taps on touchend */
     let tapStartX = 0;
     let tapStartY = 0;
     let tapStartScroll = 0;
@@ -480,7 +477,7 @@ function initMobileScrollSpy() {
         }
     });
 
-    /* ── initial state ── */
+    /* initial state */
     document.fonts.ready.then(() => {
         requestAnimationFrame(() => {
             setSpacerWidths();
@@ -493,7 +490,7 @@ function initMobileScrollSpy() {
     });
 }
 
-/* ── responsive grid packing ── */
+/* responsive grid packing */
 
 const _calScale = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
 const GRID_CARD_MIN_W = 200 * _calScale;

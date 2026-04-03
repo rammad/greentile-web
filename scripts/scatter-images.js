@@ -1,33 +1,11 @@
-/* scatter-images.js — center-relative image layout with dynamic center clearance
-   ─────────────────────────────────────────────────────────────────
-   Images are positioned at fixed pixel offsets from a central gap.
-   The gap width is driven by --center-clearance (CSS variable, set
-   by the consuming section JS).  As the gap grows or the viewport
-   shrinks, outer columns slide off-screen naturally.
-
-   Positioning formula (per image):
-     left side:  left = calc(50% - clearance/2 - offset - imgW)
-     right side: left = calc(50% + clearance/2 + offset)
-   where offset = column base + jitter ± frame shift.
-
-   Responsive tiers:
-     desktop  (>1024):  4 columns (2 per side), parallax, random jitter
-     tablet   (769–1024): 2 columns (1 per side), no parallax, alternating offset
-     mobile   (≤768):   2 columns (1 per side), no parallax, alternating offset
-
-   Usage:
-     var scatter = ScatterImages.init(sectionEl, viewportEl, numSlides, {});
-     scatter.initLayout();          // call again on resize / clearance change
-     scatter.updateImageScales();   // call on every scroll frame          */
+/* scatter-images.js — positions images at fixed px offsets from a central gap.
+   gap width is driven by --center-clearance (set by consuming section js).
+   desktop: 4 cols, parallax, jitter / tablet+mobile: 2 cols, no parallax */
 
 (function () {
 
-    // ── column definitions per breakpoint ─────────────────────────────────
-    // side:          'left' | 'right'
-    // offset:        fixed px from gap edge to the near edge of the image
-    //                0 = flush with gap,  larger = further toward viewport edge
-    // frameShiftPx:  px to shift top/bottom N images toward the gap
-    // stagger:       fraction of vertical spacing to offset this column
+    // column definitions per breakpoint
+    // offset: px from gap edge, frameShiftPx: shift toward gap, stagger: vertical offset fraction
 
     function _scatterScale() {
         return (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
@@ -99,7 +77,7 @@
         return min + Math.random() * (max - min);
     }
 
-    // ── public API ────────────────────────────────────────────────────────
+    // public api
 
     function init(section, viewport, numSlides, config) {
         var C      = mergeConfig(DEFAULTS, config);
@@ -120,7 +98,7 @@
 
         var _s = _scatterScale();
 
-        // ── layout ────────────────────────────────────────────────────────
+        // layout
 
         function initLayout() {
             allElements = [];
@@ -152,7 +130,7 @@
                      : bp === 'tablet' ? C.tabletImageWidth
                      : C.desktopImageWidth * _s;
 
-            // ── distribute source images into columns (round-robin) ──────
+            // distribute source images into columns (round-robin)
 
             var buckets = {};
             columns.forEach(function (c) { buckets[c.id] = []; });
@@ -179,7 +157,7 @@
             // CSS variable reference for center-relative calc()
             var cv = 'var(--center-clearance, 40%)';
 
-            // ── position each column's images ────────────────────────────
+            // position each column's images
 
             function positionColumn(colDef, images) {
                 var count = images.length;
@@ -198,13 +176,13 @@
                 images.forEach(function (img, i) {
                     if (img.parentNode !== track) track.appendChild(img);
 
-                    // ── vertical ──────────────────────────────────────────
+                    // vertical
                     var centerOffset = (colDef.flushTop && i === 0) ? 0 : 0.5;
                     var baseTop  = edgeTop + spacing * (i + centerOffset) + staggerPx;
                     var vJitter  = compact ? 0 : (Math.random() - 0.5) * 2 * jitterAmt;
                     var top      = Math.max(0, Math.min(fullSectionHeight - imgH, baseTop + vJitter));
 
-                    // ── horizontal offset (fixed px from gap edge) ────────
+                    // horizontal offset (fixed px from gap edge)
                     var hJitter;
                     if (compact) {
                         hJitter = ((i % 2 === 0) ? -1 : 1) * C.alternateOffsetPx;
@@ -218,10 +196,10 @@
                     // positive = further from gap, negative = closer to gap
                     var totalOffset = colDef.offset + hJitter - frameShift;
 
-                    // ── parallax speed ─────────────────────────────────────
+                    // parallax speed
                     var speed = compact ? 1.0 : randRange(C.frontSpeedMin, C.frontSpeedMax);
 
-                    // ── apply ──────────────────────────────────────────────
+                    // apply
                     img.style.position = 'absolute';
                     img.style.width    = imgW + 'px';
                     img.style.top      = top + 'px';
@@ -258,7 +236,7 @@
             _allUnity = imgCache.length > 0 && imgCache.every(function (c) { return c.speed === 1; });
         }
 
-        // ── parallax on scroll ──────────────────────────────────────────
+        // parallax on scroll
 
         var _smoothFactor = 0;
         var _currentDepth = -1;
@@ -325,7 +303,7 @@
             }
         }
 
-        // ── expose ──────────────────────────────────────────────────────
+        // expose
 
         var api = {
             state:             state,

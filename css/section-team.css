@@ -4,7 +4,6 @@
     position: relative;
     width: 100%;
     margin-top: calc(var(--section-spacing) / 2);
-    /* padding-bottom: 40px; */
 }
 
 .team-layout {
@@ -79,7 +78,6 @@
 
 .team-body-sizer {
     position: relative;
-    /* overflow: hidden; */
     transition: height 0.5s ease;
 }
 
@@ -120,39 +118,23 @@
     transition: opacity 0.7s ease;
 }
 
-/* desktop: opacity is scroll-driven in JS — strip CSS opacity transition
-   so it doesn't lag behind and "pop" when the inline transition changes */
+/* desktop: opacity is scroll-driven in js, so strip css opacity transition */
 @media (min-width: 1025px) {
     .team-section .animate-line,
     .team-section .animate-line.is-visible {
         transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     }
 }
-/* 
-.team-names {
-    color: var(--c-dark-green-50);
-} */
-
-/* type-body2 starts at opacity:0 / blur globally;
-   inside .team-body the wrapper handles fade, so reset the child */
+/* type-body2 starts hidden globally; .team-body wrapper handles its own fade */
 .team-body .type-body2 {
     opacity: 1;
     filter: none;
     font-size: clamp(16px, 1.4vw, var(--size-body2));
 }
 
-/* @media (prefers-reduced-motion: reduce) {
-    .team-poster-wrap {
-        opacity: 1;
-        transform: none;
-        transition: none;
-    }
-} */
-
 .team-dots { display: none; }
 
-/* 4K desktop — 2× scale */
-/* 4K desktop — remaining element-level overrides */
+/* 4K desktop */
 @media (min-width: 3840px) {
     .team-poster-wrap {
         height: clamp(1000px, 55vw, var(--poster-full-height));

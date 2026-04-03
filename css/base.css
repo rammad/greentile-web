@@ -44,7 +44,6 @@
     --c-dark-green-80: #3E6E3E;
     --c-dark-green-90: #265C26;
     --c-black: #000000;
-    /* --c-light-grey: #EDEDED; */
     --c-light-grey: #E2DEDB;
     --c-yellow: #FDE523;
     --c-light-yellow: #feea4f;
@@ -63,7 +62,6 @@
     --font-display: 'OT Jubilee Golden', serif;
     --font-header: 'OT Jubilee Golden', serif;
     --font-body: 'angie-sans', normal;
-    /* --font-body: 'thermal-variable', normal; */
     --font-subheader: 'Obviously Sans', normal;
 
     --time-fade-in: 0.6s;
@@ -112,7 +110,7 @@
     --nav-cluster-gap: 32px;
     --active-indicator-width: 20px;
 
-    --section-spacing: 240px; /* space between sections was 200px*/
+    --section-spacing: 240px;
 }
 
 /* reset */
@@ -213,8 +211,7 @@ section {
 .type-display-hero.is-initialized { opacity: 1; }
 .type-display-hero span { display: inline; }
 
-/* font-size is set by fitTextToWidth() in global.js
-   element stays opacity:0 until js sets .is-initialized */
+/* font-size set by fitTextToWidth() — stays hidden until js adds .is-initialized */
 .fit-text {
     display: block;
     white-space: nowrap;
@@ -263,12 +260,7 @@ section {
     text-box: trim-both cap alphabetic;
 }
 
-/* type-sub classes: Bold = wdth 525 / weight 400; Regular = wdth 450 / weight 300
-   1 = primary size, 2 = secondary size
-   subBold1    20px  section label headers (mission, What We Do)
-   subBold2    12px  secondary bold info (event date, location, marquee)
-   subRegular1 14px  nav links and buttons
-   subRegular2 10px  badges and PDP meta (tags, qty, team names) */
+/* type-sub: Bold = wdth 525 / wght 400, Regular = wdth 450 / wght 300 */
 .type-subBold1 {
     font-family: var(--font-subheader);
     font-size: var(--size-subBold1);
@@ -695,10 +687,9 @@ body::after {
     filter: brightness(0) saturate(100%) invert(22%) sepia(50%) saturate(800%) hue-rotate(80deg) brightness(88%);
 }
 
-/* ─── BREAKPOINTS ─────────────────────────────────────────────────── */
+/* breakpoints */
 
-/* widescreen fluid scaling — above 1920 everything grows proportionally,
-   capping at 2× when the viewport reaches 3840.  vw coefficient = base / 19.2 */
+/* widescreen fluid scaling — above 1920, grows proportionally up to 2x at 3840 */
 @media (min-width: 1921px) {
     :root {
         --size-display-hero:  clamp(165px, 8.594vw, 330px);
@@ -803,7 +794,7 @@ body::after {
     }
 }
 
-/* ── pull-to-refresh indicator ── */
+/* pull-to-refresh indicator */
 .ptr-indicator {
     position: fixed;
     top: 0;
@@ -829,7 +820,7 @@ body::after {
     to { transform: translateY(10px) rotate(360deg); }
 }
 
-/* ── responsive visibility utilities ── */
+/* responsive visibility */
 .mobile-only  { display: none !important; }
 
 @media (max-width: 1024px) {

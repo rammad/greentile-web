@@ -233,7 +233,7 @@
     }
 }
 
-/* 4K desktop — remaining element-level overrides */
+/* 4K desktop */
 @media (min-width: 3840px) {
     .nav-active-wrap::after {
         height: 2px;

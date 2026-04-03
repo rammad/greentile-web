@@ -22,13 +22,13 @@
 .featured-bg-img {
     position: absolute;
     top: -20%;
-    left: calc(-1 * 80px);
-    right: calc(-1 * 80px);
-    width: calc(100% + 2 * 80px);
+    left: calc(-1 * clamp(80px, 4.167vw, 160px));
+    right: calc(-1 * clamp(80px, 4.167vw, 160px));
+    width: calc(100% + 2 * clamp(80px, 4.167vw, 160px));
     height: 140%;
     object-fit: cover;
     object-position: center;
-    filter: blur(48px);
+    filter: blur(clamp(48px, 2.5vw, 96px));
     z-index: 0;
     pointer-events: none;
     user-select: none;
@@ -63,7 +63,7 @@
 
 .featured-marquee-track {
     display: flex;
-    gap: 40px;
+    gap: clamp(40px, 2.083vw, 80px);
     white-space: nowrap;
     animation: featured-scroll 90s linear infinite;
     will-change: transform;

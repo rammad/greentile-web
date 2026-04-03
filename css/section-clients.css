@@ -76,7 +76,7 @@
     transform: translateY(-3px);
 }
 
-/* ── press logos ──────────────────────────────────────────── */
+/* press logos */
 
 .press-logos {
     display: flex;
@@ -148,7 +148,7 @@
     aspect-ratio: 418 / 87;
 }
 
-/* ── press marquee ────────────────────────────────────────── */
+/* press marquee */
 
 .press-marquee {
     display: flex;
@@ -186,7 +186,7 @@
     100% { transform: translateX(0); }
 }
 
-/* 4K desktop — 2× scale (remaining transform overrides) */
+/* 4K desktop */
 @media (min-width: 3840px) {
     .clients-plain {
         transform: translateY(-6px);
@@ -218,7 +218,6 @@
 
     .press-logo-link{
         height: 48px;
-        /* height: 24px; */
     }
 
     .press-logos .press-logo-link:last-child:nth-child(odd) {

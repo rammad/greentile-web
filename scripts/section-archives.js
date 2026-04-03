@@ -35,7 +35,7 @@
         (window.pageReady || Promise.resolve()).then(enableNativeScroll);
     });
 
-    /* ── responsive grid packing ── */
+    /* responsive grid packing */
 
     const _archScale = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
     const GRID_CARD_MIN_W = 200 * _archScale;

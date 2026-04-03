@@ -5,16 +5,17 @@
 (function () {
     const { staggerTime } = window.AnimationUtils || {};
 
-    // ── section logic ─────────────────────────────────────────────────────────
+    // section logic
 
-    // ── text block transitions ────────────────────────────────────────────
+    // text block transitions
     const TIME_FADE_IN        = 0.6;   // seconds — body text fade-in duration
     const TIME_FADE_OUT       = 0.25;  // seconds — body text fade-out duration
-    const BODY_BLUR_PX        = 8;     // px — blur on hidden body text blocks
+    const _wwdScale           = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+    const BODY_BLUR_PX        = 8 * _wwdScale;
     const BODY_GAP_VH         = 0.05;  // vh — gap between menu bottom and body text top
     const _wwd_isMobile       = window.innerWidth <= 1024;
 
-    // ── desktop menu animation sequence (progress 0–100) ───────────────
+    // desktop menu animation sequence (progress 0–100)
     //   ①  revealAt                    — menu items fade in (stagger)
     //   ②  enterStart → end            — slide from below to pinned pos  (easeOut)
     //   ③  firstSlideEnd → lastSlideEnd — cycle through remaining items
@@ -41,18 +42,18 @@
     function easeOutCubic(t) { return 1 - (1 - t) * (1 - t) * (1 - t); }
     function easeInCubic(t)  { return t * t * t; }
 
-    // ── mobile menu animation sequence (progress 0–100) ─────────────
+    // mobile menu animation sequence (progress 0–100)
     const MOBILE_MENU = {
         revealAt:      0,     // menu items fade in (stagger)
-        enterStart:    -10,     // begin sliding up from below
-        enterEnd:      20,      // arrive at pinned position
-        enterTravel:   75,      // vh below pinned position at start
+        enterStart:    -20,     // begin sliding up from below
+        enterEnd:      30,      // arrive at pinned position
+        enterTravel:   150,      // vh below pinned position at start
         firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
         lastSlideEnd:  100,     // last slide ends
         exitStart:     70,      // begin sliding upward off screen
-        exitEnd:       140,     // fully offscreen + fade last body/CTA
+        exitEnd:       130,     // fully offscreen + fade last body/CTA
         exitTravel:    150,  // vh above pinned position at end
-        hideAt:        120,     // menu items fade out
+        hideAt:        110,     // menu items fade out
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -68,7 +69,7 @@
 
         const scatter = window.ScatterImages.init(section, viewport, numSlides);
 
-        // ── persistent menu ───────────────────────────────────────────────────
+        // persistent menu
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
 
         const MENU_ITEM_STAGGER_MS = 120;
@@ -91,7 +92,7 @@
             });
         }
 
-        // ── build: fixed body text container + scroll track slides ────────────
+        // build: fixed body text container + scroll track slides
 
         let bodyEl         = null;
         let activeIdx      = 0;
@@ -99,6 +100,9 @@
         let menuIsRevealed = false;
         let exitFaded      = false;
         let _cachedBlocks = [];
+        let sharedCta      = null;
+        let ctaData        = [];
+        let ctaRevealed    = false;
 
         function buildLayout() {
             const stickyContent = section.querySelector('.about-sticky-content');
@@ -130,6 +134,32 @@
         buildLayout();
         if (bodyEl) _cachedBlocks = Array.from(bodyEl.querySelectorAll('.about-text-block'));
 
+        function buildSharedCta() {
+            if (!bodyEl) return;
+            ctaData = _cachedBlocks.map((block) => {
+                const cta = block.querySelector('.cta-btn');
+                if (!cta) return { href: '#', text: '' };
+                const data = {
+                    href: cta.getAttribute('href') || '#',
+                    text: (cta.querySelector('.ui-roll-visible')?.textContent || '').trim(),
+                };
+                cta.remove();
+                return data;
+            });
+
+            sharedCta = document.createElement('a');
+            sharedCta.className = 'cta-btn wwd-shared-cta';
+            sharedCta.href = ctaData[0]?.href || '#';
+            const t = ctaData[0]?.text || '';
+            sharedCta.innerHTML =
+                '<div class="ui-roll roll-hover">' +
+                    '<span class="type-subRegular1 ui-roll-layer ui-roll-visible">' + t + '</span>' +
+                    '<span class="type-subRegular1 ui-roll-layer ui-roll-hidden">' + t + '</span>' +
+                '</div>';
+            bodyEl.appendChild(sharedCta);
+        }
+        buildSharedCta();
+
         function initBlockStates() {
             if (!bodyEl) return;
             const blocks = Array.from(bodyEl.querySelectorAll('.about-text-block'));
@@ -147,7 +177,7 @@
 
         initBlockStates();
 
-        // ── center menu + body vertically ───────────────────────────────────
+        // center menu + body vertically
 
         function positionMenuCenter(vpH) {
             if (!menuEl || !bodyEl) return;
@@ -155,8 +185,8 @@
 
             const navSpace = parseFloat(
                 getComputedStyle(document.documentElement).getPropertyValue('--space-for-nav')
-            ) || 78;
-            const nudgeHigher = 8;
+            ) || (78 * _wwdScale);
+            const nudgeHigher = 8 * _wwdScale;
 
             const menuH = menuEl.offsetHeight;
             const gap   = vpH * BODY_GAP_VH;
@@ -164,11 +194,9 @@
             const blocks = Array.from(bodyEl.querySelectorAll('.about-text-block'));
             let contentH = 0;
             blocks.forEach(b => {
-                let h = b.offsetHeight;
-                const cta = b.querySelector('.cta-btn');
-                if (cta) h += 40 + cta.offsetHeight;
-                if (h > contentH) contentH = h;
+                if (b.offsetHeight > contentH) contentH = b.offsetHeight;
             });
+            if (sharedCta) contentH += 40 * _wwdScale + sharedCta.offsetHeight;
 
             const totalH     = menuH + gap + contentH;
             const availableH = vpH - navSpace - nudgeHigher;
@@ -182,7 +210,7 @@
             : window.innerHeight;
         positionMenuCenter(initVpH);
 
-        // ── measure center clearance for image zones ──────────────────────────
+        // measure center clearance for image zones
 
         function measureCenterClearance() {
             let maxW = 0;
@@ -200,7 +228,7 @@
                 if (b.offsetWidth > maxW) maxW = b.offsetWidth;
             });
 
-            const padding = compact ? 20 : 60;
+            const padding = compact ? 20 : 60 * _wwdScale;
             const clearance = maxW + padding * 2;
             section.style.setProperty('--center-clearance', clearance + 'px');
         }
@@ -208,7 +236,7 @@
         measureCenterClearance();
         scatter.initLayout();
 
-        // ── block show / hide ─────────────────────────────────────────────────
+        // block show / hide
 
         function showBlock(block) {
             if (!block) return;
@@ -228,31 +256,83 @@
             if (!_wwd_isMobile) block.style.filter = `blur(${BODY_BLUR_PX}px)`;
         }
 
-        function showCtas(block) {
-            if (!block) return;
-            block.querySelectorAll('.cta-btn').forEach((cta) => {
-                if (cta._rollTimeout) clearTimeout(cta._rollTimeout);
-                cta.classList.add('is-visible');
-                cta._rollTimeout = setTimeout(() => {
-                    cta.querySelectorAll('.ui-roll').forEach((r) => r.classList.add('is-visible'));
-                }, 500);
-            });
+        function showSharedCta() {
+            if (!sharedCta || ctaRevealed) return;
+            ctaRevealed = true;
+            sharedCta.classList.add('is-visible');
+            if (sharedCta._rollTimeout) clearTimeout(sharedCta._rollTimeout);
+            sharedCta._rollTimeout = setTimeout(() => {
+                sharedCta.querySelectorAll('.ui-roll').forEach(r => r.classList.add('is-visible'));
+            }, 500);
         }
 
-        function hideCtas(block) {
-            if (!block) return;
-            block.querySelectorAll('.cta-btn').forEach((cta) => {
-                if (cta._rollTimeout) clearTimeout(cta._rollTimeout);
-                cta.querySelectorAll('.ui-roll').forEach((r) => r.classList.remove('is-visible'));
-                cta.classList.remove('is-visible');
-            });
+        function hideSharedCta() {
+            if (!sharedCta) return;
+            if (sharedCta._rollTimeout) clearTimeout(sharedCta._rollTimeout);
+            sharedCta.querySelectorAll('.ui-roll').forEach(r => r.classList.remove('is-visible'));
+            sharedCta.classList.remove('is-visible');
+            ctaRevealed = false;
         }
 
-        // ── scroll track ──────────────────────────────────────────────────────
+        function updateCtaContent(idx) {
+            if (!sharedCta || !ctaData[idx]) return;
+
+            const vis = sharedCta.querySelector('.ui-roll-visible');
+            const hid = sharedCta.querySelector('.ui-roll-hidden');
+            if (!vis || !hid) return;
+
+            const newText = ctaData[idx].text;
+            const newHref = ctaData[idx].href;
+
+            if (vis.textContent.trim() === newText) {
+                sharedCta.href = newHref;
+                return;
+            }
+
+            if (sharedCta._swapTimeout) clearTimeout(sharedCta._swapTimeout);
+
+            const oldW    = sharedCta.getBoundingClientRect().width;
+            const oldText = vis.textContent;
+
+            vis.style.transition = 'none';
+            hid.style.transition = 'none';
+
+            vis.textContent    = newText;
+            vis.style.transform = 'translateY(100%)';
+
+            hid.textContent    = oldText;
+            hid.style.transform = 'translateY(0%)';
+
+            const newW = sharedCta.getBoundingClientRect().width;
+            sharedCta.style.width = oldW + 'px';
+
+            void sharedCta.offsetWidth;
+
+            vis.style.transition = '';
+            hid.style.transition = '';
+            sharedCta.style.width = newW + 'px';
+
+            vis.style.transform = 'translateY(0%)';
+            hid.style.transform = 'translateY(-100%)';
+
+            sharedCta.href = newHref;
+
+            sharedCta._swapTimeout = setTimeout(() => {
+                hid.style.transition = 'none';
+                hid.textContent = newText;
+                hid.style.transform = '';
+                vis.style.transform  = '';
+                void sharedCta.offsetWidth;
+                hid.style.transition = '';
+                sharedCta.style.width = '';
+            }, 450);
+        }
+
+        // scroll track
 
         let scrollHasFired = false;
 
-        // ── menu activation trigger ─────────────────────────────────────────
+        // menu activation trigger
         const MENU_REVEAL_VH_DESKTOP = 0.05;  // vh — section top must reach this far down viewport to activate (desktop)
         const MENU_REVEAL_VH_MOBILE  = 0.35;  // vh — same trigger for mobile
 
@@ -261,7 +341,7 @@
             const revealVH  = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
             const cfg       = isMobile ? MOBILE_MENU : DESKTOP_MENU;
 
-            // ── section progress ────────────────────────────────────
+            // section progress
             const scrollStart  = revealVH * vpH;
             const scrollEnd    = vpH - secRect.height;
             const scrollRange  = scrollStart - scrollEnd;
@@ -273,7 +353,7 @@
             const justBecameActive   = isActive && !wasActive;
             const justBecameInactive = !isActive && wasActive;
 
-            // ── menu reveal / transform ─────────────────────────────
+            // menu reveal / transform
             if (menuEl) {
                 const shouldShow = sectionProg >= cfg.revealAt && sectionProg <= cfg.hideAt;
                 if (shouldShow && !menuIsRevealed)  { revealMenuItems(); menuIsRevealed = true;  }
@@ -303,16 +383,18 @@
                 bodyEl.style.top = `${menuEl.getBoundingClientRect().bottom + gap}px`;
             }
 
-            // ── text block transitions ──────────────────────────────
+            // text block transitions
             if (justBecameActive) {
                 exitFaded = false;
                 if (menuEl) { menuEl.style.transition = 'none'; menuEl.style.opacity = '1'; }
                 if (bodyEl) { bodyEl.style.transition = 'none'; bodyEl.style.opacity = '1'; }
                 showBlock(blocks[activeIdx]);
-                if (scrollHasFired) showCtas(blocks[activeIdx]);
+                updateCtaContent(activeIdx);
+                if (scrollHasFired) showSharedCta();
             }
             if (justBecameInactive) {
-                blocks.forEach(b => { hideBlock(b); hideCtas(b); });
+                blocks.forEach(b => { hideBlock(b); });
+                hideSharedCta();
                 exitFaded = false;
                 if (menuEl) { menuEl.style.transition = 'none'; menuEl.style.opacity = '1'; }
                 if (bodyEl) { bodyEl.style.transition = 'none'; bodyEl.style.opacity = '1'; }
@@ -320,7 +402,7 @@
 
             wasActive = isActive;
 
-            // ── active slide index ──────────────────────────────────
+            // active slide index
             const n  = menuItems.length;
             let closestIdx;
 
@@ -339,11 +421,11 @@
             menuItems.forEach((item, i) => item.classList.toggle('is-active', i === closestIdx));
 
             if (closestIdx !== activeIdx) {
-                hideCtas(blocks[activeIdx]);
                 hideBlock(blocks[activeIdx]);
                 if (sectionProg < cfg.hideAt) {
                     showBlock(blocks[closestIdx]);
-                    if (scrollHasFired) showCtas(blocks[closestIdx]);
+                    updateCtaContent(closestIdx);
+                    if (scrollHasFired) showSharedCta();
                 }
                 activeIdx = closestIdx;
             }
@@ -358,7 +440,7 @@
                 if (menuEl) { menuEl.style.transition = fadeTrans; menuEl.style.opacity = '1'; }
                 if (bodyEl) { bodyEl.style.transition = fadeTrans; bodyEl.style.opacity = '1'; }
                 showBlock(blocks[activeIdx]);
-                if (scrollHasFired) showCtas(blocks[activeIdx]);
+                if (scrollHasFired) showSharedCta();
                 exitFaded = false;
             }
         }
@@ -396,7 +478,7 @@
             scatter.updateImageScales(vpH, secRect.top);
         });
 
-        // ── resize ────────────────────────────────────────────────────────────
+        // resize
 
         const resizeDebounceMs = typeof staggerTime === 'number' ? staggerTime : 200;
         let resizeTimer;
