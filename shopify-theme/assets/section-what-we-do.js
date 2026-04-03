@@ -32,11 +32,10 @@
         enterTravel:   75,      // vh below pinned position at start
         firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
         lastSlideEnd:  85,      // last slide ends
-        exitStart:     75,      // begin sliding upward off screen
-        exitEnd:       130,     // fully offscreen + fade last body/CTA
+        exitStart:     70,      // begin sliding upward off screen
+        exitEnd:       120,     // fully offscreen + fade last body/CTA
         exitTravel:    80,      // vh above pinned position at end
         hideAt:        110,     // menu items fade out
-        edgeWeight:    0.80,    // edge items get 80% of equal share
     };
 
     function easeOutCubic(t) { return 1 - (1 - t) * (1 - t) * (1 - t); }
@@ -54,18 +53,6 @@
         exitEnd:       140,     // fully offscreen + fade last body/CTA
         exitTravel:    150,  // vh above pinned position at end
         hideAt:        120,     // menu items fade out
-        edgeWeight:    1,       // equal time per slide
-    };
-
-    // ── image sizing — vw-based with px clamp ────────────────────────
-    //   width = clamp(min, vw × viewport-width, max)
-    const DESKTOP_IMAGE_SIZE = {
-        frontVw: 0.10,  frontMin: 120,  frontMax: 200,
-        backVw:  0.07,  backMin:  80,   backMax:  140,
-    };
-    const MOBILE_IMAGE_SIZE = {
-        frontVw: 0.30,  frontMin: 80,   frontMax: 140,
-        backVw:  0.26,  backMin:  50,   backMax:  90,
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -79,10 +66,7 @@
         const menuEl     = section.querySelector('.about-menu-persistent');
         const isMobile   = window.innerWidth <= 1024;
 
-        const scatter = window.ScatterImages.init(section, viewport, numSlides, {
-            desktopImages: DESKTOP_IMAGE_SIZE,
-            mobileImages:  MOBILE_IMAGE_SIZE,
-        });
+        const scatter = window.ScatterImages.init(section, viewport, numSlides);
 
         // ── persistent menu ───────────────────────────────────────────────────
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
@@ -198,6 +182,32 @@
             : window.innerHeight;
         positionMenuCenter(initVpH);
 
+        // ── measure center clearance for image zones ──────────────────────────
+
+        function measureCenterClearance() {
+            let maxW = 0;
+            const compact = window.innerWidth <= 1024;
+
+            // Skip menu items on compact — word-spacing:100vw inflates their box width
+            if (menuEl && !compact) {
+                const items = menuEl.querySelectorAll('.menu-item');
+                items.forEach(item => {
+                    if (item.offsetWidth > maxW) maxW = item.offsetWidth;
+                });
+            }
+
+            _cachedBlocks.forEach(b => {
+                if (b.offsetWidth > maxW) maxW = b.offsetWidth;
+            });
+
+            const padding = compact ? 20 : 60;
+            const clearance = maxW + padding * 2;
+            section.style.setProperty('--center-clearance', clearance + 'px');
+        }
+
+        measureCenterClearance();
+        scatter.initLayout();
+
         // ── block show / hide ─────────────────────────────────────────────────
 
         function showBlock(block) {
@@ -312,7 +322,6 @@
 
             // ── active slide index ──────────────────────────────────
             const n  = menuItems.length;
-            const ew = cfg.edgeWeight ?? 1;
             let closestIdx;
 
             if (sectionProg < cfg.firstSlideEnd) {
@@ -322,18 +331,9 @@
                     ? Math.max(0, Math.min(1, (sectionProg - cfg.firstSlideEnd) / (cfg.lastSlideEnd - cfg.firstSlideEnd)))
                     : 0;
                 const remaining = n - 1;
-                closestIdx = n - 1;
-                if (remaining > 2 && ew < 1) {
-                    const edge = ew / remaining;
-                    const mid  = (1 - 2 * edge) / (remaining - 2);
-                    let acc = 0;
-                    for (let j = 0; j < remaining; j++) {
-                        acc += (j === 0 || j === remaining - 1) ? edge : mid;
-                        if (sp < acc) { closestIdx = j + 1; break; }
-                    }
-                } else if (remaining > 0) {
-                    closestIdx = 1 + Math.min(remaining - 1, Math.floor(sp * remaining));
-                }
+                closestIdx = remaining > 0
+                    ? 1 + Math.min(remaining - 1, Math.floor(sp * remaining))
+                    : n - 1;
             }
 
             menuItems.forEach((item, i) => item.classList.toggle('is-active', i === closestIdx));
@@ -409,6 +409,7 @@
                 scatter.initLayout();
                 const vpH = viewport ? viewport.getBoundingClientRect().height : window.innerHeight;
                 positionMenuCenter(vpH);
+                measureCenterClearance();
                 const slidesAfterResize = section.querySelectorAll('.about-slide');
                 if (slidesAfterResize.length > 0) {
                     const slideHeight = scatter.state.trackHeight / slidesAfterResize.length;

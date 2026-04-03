@@ -1,4 +1,4 @@
-/* what we do section (about-us.html) — column images + fixed body text + persistent menu */
+/* what we do section (about-us.html) — zone-based images + fixed body text + persistent menu */
 
 /* ── image track ──────────────────────────────────────────────────── */
 
@@ -28,23 +28,6 @@
     object-fit: cover;
     border-radius: var(--poster-radius);
     will-change: transform;
-}
-
-.scatter-img.back-layer {
-    opacity: 0.1;
-    pointer-events: none;
-}
-
-.scatter-img.back-card {
-    background: var(--c-dark-green, #0E4A0E);
-    border-radius: var(--poster-radius);
-    aspect-ratio: 4 / 5;
-}
-
-@media (min-width: 1025px) {
-    .scatter-img.back-layer {
-        filter: grayscale(1);
-    }
 }
 
 /* ── what we do section ───────────────────────────────────────────────────── */

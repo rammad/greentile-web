@@ -44,21 +44,16 @@
     // ── mobile menu animation sequence (progress 0–100) ─────────────
     const MOBILE_MENU = {
         revealAt:      0,     // menu items fade in (stagger)
-        enterStart:    -10,     // begin sliding up from below
-        enterEnd:      20,      // arrive at pinned position
-        enterTravel:   75,      // vh below pinned position at start
+        enterStart:    -20,     // begin sliding up from below
+        enterEnd:      30,      // arrive at pinned position
+        enterTravel:   150,      // vh below pinned position at start
         firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
         lastSlideEnd:  100,     // last slide ends
         exitStart:     70,      // begin sliding upward off screen
-        exitEnd:       140,     // fully offscreen + fade last body/CTA
+        exitEnd:       130,     // fully offscreen + fade last body/CTA
         exitTravel:    150,  // vh above pinned position at end
-        hideAt:        120,     // menu items fade out
+        hideAt:        110,     // menu items fade out
     };
-
-    // ── image sizing — fixed px per breakpoint ────────────────────────
-    const DESKTOP_IMAGE_SIZE = { front: 180, back: 120 };
-    const TABLET_IMAGE_SIZE  = { front: 150, back: 100 };
-    const MOBILE_IMAGE_SIZE  = { front: 120, back: 90  };
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('about');
@@ -71,11 +66,7 @@
         const menuEl     = section.querySelector('.about-menu-persistent');
         const isMobile   = window.innerWidth <= 1024;
 
-        const scatter = window.ScatterImages.init(section, viewport, numSlides, {
-            desktopImages: DESKTOP_IMAGE_SIZE,
-            tabletImages:  TABLET_IMAGE_SIZE,
-            mobileImages:  MOBILE_IMAGE_SIZE,
-        });
+        const scatter = window.ScatterImages.init(section, viewport, numSlides);
 
         // ── persistent menu ───────────────────────────────────────────────────
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
@@ -190,6 +181,32 @@
             ? viewport.getBoundingClientRect().height
             : window.innerHeight;
         positionMenuCenter(initVpH);
+
+        // ── measure center clearance for image zones ──────────────────────────
+
+        function measureCenterClearance() {
+            let maxW = 0;
+            const compact = window.innerWidth <= 1024;
+
+            // Skip menu items on compact — word-spacing:100vw inflates their box width
+            if (menuEl && !compact) {
+                const items = menuEl.querySelectorAll('.menu-item');
+                items.forEach(item => {
+                    if (item.offsetWidth > maxW) maxW = item.offsetWidth;
+                });
+            }
+
+            _cachedBlocks.forEach(b => {
+                if (b.offsetWidth > maxW) maxW = b.offsetWidth;
+            });
+
+            const padding = compact ? 20 : 60;
+            const clearance = maxW + padding * 2;
+            section.style.setProperty('--center-clearance', clearance + 'px');
+        }
+
+        measureCenterClearance();
+        scatter.initLayout();
 
         // ── block show / hide ─────────────────────────────────────────────────
 
@@ -392,6 +409,7 @@
                 scatter.initLayout();
                 const vpH = viewport ? viewport.getBoundingClientRect().height : window.innerHeight;
                 positionMenuCenter(vpH);
+                measureCenterClearance();
                 const slidesAfterResize = section.querySelectorAll('.about-slide');
                 if (slidesAfterResize.length > 0) {
                     const slideHeight = scatter.state.trackHeight / slidesAfterResize.length;
