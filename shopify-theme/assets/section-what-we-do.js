@@ -31,16 +31,16 @@
     // Narrower ranges → faster motion;  wider → slower.
     // Travel values set vertical displacement in vh.
     const DESKTOP_MENU = {
-        revealAt:      -15,     // menu items fade in (stagger)
-        enterStart:    -20,     // begin sliding up from below
-        enterEnd:      25,      // arrive at pinned position
+        revealAt:      -5,     // menu items fade in (stagger)
+        enterStart:    -15,     // begin sliding up from below
+        enterEnd:      30,      // arrive at pinned position
         enterTravel:   75,      // vh below pinned position at start
         firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
         lastSlideEnd:  85,      // last slide ends
-        exitStart:     70,      // begin sliding upward off screen
-        exitEnd:       120,     // fully offscreen + fade last body/CTA
+        exitStart:     65,      // begin sliding upward off screen
+        exitEnd:       115,     // fully offscreen + fade last body/CTA
         exitTravel:    80,      // vh above pinned position at end
-        hideAt:        110,     // menu items fade out
+        hideAt:        105,     // menu items fade out
     };
 
     function easeOutCubic(t) { return 1 - (1 - t) * (1 - t) * (1 - t); }
