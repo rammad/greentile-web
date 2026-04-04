@@ -4,7 +4,62 @@
     const { transitionCta, observeElementInOut, staggerTime } = window.AnimationUtils || {};
     const { fitTextToWidth } = window.AppUtils || {};
 
+    function initFeaturedLayout(section) {
+        const _s = (window.AppUtils && window.AppUtils.getLayoutScale) ? window.AppUtils.getLayoutScale() : 1;
+        const BG_PX      =  480 * _s;
+        const MARQUEE_PX = -120 * _s;
+        const POSTER_PX  = -240 * _s;
+
+        const frame        = section.querySelector('.featured-frame');
+        const marqueeTop   = section.querySelector('.featured-marquee-layer:not(.featured-marquee-bottom)');
+        const marqueeBot   = section.querySelector('.featured-marquee-bottom');
+        const posterWrap   = section.querySelector('.featured-poster-wrap');
+        const bgImg        = section.querySelector('.featured-bg-img');
+
+        let centerY = 0, secH = 1, cachedVH = window.innerHeight, lastW = window.innerWidth;
+        const isMobile = window.matchMedia('(max-width: 1024px)').matches;
+        let near = true;
+
+        const recalc = () => {
+            lastW = window.innerWidth;
+            cachedVH = window.innerHeight;
+            if (isMobile && frame) {
+                centerY = section.offsetTop + frame.offsetTop + frame.offsetHeight * 0.5;
+                secH    = frame.offsetHeight;
+            } else {
+                centerY = section.offsetTop + section.offsetHeight * 0.5;
+                secH    = section.offsetHeight;
+            }
+        };
+
+        document.fonts.ready.then(recalc);
+        window.addEventListener('resize', () => {
+            if (isMobile && window.innerWidth === lastW) return;
+            recalc();
+        });
+
+        new IntersectionObserver(([e]) => { near = e.isIntersecting; }, {
+            rootMargin: '25%'
+        }).observe(section);
+
+        const apply = (scrollY) => {
+            if (!near) return;
+            const d   = (scrollY + cachedVH * 0.5 - centerY) / secH;
+            const mpx = isMobile ? POSTER_PX : MARQUEE_PX;
+            if (bgImg)      bgImg.style.transform      = `translate3d(0,${(d * BG_PX).toFixed(2)}px,0)`;
+            if (marqueeTop) marqueeTop.style.transform  = `translate3d(0,${(d * mpx).toFixed(2)}px,0)`;
+            if (marqueeBot) marqueeBot.style.transform  = `translate3d(0,${(d * mpx).toFixed(2)}px,0)`;
+            if (posterWrap) posterWrap.style.transform   = `translate3d(0,${(d * POSTER_PX).toFixed(2)}px,0)`;
+        };
+
+        window.addEventListener('lenis-scroll', ({ detail }) => { apply(detail.scroll); }, { passive: true });
+        requestAnimationFrame(() => { apply(window.lenis ? window.lenis.scroll : window.scrollY); });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+        const featuredSection = document.querySelector('.events-as-featured');
+        if (featuredSection) { initFeaturedLayout(featuredSection); return; }
+
         const section = document.querySelector('.events-section');
         if (!section) return;
 

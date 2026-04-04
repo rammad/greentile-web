@@ -1,5 +1,3 @@
-{{ 'section-events.css' | asset_url | stylesheet_tag }}
-
 {%- comment -%}
   Resolve event source: specific collection → all active products.
   Manual event_card blocks are still supported as a final fallback.
@@ -10,8 +8,108 @@
   {%- assign event_source = collections.all.products -%}
 {%- endif -%}
 
+{%- comment -%} Count events (respecting max) {%- endcomment -%}
+{%- assign event_count = 0 -%}
+{%- for product in event_source -%}
+  {%- if event_count >= section.settings.max_events -%}{%- break -%}{%- endif -%}
+  {%- assign event_count = event_count | plus: 1 -%}
+{%- endfor -%}
+{%- if event_count == 0 -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'event_card' -%}
+      {%- assign event_count = event_count | plus: 1 -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- comment -%} Featured layout gate: toggle on, exactly 1 event, no standalone featured product {%- endcomment -%}
+{%- assign has_featured_product = false -%}
+{%- if section.settings.use_featured_layout -%}
+  {%- for product in collections.all.products -%}
+    {%- for tag in product.tags -%}
+      {%- assign tag_lower = tag | downcase -%}
+      {%- if tag_lower == 'featured' -%}
+        {%- assign has_featured_product = true -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if has_featured_product -%}{%- break -%}{%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- assign use_featured_layout = false -%}
+{%- if section.settings.use_featured_layout and event_count == 1 and has_featured_product == false -%}
+  {%- assign use_featured_layout = true -%}
+{%- endif -%}
+
+{%- capture data_colors -%}
+  {%- render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 -%}, {%- render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 -%}, {%- render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 -%}
+{%- endcapture -%}
+
+{%- if use_featured_layout -%}
+{{ 'section-events.css' | asset_url | stylesheet_tag }}
+{{ 'section-featured.css' | asset_url | stylesheet_tag }}
+
+{%- assign feat_event = nil -%}
+{%- for product in event_source -%}
+  {%- assign feat_event = product -%}
+  {%- break -%}
+{%- endfor -%}
+
+<section id="events" class="featured-section events-as-featured"
+  data-colors="{{ data_colors }}"
+  data-edge="0"
+>
+  <div class="featured-bg-wrap">
+    {%- if feat_event and feat_event.images.size > 1 -%}
+      <img class="featured-bg-img"
+        src="{{ feat_event.images[1] | image_url: width: 1920 }}"
+        alt="" aria-hidden="true" loading="lazy"
+      >
+    {%- elsif feat_event and feat_event.featured_image -%}
+      <img class="featured-bg-img"
+        src="{{ feat_event.featured_image | image_url: width: 1920 }}"
+        alt="" aria-hidden="true" loading="lazy"
+      >
+    {%- endif -%}
+  </div>
+
+  <div class="featured-frame">
+    <div class="featured-marquee-layer" aria-hidden="true">
+      <div class="featured-marquee-track">
+        {%- for i in (1..20) -%}
+          <span class="featured-marquee-item type-h1">{{ section.settings.title | default: 'upcoming events' | upcase }}</span>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <div class="featured-poster-wrap">
+      {%- if feat_event and feat_event.featured_image -%}
+        <a href="{{ feat_event.url }}">
+          <img src="{{ feat_event.featured_image | image_url: width: 1920 }}"
+            class="featured-img"
+            alt="{{ feat_event.title | escape }}"
+            loading="lazy"
+          >
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="featured-marquee-layer featured-marquee-bottom" aria-hidden="true">
+      <div class="featured-marquee-track marquee-reverse">
+        {%- for i in (1..20) -%}
+          <span class="featured-marquee-item type-h1">{{ section.settings.title | default: 'upcoming events' | upcase }}</span>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{%- else -%}
+{{ 'section-events.css' | asset_url | stylesheet_tag }}
+
 <section id="events" class="events-section sticky-track"
-  data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}"
+  data-colors="{{ data_colors }}"
   data-edge="0"
 >
   <div class="events-sticky">
@@ -79,6 +177,7 @@
     </div>
   </div>
 </section>
+{%- endif -%}
 
 <script src="{{ 'section-events.js' | asset_url }}" defer></script>
 
@@ -119,6 +218,17 @@
       "type": "url",
       "id": "browse_url",
       "label": "Browse CTA link"
+    },
+    {
+      "type": "header",
+      "content": "Layout variants"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_featured_layout",
+      "label": "Featured layout (single event)",
+      "default": false,
+      "info": "Only activates when exactly one event exists and no product is tagged 'featured'. Displays the event in the featured section design with marquee text."
     },
     {
       "type": "header",

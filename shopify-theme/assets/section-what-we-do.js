@@ -15,6 +15,10 @@
     const BODY_GAP_VH         = 0.05;  // vh — gap between menu bottom and body text top
     const _wwd_isMobile       = window.innerWidth <= 1024;
 
+    const ENTER_PAD_SLIDES = 0.5;
+    const EXIT_PAD_SLIDES  = 0.5;
+    const PAD_DUPLICATES   = 4;
+
     // desktop menu animation sequence (progress 0–100)
     //   ①  revealAt                    — menu items fade in (stagger)
     //   ②  enterStart → end            — slide from below to pinned pos  (easeOut)
@@ -67,7 +71,29 @@
         const menuEl     = section.querySelector('.about-menu-persistent');
         const isMobile   = window.innerWidth <= 1024;
 
-        const scatter = window.ScatterImages.init(section, viewport, numSlides);
+        const wwdTrack = section.querySelector('.about-image-track');
+        if (wwdTrack) {
+            const srcImgs = Array.from(wwdTrack.querySelectorAll('.scatter-img'));
+            if (srcImgs.length > 0) {
+                const perSlide  = Math.ceil(srcImgs.length / numSlides);
+                const firstPool = srcImgs.slice(0, perSlide);
+                const lastPool  = srcImgs.slice(-perSlide);
+                const firstRef  = srcImgs[0];
+
+                for (let i = 0; i < PAD_DUPLICATES; i++) {
+                    const clone = firstPool[firstPool.length - 1 - (i % firstPool.length)].cloneNode(true);
+                    wwdTrack.insertBefore(clone, firstRef);
+                }
+
+                for (let i = 0; i < PAD_DUPLICATES; i++) {
+                    const clone = lastPool[lastPool.length - 1 - (i % lastPool.length)].cloneNode(true);
+                    wwdTrack.appendChild(clone);
+                }
+            }
+        }
+
+        const effectiveSlides = numSlides + ENTER_PAD_SLIDES + EXIT_PAD_SLIDES;
+        const scatter = window.ScatterImages.init(section, viewport, effectiveSlides);
 
         // persistent menu
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
@@ -119,13 +145,16 @@
 
             stickyContent.remove();
 
-            const slideHeight = scatter.state.trackHeight / blocks.length;
-            const slidesWrap  = document.createElement('div');
+            const baseSlideH = scatter.state.trackHeight / effectiveSlides;
+            const slidesWrap = document.createElement('div');
             slidesWrap.className = 'about-slides';
-            blocks.forEach(() => {
+            blocks.forEach((_, i) => {
                 const slide = document.createElement('div');
                 slide.className = 'about-slide';
-                slide.style.height = `${slideHeight}px`;
+                let h = baseSlideH;
+                if (i === 0)                  h += ENTER_PAD_SLIDES * baseSlideH;
+                if (i === blocks.length - 1)  h += EXIT_PAD_SLIDES * baseSlideH;
+                slide.style.height = `${h}px`;
                 slidesWrap.appendChild(slide);
             });
             section.appendChild(slidesWrap);
@@ -494,8 +523,14 @@
                 measureCenterClearance();
                 const slidesAfterResize = section.querySelectorAll('.about-slide');
                 if (slidesAfterResize.length > 0) {
-                    const slideHeight = scatter.state.trackHeight / slidesAfterResize.length;
-                    slidesAfterResize.forEach((s) => { s.style.height = `${slideHeight}px`; });
+                    const n = slidesAfterResize.length;
+                    const baseH = scatter.state.trackHeight / (n + ENTER_PAD_SLIDES + EXIT_PAD_SLIDES);
+                    slidesAfterResize.forEach((s, i) => {
+                        let h = baseH;
+                        if (i === 0)     h += ENTER_PAD_SLIDES * baseH;
+                        if (i === n - 1) h += EXIT_PAD_SLIDES * baseH;
+                        s.style.height = `${h}px`;
+                    });
                 }
             }, resizeDebounceMs);
         });

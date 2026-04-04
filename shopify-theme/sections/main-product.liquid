@@ -162,7 +162,7 @@
                   </span>
                   <span class="buy-label">{{ section.settings.buy_label | default: 'Buy Now' }}</span>
                 {%- else -%}
-                  <span class="buy-label">Sold Out</span>
+                  <span class="buy-label">{{ 'product.sold_out' | t }}</span>
                 {%- endif -%}
               </span>
               <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">
@@ -176,7 +176,7 @@
                   </span>
                   <span class="buy-label">{{ section.settings.buy_label | default: 'Buy Now' }}</span>
                 {%- else -%}
-                  <span class="buy-label">Sold Out</span>
+                  <span class="buy-label">{{ 'product.sold_out' | t }}</span>
                 {%- endif -%}
               </span>
             </div>

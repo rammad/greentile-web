@@ -157,14 +157,6 @@
     font-size: clamp(40px, 2.7vw + 12px, var(--size-h2));
 }
 
-.cal-status {
-    margin-left: auto;
-    padding-left: 1em;
-    white-space: nowrap;
-    opacity: 0.5;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
 
 .calendar-row[data-status="sold-out"] .cal-name {
     text-decoration: line-through;

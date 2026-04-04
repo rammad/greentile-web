@@ -210,7 +210,6 @@
                 >
                   <span class="cal-date type-h2">{{ date_display | default: '—' }}</span>
                   <span class="cal-name type-h2">{{ product.title }}</span>
-                  <span class="cal-status type-subRegular2">Upcoming</span>
                 </div>
               {%- else -%}
                 <a href="{{ product.url }}" class="calendar-row"
@@ -231,7 +230,7 @@
       </div>
 
       <div class="calendar-poster-wrapper" id="poster-wrapper">
-        <img src="" alt="Event Poster" class="calendar-poster-img" id="poster-img">
+        <img src="" alt="{{ section.settings.poster_alt | default: 'Event Poster' }}" class="calendar-poster-img" id="poster-img">
         <div class="status-badge badge-soon" id="status-soon"></div>
         <div class="status-badge badge-sold" id="status-sold"></div>
       </div>
@@ -239,7 +238,7 @@
 
     <div id="dynamic-grid-container" class="calendar-grid-packed"></div>
   </div>
-  <div class="calendar-coming-soon"><span class="type-h2">more events coming soon!</span></div>
+  <div class="calendar-coming-soon"><span class="type-h2">{{ section.settings.empty_message | default: 'more events coming soon!' }}</span></div>
 </section>
 
 <script src="{{ 'section-calendar.js' | asset_url }}" defer></script>
@@ -265,6 +264,18 @@
       "type": "url",
       "id": "archives_url",
       "label": "Archives page URL"
+    },
+    {
+      "type": "text",
+      "id": "empty_message",
+      "label": "Empty state message",
+      "default": "more events coming soon!"
+    },
+    {
+      "type": "text",
+      "id": "poster_alt",
+      "label": "Poster image alt text",
+      "default": "Event Poster"
     },
     {
       "type": "header",
