@@ -47,7 +47,7 @@
     {%- endfor -%}
   </div>
 
-  <div id="dynamic-archive-container">
+  {%- capture archive_cells_markup -%}
     {%- assign archive_count = 0 -%}
     {%- if archive_source.size > 0 -%}
       {%- for product in archive_source -%}
@@ -89,18 +89,27 @@
         {%- endif -%}
       {%- endfor -%}
     {%- endif -%}
-  </div>
+  {%- endcapture -%}
+
+  {%- assign archive_cells_markup_stripped = archive_cells_markup | strip -%}
+  {%- if archive_cells_markup_stripped != blank -%}
+    <div id="dynamic-archive-container">
+      {{- archive_cells_markup -}}
+    </div>
+  {%- endif -%}
 
   <div class="archives-coming-soon"><span class="type-h2">{{ section.settings.empty_message | default: 'more events coming soon!' }}</span></div>
 
-  <div class="load-more-container">
-    <button id="btn-load-more" class="cta-btn">
-      <div class="ui-roll roll-hover">
-        <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ section.settings.load_more_label | default: 'Load More' }}</span>
-        <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ section.settings.load_more_label | default: 'Load More' }}</span>
-      </div>
-    </button>
-  </div>
+  {%- if archive_cells_markup_stripped != blank -%}
+    <div class="load-more-container">
+      <button id="btn-load-more" class="cta-btn">
+        <div class="ui-roll roll-hover">
+          <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ section.settings.load_more_label | default: 'Load More' }}</span>
+          <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ section.settings.load_more_label | default: 'Load More' }}</span>
+        </div>
+      </button>
+    </div>
+  {%- endif -%}
 </section>
 
 <script src="{{ 'section-archives.js' | asset_url }}" defer></script>
