@@ -1,129 +1,544 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "mission": {
       "type": "mission",
-      "settings": {
-        "label": "mission",
-        "gradient_color_1": "#30FA30",
-        "gradient_color_2": "#FFFCFA",
-        "gradient_color_3": "#feea4f"
-      },
       "blocks": {
-        "l1": { "type": "line", "settings": { "text": "Since day one," } },
-        "l2": { "type": "line", "settings": { "text": "we've been about" } },
-        "l3": { "type": "line", "settings": { "text": "creating Asian American" } },
-        "l4": { "type": "line", "settings": { "text": "spaces + experiences" } },
-        "l5": { "type": "line", "settings": { "text": "that center and celebrate" } },
-        "l6": { "type": "line", "settings": { "text": "our joy." } }
+        "l1": {
+          "type": "line",
+          "settings": {
+            "text": "since 2022, we've set out to create the asian american spaces"
+          }
+        },
+        "l3": {
+          "type": "line",
+          "settings": {
+            "text": "we didn't have as kids — rooted in expressing, celebrating,"
+          }
+        },
+        "line_cyrJck": {
+          "type": "line",
+          "settings": {
+            "text": "and challenging our culture through the radical act"
+          }
+        },
+        "l4": {
+          "type": "line",
+          "settings": {
+            "text": "of simply playing mahjong together"
+          }
+        }
       },
-      "block_order": ["l1", "l2", "l3", "l4", "l5", "l6"]
+      "block_order": [
+        "l1",
+        "l3",
+        "line_cyrJck",
+        "l4"
+      ],
+      "settings": {
+        "label": "our mission",
+        "gradient_color_1_source": "palette_bright_green",
+        "gradient_color_1": "#30fa30",
+        "gradient_color_2_source": "palette_off_white",
+        "gradient_color_2": "#fffcfa",
+        "gradient_color_3_source": "palette_yellow",
+        "gradient_color_3": "rgba(0,0,0,0)"
+      }
     },
     "what_we_do": {
       "type": "what-we-do",
-      "settings": {
-        "label": "What We Do",
-        "gradient_color_1": "#FFFCFA",
-        "gradient_color_2": "#C1FEC1",
-        "gradient_color_3": "#FFFCFA"
-      },
       "blocks": {
         "cat0": {
           "type": "menu_item",
           "settings": {
-            "title": "Community Events",
-            "body": "The heart of GTSC 💚 Every month, we host pop-up mahjong events to gather our growing community over games of Hong Kong mahjong.",
-            "cta_label": "All Events"
+            "title": "Community Popups",
+            "body": "the heart of GTSC 💚 every month, we host mahjong popups at community spaces across NYC to gather Asian Americans + our friends over games of Hong Kong mahjong",
+            "cta_label": "view upcoming events",
+            "cta_url": "shopify://pages/play-with-us",
+            "contact_topic": "",
+            "image_1": "shopify://shop_images/S279611-R2-075-36.jpg",
+            "image_2": "shopify://shop_images/community-events-2.jpg",
+            "image_3": "shopify://shop_images/7036R04-R01-009A.jpg",
+            "image_4": "shopify://shop_images/S165827-R1-048-22A.jpg",
+            "image_5": "shopify://shop_images/community-events-5.jpg",
+            "image_6": "shopify://shop_images/S130400-R1-028-12A.jpg",
+            "image_7": "shopify://shop_images/S132686-R1-071-34.jpg",
+            "image_8": "shopify://shop_images/S444705-R1-044-20A.jpg"
+          }
+        },
+        "cat2": {
+          "type": "menu_item",
+          "settings": {
+            "title": "Corporate &  Private Events",
+            "body": "GTSC on your turf. we bring our signature social-first experiences to companies, weddings, birthdays, and beyond — for the love of the game and communities everywhere",
+            "cta_label": "submit an inquiry",
+            "cta_url": "",
+            "contact_topic": "",
+            "image_1": "shopify://shop_images/Flow_Traders_Teaching_Setup.jpg",
+            "image_2": "shopify://shop_images/7036R10-R01-002.jpg",
+            "image_3": "shopify://shop_images/7036R10-R01-019.jpg",
+            "image_4": "shopify://shop_images/FILM_MAHJONG-3.jpg",
+            "image_5": "shopify://shop_images/FILM_MAHJONG-15.jpg"
           }
         },
         "cat1": {
           "type": "menu_item",
           "settings": {
             "title": "Brand Partnerships",
-            "body": "On occasion, we partner with values-aligned brands to amplify Chinese mahjong and culture on the national stage.",
-            "cta_label": "Partner with us"
-          }
-        },
-        "cat2": {
-          "type": "menu_item",
-          "settings": {
-            "title": "Corporate & Private Events",
-            "body": "GTSC on your turf. We can bring our entire pop-up operation to birthdays, weddings, corporate headquarters, and more.",
-            "cta_label": "book a private event"
+            "body": "we collaborate with other brands who are living at the intersectionality of community and culture to cocreate bespoke experiences, products, and more ;)",
+            "cta_label": "Partner with us",
+            "cta_url": "",
+            "contact_topic": "",
+            "image_1": "shopify://shop_images/S444705-R2-023-10.jpg",
+            "image_2": "shopify://shop_images/brand-partnerships-2.jpg",
+            "image_3": "shopify://shop_images/S444705-R2-049-23.jpg",
+            "image_4": "shopify://shop_images/brand-partnerships-4.jpg",
+            "image_5": "shopify://shop_images/brand-partnerships-5.jpg",
+            "image_6": "shopify://shop_images/S642317-R1-009-3_1.jpg",
+            "image_7": "shopify://shop_images/7036R05-R01-035A.jpg",
+            "image_8": "shopify://shop_images/Screenshot_2026-05-01_at_11.37.58_PM.png"
           }
         },
         "cat3": {
           "type": "menu_item",
           "settings": {
-            "title": "Special Projects",
-            "body": "Books, podcasts, merch, etc — we love making things that celebrate the community + culture behind Chinese mahjong.",
-            "cta_label": "Collaborate with us"
+            "title": "Mahjong Consulting",
+            "body": " whether you're creating a mahjong set or penning the next joy luck club, we help you do it right — honoring the asian american story with nuance, care, and depth",
+            "cta_label": "SHARE YOUR IDEA",
+            "cta_url": "",
+            "contact_topic": "",
+            "image_1": "shopify://shop_images/7036R09-R01-004.jpg",
+            "image_2": "shopify://shop_images/S279611-R2-063-30.jpg",
+            "image_3": "shopify://shop_images/Copy_of_S369145-R2-064-30A_3b45f680-e612-46b4-bf87-f91b49647810.jpg",
+            "image_4": "shopify://shop_images/S165688-R1-021-9_1.jpg"
           }
         }
       },
-      "block_order": ["cat0", "cat1", "cat2", "cat3"]
+      "block_order": [
+        "cat0",
+        "cat2",
+        "cat1",
+        "cat3"
+      ],
+      "settings": {
+        "label": "what we do",
+        "gradient_color_1_source": "palette_off_white",
+        "gradient_color_1": "#fffcfa",
+        "gradient_color_2_source": "palette_bright_green_30",
+        "gradient_color_2": "#c1fec1",
+        "gradient_color_3_source": "palette_off_white",
+        "gradient_color_3": "#fffcfa",
+        "gradient_color_1_mobile_source": "palette_off_white",
+        "gradient_color_1_mobile": "#fffcfa",
+        "gradient_color_2_mobile_source": "palette_bright_green_20",
+        "gradient_color_2_mobile": "#a8f0a8",
+        "gradient_color_3_mobile_source": "palette_off_white",
+        "gradient_color_3_mobile": "#fffcfa"
+      }
     },
     "team": {
       "type": "team",
+      "blocks": {
+        "team_group_k9R6Tp": {
+          "type": "team_group",
+          "settings": {
+            "image": "shopify://shop_images/team-0.jpg",
+            "names": "cofounders / grace liu, joanne xu, sarah teng, ernest chan"
+          }
+        },
+        "team_group_eUNLzj": {
+          "type": "team_group",
+          "settings": {
+            "image": "shopify://shop_images/DSC02480_GTNY_178_Large_7227f5c1-e46e-4872-bb43-bffac0036ef5.jpg",
+            "names": "2026 team / adam gong, alex urmaza, andrew chen, andrew lai, angela liu, ann tran, anni wang, ash makiewicz, ashley goh, brandon kwan, brandon wu, carmen ou, catherine leung, chak wai henry to, chris kumaradjaja, christina chann, denise lin, derek eng, donald fung, edward chin, elaine lee, emily deng, emily ding, emma tang, emma wang, eric jong, ethan choi, jason chen, jennifer cheung, jennifer pham, jess lou, jillian ledesma, jon chan, karen zhu, katherine salvador, kathleen miao, kaua'i wu, kevin huang, kylie turner, lenny an, leo rose, madison wong, malachi daniel, marissa yun, matt kamibayashi, matt ly, matthew cheng, max chu, medwin chiu, melissa su, michael kwan, michelle huang, mike lee, pedro motta, rachel son, ray javier, richard deng, ryan yiu, sam wong, sean chen, sean low, shirley yan, soran zhuo, spencer kim, stella zhou, susie tan, vanessa huang, vicky yang, vivian li, vivien guo, wanpeng meng"
+          }
+        }
+      },
+      "block_order": [
+        "team_group_k9R6Tp",
+        "team_group_eUNLzj"
+      ],
       "settings": {
         "title": "THE TEAM",
-        "gradient_color_1": "#FFFCFA",
-        "gradient_color_2": "#C1FEC1",
-        "gradient_color_3": "#FFFCFA"
+        "gradient_color_1_source": "palette_off_white",
+        "gradient_color_1": "#fffcfa",
+        "gradient_color_2_source": "palette_bright_green_30",
+        "gradient_color_2": "#c1fec1",
+        "gradient_color_3_source": "palette_off_white",
+        "gradient_color_3": "#fffcfa"
       }
     },
     "clients": {
       "type": "clients",
-      "settings": {
-        "clients_title": "Clients",
-        "press_title": "Press"
-      },
       "blocks": {
-        "cl1": { "type": "client", "settings": { "name": "Anheuser-Busch", "url": "https://www.anheuser-busch.com" } },
-        "cl2": { "type": "client", "settings": { "name": "Boston Consulting Group", "url": "https://www.bcg.com" } },
-        "cl3": { "type": "client", "settings": { "name": "Brookfield", "url": "https://www.brookfield.com" } },
-        "cl4": { "type": "client", "settings": { "name": "Citi", "url": "https://www.citi.com" } },
-        "pr1": { "type": "press_logo", "settings": { "name": "Eater", "slug": "eater", "url": "https://www.eater.com" } },
-        "pr2": { "type": "press_logo", "settings": { "name": "TimeOut New York", "slug": "timeout", "url": "https://www.timeout.com/newyork" } },
-        "pr3": { "type": "press_logo", "settings": { "name": "Thrillist", "slug": "thrillist", "url": "https://www.thrillist.com" } },
-        "pr4": { "type": "press_logo", "settings": { "name": "Gothamist", "slug": "gothamist", "url": "https://gothamist.com" } },
-        "pr5": { "type": "press_logo", "settings": { "name": "The Infatuation", "slug": "infatuation", "url": "https://www.theinfatuation.com" } },
-        "pr6": { "type": "press_logo", "settings": { "name": "New York Magazine", "slug": "nymag", "url": "https://nymag.com" } },
-        "pr7": { "type": "press_logo", "settings": { "name": "Bon Appétit", "slug": "bonappetit", "url": "https://www.bonappetit.com" } }
+        "client_c6bmTG": {
+          "type": "client",
+          "settings": {
+            "name": "AMERICAN MUSEUM OF NATURAL HISTORY",
+            "url": ""
+          }
+        },
+        "cl1": {
+          "type": "client",
+          "settings": {
+            "name": "Anheuser-Busch",
+            "url": "https://www.anheuser-busch.com"
+          }
+        },
+        "client_jGTiUe": {
+          "type": "client",
+          "settings": {
+            "name": "BONNIE'S BROOKLYN",
+            "url": ""
+          }
+        },
+        "cl2": {
+          "type": "client",
+          "settings": {
+            "name": "Boston Consulting Group",
+            "url": "https://www.bcg.com"
+          }
+        },
+        "client_ewqDHW": {
+          "type": "client",
+          "settings": {
+            "name": "brooklyn kura",
+            "url": ""
+          }
+        },
+        "cl3": {
+          "type": "client",
+          "settings": {
+            "name": "BROOKLYN MUSEUM",
+            "url": "https://www.brookfield.com"
+          }
+        },
+        "cl4": {
+          "type": "client",
+          "settings": {
+            "name": "Citi Bank",
+            "url": "https://www.citi.com"
+          }
+        },
+        "client_EbHfL8": {
+          "type": "client",
+          "settings": {
+            "name": "conde nast",
+            "url": ""
+          }
+        },
+        "client_JJwAJY": {
+          "type": "client",
+          "settings": {
+            "name": "deloitte",
+            "url": ""
+          }
+        },
+        "client_HghU3H": {
+          "type": "client",
+          "settings": {
+            "name": "HOLWELL SHUSTER & GOLDBERG",
+            "url": ""
+          }
+        },
+        "client_cB6iNT": {
+          "type": "client",
+          "settings": {
+            "name": "INDUSTRY CITY",
+            "url": ""
+          }
+        },
+        "client_ErCVWD": {
+          "type": "client",
+          "settings": {
+            "name": "meta",
+            "url": ""
+          }
+        },
+        "client_HWJAKF": {
+          "type": "client",
+          "settings": {
+            "name": "NEW YORK PUBLIC LIBRARY",
+            "url": ""
+          }
+        },
+        "client_e74VgH": {
+          "type": "client",
+          "settings": {
+            "name": "PERNOD RICARD",
+            "url": ""
+          }
+        },
+        "client_k7HRda": {
+          "type": "client",
+          "settings": {
+            "name": "PHOENIX PALACE",
+            "url": ""
+          }
+        },
+        "client_mAUX8p": {
+          "type": "client",
+          "settings": {
+            "name": "POTLUCK CLUB",
+            "url": ""
+          }
+        },
+        "client_ezg7aY": {
+          "type": "client",
+          "settings": {
+            "name": "ralph lauren",
+            "url": ""
+          }
+        },
+        "client_mr343f": {
+          "type": "client",
+          "settings": {
+            "name": "reddit",
+            "url": ""
+          }
+        },
+        "client_RD7DJM": {
+          "type": "client",
+          "settings": {
+            "name": "resy",
+            "url": ""
+          }
+        },
+        "client_7UaYyz": {
+          "type": "client",
+          "settings": {
+            "name": "soho grand",
+            "url": ""
+          }
+        },
+        "client_cfLiic": {
+          "type": "client",
+          "settings": {
+            "name": "stripe",
+            "url": ""
+          }
+        },
+        "client_YzfKNf": {
+          "type": "client",
+          "settings": {
+            "name": "SUNDAY AROMA",
+            "url": ""
+          }
+        },
+        "client_WWjbxf": {
+          "type": "client",
+          "settings": {
+            "name": "THE STANDARD",
+            "url": ""
+          }
+        },
+        "client_QrA4fQ": {
+          "type": "client",
+          "settings": {
+            "name": "visa",
+            "url": ""
+          }
+        },
+        "client_Qj3VKp": {
+          "type": "client",
+          "settings": {
+            "name": "WELCOME TO CHINATOWN",
+            "url": ""
+          }
+        },
+        "client_cWzYFG": {
+          "type": "client",
+          "settings": {
+            "name": "WILD MANNERED",
+            "url": ""
+          }
+        },
+        "client_VgmgCz": {
+          "type": "client",
+          "settings": {
+            "name": "& SO MANY MORE 💚",
+            "url": ""
+          }
+        },
+        "pr1": {
+          "type": "press_logo",
+          "settings": {
+            "name": "New York Times",
+            "slug": "nyt",
+            "logo": "shopify://shop_images/The_New_York_Times_Logo.svg",
+            "url": "https://www.nytimes.com/2024/05/20/style/mahjong-green-tile-social-club.html"
+          }
+        },
+        "pr2": {
+          "type": "press_logo",
+          "settings": {
+            "name": "Wall Street Journal",
+            "slug": "wsj",
+            "logo": "shopify://shop_images/WSJ_Logo.svg",
+            "url": "https://www.wsj.com/lifestyle/american-mahjong-obsession-6bae4ca9?st=tWBhyr&reflink=desktopwebshare_permalink"
+          }
+        },
+        "pr3": {
+          "type": "press_logo",
+          "settings": {
+            "name": "Thrillist",
+            "slug": "thrillist",
+            "url": "https://www.thrillist.com/lifestyle/new-york/green-tile-social-club-mahjong-nyc"
+          }
+        },
+        "pr4": {
+          "type": "press_logo",
+          "settings": {
+            "name": "Vogue",
+            "slug": "vogue",
+            "logo": "shopify://shop_images/VOGUE_LOGO.svg",
+            "url": "https://www.vogue.com/article/mahjong-modern-makeover"
+          }
+        },
+        "pr5": {
+          "type": "press_logo",
+          "settings": {
+            "name": "The TODAY Show",
+            "slug": "todayshow",
+            "logo": "shopify://shop_images/Today_logo.svg",
+            "url": "https://www.today.com/video/savannah-and-jenna-learn-why-mahjong-is-more-than-a-game-244691013835?search=mahjong"
+          }
+        }
       },
-      "block_order": ["cl1", "cl2", "cl3", "cl4", "pr1", "pr2", "pr3", "pr4", "pr5", "pr6", "pr7"]
+      "block_order": [
+        "client_c6bmTG",
+        "cl1",
+        "client_jGTiUe",
+        "cl2",
+        "client_ewqDHW",
+        "cl3",
+        "cl4",
+        "client_EbHfL8",
+        "client_JJwAJY",
+        "client_HghU3H",
+        "client_cB6iNT",
+        "client_ErCVWD",
+        "client_HWJAKF",
+        "client_e74VgH",
+        "client_k7HRda",
+        "client_mAUX8p",
+        "client_ezg7aY",
+        "client_mr343f",
+        "client_RD7DJM",
+        "client_7UaYyz",
+        "client_cfLiic",
+        "client_YzfKNf",
+        "client_WWjbxf",
+        "client_QrA4fQ",
+        "client_Qj3VKp",
+        "client_cWzYFG",
+        "client_VgmgCz",
+        "pr1",
+        "pr2",
+        "pr3",
+        "pr4",
+        "pr5"
+      ],
+      "settings": {
+        "clients_title": "CLIENTS & COLLABORATORS",
+        "press_title": "READ OUR STORY"
+      }
     },
     "socials": {
       "type": "socials",
-      "settings": {
-        "subheading": "hope we",
-        "title": "SEE YOU SOON!"
-      },
       "blocks": {
-        "sl_ig": { "type": "social_link", "settings": { "platform": "instagram", "url": "https://instagram.com/greentilesocialclub", "label": "Instagram" } },
-        "sl_tt": { "type": "social_link", "settings": { "platform": "tiktok", "url": "https://tiktok.com/@greentilesocialclub", "label": "TikTok" } },
-        "sl_dc": { "type": "social_link", "settings": { "platform": "discord", "url": "https://discord.gg/mwgd9P3cb4", "label": "Discord" } }
+        "image_tD64At": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/S278549-R3-065-31.jpg"
+          }
+        },
+        "image_PatMAP": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/S369145-R2-056-26A_2.jpg"
+          }
+        },
+        "image_3mtLqR": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/S132686-R1-071-34.jpg"
+          }
+        },
+        "image_AER34j": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/community-events-8.jpg"
+          }
+        },
+        "image_F9q4eV": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/7036R07-R01-032A.jpg"
+          }
+        }
       },
-      "block_order": ["sl_ig", "sl_tt", "sl_dc"]
+      "block_order": [
+        "image_tD64At",
+        "image_PatMAP",
+        "image_3mtLqR",
+        "image_AER34j",
+        "image_F9q4eV"
+      ],
+      "settings": {
+        "subheading": "AS ALWAYS, WE HOPE TO",
+        "title": "SEE YOU AT THE TABLES"
+      }
     },
     "footer": {
       "type": "footer",
-      "settings": {
-        "title": "Green Tile Social Club",
-        "gradient_color_1": "#30FA30",
-        "gradient_color_2": "#FFFCFA",
-        "gradient_color_3": "#FDE523"
-      },
       "blocks": {
-        "mq1": { "type": "marquee", "settings": { "text": "our podcast greenroom now on spotify" } },
-        "mq2": { "type": "marquee", "settings": { "text": "STREAM GTSC SOUNDS @ PARLOR", "reverse": true } },
-        "lnk1": { "type": "footer_link", "settings": { "label": "Privacy Policy" } },
-        "lnk2": { "type": "footer_link", "settings": { "label": "Go Fund Me" } },
-        "lnk3": { "type": "footer_link", "settings": { "label": "FAQ" } },
-        "lnk4": { "type": "footer_link", "settings": { "label": "Contact Us", "is_contact_trigger": true } },
-        "lnk5": { "type": "footer_link", "settings": { "label": "Follow Us" } }
+        "mq1": {
+          "type": "marquee",
+          "disabled": true,
+          "settings": {
+            "text": "FIND URSELF ON FILM",
+            "url": "",
+            "reverse": false
+          }
+        },
+        "mq2": {
+          "type": "marquee",
+          "settings": {
+            "text": "STREAM GTSC SOUNDS @ PARLOR",
+            "url": "https://soundcloud.com/parlorgtsc",
+            "reverse": true
+          }
+        }
       },
-      "block_order": ["mq1", "mq2", "lnk1", "lnk2", "lnk3", "lnk4", "lnk5"]
+      "block_order": [
+        "mq1",
+        "mq2"
+      ],
+      "settings": {
+        "gradient_color_1_source": "palette_bright_green",
+        "gradient_color_1": "#30fa30",
+        "gradient_color_2_source": "palette_off_white",
+        "gradient_color_2": "#fffcfa",
+        "gradient_color_3_source": "palette_yellow",
+        "gradient_color_3": "#fde523"
+      }
     }
   },
-  "order": ["mission", "what_we_do", "team", "clients", "socials", "footer"]
+  "order": [
+    "mission",
+    "what_we_do",
+    "team",
+    "clients",
+    "socials",
+    "footer"
+  ]
 }

@@ -1,13 +1,42 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "calendar": {
       "type": "calendar",
       "settings": {
-        "gradient_color_1": "#FFFCFA",
-        "gradient_color_2": "#D6FED6",
-        "gradient_color_3": "#FFFCFA"
+        "title": "",
+        "collection": "frontpage",
+        "archives_url": "shopify://pages/archives",
+        "empty_message": "more events coming soon!",
+        "poster_alt": "Event Poster",
+        "gradient_color_1_source": "palette_off_white",
+        "gradient_color_1": "#fffcfa",
+        "gradient_color_2_source": "palette_bright_green_20",
+        "gradient_color_2": "#d6fed6",
+        "gradient_color_3_source": "palette_off_white",
+        "gradient_color_3": "#fffcfa",
+        "cs_shape_1": "shopify://shop_images/GTSC_WEB_EVENT_STICKER_CS_SHAPE_3_INSIDE_BLANK.svg",
+        "cs_shape_2": "shopify://shop_images/GTSC_WEB_EVENT_STICKER_CS_SHAPE_4_INSIDE_BLANK.svg",
+        "cs_text": "shopify://shop_images/GTSC_WEB_EVENT_STICKER_CS_INSIDE_TEXT_ONLY_WHITE.svg",
+        "cs_color": "#87A587",
+        "so_shape_1": "shopify://shop_images/GTSC_WEB_EVENT_STICKER_SO_SHAPE_4_BLANK.svg",
+        "so_shape_2": "shopify://shop_images/GTSC_WEB_EVENT_STICKER_SO_SHAPE_1_BLANK.svg",
+        "so_text": "shopify://shop_images/GTSC_WEB_EVENT_STICKER_SO_TEXT_ONLY_WHITE.svg",
+        "so_color": "#000000",
+        "placeholder_color": "#B7C9B7",
+        "placeholder_font_color": "#87A587"
       }
     }
   },
-  "order": ["calendar"]
+  "order": [
+    "calendar"
+  ]
 }
