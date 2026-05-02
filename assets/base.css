@@ -717,6 +717,18 @@ body::after {
         --content-max-width: 600px;
     }
 
+    .type-h1 {
+        line-height: var(--lh-single);
+    }
+    
+    .type-h2 {
+        line-height: var(--lh-single);
+    }
+    
+    .type-h3 {
+        line-height: var(--lh-single);
+    }
+
     .text-mask {
         padding-top: 0.15em;
     }
