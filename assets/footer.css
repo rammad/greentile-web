@@ -45,6 +45,7 @@
     background-color: var(--color-accent);
     flex-direction: row; 
     overflow-anchor: none;
+    text-decoration: none;
 }
 
 .marquee-content { 

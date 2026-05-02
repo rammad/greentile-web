@@ -131,6 +131,7 @@
     transition: box-shadow 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.03em;
+    line-height: var(--lh-body);
 }
 
 .contact-input::placeholder,
