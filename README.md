@@ -8,10 +8,29 @@ This README is written for two audiences:
 
 ## Project Structure
 
-- `shopify-theme/` - production Shopify theme (Liquid, JSON templates, assets, locales, config).
-- `css/`, `scripts/`, `*.html` - static prototype/reference files that mirror major sections.
+- Root-level `assets/`, `sections/`, `templates/`, `snippets/`, `layout/`, `locales/`, and `config/` - active Shopify theme runtime files.
+- `/raw-html/` - static prototype/reference implementation used during design and for behavior parity checks.
+  - `raw-html/css/` - prototype styles.
+  - `raw-html/scripts/` - prototype JS behavior modules.
+  - `raw-html/*.html` - section/page reference markup.
 
-If you are editing the live site behavior, work in `shopify-theme/`.
+If you are editing live storefront behavior, work in the Shopify theme files (not the static `raw-html/` reference files).
+
+## Shopify Integration & Branch Workflow
+
+This repo separates client-managed Shopify changes from core code maintenance:
+
+- `master` - source of truth for underlying theme code and engineering changes.
+- `shopify` - branch that receives client/content changes synced from Shopify Admin/Theme Editor.
+
+Expected flow:
+
+1. Client or non-dev content/styling updates happen in Shopify Admin.
+2. Those Shopify-side changes are pulled/committed to `shopify`.
+3. `master` stays clean of direct client portal edits and remains the canonical engineering baseline.
+4. Engineering work is developed/reviewed against `master`, then selectively merged/cherry-picked into `shopify` as needed for deployment sync.
+
+This keeps portal-driven content edits auditable without muddying core source history.
 
 ## Shopify Setup
 
