@@ -1,1 +1,125 @@
-{"current":{"contact_email":"hello@greentilesocialclub.com","event_metafield_namespace":"event_ticketing","event_metafield_key":"event_v2","nav_contact_label":"SAY HI","nav_back_label":"BACK","nav_back_link":"shopify:\/\/pages\/play-with-us","nav_link_1_label":"PLAY WITH US","nav_link_1_mobile_label":"Play with us","nav_link_1_url":"shopify:\/\/pages\/play-with-us","nav_link_2_label":"WORK WITH US","nav_link_2_mobile_label":"Work with us","nav_link_2_url":"shopify:\/\/pages\/work-with-us","footer_title":"Green Tile Social Club","footer_link_1_label":"","footer_link_2_label":"","footer_link_3_label":"","footer_link_3_open_new_tab":true,"footer_link_5_url":"https:\/\/www.instagram.com\/greentilesocialclub\/","footer_link_5_open_new_tab":true,"social_1_url":"#","social_2_url":"#","social_3_url":"#","sections":{"header":{"type":"header","settings":{}},"contact-panel":{"type":"contact-panel","blocks":{"topic_RR99g9":{"type":"topic","settings":{"label":"ticket issues","value":"ticket","email":"hello@greentilesocialclub.com","default":false,"message_placeholder":""}},"topic1":{"type":"topic","settings":{"label":"community popups","value":"community","email":"hello@greentilesocialclub.com","default":true,"message_placeholder":""}},"topic2":{"type":"topic","settings":{"label":"private events","value":"private","email":"partnerships@greentilesocialclub.com","default":false,"message_placeholder":""}},"topic3":{"type":"topic","settings":{"label":"brand partnerships","value":"partnerships","email":"partnerships@greentilesocialclub.com","default":false,"message_placeholder":""}},"topic_gEWMLC":{"type":"topic","settings":{"label":"mahjong consulting","value":"consulting","email":"partnerships@greentilesocialclub.com","default":false,"message_placeholder":""}},"topic_Rt68yU":{"type":"topic","settings":{"label":"something else","value":"misc","email":"hello@greentilesocialclub.com","default":false,"message_placeholder":""}}},"block_order":["topic_RR99g9","topic1","topic2","topic3","topic_gEWMLC","topic_Rt68yU"],"settings":{"title":"HIT OUR LINE","topic_label":"what's your message about?","info_label":"Your Information","message_placeholder":"TELL US ABOUT YOUR QUESTION, IDEA, OR PROJECT + HOW WE CAN HELP. THE MORE DETAIL, THE BETTER WE CAN ASSIST 💚","submit_label":"Beep Boop","default_email":"","success_message":"done and done — we'll be in touch as soon as possible 💌","error_message":"oops! something went wrong — please try again"}}},"content_for_index":[]}}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "current": {
+    "contact_email": "hello@greentilesocialclub.com",
+    "event_metafield_namespace": "event_ticketing",
+    "event_metafield_key": "event_v2",
+    "nav_contact_label": "SAY HI",
+    "nav_back_label": "BACK",
+    "nav_back_link": "shopify://pages/play-with-us",
+    "nav_link_1_label": "PLAY WITH US",
+    "nav_link_1_mobile_label": "Play with us",
+    "nav_link_1_url": "shopify://pages/play-with-us",
+    "nav_link_2_label": "WORK WITH US",
+    "nav_link_2_mobile_label": "Work with us",
+    "nav_link_2_url": "shopify://pages/work-with-us",
+    "footer_title": "Green Tile Social Club",
+    "footer_link_1_label": "",
+    "footer_link_2_label": "",
+    "footer_link_3_label": "",
+    "footer_link_3_open_new_tab": true,
+    "footer_link_5_url": "https://www.instagram.com/greentilesocialclub/",
+    "footer_link_5_open_new_tab": true,
+    "social_1_url": "#",
+    "social_2_url": "#",
+    "social_3_url": "#",
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {}
+      },
+      "contact-panel": {
+        "type": "contact-panel",
+        "blocks": {
+          "topic_RR99g9": {
+            "type": "topic",
+            "settings": {
+              "label": "ticket issues",
+              "value": "ticket",
+              "email": "hello@greentilesocialclub.com",
+              "default": false,
+              "message_placeholder": ""
+            }
+          },
+          "topic1": {
+            "type": "topic",
+            "settings": {
+              "label": "community popups",
+              "value": "community",
+              "email": "hello@greentilesocialclub.com",
+              "default": true,
+              "message_placeholder": ""
+            }
+          },
+          "topic2": {
+            "type": "topic",
+            "settings": {
+              "label": "private events",
+              "value": "private",
+              "email": "partnerships@greentilesocialclub.com",
+              "default": false,
+              "message_placeholder": ""
+            }
+          },
+          "topic3": {
+            "type": "topic",
+            "settings": {
+              "label": "brand partnerships",
+              "value": "partnerships",
+              "email": "partnerships@greentilesocialclub.com",
+              "default": false,
+              "message_placeholder": ""
+            }
+          },
+          "topic_gEWMLC": {
+            "type": "topic",
+            "settings": {
+              "label": "mahjong consulting",
+              "value": "consulting",
+              "email": "partnerships@greentilesocialclub.com",
+              "default": false,
+              "message_placeholder": ""
+            }
+          },
+          "topic_Rt68yU": {
+            "type": "topic",
+            "settings": {
+              "label": "something else",
+              "value": "misc",
+              "email": "hello@greentilesocialclub.com",
+              "default": false,
+              "message_placeholder": ""
+            }
+          }
+        },
+        "block_order": [
+          "topic_RR99g9",
+          "topic1",
+          "topic2",
+          "topic3",
+          "topic_gEWMLC",
+          "topic_Rt68yU"
+        ],
+        "settings": {
+          "title": "HIT OUR LINE",
+          "topic_label": "what's your message about?",
+          "info_label": "Your Information",
+          "message_placeholder": "TELL US ABOUT YOUR QUESTION, IDEA, OR PROJECT + HOW WE CAN HELP. THE MORE DETAIL, THE BETTER WE CAN ASSIST 💚",
+          "submit_label": "Beep Boop",
+          "default_email": "",
+          "success_message": "done and done — we'll be in touch as soon as possible 💌",
+          "error_message": "oops! something went wrong — please try again"
+        }
+      }
+    },
+    "content_for_index": []
+  }
+}
