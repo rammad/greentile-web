@@ -165,79 +165,85 @@
     </div>
   </div>
 
-  <div class="calendar-body">
-    <div class="calendar-interface-wrapper">
-      <div class="calendar-list" data-lenis-prevent>
-        {%- if cal_collection != blank -%}
-          {%- for product in collections[cal_collection].products -%}
-            {%- liquid
-              assign ev = product.metafields[evt_ns][evt_key].value
-              assign event_date_str = nil
+  {%- capture calendar_rows_markup -%}
+    {%- if cal_collection != blank -%}
+      {%- for product in collections[cal_collection].products -%}
+        {%- liquid
+          assign ev = product.metafields[evt_ns][evt_key].value
+          assign event_date_str = nil
 
-              if ev
-                assign event_date_str = ev.starts_at | date: '%Y-%m-%d'
-                assign date_display = ev.starts_at | date: '%m.%d'
-                assign event_venue_name = ev.venue.name
-              else
-                assign date_display = nil
-                assign event_venue_name = nil
-              endif
+          if ev
+            assign event_date_str = ev.starts_at | date: '%Y-%m-%d'
+            assign date_display = ev.starts_at | date: '%m.%d'
+            assign event_venue_name = ev.venue.name
+          else
+            assign date_display = nil
+            assign event_venue_name = nil
+          endif
 
-              assign in_season = false
-              if event_date_str == nil
-                assign in_season = true
-              elsif event_date_str >= season_start and event_date_str <= season_end
-                assign in_season = true
-              endif
-            -%}
+          assign in_season = false
+          if event_date_str == nil
+            assign in_season = true
+          elsif event_date_str >= season_start and event_date_str <= season_end
+            assign in_season = true
+          endif
+        -%}
 
-            {%- if in_season -%}
-              {%- liquid
-                assign row_status = ''
-                if product.tags contains 'upcoming'
-                  assign row_status = 'coming-soon'
-                elsif product.available == false
-                  assign row_status = 'sold-out'
-                endif
-              -%}
-              {%- if row_status == 'coming-soon' -%}
-                <div class="calendar-row calendar-row--upcoming"
-                  data-month="{{ date_display | split: '.' | first }}"
-                  data-img="{{ product.featured_image | image_url: width: 800 }}"
-                  data-title="{{ product.title | escape }}"
-                  {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
-                  data-status="coming-soon"
-                >
-                  <span class="cal-date type-h2">{{ date_display | default: '—' }}</span>
-                  <span class="cal-name type-h2">{{ product.title }}</span>
-                </div>
-              {%- else -%}
-                <a href="{{ product.url }}" class="calendar-row"
-                  data-month="{{ date_display | split: '.' | first }}"
-                  data-img="{{ product.featured_image | image_url: width: 800 }}"
-                  data-title="{{ product.title | escape }}"
-                  {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
-                  {%- if row_status != blank %} data-status="{{ row_status }}"{% endif -%}
-                >
-                  <span class="cal-date type-h2">{{ date_display | default: '—' }}</span>
-                  <span class="cal-name type-h2">{{ product.title }}</span>
-                </a>
-              {%- endif -%}
-            {%- endif -%}
-          {%- endfor -%}
+        {%- if in_season -%}
+          {%- liquid
+            assign row_status = ''
+            if product.tags contains 'upcoming'
+              assign row_status = 'coming-soon'
+            elsif product.available == false
+              assign row_status = 'sold-out'
+            endif
+          -%}
+          {%- if row_status == 'coming-soon' -%}
+            <div class="calendar-row calendar-row--upcoming"
+              data-month="{{ date_display | split: '.' | first }}"
+              data-img="{{ product.featured_image | image_url: width: 800 }}"
+              data-title="{{ product.title | escape }}"
+              {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
+              data-status="coming-soon"
+            >
+              <span class="cal-date type-h2">{{ date_display | default: '—' }}</span>
+              <span class="cal-name type-h2">{{ product.title }}</span>
+            </div>
+          {%- else -%}
+            <a href="{{ product.url }}" class="calendar-row"
+              data-month="{{ date_display | split: '.' | first }}"
+              data-img="{{ product.featured_image | image_url: width: 800 }}"
+              data-title="{{ product.title | escape }}"
+              {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
+              {%- if row_status != blank %} data-status="{{ row_status }}"{% endif -%}
+            >
+              <span class="cal-date type-h2">{{ date_display | default: '—' }}</span>
+              <span class="cal-name type-h2">{{ product.title }}</span>
+            </a>
+          {%- endif -%}
         {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endcapture -%}
 
+  {%- assign calendar_rows_markup_stripped = calendar_rows_markup | strip -%}
+  {%- if calendar_rows_markup_stripped != blank -%}
+    <div class="calendar-body">
+      <div class="calendar-interface-wrapper">
+        <div class="calendar-list" data-lenis-prevent>
+          {{- calendar_rows_markup -}}
+        </div>
+
+        <div class="calendar-poster-wrapper" id="poster-wrapper">
+          <img src="" alt="{{ section.settings.poster_alt | default: 'Event Poster' }}" class="calendar-poster-img" id="poster-img">
+          <div class="status-badge badge-soon" id="status-soon"></div>
+          <div class="status-badge badge-sold" id="status-sold"></div>
+        </div>
       </div>
 
-      <div class="calendar-poster-wrapper" id="poster-wrapper">
-        <img src="" alt="{{ section.settings.poster_alt | default: 'Event Poster' }}" class="calendar-poster-img" id="poster-img">
-        <div class="status-badge badge-soon" id="status-soon"></div>
-        <div class="status-badge badge-sold" id="status-sold"></div>
-      </div>
+      <div id="dynamic-grid-container" class="calendar-grid-packed"></div>
     </div>
-
-    <div id="dynamic-grid-container" class="calendar-grid-packed"></div>
-  </div>
+  {%- endif -%}
   <div class="calendar-coming-soon"><span class="type-h2">{{ section.settings.empty_message | default: 'more events coming soon!' }}</span></div>
 </section>
 

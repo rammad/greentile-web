@@ -493,7 +493,15 @@
     }
 
     .calendar-coming-soon {
-        bottom: 80px;
+        position: static;
+        bottom: auto;
+        left: auto;
+        right: auto;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 var(--page-gutter) 32px;
     }
 
     .calendar-header {
