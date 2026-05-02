@@ -9,7 +9,7 @@ This README is written for two audiences:
 ## Project Structure
 
 - Root-level `assets/`, `sections/`, `templates/`, `snippets/`, `layout/`, `locales/`, and `config/` - active Shopify theme runtime files.
-- `/raw-html/` - static prototype/reference implementation used during design and for behavior parity checks.
+- `raw-html/` - static prototype/reference implementation used during design and for behavior parity checks.
   - `raw-html/css/` - prototype styles.
   - `raw-html/scripts/` - prototype JS behavior modules.
   - `raw-html/*.html` - section/page reference markup.
