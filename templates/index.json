@@ -132,7 +132,7 @@
         "max_events": 4,
         "browse_label": "see all events",
         "browse_url": "shopify://pages/play-with-us",
-        "use_featured_layout": true,
+        "use_featured_layout": false,
         "gradient_color_1_source": "palette_off_white",
         "gradient_color_1": "#fffcfa",
         "gradient_color_2_source": "palette_bright_green_30",
