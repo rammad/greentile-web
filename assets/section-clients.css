@@ -31,7 +31,7 @@
     align-items: center;
     text-align: center;
     gap: var(--gap-text);
-    max-width: clamp(740px, 38.542vw, 1480px);
+    max-width: clamp(820px, 38.542vw, 1480px);
 }
 
 .clients-col .type-subBold2 {
