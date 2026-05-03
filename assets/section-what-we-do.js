@@ -395,10 +395,11 @@
             const slideSpan = cfg.lastSlideEnd - cfg.firstSlideEnd;
             if (idx === n - 1 && remaining > 0) {
                 const progMinLast = cfg.firstSlideEnd + ((remaining - 1) / remaining) * slideSpan;
+                const progInsideLast = progMinLast + 0.01;
                 const beforeExit = cfg.exitStart - SLIDE_LAST_PROG_BEFORE_EXIT;
                 return Math.min(
                     cfg.lastSlideEnd - 0.01,
-                    Math.max(progMinLast, beforeExit)
+                    Math.max(progInsideLast, beforeExit)
                 );
             }
             const sp = (idx - 1 + 0.5) / remaining;
@@ -449,11 +450,13 @@
                 Math.min(maxS, currentScroll + delta)
             );
 
+            // Lock menu/copy/CTA state during any programmatic jump (desktop + mobile).
+            menuJumpLockActive = true;
+            menuJumpDisplayIdx = activeIdx;
+            menuJumpTargetIdx = slideIdx;
+            menuJumpTargetScroll = nextScroll;
+
             if (!_isMobileScroll && window.lenis) {
-                menuJumpLockActive = true;
-                menuJumpDisplayIdx = activeIdx;
-                menuJumpTargetIdx = slideIdx;
-                menuJumpTargetScroll = nextScroll;
                 const slidesToJump = Math.max(1, Math.abs(slideIdx - activeIdx));
                 const jumpDuration = Math.min(
                     DESKTOP_JUMP_MAX_DURATION,
