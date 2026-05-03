@@ -154,7 +154,7 @@
 
 .calendar-row .cal-date,
 .calendar-row .cal-name {
-    font-size: clamp(40px, 2.7vw + 12px, var(--size-h2));
+    font-size: clamp(32px, 2.2vw + 8px, var(--size-h3));
 }
 
 
@@ -165,10 +165,8 @@
 .calendar-row--upcoming {
     pointer-events: auto;
     cursor: default;
-    opacity: 0.45;
 }
 .calendar-row--upcoming.is-visible {
-    opacity: 0.45;
     filter: blur(0px);
 }
 @media (hover: hover) {
@@ -452,7 +450,6 @@
     }
     .calendar-row.is-visible { filter: blur(0px); }
 
-    /* font-size for .cal-date/.cal-name now auto-scales via fluid --size-h2 */
 
     .calendar-coming-soon {
         bottom: 80px;

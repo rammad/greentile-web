@@ -274,7 +274,7 @@ function initMobileScrollSpy() {
     items.forEach((item, i) => {
         const dateText = item.querySelector('.cal-date').textContent.trim();
         const dateEl = document.createElement('span');
-        dateEl.className = 'cal-date-item type-h2';
+        dateEl.className = 'cal-date-item type-h3';
         dateEl.textContent = dateText;
         dateEl.dataset.index = i;
         datesTrack.appendChild(dateEl);

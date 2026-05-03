@@ -263,8 +263,8 @@
               {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
               data-status="coming-soon"
             >
-              <span class="cal-date type-h2">{{ date_display | default: '—' }}</span>
-              <span class="cal-name type-h2">{{ product.title }}</span>
+              <span class="cal-date type-h3">{{ date_display | default: '—' }}</span>
+              <span class="cal-name type-h3">{{ product.title }}</span>
             </div>
           {%- else -%}
             <a href="{{ product.url }}" class="calendar-row"
@@ -274,8 +274,8 @@
               {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
               {%- if row_status != blank %} data-status="{{ row_status }}"{% endif -%}
             >
-              <span class="cal-date type-h2">{{ date_display | default: '—' }}</span>
-              <span class="cal-name type-h2">{{ product.title }}</span>
+              <span class="cal-date type-h3">{{ date_display | default: '—' }}</span>
+              <span class="cal-name type-h3">{{ product.title }}</span>
             </a>
           {%- endif -%}
         {%- endif -%}
