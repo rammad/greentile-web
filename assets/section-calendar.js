@@ -138,6 +138,16 @@ function initEventInteractions() {
     populateBadge(statusSold, 'sold-out');
 
     if (rows.length > 0 && posterWrapper && posterImg) {
+        const isComingSoonRow = (row) => row?.getAttribute('data-status') === 'coming-soon';
+
+        // Safety: if a coming-soon row is ever rendered as an anchor, make it non-navigable.
+        rows.forEach(row => {
+            if (isComingSoonRow(row) && row.tagName === 'A') {
+                row.removeAttribute('href');
+                row.setAttribute('aria-disabled', 'true');
+            }
+        });
+
         rows.forEach(row => {
             row.addEventListener('mouseenter', () => {
                 if (window.innerWidth > 1024 && !pageContainer.classList.contains('mode-grid')) {
@@ -179,8 +189,18 @@ function initEventInteractions() {
             });
 
             row.addEventListener('click', (e) => {
+                if (isComingSoonRow(row)) {
+                    e.preventDefault();
+                    return;
+                }
+
                 if (window.innerWidth > 1024) {
-                    window.location.href = row.getAttribute('href');
+                    const href = row.getAttribute('href');
+                    if (!href) {
+                        e.preventDefault();
+                        return;
+                    }
+                    window.location.href = href;
                 }
             });
         });
@@ -461,7 +481,11 @@ function initMobileScrollSpy() {
         datesRail.style.pointerEvents = '';
         if (below) {
             const link = below.closest('a');
-            if (link) { tapHandledByTouch = true; link.click(); }
+            if (link) {
+                if (link.classList.contains('calendar-row') && link.getAttribute('data-status') === 'coming-soon') return;
+                tapHandledByTouch = true;
+                link.click();
+            }
         }
     }, { passive: true });
 
@@ -474,7 +498,10 @@ function initMobileScrollSpy() {
         datesRail.style.pointerEvents = '';
         if (below) {
             const link = below.closest('a');
-            if (link) link.click();
+            if (link) {
+                if (link.classList.contains('calendar-row') && link.getAttribute('data-status') === 'coming-soon') return;
+                link.click();
+            }
         }
     });
 
@@ -564,8 +591,9 @@ function renderPackedGrid(container, monthGroups, totalCols) {
             const gridEl = document.createElement('div');
             gridEl.className = `chunk-grid cols-${chunk.span}`;
             chunk.items.forEach(item => {
-                const card = document.createElement('a');
-                card.href = item.href;
+                const isComingSoon = item.status === 'coming-soon';
+                const card = document.createElement(isComingSoon ? 'div' : 'a');
+                if (!isComingSoon) card.href = item.href;
                 card.className = 'grid-card' + (item.status ? ` grid-${item.status}` : '');
                 if (item.status === 'coming-soon') {
                     const ox = Math.round((Math.random() - 0.5) * 80);

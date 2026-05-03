@@ -163,7 +163,7 @@
 }
 
 .calendar-row--upcoming {
-    pointer-events: none;
+    pointer-events: auto;
     cursor: default;
     opacity: 0.45;
 }
@@ -173,6 +173,9 @@
 }
 @media (hover: hover) {
     .calendar-row:hover {
+        color: var(--color-text-main);
+    }
+    .calendar-row--upcoming:hover {
         color: var(--color-text-main);
     }
 }
