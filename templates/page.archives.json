@@ -1,15 +1,31 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "archives": {
       "type": "archives",
       "settings": {
-        "title": "Event Archives",
+        "title": "THE ARCHIVES",
+        "collection": "",
         "load_more_label": "Load More",
-        "gradient_color_1": "#FFFCFA",
-        "gradient_color_2": "#D6FED6",
-        "gradient_color_3": "#FFFCFA"
+        "empty_message": "more events coming soon!",
+        "gradient_color_1_source": "palette_off_white",
+        "gradient_color_1": "#fffcfa",
+        "gradient_color_2_source": "palette_bright_green_20",
+        "gradient_color_2": "#d6fed6",
+        "gradient_color_3_source": "palette_off_white",
+        "gradient_color_3": "#fffcfa"
       }
     }
   },
-  "order": ["archives"]
+  "order": [
+    "archives"
+  ]
 }
