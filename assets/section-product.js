@@ -54,7 +54,15 @@
     }
 
     const buyLabel = document.querySelector('.pdp-section')?.dataset.buyLabel || 'Buy Now';
+    const eventStartAt = document.querySelector('.pdp-section')?.dataset.eventStartAt || '';
     let wasSoldOut = false;
+
+    function isEventPast() {
+        if (!eventStartAt) return false;
+        const eventDate = new Date(eventStartAt);
+        if (Number.isNaN(eventDate.getTime())) return false;
+        return Date.now() > eventDate.getTime();
+    }
 
     function updateBuyButton() {
         const buyBtn = document.getElementById('pdp-add-to-cart');
@@ -73,7 +81,7 @@
 
         if (buyBtn && productData) {
             const variant = productData.variants.find(v => v.id === currentVariantId);
-            const available = variant ? variant.available : false;
+            const available = variant ? (variant.available && !isEventPast()) : false;
             const hasMultiple = productData.variants.length > 1;
 
             buyBtn.disabled = !available;
@@ -146,7 +154,7 @@
 
         buyBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (!currentVariantId) return;
+            if (!currentVariantId || buyBtn.disabled) return;
 
             const routes = window.THEME_SETTINGS?.routes;
             const cartAddUrl = routes?.cartAdd || '/cart/add.js';
