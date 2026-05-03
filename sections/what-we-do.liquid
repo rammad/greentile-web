@@ -17,7 +17,7 @@
     <ul>
       {%- for block in items -%}
         <li class="menu-item type-h2" data-index="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
-          {{ block.settings.title | replace: '& ', '<span class="ws-normal">&amp; </span>' }}
+          {{- block.settings.title | escape -}}
         </li>
       {%- endfor -%}
     </ul>

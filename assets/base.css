@@ -59,7 +59,12 @@
     --blur-standard: 10px;
 
     --poster-gap: 20px;
-    --poster-radius: 8% / 7%;
+    /* Poster cards use aspect-ratio height:width (e.g. 4:5 → 5 / 4). Vertical radius must track
+       the resolved horizontal radius so capping does not break the 8%W / 7%H ellipse. */
+    --poster-aspect-w: 4;
+    --poster-aspect-h: 5;
+    --poster-radius-max: 36px;
+    --poster-radius: min(8%, var(--poster-radius-max)) / min(7%, calc(min(8%, var(--poster-radius-max)) * 7 * var(--poster-aspect-h) / (8 * var(--poster-aspect-w))));
     --poster-full-height: calc(100vh - var(--space-for-nav) - 40px);
 
     --lh-tight:   0.85;
