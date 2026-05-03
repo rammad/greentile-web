@@ -46,6 +46,35 @@
     function easeOutCubic(t) { return 1 - (1 - t) * (1 - t) * (1 - t); }
     function easeInCubic(t)  { return t * t * t; }
 
+    /** Mobile menu uses word-spacing:100vw between words; keep "& Word" inside .ws-normal (see section-what-we-do.css). */
+    function formatWwdMenuAmpersands(menuRoot) {
+        if (!menuRoot) return;
+        const doc = menuRoot.ownerDocument;
+        menuRoot.querySelectorAll('.menu-item').forEach((li) => {
+            if (li.querySelector('span.ws-normal')) return;
+            const full = li.textContent;
+            if (!full.includes(' & ')) return;
+            const parts = full.split(' & ');
+            while (li.firstChild) li.removeChild(li.firstChild);
+            li.appendChild(doc.createTextNode(parts[0]));
+            for (let i = 1; i < parts.length; i++) {
+                const seg = parts[i];
+                if (seg.length === 0) {
+                    li.appendChild(doc.createTextNode(' &'));
+                    continue;
+                }
+                const spaceIdx = seg.indexOf(' ');
+                const firstWord = spaceIdx === -1 ? seg : seg.substring(0, spaceIdx);
+                const rest = spaceIdx === -1 ? '' : seg.substring(spaceIdx);
+                const span = doc.createElement('span');
+                span.className = 'ws-normal';
+                span.appendChild(doc.createTextNode('& ' + firstWord));
+                li.appendChild(span);
+                if (rest.length > 0) li.appendChild(doc.createTextNode(rest));
+            }
+        });
+    }
+
     // mobile menu animation sequence (progress 0–100)
     const MOBILE_MENU = {
         revealAt:      0,     // menu items fade in (stagger)
@@ -97,6 +126,7 @@
 
         // persistent menu
         const menuItems = menuEl ? Array.from(menuEl.querySelectorAll('.menu-item')) : [];
+        formatWwdMenuAmpersands(menuEl);
 
         const MENU_ITEM_STAGGER_MS = 120;
 
