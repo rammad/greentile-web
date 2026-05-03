@@ -160,11 +160,19 @@
             "image": "shopify://shop_images/DSC02480_GTNY_178_Large_7227f5c1-e46e-4872-bb43-bffac0036ef5.jpg",
             "names": "2026 team / adam gong, alex urmaza, andrew chen, andrew lai, angela liu, ann tran, anni wang, ash makiewicz, ashley goh, brandon kwan, brandon wu, carmen ou, catherine leung, chak wai henry to, chris kumaradjaja, christina chann, denise lin, derek eng, donald fung, edward chin, elaine lee, emily deng, emily ding, emma tang, emma wang, eric jong, ethan choi, jason chen, jennifer cheung, jennifer pham, jess lou, jillian ledesma, jon chan, karen zhu, katherine salvador, kathleen miao, kaua'i wu, kevin huang, kylie turner, lenny an, leo rose, madison wong, malachi daniel, marissa yun, matt kamibayashi, matt ly, matthew cheng, max chu, medwin chiu, melissa su, michael kwan, michelle huang, mike lee, pedro motta, rachel son, ray javier, richard deng, ryan yiu, sam wong, sean chen, sean low, shirley yan, soran zhuo, spencer kim, stella zhou, susie tan, vanessa huang, vicky yang, vivian li, vivien guo, wanpeng meng"
           }
+        },
+        "team_group_kTDncH": {
+          "type": "team_group",
+          "settings": {
+            "image": "shopify://shop_images/7036R04-R01-001A.jpg",
+            "names": ""
+          }
         }
       },
       "block_order": [
         "team_group_k9R6Tp",
-        "team_group_eUNLzj"
+        "team_group_eUNLzj",
+        "team_group_kTDncH"
       ],
       "settings": {
         "title": "IT TAKES A VILLAGE",
