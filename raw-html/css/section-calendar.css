@@ -379,7 +379,7 @@
 #status-soon { top: 50%; left: 50%; width: 100%; height: 100%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease; }
 #status-sold { top: 50%; left: 50%; width: min(280px, 60%); aspect-ratio: 1; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease; }
 
-.grid-card .badge-sold { width: min(120px, 40%); aspect-ratio: 1; }
+.grid-card .badge-sold { width: min(280px, 60%); aspect-ratio: 1; }
 
 .cal-poster-wrap .badge-sold { width: min(120px, 35%); aspect-ratio: 1; }
 
@@ -459,7 +459,7 @@
 
     #status-soon { width: 100%; height: 100%; }
     #status-sold { width: min(560px, 60%); }
-    .grid-card .badge-sold { width: min(240px, 40%); }
+    .grid-card .badge-sold { width: min(560px, 60%); }
     .cal-poster-wrap .badge-sold { width: min(240px, 35%); }
 }
 

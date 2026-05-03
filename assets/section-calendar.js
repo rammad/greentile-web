@@ -211,7 +211,8 @@ function initEventInteractions() {
 function randomizeGridStickers() {
     requestAnimationFrame(() => {
         document.querySelectorAll('.grid-card .badge-sold').forEach(el => {
-            randomizeSticker(el);
+            const poster = el.parentElement?.querySelector('.grid-card-poster');
+            randomizeSticker(el, poster || undefined);
         });
     });
 }
