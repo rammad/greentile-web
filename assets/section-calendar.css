@@ -23,7 +23,7 @@
 .calendar-header .type-display-hero {
     font-size: 9.1vw;
     margin: 0;
-    line-height: var(--lh-tight);
+    line-height: var(--lh-single);
     overflow: visible;
 }
 
