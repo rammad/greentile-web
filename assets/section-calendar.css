@@ -158,8 +158,10 @@
 }
 
 
+.calendar-row[data-status="sold-out"] .cal-date,
 .calendar-row[data-status="sold-out"] .cal-name {
     text-decoration: line-through;
+    text-decoration-thickness: max(1px, 0.06em);
 }
 
 .calendar-row--upcoming {
