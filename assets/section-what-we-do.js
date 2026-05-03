@@ -50,7 +50,7 @@
     const MOBILE_MENU = {
         revealAt:      0,     // menu items fade in (stagger)
         enterStart:    -20,     // begin sliding up from below
-        enterEnd:      30,      // arrive at pinned position
+        enterEnd:      20,      // arrive at pinned position
         enterTravel:   150,      // vh below pinned position at start
         firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
         lastSlideEnd:  100,     // last slide ends
@@ -365,15 +365,24 @@
         // menu activation trigger
         const MENU_REVEAL_VH_DESKTOP = 0.05;  // vh — section top must reach this far down viewport to activate (desktop)
         const MENU_REVEAL_VH_MOBILE  = 0.35;  // vh — same trigger for mobile
-        /** slide-0 anchors must stay strictly below firstSlideEnd (scroll logic) — land near upper end of that band so menu enter tween is nearer pinned pos */
-        const SLIDE_0_PROG_BEFORE_FIRST_END = 0.01;
+        /** first-slide anchors target just before clamped enter completion to avoid post-jump menu drift */
+        const SLIDE_0_PROG_BEFORE_ENTER_END = 0.01;
         /** last-slide midpoint often sits past exitStart → menu exits; aim just shy of exit while staying in last-slide band (clamp ≥ prog band floor) */
         const SLIDE_LAST_PROG_BEFORE_EXIT = 0.1;
+        // Desktop-only menu jump tuning (Lenis call options); normal wheel/trackpad scroll remains unchanged.
+        const DESKTOP_JUMP_BASE_DURATION = 1.0;
+        const DESKTOP_JUMP_PER_SLIDE_DURATION = 0.5;
+        const DESKTOP_JUMP_MAX_DURATION = 2.0;
+
+        function getClampedEnterEnd(cfg) {
+            // keep entrance fully complete by the time slide-0 window ends
+            return Math.min(cfg.enterEnd, cfg.firstSlideEnd);
+        }
 
         function sectionProgForSlideIndex(idx, n, cfg) {
             if (n <= 0) return cfg.firstSlideEnd;
             if (idx <= 0)
-                return Math.max(cfg.revealAt + 0.01, cfg.firstSlideEnd - SLIDE_0_PROG_BEFORE_FIRST_END);
+                return Math.max(cfg.revealAt + 0.01, getClampedEnterEnd(cfg) - SLIDE_0_PROG_BEFORE_ENTER_END);
             const remaining = n - 1;
             const slideSpan = cfg.lastSlideEnd - cfg.firstSlideEnd;
             if (idx === n - 1 && remaining > 0) {
@@ -433,7 +442,15 @@
             );
 
             if (!_isMobileScroll && window.lenis) {
-                window.lenis.scrollTo(nextScroll);
+                const slidesToJump = Math.max(1, Math.abs(slideIdx - activeIdx));
+                const jumpDuration = Math.min(
+                    DESKTOP_JUMP_MAX_DURATION,
+                    DESKTOP_JUMP_BASE_DURATION + (slidesToJump - 1) * DESKTOP_JUMP_PER_SLIDE_DURATION
+                );
+                window.lenis.scrollTo(nextScroll, {
+                    duration: jumpDuration,
+                    easing: (t) => t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2,
+                });
             } else if (!_isMobileScroll && viewport) {
                 viewport.scrollTo({ top: nextScroll, behavior: 'smooth' });
             } else {
@@ -490,10 +507,12 @@
                 const entryPx = (cfg.enterTravel / 100) * vpH;
                 const exitPx  = (cfg.exitTravel  / 100) * vpH;
                 let menuY;
+                const enterEnd = getClampedEnterEnd(cfg);
                 if (sectionProg <= cfg.enterStart) {
                     menuY = entryPx;
-                } else if (sectionProg <= cfg.enterEnd) {
-                    const t = (sectionProg - cfg.enterStart) / (cfg.enterEnd - cfg.enterStart);
+                } else if (sectionProg <= enterEnd) {
+                    const enterRange = Math.max(0.0001, enterEnd - cfg.enterStart);
+                    const t = (sectionProg - cfg.enterStart) / enterRange;
                     menuY = (1 - easeOutCubic(t)) * entryPx;
                 } else if (sectionProg < cfg.exitStart) {
                     menuY = 0;
