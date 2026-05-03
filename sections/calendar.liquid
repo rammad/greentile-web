@@ -166,7 +166,7 @@
     </div>
   </div>
 
-  {%- comment -%} Build sort keys (YYYYMMDD::handle); undated in-season rows sort after dated ones. {%- endcomment -%}
+  {%- comment -%} Sort keys YYYYMMDD::handle; undated in-season rows sort after dated ones. {%- endcomment -%}
   {%- assign sorted_calendar_lines = '' -%}
   {%- if cal_collection != blank -%}
     {%- for product in collections[cal_collection].products -%}
@@ -203,12 +203,23 @@
   {%- assign sorted_calendar_entries = sorted_calendar_lines | split: '||' | sort -%}
 
   {%- capture calendar_rows_markup -%}
+    {%- if cal_collection != blank -%}
     {%- for entry in sorted_calendar_entries -%}
       {%- if entry == blank -%}{%- continue -%}{%- endif -%}
       {%- assign entry_parts = entry | split: '::' -%}
       {%- assign cal_product_handle = entry_parts[1] -%}
-      {%- assign product = all_products[cal_product_handle] -%}
-      {%- if product == blank -%}{%- continue -%}{%- endif -%}
+      {%- liquid
+        assign product = nil
+        assign product_resolved = false
+        for p in collections[cal_collection].products
+          if p.handle == cal_product_handle
+            assign product = p
+            assign product_resolved = true
+            break
+          endif
+        endfor
+      -%}
+      {%- unless product_resolved -%}{%- continue -%}{%- endunless -%}
 
         {%- liquid
           assign ev = product.metafields[evt_ns][evt_key].value
@@ -269,6 +280,7 @@
           {%- endif -%}
         {%- endif -%}
     {%- endfor -%}
+    {%- endif -%}
   {%- endcapture -%}
 
   {%- assign calendar_rows_markup_stripped = calendar_rows_markup | strip -%}
