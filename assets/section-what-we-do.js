@@ -118,6 +118,10 @@
             });
         }
 
+        function setMenuActiveVisual(idx) {
+            menuItems.forEach((item, i) => item.classList.toggle('is-active', i === idx));
+        }
+
         // build: fixed body text container + scroll track slides
 
         let bodyEl         = null;
@@ -129,6 +133,10 @@
         let sharedCta      = null;
         let ctaData        = [];
         let ctaRevealed    = false;
+        let menuJumpLockActive = false;
+        let menuJumpDisplayIdx = 0;
+        let menuJumpTargetIdx = 0;
+        let menuJumpTargetScroll = 0;
 
         function buildLayout() {
             const stickyContent = section.querySelector('.about-sticky-content');
@@ -442,6 +450,10 @@
             );
 
             if (!_isMobileScroll && window.lenis) {
+                menuJumpLockActive = true;
+                menuJumpDisplayIdx = activeIdx;
+                menuJumpTargetIdx = slideIdx;
+                menuJumpTargetScroll = nextScroll;
                 const slidesToJump = Math.max(1, Math.abs(slideIdx - activeIdx));
                 const jumpDuration = Math.min(
                     DESKTOP_JUMP_MAX_DURATION,
@@ -485,6 +497,12 @@
             const blocks    = _cachedBlocks;
             const revealVH  = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
             const cfg       = isMobile ? MOBILE_MENU : DESKTOP_MENU;
+            const currentScrollNow =
+                !_isMobileScroll && window.lenis
+                    ? window.lenis.scroll
+                    : !_isMobileScroll && viewport
+                        ? viewport.scrollTop
+                        : window.scrollY;
 
             // section progress
             const scrollStart  = revealVH * vpH;
@@ -565,16 +583,28 @@
                     : n - 1;
             }
 
-            menuItems.forEach((item, i) => item.classList.toggle('is-active', i === closestIdx));
+            let effectiveIdx = closestIdx;
+            if (menuJumpLockActive) {
+                setMenuActiveVisual(menuJumpDisplayIdx);
+                effectiveIdx = menuJumpDisplayIdx;
+                const distToTarget = Math.abs(currentScrollNow - menuJumpTargetScroll);
+                if (closestIdx === menuJumpTargetIdx && distToTarget <= 8) {
+                    menuJumpLockActive = false;
+                    setMenuActiveVisual(menuJumpTargetIdx);
+                    effectiveIdx = menuJumpTargetIdx;
+                }
+            } else {
+                setMenuActiveVisual(closestIdx);
+            }
 
-            if (closestIdx !== activeIdx) {
+            if (effectiveIdx !== activeIdx) {
                 hideBlock(blocks[activeIdx]);
                 if (sectionProg < cfg.hideAt) {
-                    showBlock(blocks[closestIdx]);
-                    updateCtaContent(closestIdx);
+                    showBlock(blocks[effectiveIdx]);
+                    updateCtaContent(effectiveIdx);
                     if (scrollHasFired) showSharedCta();
                 }
-                activeIdx = closestIdx;
+                activeIdx = effectiveIdx;
             }
 
             if (sectionProg >= cfg.hideAt && !exitFaded) {
@@ -606,7 +636,7 @@
                 : 0;
 
             const isActive = secRect.top <= scrollStart && secRect.bottom > 0;
-            menuItems.forEach((item, i) => item.classList.toggle('is-active', i === 0));
+            setMenuActiveVisual(0);
             wasActive = isActive;
 
             if (sectionProg >= cfg.revealAt && sectionProg <= cfg.hideAt) {
