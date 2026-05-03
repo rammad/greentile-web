@@ -151,6 +151,7 @@
             blocks.forEach((_, i) => {
                 const slide = document.createElement('div');
                 slide.className = 'about-slide';
+                slide.id = 'about-slide-' + i;
                 let h = baseSlideH;
                 if (i === 0)                  h += ENTER_PAD_SLIDES * baseSlideH;
                 if (i === blocks.length - 1)  h += EXIT_PAD_SLIDES * baseSlideH;
@@ -364,6 +365,104 @@
         // menu activation trigger
         const MENU_REVEAL_VH_DESKTOP = 0.05;  // vh — section top must reach this far down viewport to activate (desktop)
         const MENU_REVEAL_VH_MOBILE  = 0.35;  // vh — same trigger for mobile
+        /** slide-0 anchors must stay strictly below firstSlideEnd (scroll logic) — land near upper end of that band so menu enter tween is nearer pinned pos */
+        const SLIDE_0_PROG_BEFORE_FIRST_END = 0.01;
+        /** last-slide midpoint often sits past exitStart → menu exits; aim just shy of exit while staying in last-slide band (clamp ≥ prog band floor) */
+        const SLIDE_LAST_PROG_BEFORE_EXIT = 0.1;
+
+        function sectionProgForSlideIndex(idx, n, cfg) {
+            if (n <= 0) return cfg.firstSlideEnd;
+            if (idx <= 0)
+                return Math.max(cfg.revealAt + 0.01, cfg.firstSlideEnd - SLIDE_0_PROG_BEFORE_FIRST_END);
+            const remaining = n - 1;
+            const slideSpan = cfg.lastSlideEnd - cfg.firstSlideEnd;
+            if (idx === n - 1 && remaining > 0) {
+                const progMinLast = cfg.firstSlideEnd + ((remaining - 1) / remaining) * slideSpan;
+                const beforeExit = cfg.exitStart - SLIDE_LAST_PROG_BEFORE_EXIT;
+                return Math.min(
+                    cfg.lastSlideEnd - 0.01,
+                    Math.max(progMinLast, beforeExit)
+                );
+            }
+            const sp = (idx - 1 + 0.5) / remaining;
+            return cfg.firstSlideEnd + sp * slideSpan;
+        }
+
+        function getAboutMaxScroll() {
+            if (_isMobileScroll) {
+                return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+            }
+            const vp = viewport;
+            const contentEl = document.getElementById('scroll-content');
+            if (!vp || !contentEl) return 0;
+            return Math.max(0, contentEl.scrollHeight - vp.clientHeight);
+        }
+
+        /** Maps menu index → scroll delta so `updateActiveSlide` picks that slide (same logic as wheel scroll). */
+        function scrollToSlideIndex(slideIdx) {
+            const n = menuItems.length;
+            if (n <= 0 || slideIdx < 0 || slideIdx >= n) return;
+
+            const cfg = isMobile ? MOBILE_MENU : DESKTOP_MENU;
+            const revealVH = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
+            const vpEl = viewport || null;
+            const vpHNow = vpEl ? vpEl.getBoundingClientRect().height : window.innerHeight;
+            const secRect = section.getBoundingClientRect();
+            const progTarget = sectionProgForSlideIndex(slideIdx, n, cfg);
+
+            const scrollStart = revealVH * vpHNow;
+            const scrollEnd = vpHNow - secRect.height;
+            const scrollRange = scrollStart - scrollEnd;
+
+            const currentScroll =
+                !_isMobileScroll && window.lenis
+                    ? window.lenis.scroll
+                    : !_isMobileScroll && viewport
+                        ? viewport.scrollTop
+                        : window.scrollY;
+
+            if (scrollRange <= 1) return;
+
+            const desiredTop =
+                scrollStart - (progTarget / 100) * scrollRange;
+            const delta = secRect.top - desiredTop;
+            const maxS = getAboutMaxScroll();
+            const nextScroll = Math.max(
+                0,
+                Math.min(maxS, currentScroll + delta)
+            );
+
+            if (!_isMobileScroll && window.lenis) {
+                window.lenis.scrollTo(nextScroll);
+            } else if (!_isMobileScroll && viewport) {
+                viewport.scrollTo({ top: nextScroll, behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: nextScroll, behavior: 'smooth' });
+            }
+        }
+
+        menuItems.forEach((item) => {
+            item.addEventListener('click', (e) => {
+                const idx = parseInt(item.getAttribute('data-index') || '0', 10);
+                e.preventDefault();
+                scrollToSlideIndex(idx);
+            });
+        });
+
+        (function consumeAboutSlideHash() {
+            function tryHash() {
+                const m = /^#about-slide-(\d+)$/.exec(location.hash);
+                if (!m) return;
+                const hi = parseInt(m[1], 10);
+                if (hi >= 0 && hi < menuItems.length) scrollToSlideIndex(hi);
+            }
+            if (typeof window.pageReady !== 'undefined' && window.pageReady && typeof window.pageReady.then === 'function') {
+                window.pageReady.then(() => requestAnimationFrame(tryHash));
+            } else {
+                requestAnimationFrame(tryHash);
+            }
+            window.addEventListener('hashchange', tryHash);
+        })();
 
         function updateActiveSlide(secRect, vpH) {
             const blocks    = _cachedBlocks;
