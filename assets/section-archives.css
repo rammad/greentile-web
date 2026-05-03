@@ -6,7 +6,7 @@
     min-height: 100vh;
     height: auto !important; 
     overflow: visible !important;
-    padding-top: calc(var(--space-for-nav) - 10px); 
+    padding-top: var(--space-for-nav);
     padding-bottom: clamp(80px, 4.167vw, 160px);
     padding-left: var(--page-gutter);
     padding-right: var(--page-gutter);
@@ -15,24 +15,44 @@
 .archives-page.is-active { opacity: 1; }
 
 .archives-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(40px, 2.083vw, 80px);
-    margin-bottom: clamp(40px, 2.083vw, 80px);
+    padding: 0;
+    flex-shrink: 0;
+    width: 100%;
+    overflow: visible;
     position: relative;
-    padding: 0 clamp(40px, 2.083vw, 80px);
-    overflow: hidden;
 }
 
-.archives-title {
-    font-family: var(--font-header);
-    font-size: 8vw; 
-    line-height: var(--lh-single);
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--color-text-main);
+/*
+ * Calendar hero sits in a full-width section; archives-page has horizontal gutters.
+ * Pull the title + spacer strip edge-to-edge so 9.1vw reads the same as the calendar.
+ */
+.archives-page > .calendar-header.archives-header,
+.archives-page > .archives-controls-spacer {
+    margin-left: calc(-1 * var(--page-gutter));
+    margin-right: calc(-1 * var(--page-gutter));
+    width: calc(100% + 2 * var(--page-gutter));
+    max-width: none;
+    box-sizing: border-box;
+}
+
+/* Slightly higher specificity than base .type-display-hero so 9.1vw always wins */
+.archives-page .calendar-header.archives-header .type-display-hero {
+    font-size: 9.1vw;
     margin: 0;
+    line-height: var(--lh-single);
+    overflow: visible;
+}
+
+/* Reserve the same vertical band as .calendar-controls (filters / view row) */
+.archives-controls-spacer {
+    margin: 32px 20px 0;
+    min-height: calc(var(--size-subRegular1) + 8px);
+    flex-shrink: 0;
+}
+
+/* Match .calendar-body top inset so packed grids start at the same scroll position */
+.archives-body {
+    padding-top: 40px;
 }
 
 .archives-page .grid-card {
@@ -81,6 +101,15 @@
 @media (min-width: 3840px) {
     .archives-coming-soon {
         bottom: 80px;
+    }
+
+    .archives-controls-spacer {
+        margin: 64px 40px 0;
+        min-height: calc(var(--size-subRegular1) + 16px);
+    }
+
+    .archives-body {
+        padding-top: 80px;
     }
 }
 
@@ -143,5 +172,9 @@
 
     .load-more-container {
         margin-top: 40px;
+    }
+
+    .archives-body {
+        padding-top: 0;
     }
 }
