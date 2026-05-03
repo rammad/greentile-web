@@ -167,7 +167,7 @@ function initEventInteractions() {
                             randomizeSticker(statusSold, posterImg);
                         }
                         posterImg.classList.add('is-sold-out');
-                        posterImg.style.opacity = '0.5';
+                        posterImg.style.opacity = '0.4';
                     }
                 }
             });
@@ -191,7 +191,8 @@ function initEventInteractions() {
 function randomizeGridStickers() {
     requestAnimationFrame(() => {
         document.querySelectorAll('.grid-card .badge-sold').forEach(el => {
-            randomizeSticker(el);
+            const poster = el.parentElement?.querySelector('.grid-card-poster');
+            randomizeSticker(el, poster || undefined);
         });
     });
 }
@@ -574,7 +575,7 @@ function renderPackedGrid(container, monthGroups, totalCols) {
                     card.innerHTML = `
                         <div class="grid-card-placeholder">
                             <div class="status-badge badge-soon" style="left:calc(50% + ${ox}px);top:calc(40% + ${oy}px);transform:translate(-50%,-50%)">${buildBadgeHTML('coming-soon')}</div>
-                            <span class="grid-card-label type-subBold1">${item.title}</span>
+                            <h3 class="grid-card-label type-h3">${item.title}</h3>
                         </div>
                     `;
                 } else {
