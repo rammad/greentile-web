@@ -173,6 +173,22 @@
         if (!container) return;
 
         const allCells = Array.from(document.querySelectorAll('.archive-cell'));
+        const parseEventDate = (cell) => {
+            const raw = (cell.getAttribute('data-event-date') || '').trim();
+            if (!raw) return null;
+            const t = Date.parse(`${raw}T00:00:00`);
+            return Number.isNaN(t) ? null : t;
+        };
+        const sortedCells = allCells
+            .map((cell, index) => ({ cell, index, ts: parseEventDate(cell) }))
+            .sort((a, b) => {
+                // Most recent first for dated events; keep undated entries stable at the end.
+                if (a.ts !== null && b.ts !== null) return b.ts - a.ts;
+                if (a.ts !== null) return -1;
+                if (b.ts !== null) return 1;
+                return a.index - b.index;
+            })
+            .map(entry => entry.cell);
         container.innerHTML = '';
         container.classList.add('calendar-grid-packed');
         container.style.display = 'flex';
@@ -181,7 +197,7 @@
         let currentMonthName = null;
         let currentGroup = null;
 
-        allCells.forEach(cell => {
+        sortedCells.forEach(cell => {
             const m = cell.getAttribute('data-month');
             const img = cell.querySelector('img');
             const imgSrc = img ? img.getAttribute('src') : '';
@@ -197,7 +213,7 @@
         });
 
         _state.monthGroups = monthGroups;
-        _state.totalItems = allCells.length;
+        _state.totalItems = sortedCells.length;
         _state.activeCols = getGridColCount();
 
         const flatItemList = renderArchiveGrid(container, monthGroups, _state.activeCols);
