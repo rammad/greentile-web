@@ -67,7 +67,7 @@
           endif
         -%}
         {%- if is_archive -%}
-          <a href="{{ product.url }}" class="archive-cell" data-month="{{ month_label | default: 'Undated' }}">
+          <a href="{{ product.url }}" class="archive-cell" data-month="{{ month_label | default: 'Undated' }}" data-event-date="{{ event_date_str }}">
             {%- if product.featured_image -%}
               <img src="{{ product.featured_image | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ product.title | escape }}">
             {%- endif -%}
@@ -81,7 +81,7 @@
     {%- if archive_count == 0 -%}
       {%- for block in section.blocks -%}
         {%- if block.type == 'archive_event' -%}
-          <a href="{{ block.settings.url | default: '#' }}" class="archive-cell" data-month="{{ block.settings.month }}" {{ block.shopify_attributes }}>
+          <a href="{{ block.settings.url | default: '#' }}" class="archive-cell" data-month="{{ block.settings.month }}" data-event-date="" {{ block.shopify_attributes }}>
             {%- if block.settings.poster -%}
               <img src="{{ block.settings.poster | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ block.settings.title | escape }}">
             {%- endif -%}

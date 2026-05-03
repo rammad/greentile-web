@@ -50,7 +50,7 @@
     const MOBILE_MENU = {
         revealAt:      0,     // menu items fade in (stagger)
         enterStart:    -20,     // begin sliding up from below
-        enterEnd:      30,      // arrive at pinned position
+        enterEnd:      20,      // arrive at pinned position
         enterTravel:   150,      // vh below pinned position at start
         firstSlideEnd: 20,      // slide 1 ends → transition to slide 2
         lastSlideEnd:  100,     // last slide ends
@@ -118,6 +118,10 @@
             });
         }
 
+        function setMenuActiveVisual(idx) {
+            menuItems.forEach((item, i) => item.classList.toggle('is-active', i === idx));
+        }
+
         // build: fixed body text container + scroll track slides
 
         let bodyEl         = null;
@@ -129,6 +133,10 @@
         let sharedCta      = null;
         let ctaData        = [];
         let ctaRevealed    = false;
+        let menuJumpLockActive = false;
+        let menuJumpDisplayIdx = 0;
+        let menuJumpTargetIdx = 0;
+        let menuJumpTargetScroll = 0;
 
         function buildLayout() {
             const stickyContent = section.querySelector('.about-sticky-content');
@@ -151,6 +159,7 @@
             blocks.forEach((_, i) => {
                 const slide = document.createElement('div');
                 slide.className = 'about-slide';
+                slide.id = 'about-slide-' + i;
                 let h = baseSlideH;
                 if (i === 0)                  h += ENTER_PAD_SLIDES * baseSlideH;
                 if (i === blocks.length - 1)  h += EXIT_PAD_SLIDES * baseSlideH;
@@ -364,11 +373,139 @@
         // menu activation trigger
         const MENU_REVEAL_VH_DESKTOP = 0.05;  // vh — section top must reach this far down viewport to activate (desktop)
         const MENU_REVEAL_VH_MOBILE  = 0.35;  // vh — same trigger for mobile
+        /** first-slide anchors target just before clamped enter completion to avoid post-jump menu drift */
+        const SLIDE_0_PROG_BEFORE_ENTER_END = 0.01;
+        /** last-slide midpoint often sits past exitStart → menu exits; aim just shy of exit while staying in last-slide band (clamp ≥ prog band floor) */
+        const SLIDE_LAST_PROG_BEFORE_EXIT = 0.1;
+        // Desktop-only menu jump tuning (Lenis call options); normal wheel/trackpad scroll remains unchanged.
+        const DESKTOP_JUMP_BASE_DURATION = 1.0;
+        const DESKTOP_JUMP_PER_SLIDE_DURATION = 0.5;
+        const DESKTOP_JUMP_MAX_DURATION = 2.0;
+
+        function getClampedEnterEnd(cfg) {
+            // keep entrance fully complete by the time slide-0 window ends
+            return Math.min(cfg.enterEnd, cfg.firstSlideEnd);
+        }
+
+        function sectionProgForSlideIndex(idx, n, cfg) {
+            if (n <= 0) return cfg.firstSlideEnd;
+            if (idx <= 0)
+                return Math.max(cfg.revealAt + 0.01, getClampedEnterEnd(cfg) - SLIDE_0_PROG_BEFORE_ENTER_END);
+            const remaining = n - 1;
+            const slideSpan = cfg.lastSlideEnd - cfg.firstSlideEnd;
+            if (idx === n - 1 && remaining > 0) {
+                const progMinLast = cfg.firstSlideEnd + ((remaining - 1) / remaining) * slideSpan;
+                const progInsideLast = progMinLast + 0.01;
+                const beforeExit = cfg.exitStart - SLIDE_LAST_PROG_BEFORE_EXIT;
+                return Math.min(
+                    cfg.lastSlideEnd - 0.01,
+                    Math.max(progInsideLast, beforeExit)
+                );
+            }
+            const sp = (idx - 1 + 0.5) / remaining;
+            return cfg.firstSlideEnd + sp * slideSpan;
+        }
+
+        function getAboutMaxScroll() {
+            if (_isMobileScroll) {
+                return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+            }
+            const vp = viewport;
+            const contentEl = document.getElementById('scroll-content');
+            if (!vp || !contentEl) return 0;
+            return Math.max(0, contentEl.scrollHeight - vp.clientHeight);
+        }
+
+        /** Maps menu index → scroll delta so `updateActiveSlide` picks that slide (same logic as wheel scroll). */
+        function scrollToSlideIndex(slideIdx) {
+            const n = menuItems.length;
+            if (n <= 0 || slideIdx < 0 || slideIdx >= n) return;
+
+            const cfg = isMobile ? MOBILE_MENU : DESKTOP_MENU;
+            const revealVH = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
+            const vpEl = viewport || null;
+            const vpHNow = vpEl ? vpEl.getBoundingClientRect().height : window.innerHeight;
+            const secRect = section.getBoundingClientRect();
+            const progTarget = sectionProgForSlideIndex(slideIdx, n, cfg);
+
+            const scrollStart = revealVH * vpHNow;
+            const scrollEnd = vpHNow - secRect.height;
+            const scrollRange = scrollStart - scrollEnd;
+
+            const currentScroll =
+                !_isMobileScroll && window.lenis
+                    ? window.lenis.scroll
+                    : !_isMobileScroll && viewport
+                        ? viewport.scrollTop
+                        : window.scrollY;
+
+            if (scrollRange <= 1) return;
+
+            const desiredTop =
+                scrollStart - (progTarget / 100) * scrollRange;
+            const delta = secRect.top - desiredTop;
+            const maxS = getAboutMaxScroll();
+            const nextScroll = Math.max(
+                0,
+                Math.min(maxS, currentScroll + delta)
+            );
+
+            // Lock menu/copy/CTA state during any programmatic jump (desktop + mobile).
+            menuJumpLockActive = true;
+            menuJumpDisplayIdx = activeIdx;
+            menuJumpTargetIdx = slideIdx;
+            menuJumpTargetScroll = nextScroll;
+
+            if (!_isMobileScroll && window.lenis) {
+                const slidesToJump = Math.max(1, Math.abs(slideIdx - activeIdx));
+                const jumpDuration = Math.min(
+                    DESKTOP_JUMP_MAX_DURATION,
+                    DESKTOP_JUMP_BASE_DURATION + (slidesToJump - 1) * DESKTOP_JUMP_PER_SLIDE_DURATION
+                );
+                window.lenis.scrollTo(nextScroll, {
+                    duration: jumpDuration,
+                    easing: (t) => t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2,
+                });
+            } else if (!_isMobileScroll && viewport) {
+                viewport.scrollTo({ top: nextScroll, behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: nextScroll, behavior: 'smooth' });
+            }
+        }
+
+        menuItems.forEach((item) => {
+            item.addEventListener('click', (e) => {
+                const idx = parseInt(item.getAttribute('data-index') || '0', 10);
+                e.preventDefault();
+                scrollToSlideIndex(idx);
+            });
+        });
+
+        (function consumeAboutSlideHash() {
+            function tryHash() {
+                const m = /^#about-slide-(\d+)$/.exec(location.hash);
+                if (!m) return;
+                const hi = parseInt(m[1], 10);
+                if (hi >= 0 && hi < menuItems.length) scrollToSlideIndex(hi);
+            }
+            if (typeof window.pageReady !== 'undefined' && window.pageReady && typeof window.pageReady.then === 'function') {
+                window.pageReady.then(() => requestAnimationFrame(tryHash));
+            } else {
+                requestAnimationFrame(tryHash);
+            }
+            window.addEventListener('hashchange', tryHash);
+        })();
 
         function updateActiveSlide(secRect, vpH) {
             const blocks    = _cachedBlocks;
             const revealVH  = isMobile ? MENU_REVEAL_VH_MOBILE : MENU_REVEAL_VH_DESKTOP;
             const cfg       = isMobile ? MOBILE_MENU : DESKTOP_MENU;
+            const currentScrollNow =
+                !_isMobileScroll && window.lenis
+                    ? window.lenis.scroll
+                    : !_isMobileScroll && viewport
+                        ? viewport.scrollTop
+                        : window.scrollY;
 
             // section progress
             const scrollStart  = revealVH * vpH;
@@ -391,10 +528,12 @@
                 const entryPx = (cfg.enterTravel / 100) * vpH;
                 const exitPx  = (cfg.exitTravel  / 100) * vpH;
                 let menuY;
+                const enterEnd = getClampedEnterEnd(cfg);
                 if (sectionProg <= cfg.enterStart) {
                     menuY = entryPx;
-                } else if (sectionProg <= cfg.enterEnd) {
-                    const t = (sectionProg - cfg.enterStart) / (cfg.enterEnd - cfg.enterStart);
+                } else if (sectionProg <= enterEnd) {
+                    const enterRange = Math.max(0.0001, enterEnd - cfg.enterStart);
+                    const t = (sectionProg - cfg.enterStart) / enterRange;
                     menuY = (1 - easeOutCubic(t)) * entryPx;
                 } else if (sectionProg < cfg.exitStart) {
                     menuY = 0;
@@ -447,16 +586,28 @@
                     : n - 1;
             }
 
-            menuItems.forEach((item, i) => item.classList.toggle('is-active', i === closestIdx));
+            let effectiveIdx = closestIdx;
+            if (menuJumpLockActive) {
+                setMenuActiveVisual(menuJumpDisplayIdx);
+                effectiveIdx = menuJumpDisplayIdx;
+                const distToTarget = Math.abs(currentScrollNow - menuJumpTargetScroll);
+                if (closestIdx === menuJumpTargetIdx && distToTarget <= 8) {
+                    menuJumpLockActive = false;
+                    setMenuActiveVisual(menuJumpTargetIdx);
+                    effectiveIdx = menuJumpTargetIdx;
+                }
+            } else {
+                setMenuActiveVisual(closestIdx);
+            }
 
-            if (closestIdx !== activeIdx) {
+            if (effectiveIdx !== activeIdx) {
                 hideBlock(blocks[activeIdx]);
                 if (sectionProg < cfg.hideAt) {
-                    showBlock(blocks[closestIdx]);
-                    updateCtaContent(closestIdx);
+                    showBlock(blocks[effectiveIdx]);
+                    updateCtaContent(effectiveIdx);
                     if (scrollHasFired) showSharedCta();
                 }
-                activeIdx = closestIdx;
+                activeIdx = effectiveIdx;
             }
 
             if (sectionProg >= cfg.hideAt && !exitFaded) {
@@ -488,7 +639,7 @@
                 : 0;
 
             const isActive = secRect.top <= scrollStart && secRect.bottom > 0;
-            menuItems.forEach((item, i) => item.classList.toggle('is-active', i === 0));
+            setMenuActiveVisual(0);
             wasActive = isActive;
 
             if (sectionProg >= cfg.revealAt && sectionProg <= cfg.hideAt) {
