@@ -356,14 +356,10 @@
 .grid-card-label {
     position: absolute;
     bottom: 20px; left: 12px; right: 12px;
+    margin: 0;
     color: var(--c-dark-green-50);
-    font-family: var(--font-header);
-    font-size: clamp(14px, 14cqi, var(--size-h1));
-    font-weight: 800;
-    line-height: var(--lh-tight);
-    letter-spacing: var(--ls-header);
     text-align: center;
-    text-transform: uppercase;
+    font-size: clamp(11px, 10cqi, calc(var(--size-h3) * 0.9));
 }
 
 @keyframes spin-cw {
