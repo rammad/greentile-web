@@ -250,7 +250,7 @@
 .span-6 { grid-column: span 6; }
 
 .month-header {
-    color: var(--c-dark-green-30);
+    color: var(--c-dark-green-20);
     display: flex;
     align-items: center;
     white-space: nowrap;
@@ -258,7 +258,7 @@
     min-height: var(--size-subBold1);
 }
 .month-header::after, .spacer-line::after {
-    content: ''; display: block; flex-grow: 1; height: 1px; background-color: var(--c-dark-green-30);
+    content: ''; display: block; flex-grow: 1; height: 1px; background-color: var(--c-dark-green-20);
 }
 .month-header:not(.continuation-header)::after { margin-left: var(--poster-gap); }
 .continuation-header { width: 100%; display: flex; }
