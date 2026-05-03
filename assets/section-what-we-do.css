@@ -52,6 +52,8 @@
 .what-we-do .about-slide {
     position: relative;
     width: 100%;
+    /* offset when jumping via hash (#about-slide-N) — matches nav clearance */
+    scroll-margin-top: var(--space-for-nav, 78px);
 }
 
 /* fixed body text — outside #scroll-content to avoid lenis transform context,
@@ -153,6 +155,8 @@
 
 .about-menu-persistent .menu-item.is-revealed {
     opacity: 1;
+    pointer-events: auto;
+    cursor: pointer;
     transition: color var(--time-fade-out) ease, opacity 0.5s ease;
 }
 
