@@ -37,9 +37,12 @@
   data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}"
   data-edge="0"
 >
-  <div class="archives-header desktop-only">
-    <h1 class="archives-title animate-cascade">{{ section.settings.title | default: 'Event Archives' }}</h1>
+  <div class="calendar-header archives-header desktop-only">
+    <h1 class="type-display-hero animate-cascade desktop-only">
+      {{ section.settings.title | default: 'Event Archives' }}
+    </h1>
   </div>
+  <div class="archives-controls-spacer desktop-only" aria-hidden="true"></div>
   <div class="archives-title-mobile mobile-only">
     {%- assign title_words = section.settings.title | default: 'Event Archives' | split: ' ' -%}
     {%- for word in title_words -%}
@@ -92,24 +95,26 @@
   {%- endcapture -%}
 
   {%- assign archive_cells_markup_stripped = archive_cells_markup | strip -%}
-  {%- if archive_cells_markup_stripped != blank -%}
-    <div id="dynamic-archive-container">
-      {{- archive_cells_markup -}}
-    </div>
-  {%- endif -%}
+  <div class="archives-body">
+    {%- if archive_cells_markup_stripped != blank -%}
+      <div id="dynamic-archive-container">
+        {{- archive_cells_markup -}}
+      </div>
+    {%- endif -%}
 
-  <div class="archives-coming-soon"><span class="type-h2">{{ section.settings.empty_message | default: 'more events coming soon!' }}</span></div>
+    <div class="archives-coming-soon"><span class="type-h2">{{ section.settings.empty_message | default: 'more events coming soon!' }}</span></div>
 
-  {%- if archive_cells_markup_stripped != blank -%}
-    <div class="load-more-container">
-      <button id="btn-load-more" class="cta-btn">
-        <div class="ui-roll roll-hover">
-          <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ section.settings.load_more_label | default: 'Load More' }}</span>
-          <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ section.settings.load_more_label | default: 'Load More' }}</span>
-        </div>
-      </button>
-    </div>
-  {%- endif -%}
+    {%- if archive_cells_markup_stripped != blank -%}
+      <div class="load-more-container">
+        <button id="btn-load-more" class="cta-btn">
+          <div class="ui-roll roll-hover">
+            <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ section.settings.load_more_label | default: 'Load More' }}</span>
+            <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ section.settings.load_more_label | default: 'Load More' }}</span>
+          </div>
+        </button>
+      </div>
+    {%- endif -%}
+  </div>
 </section>
 
 <script src="{{ 'section-archives.js' | asset_url }}" defer></script>

@@ -158,8 +158,10 @@
 }
 
 
+.calendar-row[data-status="sold-out"] .cal-date,
 .calendar-row[data-status="sold-out"] .cal-name {
     text-decoration: line-through;
+    text-decoration-thickness: max(1px, 0.06em);
 }
 
 .calendar-row--upcoming {
@@ -397,7 +399,7 @@
 
 .grid-card .badge-sold { width: min(280px, 60%); aspect-ratio: 1; }
 
-.cal-poster-wrap .badge-sold { width: min(120px, 35%); aspect-ratio: 1; }
+.cal-poster-wrap .badge-sold { width: min(280px, 60%); aspect-ratio: 1; }
 
 /* 4K desktop */
 @media (min-width: 3840px) {
@@ -475,7 +477,7 @@
     #status-soon { width: 100%; height: 100%; }
     #status-sold { width: min(560px, 60%); }
     .grid-card .badge-sold { width: min(560px, 60%); }
-    .cal-poster-wrap .badge-sold { width: min(240px, 35%); }
+    .cal-poster-wrap .badge-sold { width: min(560px, 60%); }
 }
 
 @media (max-width: 1024px) {
