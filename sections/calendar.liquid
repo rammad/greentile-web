@@ -8,6 +8,7 @@
 
   assign current_month = 'now' | date: '%m' | plus: 0
   assign current_year = 'now' | date: '%Y'
+  assign today_date = 'now' | date: '%Y-%m-%d'
 
   if current_month >= 3 and current_month <= 5
     assign season_label = 'Spring'
@@ -165,9 +166,61 @@
     </div>
   </div>
 
+  {%- comment -%} Sort keys YYYYMMDD::handle; undated in-season rows sort after dated ones. {%- endcomment -%}
+  {%- assign sorted_calendar_lines = '' -%}
+  {%- if cal_collection != blank -%}
+    {%- for product in collections[cal_collection].products -%}
+      {%- liquid
+        assign ev = product.metafields[evt_ns][evt_key].value
+        assign event_date_str = nil
+
+        if ev
+          assign event_date_str = ev.starts_at | date: '%Y-%m-%d'
+        endif
+
+        assign in_season = false
+        if event_date_str == nil
+          assign in_season = true
+        elsif event_date_str >= season_start and event_date_str <= season_end
+          assign in_season = true
+        endif
+      -%}
+      {%- if in_season -%}
+        {%- liquid
+          if event_date_str
+            assign calendar_sort_key = event_date_str | replace: '-', ''
+          else
+            assign calendar_sort_key = '99999999'
+          endif
+        -%}
+        {%- capture sorted_calendar_lines -%}
+          {{- sorted_calendar_lines -}}
+          {{- calendar_sort_key -}}::{{- product.handle -}}||
+        {%- endcapture -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- assign sorted_calendar_entries = sorted_calendar_lines | split: '||' | sort -%}
+
   {%- capture calendar_rows_markup -%}
     {%- if cal_collection != blank -%}
-      {%- for product in collections[cal_collection].products -%}
+    {%- for entry in sorted_calendar_entries -%}
+      {%- if entry == blank -%}{%- continue -%}{%- endif -%}
+      {%- assign entry_parts = entry | split: '::' -%}
+      {%- assign cal_product_handle = entry_parts[1] -%}
+      {%- liquid
+        assign product = nil
+        assign product_resolved = false
+        for p in collections[cal_collection].products
+          if p.handle == cal_product_handle
+            assign product = p
+            assign product_resolved = true
+            break
+          endif
+        endfor
+      -%}
+      {%- unless product_resolved -%}{%- continue -%}{%- endunless -%}
+
         {%- liquid
           assign ev = product.metafields[evt_ns][evt_key].value
           assign event_date_str = nil
@@ -192,9 +245,13 @@
         {%- if in_season -%}
           {%- liquid
             assign row_status = ''
+            assign event_passed = false
+            if event_date_str and event_date_str < today_date
+              assign event_passed = true
+            endif
             if product.tags contains 'upcoming'
               assign row_status = 'coming-soon'
-            elsif product.available == false
+            elsif product.available == false or event_passed
               assign row_status = 'sold-out'
             endif
           -%}
@@ -206,8 +263,8 @@
               {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
               data-status="coming-soon"
             >
-              <span class="cal-date type-h2">{{ date_display | default: '—' }}</span>
-              <span class="cal-name type-h2">{{ product.title }}</span>
+              <span class="cal-date type-h3">{{ date_display | default: '—' }}</span>
+              <span class="cal-name type-h3">{{ product.title }}</span>
             </div>
           {%- else -%}
             <a href="{{ product.url }}" class="calendar-row"
@@ -217,12 +274,12 @@
               {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
               {%- if row_status != blank %} data-status="{{ row_status }}"{% endif -%}
             >
-              <span class="cal-date type-h2">{{ date_display | default: '—' }}</span>
-              <span class="cal-name type-h2">{{ product.title }}</span>
+              <span class="cal-date type-h3">{{ date_display | default: '—' }}</span>
+              <span class="cal-name type-h3">{{ product.title }}</span>
             </a>
           {%- endif -%}
         {%- endif -%}
-      {%- endfor -%}
+    {%- endfor -%}
     {%- endif -%}
   {%- endcapture -%}
 

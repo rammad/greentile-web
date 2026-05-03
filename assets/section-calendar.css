@@ -23,7 +23,7 @@
 .calendar-header .type-display-hero {
     font-size: 9.1vw;
     margin: 0;
-    line-height: var(--lh-tight);
+    line-height: var(--lh-single);
     overflow: visible;
 }
 
@@ -154,7 +154,7 @@
 
 .calendar-row .cal-date,
 .calendar-row .cal-name {
-    font-size: clamp(40px, 2.7vw + 12px, var(--size-h2));
+    font-size: clamp(32px, 2.2vw + 8px, var(--size-h3));
 }
 
 
@@ -165,10 +165,8 @@
 .calendar-row--upcoming {
     pointer-events: auto;
     cursor: default;
-    opacity: 0.45;
 }
 .calendar-row--upcoming.is-visible {
-    opacity: 0.45;
     filter: blur(0px);
 }
 @media (hover: hover) {
@@ -252,7 +250,7 @@
 .span-6 { grid-column: span 6; }
 
 .month-header {
-    color: var(--c-dark-green-30);
+    color: var(--c-dark-green-20);
     display: flex;
     align-items: center;
     white-space: nowrap;
@@ -260,7 +258,7 @@
     min-height: var(--size-subBold1);
 }
 .month-header::after, .spacer-line::after {
-    content: ''; display: block; flex-grow: 1; height: 1px; background-color: var(--c-dark-green-30);
+    content: ''; display: block; flex-grow: 1; height: 1px; background-color: var(--c-dark-green-20);
 }
 .month-header:not(.continuation-header)::after { margin-left: var(--poster-gap); }
 .continuation-header { width: 100%; display: flex; }
@@ -317,12 +315,12 @@
 
 .calendar-page .grid-sold-out .grid-card-poster {
     filter: grayscale(100%) sepia(40%) hue-rotate(90deg);
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 .calendar-poster-img.is-sold-out {
     filter: grayscale(100%) sepia(40%) hue-rotate(90deg);
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 .status-badge {
@@ -377,14 +375,11 @@
 .grid-card-label {
     position: absolute;
     bottom: 20px; left: 12px; right: 12px;
+    margin: 0;
     color: var(--c-dark-green-50);
-    font-family: var(--font-header);
-    font-size: clamp(14px, 14cqi, var(--size-h1));
-    font-weight: 800;
-    line-height: var(--lh-tight);
-    letter-spacing: var(--ls-header);
     text-align: center;
-    text-transform: uppercase;
+    font-size: clamp(11px, 10cqi, var(--size-h3));
+    line-height: var(--lh-single);
 }
 
 @keyframes spin-cw {
@@ -400,7 +395,7 @@
 #status-soon { top: 50%; left: 50%; width: 100%; height: 100%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease; }
 #status-sold { top: 50%; left: 50%; width: min(280px, 60%); aspect-ratio: 1; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s ease; }
 
-.grid-card .badge-sold { width: min(120px, 40%); aspect-ratio: 1; }
+.grid-card .badge-sold { width: min(280px, 60%); aspect-ratio: 1; }
 
 .cal-poster-wrap .badge-sold { width: min(120px, 35%); aspect-ratio: 1; }
 
@@ -452,7 +447,6 @@
     }
     .calendar-row.is-visible { filter: blur(0px); }
 
-    /* font-size for .cal-date/.cal-name now auto-scales via fluid --size-h2 */
 
     .calendar-coming-soon {
         bottom: 80px;
@@ -480,7 +474,7 @@
 
     #status-soon { width: 100%; height: 100%; }
     #status-sold { width: min(560px, 60%); }
-    .grid-card .badge-sold { width: min(240px, 40%); }
+    .grid-card .badge-sold { width: min(560px, 60%); }
     .cal-poster-wrap .badge-sold { width: min(240px, 35%); }
 }
 
@@ -663,7 +657,7 @@
 
     .cal-poster-inline.is-sold-out {
         filter: grayscale(100%) sepia(40%) hue-rotate(90deg);
-        opacity: 0.5;
+        opacity: 0.4;
     }
 
     /* mobile controls */

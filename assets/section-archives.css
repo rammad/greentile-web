@@ -6,7 +6,7 @@
     min-height: 100vh;
     height: auto !important; 
     overflow: visible !important;
-    padding-top: calc(var(--space-for-nav) - 8px); 
+    padding-top: calc(var(--space-for-nav) - 10px); 
     padding-bottom: clamp(80px, 4.167vw, 160px);
     padding-left: var(--page-gutter);
     padding-right: var(--page-gutter);
@@ -41,7 +41,7 @@
 
 .archives-page .grid-card-poster {
     filter: grayscale(100%) sepia(40%) hue-rotate(90deg);
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 @media (hover: hover) {
