@@ -315,12 +315,12 @@
 
 .calendar-page .grid-sold-out .grid-card-poster {
     filter: grayscale(100%) sepia(40%) hue-rotate(90deg);
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 .calendar-poster-img.is-sold-out {
     filter: grayscale(100%) sepia(40%) hue-rotate(90deg);
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 .status-badge {
@@ -660,7 +660,7 @@
 
     .cal-poster-inline.is-sold-out {
         filter: grayscale(100%) sepia(40%) hue-rotate(90deg);
-        opacity: 0.5;
+        opacity: 0.4;
     }
 
     /* mobile controls */

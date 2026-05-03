@@ -41,7 +41,7 @@
 
 .archives-page .grid-card-poster {
     filter: grayscale(100%) sepia(40%) hue-rotate(90deg);
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 @media (hover: hover) {

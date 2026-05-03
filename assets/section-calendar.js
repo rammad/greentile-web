@@ -177,7 +177,7 @@ function initEventInteractions() {
                             randomizeSticker(statusSold, posterImg);
                         }
                         posterImg.classList.add('is-sold-out');
-                        posterImg.style.opacity = '0.5';
+                        posterImg.style.opacity = '0.4';
                     }
                 }
             });
