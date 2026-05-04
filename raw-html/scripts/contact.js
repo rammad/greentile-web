@@ -88,12 +88,6 @@
         panel.classList.add('is-open');
         backdrop.classList.add('is-open');
         if (window.lenis && window.lenis.stop) window.lenis.stop();
-
-        const hamburger = document.querySelector('.nav-hamburger');
-        if (hamburger) {
-            hamburger.classList.add('is-active');
-            hamburger.setAttribute('aria-expanded', 'true');
-        }
     }
 
     function close() {
@@ -115,6 +109,9 @@
     }
 
     backdrop.addEventListener('click', close);
+
+    const closeBtn = panel.querySelector('.contact-close');
+    if (closeBtn) closeBtn.addEventListener('click', () => close());
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && isOpen) close();

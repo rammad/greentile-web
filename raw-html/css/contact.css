@@ -48,6 +48,52 @@
     min-height: 100%;
 }
 
+.contact-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.contact-panel-header .contact-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.contact-close {
+    flex-shrink: 0;
+    position: relative;
+    width: 44px;
+    height: 44px;
+    margin: 0 -8px 0 0;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: block;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.contact-close-line {
+    position: absolute;
+    left: 50%;
+    top: calc(10px * 0.7071067812 - 0.5px);
+    width: 20px;
+    height: 1px;
+    margin-left: -10px;
+    background: var(--c-dark-green);
+    border-radius: 2px;
+    transform-origin: center;
+}
+
+.contact-close-line:first-child {
+    transform: rotate(45deg);
+}
+
+.contact-close-line:last-child {
+    transform: rotate(-45deg);
+}
+
 .contact-title {
     font-size: clamp(48px, 8vw, var(--size-h1));
     text-align: left;
@@ -182,13 +228,9 @@
     color: var(--c-red);
 }
 
-/* desktop: hide "SAY HI", show hamburger X instead */
+/* desktop: hide "SAY HI" while panel is open — close control lives in the panel */
 body.contact-is-open .nav-right {
     display: none;
-}
-
-body.contact-is-open .nav-hamburger {
-    display: flex;
 }
 
 @media (min-width: 1025px) {
@@ -214,22 +256,6 @@ body.contact-is-open .nav-hamburger {
     body.contact-is-open .nav-center {
         opacity: 0;
         pointer-events: none;
-    }
-
-    body.contact-is-open .nav-hamburger {
-        gap: 5px;
-    }
-
-    body.contact-is-open .hamburger-line {
-        width: 16px;
-    }
-
-    body.contact-is-open .nav-hamburger.is-active .hamburger-line:first-child {
-        transform: translateY(3px) rotate(45deg);
-    }
-
-    body.contact-is-open .nav-hamburger.is-active .hamburger-line:last-child {
-        transform: translateY(-3px) rotate(-45deg);
     }
 }
 
@@ -299,24 +325,13 @@ body.contact-is-open .nav-hamburger {
         bottom: 24px;
         border-radius: 54px;
     }
-
-    body.contact-is-open .nav-hamburger {
-        gap: 10px;
-    }
-
-    body.contact-is-open .hamburger-line {
-        width: 32px;
-    }
-
-    body.contact-is-open .nav-hamburger.is-active .hamburger-line:first-child {
-        transform: translateY(6px) rotate(45deg);
-    }
-    body.contact-is-open .nav-hamburger.is-active .hamburger-line:last-child {
-        transform: translateY(-6px) rotate(-45deg);
-    }
 }
 
 @media (max-width: 1024px) {
+    .contact-close {
+        display: none;
+    }
+
     .contact-form {
         gap: 40px;
         margin-top: 40px;

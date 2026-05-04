@@ -380,7 +380,7 @@
     margin: 0;
     color: var(--c-dark-green-50);
     text-align: center;
-    font-size: clamp(11px, 10cqi, var(--size-h3));
+    font-size: clamp(11px, 10cqi, var(--size-subBold1));
     line-height: var(--lh-single);
 }
 
@@ -732,7 +732,7 @@
     .calendar-page.mode-grid .calendar-body {
         height: auto;
         overflow: visible;
-        padding: 0 var(--page-gutter);
+        padding: var(--gap-text) var(--page-gutter) 0;
     }
 
     .calendar-page.mode-grid .calendar-grid-packed {

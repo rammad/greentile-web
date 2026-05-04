@@ -1,6 +1,9 @@
 {{ 'section-socials.css' | asset_url | stylesheet_tag }}
 
-<div id="socials" class="socials-section">
+<section id="socials" class="socials-section"
+  data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}"
+  data-edge="0"
+>
   <div class="socials-header">
     <div class="type-subBold1 socials-subhead">{{ section.settings.subheading | default: 'hope we' }}</div>
     <div class="type-h1 animate-cascade">{{ section.settings.title | default: 'SEE YOU SOON!' }}</div>
@@ -63,7 +66,7 @@
       {%- endif -%}
     {%- endfor -%}
   </div>
-</div>
+</section>
 
 <script src="{{ 'section-socials.js' | asset_url }}" defer></script>
 
@@ -88,6 +91,137 @@
       "id": "title",
       "label": "Title",
       "default": "SEE YOU SOON!"
+    },
+    {
+      "type": "header",
+      "content": "Section gradient",
+      "visible_if": "{{ false }}"
+    },
+    {
+      "type": "select",
+      "id": "gradient_color_1_source",
+      "visible_if": "{{ false }}",
+      "label": "Gradient color 1",
+      "default": "palette_off_white",
+      "options": [
+        { "value": "palette_dark_green", "label": "Dark Green" },
+        { "value": "palette_dark_green_90", "label": "Dark Green 90%" },
+        { "value": "palette_dark_green_80", "label": "Dark Green 80%" },
+        { "value": "palette_dark_green_70", "label": "Dark Green 70%" },
+        { "value": "palette_dark_green_60", "label": "Dark Green 60%" },
+        { "value": "palette_dark_green_50", "label": "Dark Green 50%" },
+        { "value": "palette_dark_green_40", "label": "Dark Green 40%" },
+        { "value": "palette_dark_green_30", "label": "Dark Green 30%" },
+        { "value": "palette_dark_green_20", "label": "Dark Green 20%" },
+        { "value": "palette_dark_green_10", "label": "Dark Green 10%" },
+        { "value": "palette_bright_green", "label": "Bright Green" },
+        { "value": "palette_bright_green_90", "label": "Bright Green 90%" },
+        { "value": "palette_bright_green_80", "label": "Bright Green 80%" },
+        { "value": "palette_bright_green_70", "label": "Bright Green 70%" },
+        { "value": "palette_bright_green_60", "label": "Bright Green 60%" },
+        { "value": "palette_bright_green_50", "label": "Bright Green 50%" },
+        { "value": "palette_bright_green_40", "label": "Bright Green 40%" },
+        { "value": "palette_bright_green_30", "label": "Bright Green 30%" },
+        { "value": "palette_bright_green_20", "label": "Bright Green 20%" },
+        { "value": "palette_bright_green_10", "label": "Bright Green 10%" },
+        { "value": "palette_black", "label": "Black" },
+        { "value": "palette_off_white", "label": "Off White" },
+        { "value": "palette_light_grey", "label": "Light Grey" },
+        { "value": "palette_yellow", "label": "Yellow" },
+        { "value": "custom", "label": "Custom hex" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "visible_if": "{{ false }}",
+      "label": "Custom color 1",
+      "default": "#FFFCFA",
+      "info": "Used when source is set to Custom hex"
+    },
+    {
+      "type": "select",
+      "id": "gradient_color_2_source",
+      "visible_if": "{{ false }}",
+      "label": "Gradient color 2",
+      "default": "palette_bright_green_30",
+      "options": [
+        { "value": "palette_dark_green", "label": "Dark Green" },
+        { "value": "palette_dark_green_90", "label": "Dark Green 90%" },
+        { "value": "palette_dark_green_80", "label": "Dark Green 80%" },
+        { "value": "palette_dark_green_70", "label": "Dark Green 70%" },
+        { "value": "palette_dark_green_60", "label": "Dark Green 60%" },
+        { "value": "palette_dark_green_50", "label": "Dark Green 50%" },
+        { "value": "palette_dark_green_40", "label": "Dark Green 40%" },
+        { "value": "palette_dark_green_30", "label": "Dark Green 30%" },
+        { "value": "palette_dark_green_20", "label": "Dark Green 20%" },
+        { "value": "palette_dark_green_10", "label": "Dark Green 10%" },
+        { "value": "palette_bright_green", "label": "Bright Green" },
+        { "value": "palette_bright_green_90", "label": "Bright Green 90%" },
+        { "value": "palette_bright_green_80", "label": "Bright Green 80%" },
+        { "value": "palette_bright_green_70", "label": "Bright Green 70%" },
+        { "value": "palette_bright_green_60", "label": "Bright Green 60%" },
+        { "value": "palette_bright_green_50", "label": "Bright Green 50%" },
+        { "value": "palette_bright_green_40", "label": "Bright Green 40%" },
+        { "value": "palette_bright_green_30", "label": "Bright Green 30%" },
+        { "value": "palette_bright_green_20", "label": "Bright Green 20%" },
+        { "value": "palette_bright_green_10", "label": "Bright Green 10%" },
+        { "value": "palette_black", "label": "Black" },
+        { "value": "palette_off_white", "label": "Off White" },
+        { "value": "palette_light_grey", "label": "Light Grey" },
+        { "value": "palette_yellow", "label": "Yellow" },
+        { "value": "custom", "label": "Custom hex" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "visible_if": "{{ false }}",
+      "label": "Custom color 2",
+      "default": "#C1FEC1",
+      "info": "Used when source is set to Custom hex"
+    },
+    {
+      "type": "select",
+      "id": "gradient_color_3_source",
+      "visible_if": "{{ false }}",
+      "label": "Gradient color 3",
+      "default": "palette_off_white",
+      "options": [
+        { "value": "palette_dark_green", "label": "Dark Green" },
+        { "value": "palette_dark_green_90", "label": "Dark Green 90%" },
+        { "value": "palette_dark_green_80", "label": "Dark Green 80%" },
+        { "value": "palette_dark_green_70", "label": "Dark Green 70%" },
+        { "value": "palette_dark_green_60", "label": "Dark Green 60%" },
+        { "value": "palette_dark_green_50", "label": "Dark Green 50%" },
+        { "value": "palette_dark_green_40", "label": "Dark Green 40%" },
+        { "value": "palette_dark_green_30", "label": "Dark Green 30%" },
+        { "value": "palette_dark_green_20", "label": "Dark Green 20%" },
+        { "value": "palette_dark_green_10", "label": "Dark Green 10%" },
+        { "value": "palette_bright_green", "label": "Bright Green" },
+        { "value": "palette_bright_green_90", "label": "Bright Green 90%" },
+        { "value": "palette_bright_green_80", "label": "Bright Green 80%" },
+        { "value": "palette_bright_green_70", "label": "Bright Green 70%" },
+        { "value": "palette_bright_green_60", "label": "Bright Green 60%" },
+        { "value": "palette_bright_green_50", "label": "Bright Green 50%" },
+        { "value": "palette_bright_green_40", "label": "Bright Green 40%" },
+        { "value": "palette_bright_green_30", "label": "Bright Green 30%" },
+        { "value": "palette_bright_green_20", "label": "Bright Green 20%" },
+        { "value": "palette_bright_green_10", "label": "Bright Green 10%" },
+        { "value": "palette_black", "label": "Black" },
+        { "value": "palette_off_white", "label": "Off White" },
+        { "value": "palette_light_grey", "label": "Light Grey" },
+        { "value": "palette_yellow", "label": "Yellow" },
+        { "value": "custom", "label": "Custom hex" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "visible_if": "{{ false }}",
+      "label": "Custom color 3",
+      "default": "#FFFCFA",
+      "info": "Used when source is set to Custom hex"
     }
   ],
   "blocks": [

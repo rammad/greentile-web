@@ -92,7 +92,7 @@
     --gap-text: 40px;
     --gap-display-lines: 16px;
     --travel-reveal: 20px;
-    --cta-padding: 12px 20px;
+    --cta-padding: 13px 20px 11px; /* ugly but necessary to perfectly align wo choking the text w line height */
     --nav-cluster-gap: 32px;
     --active-indicator-width: 20px;
 
@@ -228,7 +228,7 @@ section {
     font-size: var(--size-h2);
     font-weight: 800;
     text-transform: uppercase;
-    line-height: var(--lh-tight);
+    line-height: var(--lh-single);
     margin: 0;
     text-box: trim-both cap alphabetic;
 }
@@ -238,7 +238,7 @@ section {
     font-size: var(--size-h3);
     font-weight: 750;
     text-transform: uppercase;
-    line-height: var(--lh-tight);
+    line-height: var(--lh-single);
     text-box: trim-both cap alphabetic;
 }
 
@@ -251,7 +251,7 @@ section {
     color: var(--color-text-subheader);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    line-height: var(--lh-single);
+    line-height: var(--lh-body);
 }
 
 .type-subBold2 {
@@ -262,7 +262,7 @@ section {
     color: var(--color-text-subheader);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    line-height: var(--lh-single);
+    line-height: var(--lh-body);
 }
 
 .type-subRegular1 {
@@ -271,7 +271,7 @@ section {
     font-weight: 300;
     font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
-    line-height: var(--lh-single);
+    line-height: var(--lh-body);
     text-transform: uppercase;
     text-decoration: none;
 }
@@ -282,7 +282,7 @@ section {
     font-weight: 300;
     font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
-    line-height: var(--lh-single);
+    line-height: var(--lh-body);
     text-transform: uppercase;
     text-decoration: none;
 }
@@ -706,9 +706,10 @@ body::after {
         --size-body2:         16px;
         --size-body3:         24px;
 
-        --lh-tight:   0.85;
-        --lh-display: 0.9;
         --lh-single:  1;
+        /* headers/subheads often wrap on narrow viewports — match lh-single everywhere lh-tight was used */
+        --lh-tight:   var(--lh-single);
+        --lh-display: var(--lh-single);
         --lh-body:    1.2;
         --lh-open:    1.4;
 
@@ -723,15 +724,10 @@ body::after {
         --content-max-width: 600px;
     }
 
-    .type-h1 {
-        line-height: var(--lh-single);
-    }
-    
-    .type-h2 {
-        line-height: var(--lh-single);
-    }
-    
-    .type-h3 {
+    .type-subBold1,
+    .type-subBold2,
+    .type-subRegular1,
+    .type-subRegular2 {
         line-height: var(--lh-single);
     }
 
@@ -763,8 +759,8 @@ body::after {
         --size-display-xl:    80px;
         --size-h1:            32px;
         --size-h2:            28px;
-        --size-h3:            28px;
-        --size-subBold1:      14px;
+        --size-h3:            26px;
+        --size-subBold1:      12px;
         --size-body2:         14px;
         --size-body3:         16px;
 

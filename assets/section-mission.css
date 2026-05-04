@@ -40,7 +40,7 @@
 
 .mission-section .type-display-hero {
     width: 100%;
-    line-height: 1.2;
+    line-height: var(--lh-body);
     text-box: normal;
     margin: 0 auto;
 }
@@ -67,7 +67,7 @@
     }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1023px) {
     .mission-section {
         padding: 20px var(--page-gutter);
     }
@@ -75,8 +75,8 @@
         width: 80%;
     }
     .mission-section .type-display-hero {
-        font-size: clamp(32px, 5vw + 16px, 64px) !important;
-        line-height: 1.2;
+        font-size: var(--size-h2) !important;
+        line-height: var(--lh-body);
         text-box: normal;
         margin-bottom: 0;
     }

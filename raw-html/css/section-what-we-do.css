@@ -90,6 +90,16 @@
     transition: none !important;
 }
 
+/* Body copy — same scale as team section (.team-body .type-body2) */
+.what-we-do-body .type-body2 {
+    font-size: clamp(16px, 1.4vw, var(--size-body2));
+}
+
+/* Theme editor line breaks in menu item description (textarea) */
+.what-we-do .about-content p.type-body2 {
+    white-space: pre-line;
+}
+
 /* about-content wrapper — scoped to .what-we-do-body because JS moves blocks there at runtime */
 .what-we-do-body .about-content {
     position: relative;
@@ -207,10 +217,15 @@
 
 @media (max-width: 768px) {
     .what-we-do-body .about-text-block { max-width: 240px; }
-}
 
-@media (max-width: 768px) {
-    .about-menu-persistent .menu-item { word-spacing: 100vw; line-height: var(--lh-display); }
+    /* Match type-h3 on small mobile (menu items stay .type-h2 in markup for desktop) */
+    .about-menu-persistent .menu-item {
+        font-size: var(--size-h3);
+        font-weight: 750;
+        word-spacing: 100vw;
+        line-height: var(--lh-single);
+    }
+
     .about-menu-persistent .menu-item .ws-normal { word-spacing: normal; white-space: nowrap; }
 
     .about-menu-persistent .menu-label {
@@ -218,7 +233,4 @@
         text-box: trim-both cap alphabetic;
     }
 
-    .about-menu-persistent .menu-item {
-        line-height: var(--lh-single);
-    }
 }

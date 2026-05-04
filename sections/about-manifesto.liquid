@@ -6,7 +6,7 @@
 >
   <div class="about-inner">
     <div class="type-subBold1 about-subhead animate-line">{{ section.settings.subheading | default: 'manifesto' }}</div>
-    <div class="about-text type-h1">{{ section.settings.body }}</div>
+    <div class="about-text about-manifesto-copy">{{ section.settings.body }}</div>
 
     <div class="about-images" hidden aria-hidden="true">
       {%- for block in section.blocks -%}
@@ -17,13 +17,28 @@
               assign img_pool = block.settings.image | image_url: width: 600
             endif
             if block.settings.image_2
-              assign img_pool = img_pool | append: '|' | append: block.settings.image_2 | image_url: width: 600
+              assign _u = block.settings.image_2 | image_url: width: 600
+              if img_pool != blank
+                assign img_pool = img_pool | append: '|' | append: _u
+              else
+                assign img_pool = _u
+              endif
             endif
             if block.settings.image_3
-              assign img_pool = img_pool | append: '|' | append: block.settings.image_3 | image_url: width: 600
+              assign _u = block.settings.image_3 | image_url: width: 600
+              if img_pool != blank
+                assign img_pool = img_pool | append: '|' | append: _u
+              else
+                assign img_pool = _u
+              endif
             endif
             if block.settings.image_4
-              assign img_pool = img_pool | append: '|' | append: block.settings.image_4 | image_url: width: 600
+              assign _u = block.settings.image_4 | image_url: width: 600
+              if img_pool != blank
+                assign img_pool = img_pool | append: '|' | append: _u
+              else
+                assign img_pool = _u
+              endif
             endif
           -%}
           <img
@@ -63,11 +78,13 @@
     },
     {
       "type": "header",
-      "content": "Section gradient"
+      "content": "Section gradient",
+      "visible_if": "{{ false }}"
     },
     {
       "type": "select",
       "id": "gradient_color_1_source",
+      "visible_if": "{{ false }}",
       "label": "Gradient color 1",
       "default": "palette_bright_green",
       "options": [
@@ -101,6 +118,7 @@
     {
       "type": "color",
       "id": "gradient_color_1",
+      "visible_if": "{{ false }}",
       "label": "Custom color 1",
       "default": "#30FA30",
       "info": "Used when source is set to Custom hex"
@@ -108,6 +126,7 @@
     {
       "type": "select",
       "id": "gradient_color_2_source",
+      "visible_if": "{{ false }}",
       "label": "Gradient color 2",
       "default": "palette_off_white",
       "options": [
@@ -141,6 +160,7 @@
     {
       "type": "color",
       "id": "gradient_color_2",
+      "visible_if": "{{ false }}",
       "label": "Custom color 2",
       "default": "#FFFCFA",
       "info": "Used when source is set to Custom hex"
@@ -148,6 +168,7 @@
     {
       "type": "select",
       "id": "gradient_color_3_source",
+      "visible_if": "{{ false }}",
       "label": "Gradient color 3",
       "default": "custom",
       "options": [
@@ -181,6 +202,7 @@
     {
       "type": "color",
       "id": "gradient_color_3",
+      "visible_if": "{{ false }}",
       "label": "Custom color 3",
       "default": "#feea4f",
       "info": "Used when source is set to Custom hex"

@@ -8,6 +8,17 @@
     "theme_support_email": "hello@greentilesocialclub.com"
   },
   {
+    "name": "Favicon",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "Shown in browser tabs. Use a square image (PNG or SVG); 32×32 px or larger."
+      }
+    ]
+  },
+  {
     "name": "Contact form",
     "settings": [
       {

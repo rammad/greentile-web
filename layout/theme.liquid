@@ -14,6 +14,11 @@
     <meta name="description" content="{{ page_description | escape }}">
   {% endif %}
 
+  {%- if settings.favicon != blank -%}
+    <link rel="icon" href="{{ settings.favicon | image_url: width: 32, height: 32 }}" sizes="32x32">
+    <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
+  {%- endif -%}
+
   {%- comment -%} Fonts: @font-face requires Liquid for asset URLs, so declared inline {%- endcomment -%}
   <style>
     @import url('https://use.typekit.net/fbu0ukm.css');

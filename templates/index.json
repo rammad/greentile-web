@@ -200,7 +200,13 @@
       ],
       "settings": {
         "subheading": "as always, we hope to",
-        "title": "SEE YOU AT THE TABLES"
+        "title": "SEE YOU AT THE TABLES",
+        "gradient_color_1_source": "palette_off_white",
+        "gradient_color_1": "#fffcfa",
+        "gradient_color_2_source": "palette_bright_green_30",
+        "gradient_color_2": "#c1fec1",
+        "gradient_color_3_source": "palette_off_white",
+        "gradient_color_3": "#fffcfa"
       }
     },
     "footer": {
