@@ -215,13 +215,6 @@
             "url": ""
           }
         },
-        "cl2": {
-          "type": "client",
-          "settings": {
-            "name": "Boston Consulting Group",
-            "url": "https://www.bcg.com"
-          }
-        },
         "client_ewqDHW": {
           "type": "client",
           "settings": {
@@ -229,11 +222,11 @@
             "url": ""
           }
         },
-        "cl3": {
+        "client_aAn6FL": {
           "type": "client",
           "settings": {
-            "name": "BROOKLYN MUSEUM",
-            "url": "https://www.brookfield.com"
+            "name": "brooklyn museum",
+            "url": ""
           }
         },
         "cl4": {
@@ -454,9 +447,8 @@
         "client_c6bmTG",
         "client_igcgft",
         "client_jGTiUe",
-        "cl2",
         "client_ewqDHW",
-        "cl3",
+        "client_aAn6FL",
         "cl4",
         "client_EbHfL8",
         "client_JJwAJY",
