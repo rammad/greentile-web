@@ -92,7 +92,7 @@
     --gap-text: 40px;
     --gap-display-lines: 16px;
     --travel-reveal: 20px;
-    --cta-padding: 12px 20px;
+    --cta-padding: 13px 20px 11px; /* ugly but necessary to perfectly align wo choking the text w line height */
     --nav-cluster-gap: 32px;
     --active-indicator-width: 20px;
 
@@ -228,7 +228,7 @@ section {
     font-size: var(--size-h2);
     font-weight: 800;
     text-transform: uppercase;
-    line-height: var(--lh-tight);
+    line-height: var(--lh-single);
     margin: 0;
     text-box: trim-both cap alphabetic;
 }
@@ -238,7 +238,7 @@ section {
     font-size: var(--size-h3);
     font-weight: 750;
     text-transform: uppercase;
-    line-height: var(--lh-tight);
+    line-height: var(--lh-single);
     text-box: trim-both cap alphabetic;
 }
 
@@ -759,8 +759,8 @@ body::after {
         --size-display-xl:    80px;
         --size-h1:            32px;
         --size-h2:            28px;
-        --size-h3:            28px;
-        --size-subBold1:      14px;
+        --size-h3:            26px;
+        --size-subBold1:      12px;
         --size-body2:         14px;
         --size-body3:         16px;
 

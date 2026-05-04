@@ -4,8 +4,21 @@
     const { fitTextToWidth, fitTextGroupToWidth } = window.AppUtils || {};
 
     const LINE_STAGGER_MS = 80;
-    const mobileQuery = window.matchMedia('(max-width: 1024px)');
+    const mobileQuery = window.matchMedia('(max-width: 1023px)');
     let originalTexts = null;
+
+    /** Resolved --size-h3 in px — floor so fitText cannot shrink mission lines to tiny sizes on long strings. */
+    function missionFloorFontPx() {
+        const probe = document.createElement('span');
+        probe.setAttribute('aria-hidden', 'true');
+        probe.style.cssText =
+            'position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;white-space:nowrap;font-size:var(--size-h3);';
+        probe.textContent = 'M';
+        document.body.appendChild(probe);
+        const px = parseFloat(getComputedStyle(probe).fontSize);
+        probe.remove();
+        return Number.isFinite(px) && px > 0 ? px : 48;
+    }
 
     /** Same shared font size desktop used before: min of fitTextToWidth on each theme line (nowrap full-line width). */
     function computeLegacyDesktopMinFont(group, cmsLines) {
@@ -43,7 +56,7 @@
         if (!words.length) return [fullText];
 
         const probe = document.createElement('h1');
-        probe.className = 'type-display-hero';
+        probe.className = 'type-h1';
         probe.style.visibility = 'hidden';
         if (fontSizePx != null && fontSizePx > 0) {
             probe.style.fontSize = `${fontSizePx}px`;
@@ -114,16 +127,28 @@
             }
         }
 
-        const naturalLines = measureNaturalLines(group, fullText, wrapFontPx);
+        /* Breaks measured at same px as painted — avoids floor vs fit mismatch + ragged lines. */
+        let measureFontPx = wrapFontPx;
+        if (!mobileQuery.matches && wrapFontPx != null) {
+            measureFontPx = Math.max(wrapFontPx, missionFloorFontPx());
+        }
+
+        const naturalLines = measureNaturalLines(group, fullText, measureFontPx);
         rebuildLines(group, naturalLines, revealed);
 
         if (!mobileQuery.matches && wrapFontPx != null) {
+            const sizePx = measureFontPx;
             group.querySelectorAll('.animate-line').forEach(el => {
-                el.style.fontSize = `${wrapFontPx}px`;
+                el.style.fontSize = `${sizePx}px`;
             });
         } else if (!mobileQuery.matches && fitTextGroupToWidth) {
             const lines = [...group.querySelectorAll('.animate-line')];
             if (lines.length) fitTextGroupToWidth(lines);
+            const floor = missionFloorFontPx();
+            lines.forEach(el => {
+                const n = parseFloat(el.style.fontSize);
+                if (Number.isFinite(n) && n < floor) el.style.fontSize = `${floor}px`;
+            });
         }
     }
 

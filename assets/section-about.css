@@ -20,10 +20,13 @@
     margin-bottom: calc(var(--gap-text) - 64px);
 }
 
-/* text block — full width so JS line measurements are stable */
-.about-text.type-h2 {
+/* manifesto body — fluid desktop (original clamp, min raised to 48px) */
+.about-text.about-manifesto-copy {
     width: 100%;
-    font-size: clamp(43px, -9.85px + 5.13vw, var(--size-h2));
+    font-family: var(--font-header);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(48px, 3.95vw + 10px, 86px);
     line-height: var(--lh-tight);
     text-align: center;
     text-box: normal;
@@ -92,6 +95,13 @@
     pointer-events: auto;
 }
 
+/* align with base.css ultra-wide fluid typography */
+@media (min-width: 1921px) {
+    .about-text.about-manifesto-copy {
+        font-size: clamp(72px, 4.45vw, 160px);
+    }
+}
+
 @media (max-width: 1024px) {
     .about {
         padding-top: var(--section-spacing);
@@ -102,8 +112,8 @@
         gap: var(--gap-text);
     }
 
-    .about-text.type-h2 {
-        font-size: var(--size-h1);
+    .about-text.about-manifesto-copy {
+        font-size: clamp(40px, 7.5vw + 8px, 68px);
         line-height: var(--lh-open);
     }
     .about .animate-line + .animate-line {

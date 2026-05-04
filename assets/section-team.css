@@ -181,7 +181,7 @@
 
     .team-title-col {
         order: -1;
-        margin-bottom: 40px;
+        margin-bottom: var(--gap-text);
         min-width: 0; /* grid: allow column to shrink so long titles don’t overflow */
     }
 
@@ -195,7 +195,7 @@
     }
 
     .team-title-text {
-        font-size: min(var(--size-h2), 17vw);
+        font-size: min(var(--size-h3), 17vw);
         max-width: 100%;
         margin-inline: auto;
         overflow-wrap: break-word;

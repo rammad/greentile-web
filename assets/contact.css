@@ -42,7 +42,7 @@
 .contact-panel-inner {
     display: flex;
     flex-direction: column;
-    padding: 48px calc(var(--page-gutter) * 2) 40px;
+    padding: 44px calc(var(--page-gutter) * 2) 40px;
     min-height: 100%;
 }
 
