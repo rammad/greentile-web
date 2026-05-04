@@ -87,6 +87,13 @@
     display: none;
 }
 
+@media (min-width: 1025px) {
+    /* Optical alignment: poster’s rounded top reads “higher” than the text block */
+    .pdp-info {
+        transform: translateY(-8px);
+    }
+}
+
 .pdp-image-col {
     overflow: visible;
     position: relative;
@@ -391,7 +398,6 @@
     .pdp-info .type-subRegular1,
     .pdp-info .type-subRegular2 {
         text-box: normal;
-        line-height: var(--lh-body);
     }
 
     .pdp-info {

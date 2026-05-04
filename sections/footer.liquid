@@ -69,11 +69,13 @@
     },
     {
       "type": "header",
-      "content": "Footer gradient"
+      "content": "Footer gradient",
+      "visible_if": "{{ false }}"
     },
     {
       "type": "select",
       "id": "gradient_color_1_source",
+      "visible_if": "{{ false }}",
       "label": "Gradient color 1",
       "default": "palette_bright_green",
       "options": [
@@ -107,6 +109,7 @@
     {
       "type": "color",
       "id": "gradient_color_1",
+      "visible_if": "{{ false }}",
       "label": "Custom color 1",
       "default": "#30FA30",
       "info": "Used when source is set to Custom hex"
@@ -114,6 +117,7 @@
     {
       "type": "select",
       "id": "gradient_color_2_source",
+      "visible_if": "{{ false }}",
       "label": "Gradient color 2",
       "default": "palette_off_white",
       "options": [
@@ -147,6 +151,7 @@
     {
       "type": "color",
       "id": "gradient_color_2",
+      "visible_if": "{{ false }}",
       "label": "Custom color 2",
       "default": "#FFFCFA",
       "info": "Used when source is set to Custom hex"
@@ -154,6 +159,7 @@
     {
       "type": "select",
       "id": "gradient_color_3_source",
+      "visible_if": "{{ false }}",
       "label": "Gradient color 3",
       "default": "palette_yellow",
       "options": [
@@ -187,6 +193,7 @@
     {
       "type": "color",
       "id": "gradient_color_3",
+      "visible_if": "{{ false }}",
       "label": "Custom color 3",
       "default": "#FDE523",
       "info": "Used when source is set to Custom hex"

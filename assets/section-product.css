@@ -83,6 +83,12 @@
     box-sizing: border-box;
 }
 
+@media (min-width: 1025px) {
+    .pdp-info {
+        padding-top: var(--gap-text);
+    }
+}
+
 .pdp-info::-webkit-scrollbar {
     display: none;
 }

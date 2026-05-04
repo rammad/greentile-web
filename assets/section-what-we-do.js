@@ -46,7 +46,7 @@
     function easeOutCubic(t) { return 1 - (1 - t) * (1 - t) * (1 - t); }
     function easeInCubic(t)  { return t * t * t; }
 
-    /** Mobile menu uses word-spacing:100vw between words; keep "& Word" inside .ws-normal (see section-what-we-do.css). */
+    /** Split on " & " so only the ampersand sits in .ws-normal (mobile wraps like normal text; avoid word-spacing:100vw on the item). */
     function formatWwdMenuAmpersands(menuRoot) {
         if (!menuRoot) return;
         const doc = menuRoot.ownerDocument;
@@ -58,19 +58,17 @@
             while (li.firstChild) li.removeChild(li.firstChild);
             li.appendChild(doc.createTextNode(parts[0]));
             for (let i = 1; i < parts.length; i++) {
-                const seg = parts[i];
+                const seg = parts[i].replace(/\s+/g, ' ').trim();
                 if (seg.length === 0) {
                     li.appendChild(doc.createTextNode(' &'));
                     continue;
                 }
-                const spaceIdx = seg.indexOf(' ');
-                const firstWord = spaceIdx === -1 ? seg : seg.substring(0, spaceIdx);
-                const rest = spaceIdx === -1 ? '' : seg.substring(spaceIdx);
+                li.appendChild(doc.createTextNode(' '));
                 const span = doc.createElement('span');
                 span.className = 'ws-normal';
-                span.appendChild(doc.createTextNode('& ' + firstWord));
+                span.appendChild(doc.createTextNode('&'));
                 li.appendChild(span);
-                if (rest.length > 0) li.appendChild(doc.createTextNode(rest));
+                li.appendChild(doc.createTextNode(` ${seg}`));
             }
         });
     }
@@ -300,8 +298,7 @@
             let maxW = 0;
             const compact = window.innerWidth <= 1024;
 
-            // Skip menu items on compact — word-spacing:100vw inflates their box width
-            if (menuEl && !compact) {
+            if (menuEl) {
                 const items = menuEl.querySelectorAll('.menu-item');
                 items.forEach(item => {
                     if (item.offsetWidth > maxW) maxW = item.offsetWidth;

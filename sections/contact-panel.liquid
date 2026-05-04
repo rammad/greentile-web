@@ -10,7 +10,13 @@
   data-error-msg="{{ section.settings.error_message | default: 'contact.error' | t }}"
 >
   <div class="contact-panel-inner">
-    <h2 class="contact-title type-display-hero">{{ section.settings.title | default: 'SAY HELLO!' }}</h2>
+    <div class="contact-panel-header">
+      <h2 class="contact-title type-display-hero">{{ section.settings.title | default: 'SAY HELLO!' }}</h2>
+      <button type="button" class="contact-close" aria-label="Close">
+        <span class="contact-close-line" aria-hidden="true"></span>
+        <span class="contact-close-line" aria-hidden="true"></span>
+      </button>
+    </div>
 
     <form class="contact-form" id="contact-form">
       {%- comment -%} Topic selection {%- endcomment -%}

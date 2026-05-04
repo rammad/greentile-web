@@ -171,7 +171,7 @@
     }
 
     .team-title-text {
-        font-size: min(var(--size-h2), 17vw);
+        font-size: min(var(--size-h3), 17vw);
         white-space: nowrap;
     }
 

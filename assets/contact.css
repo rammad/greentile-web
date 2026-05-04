@@ -42,8 +42,55 @@
 .contact-panel-inner {
     display: flex;
     flex-direction: column;
-    padding: 40px calc(var(--page-gutter) * 2);
+    padding: 44px calc(var(--page-gutter) * 2) 40px;
     min-height: 100%;
+}
+
+.contact-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.contact-panel-header .contact-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.contact-close {
+    flex-shrink: 0;
+    position: relative;
+    width: 44px;
+    height: 44px;
+    margin: 0 -8px 0 0;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: block;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Icon sits under the row top (same as title box top); stroke intersection ~10px*sin(45°) down so the upper vertex of the X is at y≈0. */
+.contact-close-line {
+    position: absolute;
+    left: 50%;
+    top: calc(10px * 0.7071067812 - 0.5px);
+    width: 20px;
+    height: 1px;
+    margin-left: -10px;
+    background: var(--c-dark-green);
+    border-radius: 2px;
+    transform-origin: center;
+}
+
+.contact-close-line:first-child {
+    transform: rotate(45deg);
+}
+
+.contact-close-line:last-child {
+    transform: rotate(-45deg);
 }
 
 .contact-title {
@@ -197,17 +244,9 @@
     color: var(--c-red);
 }
 
-/* desktop: hide "SAY HI", show hamburger X instead */
+/* desktop: hide "SAY HI" while panel is open — close control lives in the panel */
 body.contact-is-open .nav-right {
     display: none;
-}
-
-body.contact-is-open .nav-hamburger {
-    display: flex;
-    /* no backdrop-filter — avoids muddy blur at the panel corner; match pill fill */
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: var(--color-bg);
 }
 
 @media (min-width: 1025px) {
@@ -233,11 +272,6 @@ body.contact-is-open .nav-hamburger {
     body.contact-is-open .nav-center {
         opacity: 0;
         pointer-events: none;
-    }
-
-    /* same vertical + horizontal padding as .nav-right / .nav-center (nav.css) */
-    body.contact-is-open .nav-hamburger {
-        padding: 12px 24px calc(12px - 4px);
     }
 }
 
@@ -310,6 +344,10 @@ body.contact-is-open .nav-hamburger {
 }
 
 @media (max-width: 1024px) {
+    .contact-close {
+        display: none;
+    }
+
     .contact-form {
         gap: 40px;
         margin-top: 40px;

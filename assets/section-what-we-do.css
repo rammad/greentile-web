@@ -92,6 +92,11 @@
     transition: none !important;
 }
 
+/* Body copy — same scale as team section (.team-body .type-body2) */
+.what-we-do-body .type-body2 {
+    font-size: clamp(16px, 1.4vw, var(--size-body2));
+}
+
 /* Theme editor line breaks in menu item description (textarea) */
 .what-we-do .about-content p.type-body2 {
     white-space: pre-line;
@@ -131,7 +136,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 24px;
+    gap: var(--gap-text);
     z-index: 5;
     pointer-events: none;
     touch-action: pan-y;
@@ -144,7 +149,7 @@
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: var(--gap-text);
 }
 
 .about-menu-persistent .menu-label {
@@ -189,17 +194,6 @@
     }
 }
 
-/* 4K desktop */
-@media (min-width: 3840px) {
-    .about-menu-persistent {
-        gap: 48px;
-    }
-
-    .about-menu-persistent ul {
-        gap: 48px;
-    }
-}
-
 @media (max-width: 1024px) {
     .what-we-do .about-menu-persistent { top: 18vh; }
 
@@ -207,27 +201,36 @@
         font-size: clamp(32px, 3.5vw, 48px);
     }
 
-    .about-menu-persistent ul {
-        gap: 22px;
-    }
-
     .what-we-do-body .about-text-block { max-width: 480px; }
 }
 
 @media (max-width: 768px) {
-    .what-we-do-body .about-text-block { max-width: 240px; }
-}
+    /* Narrower than full bleed so long labels wrap sooner; center without transform (JS uses translateY) */
+    .what-we-do .about-menu-persistent {
+        width: 100%;
+        max-width: min(248px, 78vw);
+        margin-inline: auto;
+    }
 
-@media (max-width: 768px) {
-    .about-menu-persistent .menu-item { word-spacing: 100vw; line-height: var(--lh-display); }
-    .about-menu-persistent .menu-item .ws-normal { word-spacing: normal; white-space: nowrap; }
+    .what-we-do-body .about-text-block { max-width: 240px; }
+
+    /* Match type-h3 on small mobile (menu items stay .type-h2 in markup for desktop). Normal wrap — no word-spacing:100vw (it forced one token per line and orphaned "&"). */
+    .about-menu-persistent .menu-item {
+        font-size: var(--size-h3);
+        font-weight: 750;
+        word-spacing: normal;
+        line-height: 1.05;
+    }
+
+    /* JS wraps only "&" so it can pick up typography; flows inline like the rest of the title */
+    .about-menu-persistent .menu-item .ws-normal {
+        word-spacing: normal;
+        white-space: normal;
+    }
 
     .about-menu-persistent .menu-label {
         line-height: var(--lh-tight);
         text-box: trim-both cap alphabetic;
     }
 
-    .about-menu-persistent .menu-item {
-        line-height: var(--lh-single);
-    }
 }
