@@ -342,7 +342,7 @@
     position: relative;
     width: 100%;
     height: 100%;
-    background: linear-gradient(160deg, rgba(183, 201, 183, 0.5), rgba(255, 252, 250, 0.5), rgba(135, 165, 135, 0.5));
+    background: linear-gradient(160deg, rgba(207, 219, 207, 0.5), rgba(255, 252, 250, 0.5), rgba(183, 201, 183, 0.5));
     border-radius: var(--poster-radius);
     overflow: hidden;
     container-type: inline-size;
@@ -359,7 +359,8 @@
     margin: 0;
     color: var(--c-dark-green-50);
     text-align: center;
-    font-size: clamp(11px, 10cqi, calc(var(--size-h3) * 0.9));
+    font-size: clamp(11px, 10cqi, var(--size-subBold2));
+    line-height: var(--lh-single);
 }
 
 @keyframes spin-cw {
