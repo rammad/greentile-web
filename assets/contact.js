@@ -45,9 +45,34 @@
         updateMessagePlaceholder(defaultBtn);
     }
 
+    function normalizeTopicValue(value) {
+        return (value || '')
+            .toString()
+            .trim()
+            .toLowerCase()
+            .replace(/[_\s-]+/g, '');
+    }
+
+    function resolveTopicButton(value) {
+        if (!value) return null;
+        const raw = value.toString().trim();
+        if (!raw) return null;
+
+        const exactBtn = panel.querySelector(`.contact-topic-btn[data-topic="${CSS.escape(raw)}"]`);
+        if (exactBtn) return exactBtn;
+
+        const normalizedInput = normalizeTopicValue(raw);
+        for (const btn of topicBtns) {
+            const topicValue = btn.dataset.topic || '';
+            if (normalizeTopicValue(topicValue) === normalizedInput) return btn;
+            if (normalizeTopicValue(btn.textContent || '') === normalizedInput) return btn;
+        }
+
+        return null;
+    }
+
     function selectTopic(value) {
-        if (!value) return;
-        const btn = panel.querySelector(`.contact-topic-btn[data-topic="${CSS.escape(value)}"]`);
+        const btn = resolveTopicButton(value);
         if (!btn) return;
         topicBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -217,7 +242,7 @@
             const trigger = e.target.closest('[data-contact-trigger]');
             if (!trigger) return;
             e.preventDefault();
-            const topic = trigger.dataset.contactTopic;
+            const topic = trigger.dataset.contactTopic ? decodeURIComponent(trigger.dataset.contactTopic) : '';
             if (isOpen && !topic) close();
             else open(topic);
         });
@@ -230,7 +255,8 @@
             const match = href.match(/^#contact(?::(.+))?$/);
             if (!match) return;
             e.preventDefault();
-            open(match[1] || null);
+            const topic = match[1] ? decodeURIComponent(match[1]) : null;
+            open(topic);
         });
 
         const hamburger = document.querySelector('.nav-hamburger');
@@ -244,9 +270,23 @@
         }
     }
 
+    function consumeContactHash() {
+        const hash = window.location.hash || '';
+        const match = hash.match(/^#contact(?::(.+))?$/);
+        if (!match) return;
+        const topic = match[1] ? decodeURIComponent(match[1]) : null;
+        open(topic);
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', wireTriggers);
+        document.addEventListener('DOMContentLoaded', () => {
+            wireTriggers();
+            consumeContactHash();
+        });
     } else {
         wireTriggers();
+        consumeContactHash();
     }
+
+    window.addEventListener('hashchange', consumeContactHash);
 })();
