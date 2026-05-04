@@ -53,8 +53,8 @@
 }
 
 .icon-circle {
-    width: clamp(52px, 2.708vw, 104px);
-    height: clamp(52px, 2.708vw, 104px);
+    width: clamp(40px, 2.083vw, 80px);
+    height: clamp(40px, 2.083vw, 80px);
     background-color: var(--c-dark-green-30);
     mask-size: contain;
     mask-repeat: no-repeat;
@@ -123,8 +123,8 @@
     }
 
     .icon-circle {
-        width: 32px;
-        height: 32px;
+        width: 26px;
+        height: 26px;
     }
 
     .socials-track {
