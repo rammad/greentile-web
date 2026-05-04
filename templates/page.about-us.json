@@ -187,13 +187,6 @@
     "clients": {
       "type": "clients",
       "blocks": {
-        "client_9GTbGP": {
-          "type": "client",
-          "settings": {
-            "name": "MALA PROJECT",
-            "url": ""
-          }
-        },
         "client_c6bmTG": {
           "type": "client",
           "settings": {
@@ -268,6 +261,13 @@
           "type": "client",
           "settings": {
             "name": "INDUSTRY CITY",
+            "url": ""
+          }
+        },
+        "client_9GTbGP": {
+          "type": "client",
+          "settings": {
+            "name": "MALA PROJECT",
             "url": ""
           }
         },
@@ -429,7 +429,6 @@
         }
       },
       "block_order": [
-        "client_9GTbGP",
         "client_c6bmTG",
         "cl1",
         "client_jGTiUe",
@@ -441,6 +440,7 @@
         "client_JJwAJY",
         "client_HghU3H",
         "client_cB6iNT",
+        "client_9GTbGP",
         "client_ErCVWD",
         "client_HWJAKF",
         "client_e74VgH",
