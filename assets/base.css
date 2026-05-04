@@ -251,7 +251,7 @@ section {
     color: var(--color-text-subheader);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    line-height: var(--lh-single);
+    line-height: var(--lh-body);
 }
 
 .type-subBold2 {
@@ -262,7 +262,7 @@ section {
     color: var(--color-text-subheader);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    line-height: var(--lh-single);
+    line-height: var(--lh-body);
 }
 
 .type-subRegular1 {
@@ -271,7 +271,7 @@ section {
     font-weight: 300;
     font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
-    line-height: var(--lh-single);
+    line-height: var(--lh-body);
     text-transform: uppercase;
     text-decoration: none;
 }
@@ -282,7 +282,7 @@ section {
     font-weight: 300;
     font-variation-settings: 'wdth' 450;
     color: var(--color-text-subheader);
-    line-height: var(--lh-single);
+    line-height: var(--lh-body);
     text-transform: uppercase;
     text-decoration: none;
 }
@@ -706,9 +706,10 @@ body::after {
         --size-body2:         16px;
         --size-body3:         24px;
 
-        --lh-tight:   0.85;
-        --lh-display: 0.9;
         --lh-single:  1;
+        /* headers/subheads often wrap on narrow viewports — match lh-single everywhere lh-tight was used */
+        --lh-tight:   var(--lh-single);
+        --lh-display: var(--lh-single);
         --lh-body:    1.2;
         --lh-open:    1.4;
 
@@ -723,15 +724,10 @@ body::after {
         --content-max-width: 600px;
     }
 
-    .type-h1 {
-        line-height: var(--lh-single);
-    }
-    
-    .type-h2 {
-        line-height: var(--lh-single);
-    }
-    
-    .type-h3 {
+    .type-subBold1,
+    .type-subBold2,
+    .type-subRegular1,
+    .type-subRegular2 {
         line-height: var(--lh-single);
     }
 
