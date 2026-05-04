@@ -195,7 +195,7 @@
     }
 
     .team-title-text {
-        font-size: min(var(--size-display-xl), 17vw);
+        font-size: min(var(--size-h2), 17vw);
         max-width: 100%;
         margin-inline: auto;
         overflow-wrap: break-word;

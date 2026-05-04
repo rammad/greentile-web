@@ -57,7 +57,7 @@
                 {%- case block.settings.type -%}
                   {%- when 'textarea' -%}
                     <textarea
-                      class="contact-textarea type-subRegular1"
+                      class="contact-textarea"
                       name="{{ block.settings.name }}"
                       placeholder="{{ block.settings.placeholder }}"
                       {% if block.settings.required %}required{% endif %}
@@ -94,7 +94,7 @@
           </div>
         {%- endif -%}
 
-        <textarea class="contact-textarea type-subRegular1" name="message"
+        <textarea class="contact-textarea" name="message"
           placeholder="{{ section.settings.message_placeholder | default: 'WRITE YOUR MESSAGE HERE' }}" required></textarea>
       </div>
 

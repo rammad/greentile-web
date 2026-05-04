@@ -1,19 +1,53 @@
-/* mission section */
+/* mission section — reflow joined copy at the same scale as before (min of per–CMS-line fitTextToWidth), then split wraps */
 (() => {
     const { observeElementInOut } = window.AnimationUtils || {};
-    const { fitTextToWidth } = window.AppUtils || {};
+    const { fitTextToWidth, fitTextGroupToWidth } = window.AppUtils || {};
 
     const LINE_STAGGER_MS = 80;
     const mobileQuery = window.matchMedia('(max-width: 1024px)');
     let originalTexts = null;
 
-    function measureNaturalLines(group, fullText) {
+    /** Same shared font size desktop used before: min of fitTextToWidth on each theme line (nowrap full-line width). */
+    function computeLegacyDesktopMinFont(group, cmsLines) {
+        if (!fitTextToWidth || !cmsLines.length) return null;
+        const w = group.clientWidth;
+        if (w <= 0) return null;
+
+        const holder = document.createElement('div');
+        holder.setAttribute('aria-hidden', 'true');
+        holder.style.cssText =
+            `position:absolute;left:-9999px;top:0;width:${w}px;visibility:hidden;pointer-events:none;`;
+        const section = group.closest('.mission-section') || document.body;
+        section.appendChild(holder);
+
+        cmsLines.forEach(text => {
+            const h = document.createElement('h1');
+            h.className = 'type-display-hero animate-line';
+            h.textContent = text;
+            holder.appendChild(h);
+        });
+
+        const hs = [...holder.querySelectorAll('h1')];
+        hs.forEach(h => {
+            h.style.fontSize = '';
+            fitTextToWidth(h);
+        });
+        const sizes = hs.map(h => parseFloat(h.style.fontSize)).filter(n => !Number.isNaN(n) && n > 0);
+        holder.remove();
+
+        return sizes.length ? Math.min(...sizes) : null;
+    }
+
+    function measureNaturalLines(group, fullText, fontSizePx = null) {
         const words = fullText.split(/\s+/).filter(Boolean);
         if (!words.length) return [fullText];
 
         const probe = document.createElement('h1');
         probe.className = 'type-display-hero';
         probe.style.visibility = 'hidden';
+        if (fontSizePx != null && fontSizePx > 0) {
+            probe.style.fontSize = `${fontSizePx}px`;
+        }
 
         words.forEach((word, i) => {
             const span = document.createElement('span');
@@ -63,26 +97,33 @@
             originalTexts = [...group.querySelectorAll('.animate-line')].map(l => l.textContent);
         }
 
+        if (!originalTexts.length) return;
+
         const revealed = section.classList.contains('is-revealed');
 
         group.querySelectorAll('.animate-line').forEach(l => { l.style.fontSize = ''; });
 
-        if (mobileQuery.matches) {
-            const fullText = originalTexts.join(' ');
-            const naturalLines = measureNaturalLines(group, fullText);
-            rebuildLines(group, naturalLines, revealed);
-        } else {
-            const current = [...group.querySelectorAll('.animate-line')].map(l => l.textContent);
-            if (current.length !== originalTexts.length ||
-                current.some((t, i) => t !== originalTexts[i])) {
-                rebuildLines(group, originalTexts, revealed);
+        const fullText = originalTexts.join(' ');
+
+        let wrapFontPx = null;
+        if (!mobileQuery.matches) {
+            wrapFontPx = computeLegacyDesktopMinFont(group, originalTexts);
+            if (wrapFontPx == null && group.clientWidth <= 0) {
+                requestAnimationFrame(() => layoutMissionLines(section));
+                return;
             }
-            if (fitTextToWidth) {
-                const lines = [...group.querySelectorAll('.animate-line')];
-                lines.forEach(line => { line.style.fontSize = ''; fitTextToWidth(line); });
-                const minSize = Math.min(...lines.map(l => parseFloat(l.style.fontSize)));
-                lines.forEach(line => line.style.fontSize = `${minSize}px`);
-            }
+        }
+
+        const naturalLines = measureNaturalLines(group, fullText, wrapFontPx);
+        rebuildLines(group, naturalLines, revealed);
+
+        if (!mobileQuery.matches && wrapFontPx != null) {
+            group.querySelectorAll('.animate-line').forEach(el => {
+                el.style.fontSize = `${wrapFontPx}px`;
+            });
+        } else if (!mobileQuery.matches && fitTextGroupToWidth) {
+            const lines = [...group.querySelectorAll('.animate-line')];
+            if (lines.length) fitTextGroupToWidth(lines);
         }
     }
 
@@ -105,7 +146,19 @@
         if (!section) return;
 
         document.fonts.ready.then(() => layoutMissionLines(section));
-        window.addEventListener('resize', () => layoutMissionLines(section));
+
+        let resizeTimer;
+        const scheduleLayout = () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => layoutMissionLines(section), 150);
+        };
+        window.addEventListener('resize', scheduleLayout);
+        const onBreakpointChange = () => layoutMissionLines(section);
+        if (typeof mobileQuery.addEventListener === 'function') {
+            mobileQuery.addEventListener('change', onBreakpointChange);
+        } else {
+            mobileQuery.addListener(onBreakpointChange);
+        }
 
         if (window.ScrollManager) {
             ScrollManager.addSteps([{
