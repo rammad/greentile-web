@@ -11,6 +11,8 @@
     // Negative / >100 values represent scroll outside that range.
     const TITLE_FADE_START = -50;    // progress where title begins to appear
     const TITLE_FADE_END   = 10;   // progress where title is fully opaque
+    /** Scroll-range baseline: same as a two-poster section (card count must not retime the fade). */
+    const TITLE_SCROLL_REFERENCE_POSTERS = 2;
 
     document.addEventListener('DOMContentLoaded', () => {
         const section = document.getElementById('team');
@@ -213,6 +215,22 @@
             if (bodySizer) bodySizer.style.height = '';
         }
 
+        /** Layout-stable poster + gap step (matches one extra row in .team-images-col). */
+        function getPosterColumnStepPx() {
+            const ph = firstPoster.offsetHeight;
+            let gap = 0;
+            if (posters.length >= 2) {
+                gap = posters[1].offsetTop - posters[0].offsetTop - firstPoster.offsetHeight;
+            } else {
+                const imagesCol = section.querySelector('.team-images-col');
+                if (imagesCol) {
+                    const g = getComputedStyle(imagesCol).gap;
+                    gap = parseFloat(String(g).trim().split(/\s+/)[0]) || 0;
+                }
+            }
+            return { ph, gap: Math.max(0, gap), step: ph + Math.max(0, gap) };
+        }
+
         function updateDesktop() {
             if (isMobile) return;
 
@@ -220,9 +238,14 @@
             const rect = section.getBoundingClientRect();
             const vh = window.innerHeight;
 
-            // section progress (always computed — drives title opacity)
-            const sectionProgress = rect.height > vh
-                ? (-rect.top / (rect.height - vh)) * 100
+            // section progress — drives title opacity; denominator is always the two-poster
+            // scroll range so adding cards does not retime the fade (matches n === 2 exactly).
+            const { step } = getPosterColumnStepPx();
+            const referenceSectionH = rect.height
+                - (posters.length - TITLE_SCROLL_REFERENCE_POSTERS) * step;
+            const scrollRange = Math.max(1, referenceSectionH - vh);
+            const sectionProgress = referenceSectionH > vh
+                ? (-rect.top / scrollRange) * 100
                 : 0;
             const titleT = (sectionProgress - TITLE_FADE_START)
                          / (TITLE_FADE_END - TITLE_FADE_START);
