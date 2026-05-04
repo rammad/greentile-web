@@ -187,6 +187,13 @@
     "clients": {
       "type": "clients",
       "blocks": {
+        "client_VAeECr": {
+          "type": "client",
+          "settings": {
+            "name": "a24",
+            "url": ""
+          }
+        },
         "client_c6bmTG": {
           "type": "client",
           "settings": {
@@ -429,6 +436,7 @@
         }
       },
       "block_order": [
+        "client_VAeECr",
         "client_c6bmTG",
         "cl1",
         "client_jGTiUe",
