@@ -250,6 +250,13 @@
             "url": ""
           }
         },
+        "client_TQyn7C": {
+          "type": "client",
+          "settings": {
+            "name": "elizabeth street garden",
+            "url": ""
+          }
+        },
         "client_KUTbGB": {
           "type": "client",
           "settings": {
@@ -445,6 +452,7 @@
         "client_aAn6FL",
         "client_EbHfL8",
         "client_JJwAJY",
+        "client_TQyn7C",
         "client_KUTbGB",
         "client_jKNKMg",
         "client_HghU3H",
