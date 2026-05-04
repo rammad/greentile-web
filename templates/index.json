@@ -105,11 +105,11 @@
       "settings": {
         "subheading": "🀄️🀄️🀄️",
         "body": "Mahjong connects more than tiles. Since our first serendipitous mahjong night in 2022, we've built this club as a love letter to our younger selves and the complexities we all hold as asian americans. From our favorite asian community spaces to storied nyc institutions, we create social mahjong experiences to bring us closer to each other and our heritage.",
-        "gradient_color_1_source": "palette_bright_green",
+        "gradient_color_1_source": "palette_off_white",
         "gradient_color_1": "#30fa30",
-        "gradient_color_2_source": "palette_off_white",
+        "gradient_color_2_source": "palette_bright_green",
         "gradient_color_2": "#fffcfa",
-        "gradient_color_3_source": "palette_yellow",
+        "gradient_color_3_source": "palette_off_white",
         "gradient_color_3": "rgba(0,0,0,0)"
       }
     },
