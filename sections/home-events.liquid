@@ -38,6 +38,11 @@
   endif
 -%}
 
+{%- comment -%}
+  Same signals as calendar rows that become real ticket links (not calendar-row--upcoming, not sold-out):
+  in-season dated event, not before today, not tagged upcoming, still available, has a poster image.
+  Omitting these here keeps sorted_event_entries aligned with what the grid can actually show.
+{%- endcomment -%}
 {%- assign sorted_event_lines = '' -%}
 {%- for product in event_source -%}
   {%- liquid
@@ -47,8 +52,28 @@
       assign event_date_str = ev.starts_at | date: '%Y-%m-%d'
     endif
 
-    assign include_event = false
+    assign is_coming_soon_tag = false
+  -%}
+  {%- for tag in product.tags -%}
+    {%- assign tag_lower = tag | downcase -%}
+    {%- if tag_lower == 'upcoming' -%}
+      {%- assign is_coming_soon_tag = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- liquid
+    assign event_passed = false
+    if event_date_str and event_date_str < today_date
+      assign event_passed = true
+    endif
+
+    assign in_home_window = false
     if event_date_str and event_date_str >= season_start and event_date_str <= season_end and event_date_str >= today_date
+      assign in_home_window = true
+    endif
+
+    assign include_event = false
+    if in_home_window and is_coming_soon_tag == false and product.available and event_passed == false and product.featured_image
       assign include_event = true
     endif
   -%}
@@ -62,21 +87,35 @@
 {%- endfor -%}
 
 {%- assign sorted_event_entries = sorted_event_lines | split: '||' | sort -%}
-{%- assign event_count = 0 -%}
+
+{%- comment -%}
+  Count rows the grid would output: handle resolves and still has a poster (matches .event-card with img).
+{%- endcomment -%}
+{%- assign resolvable_event_count = 0 -%}
 {%- for entry in sorted_event_entries -%}
-  {%- if entry != blank -%}
-    {%- assign event_count = event_count | plus: 1 -%}
-  {%- endif -%}
+  {%- if entry == blank -%}{%- continue -%}{%- endif -%}
+  {%- assign entry_parts = entry | split: '::' -%}
+  {%- assign vis_handle = entry_parts[1] -%}
+  {%- assign vis_product = all_products[vis_handle] -%}
+  {%- if vis_product == blank or vis_product.featured_image == blank -%}{%- continue -%}{%- endif -%}
+  {%- assign resolvable_event_count = resolvable_event_count | plus: 1 -%}
 {%- endfor -%}
-{%- if event_count == 0 -%}
+
+{%- assign manual_visible_count = 0 -%}
+{%- if resolvable_event_count == 0 -%}
   {%- for block in section.blocks -%}
-    {%- if block.type == 'event_card' -%}
-      {%- assign event_count = event_count | plus: 1 -%}
+    {%- if block.type == 'event_card' and block.settings.poster -%}
+      {%- assign manual_visible_count = manual_visible_count | plus: 1 -%}
     {%- endif -%}
   {%- endfor -%}
 {%- endif -%}
 
-{%- comment -%} Featured layout gate: toggle on, exactly 1 event, no standalone featured product {%- endcomment -%}
+{%- assign total_visible_events = resolvable_event_count -%}
+{%- if total_visible_events == 0 -%}
+  {%- assign total_visible_events = manual_visible_count -%}
+{%- endif -%}
+
+{%- comment -%} Featured layout gate: toggle on, exactly 1 resolvable event, no standalone featured product {%- endcomment -%}
 {%- assign has_featured_product = false -%}
 {%- if section.settings.use_featured_layout -%}
   {%- for product in collections.all.products -%}
@@ -92,10 +131,12 @@
 {%- endif -%}
 
 {%- assign use_featured_layout = false -%}
-{%- if section.settings.use_featured_layout and event_count == 1 and has_featured_product == false -%}
+{%- if section.settings.use_featured_layout and resolvable_event_count == 1 and has_featured_product == false -%}
   {%- assign use_featured_layout = true -%}
 {%- endif -%}
 
+{%- comment -%} Nothing would render → skip markup, assets, and script {%- endcomment -%}
+{%- if total_visible_events > 0 -%}
 {%- capture data_colors -%}
   {%- render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 -%}, {%- render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 -%}, {%- render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 -%}
 {%- endcapture -%}
@@ -106,12 +147,12 @@
 
 {%- assign feat_event = nil -%}
 {%- for entry in sorted_event_entries -%}
-  {%- if entry != blank -%}
-    {%- assign entry_parts = entry | split: '::' -%}
-    {%- assign feat_event_handle = entry_parts[1] -%}
-    {%- assign feat_event = all_products[feat_event_handle] -%}
-    {%- break -%}
-  {%- endif -%}
+  {%- if entry == blank -%}{%- continue -%}{%- endif -%}
+  {%- assign entry_parts = entry | split: '::' -%}
+  {%- assign feat_event_handle = entry_parts[1] -%}
+  {%- assign feat_event = all_products[feat_event_handle] -%}
+  {%- if feat_event and feat_event.featured_image -%}{%- break -%}{%- endif -%}
+  {%- assign feat_event = nil -%}
 {%- endfor -%}
 
 <section id="events" class="featured-section events-as-featured"
@@ -194,7 +235,7 @@
             {%- assign entry_parts = entry | split: '::' -%}
             {%- assign product_handle = entry_parts[1] -%}
             {%- assign product = all_products[product_handle] -%}
-            {%- if product == blank -%}{%- continue -%}{%- endif -%}
+            {%- if product == blank or product.featured_image == blank -%}{%- continue -%}{%- endif -%}
             <a href="{{ product.url }}" class="event-card">
               {%- if product.featured_image -%}
                 <img
@@ -211,16 +252,14 @@
           {%- comment -%} Manual block fallback when no products found {%- endcomment -%}
           {%- if events_shown == 0 -%}
             {%- for block in section.blocks -%}
-              {%- if block.type == 'event_card' -%}
+              {%- if block.type == 'event_card' and block.settings.poster -%}
                 <a href="{{ block.settings.url | default: '#' }}" class="event-card" {{ block.shopify_attributes }}>
-                  {%- if block.settings.poster -%}
-                    <img
-                      src="{{ block.settings.poster | image_url: width: 800 }}"
-                      class="event-poster"
-                      alt="{{ block.settings.title | escape }}"
-                      loading="lazy"
-                    >
-                  {%- endif -%}
+                  <img
+                    src="{{ block.settings.poster | image_url: width: 800 }}"
+                    class="event-poster"
+                    alt="{{ block.settings.title | escape }}"
+                    loading="lazy"
+                  >
                 </a>
               {%- endif -%}
             {%- endfor -%}
@@ -243,6 +282,7 @@
 {%- endif -%}
 
 <script src="{{ 'section-events.js' | asset_url }}" defer></script>
+{%- endif -%}
 
 {% schema %}
 {
