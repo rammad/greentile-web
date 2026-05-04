@@ -21,9 +21,9 @@
 }
 
 /* text block — full width so JS line measurements are stable */
-.about-text.type-h1 {
+.about-text.type-h2 {
     width: 100%;
-    font-size: clamp(64px, -14.77px + 7.69vw, 96px);
+    font-size: clamp(43px, -9.85px + 5.13vw, var(--size-h2));
     line-height: var(--lh-tight);
     text-align: center;
     text-box: normal;
@@ -51,8 +51,8 @@
 /* Default: inline-block during JS probe phase (images must be in flow for accurate measurement) */
 .about-inline-img {
     display: inline-block;
-    height: 1.1em;
-    width: calc(1.1em * 1.25);
+    height: 1.3em;
+    width: calc(1.3em * 1.25);
     object-fit: cover;
     border-radius: 7% / 8%;
     vertical-align: middle;
@@ -67,8 +67,8 @@
 .about-img-wrap {
     display: inline-block;
     vertical-align: middle;
-    width: calc(1.1em * 1.25);
-    height: 0.67em;
+    width: calc(1.3em * 1.25);
+    height: 0.79em;
     overflow: visible;
     position: relative;
     top: -0.1em;
@@ -83,7 +83,7 @@
     top: 50%;
     transform: translateY(-50%);
     width: 100%;
-    height: 1.1em;
+    height: 1.3em;
     margin: 0;
 }
 
@@ -102,7 +102,7 @@
         gap: var(--gap-text);
     }
 
-    .about-text.type-h1 {
+    .about-text.type-h2 {
         font-size: var(--size-h1);
         line-height: var(--lh-open);
     }
@@ -115,16 +115,16 @@
     }
 
     .about-inline-img {
-        height: 1.5em;
-        width: calc(1.5em * 1.25);
+        height: 1.45em;
+        width: calc(1.45em * 1.25);
     }
 
     .about-img-wrap {
-        width: calc(1.5em * 1.25);
-        height: 0.97em;
+        width: calc(1.45em * 1.25);
+        height: 0.94em;
     }
 
     .about-img-wrap .about-inline-img {
-        height: 1.5em;
+        height: 1.45em;
     }
 }
