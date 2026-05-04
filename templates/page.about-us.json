@@ -201,11 +201,11 @@
             "url": ""
           }
         },
-        "cl1": {
+        "client_igcgft": {
           "type": "client",
           "settings": {
-            "name": "Anheuser-Busch",
-            "url": "https://www.anheuser-busch.com"
+            "name": "anheuser-busch",
+            "url": ""
           }
         },
         "client_jGTiUe": {
@@ -254,6 +254,20 @@
           "type": "client",
           "settings": {
             "name": "deloitte",
+            "url": ""
+          }
+        },
+        "client_KUTbGB": {
+          "type": "client",
+          "settings": {
+            "name": "fujifilm",
+            "url": ""
+          }
+        },
+        "client_jKNKMg": {
+          "type": "client",
+          "settings": {
+            "name": "guinness",
             "url": ""
           }
         },
@@ -438,7 +452,7 @@
       "block_order": [
         "client_VAeECr",
         "client_c6bmTG",
-        "cl1",
+        "client_igcgft",
         "client_jGTiUe",
         "cl2",
         "client_ewqDHW",
@@ -446,6 +460,8 @@
         "cl4",
         "client_EbHfL8",
         "client_JJwAJY",
+        "client_KUTbGB",
+        "client_jKNKMg",
         "client_HghU3H",
         "client_cB6iNT",
         "client_9GTbGP",
