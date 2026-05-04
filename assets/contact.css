@@ -42,7 +42,7 @@
 .contact-panel-inner {
     display: flex;
     flex-direction: column;
-    padding: calc(var(--space-for-nav) - 12px) calc(var(--page-gutter) * 2) 40px; /* todo: apply to shopify theme */
+    padding: 40px calc(var(--page-gutter) * 2);
     min-height: 100%;
 }
 
@@ -86,9 +86,14 @@
     background: none;
     border: none;
     box-shadow: inset 0 0 0 1px var(--c-dark-green-20);
-    color: var(--color-text-main);
+    color: var(--c-dark-green);
     transition: background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
     -webkit-tap-highlight-color: transparent;
+}
+
+/* Topic pills use .cta-btn — override its black label color for type */
+.contact-topic-btn.cta-btn.is-visible {
+    color: var(--c-dark-green);
 }
 
 @media (hover: hover) {
@@ -117,10 +122,10 @@
 
 .contact-input,
 .contact-textarea {
-    font-family: var(--font-subheader);
-    font-size: var(--size-subRegular1);
-    font-weight: 300;
-    font-variation-settings: 'wdth' 450;
+    /* font-family: var(--font-subheader); */
+    /* font-size: var(--size-subRegular1); */
+    /* font-weight: 300; */
+    /* font-variation-settings: 'wdth' 450; */
     color: var(--color-text-main);
     background: none;
     border: none;
@@ -134,6 +139,11 @@
     line-height: var(--lh-body);
 }
 
+/* Name / email / extra row: explicit body green (matches site type) */
+.contact-panel .contact-info-field {
+    color: var(--c-dark-green);
+}
+
 .contact-input::placeholder,
 .contact-textarea::placeholder {
     color: var(--c-dark-green-30);
@@ -145,6 +155,12 @@
 }
 
 .contact-textarea {
+    font-family: var(--font-body);
+    font-size: var(--size-body1);
+    font-weight: 300;
+    font-variation-settings: "opsz" 100, "wght" 100;
+    text-transform: none;
+    letter-spacing: normal;
     border-radius: 16px;
     padding: 16px;
     flex: 1;
@@ -188,6 +204,10 @@ body.contact-is-open .nav-right {
 
 body.contact-is-open .nav-hamburger {
     display: flex;
+    /* no backdrop-filter — avoids muddy blur at the panel corner; match pill fill */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--color-bg);
 }
 
 @media (min-width: 1025px) {
@@ -215,20 +235,9 @@ body.contact-is-open .nav-hamburger {
         pointer-events: none;
     }
 
+    /* same vertical + horizontal padding as .nav-right / .nav-center (nav.css) */
     body.contact-is-open .nav-hamburger {
-        gap: 5px;
-    }
-
-    body.contact-is-open .hamburger-line {
-        width: 16px;
-    }
-
-    body.contact-is-open .nav-hamburger.is-active .hamburger-line:first-child {
-        transform: translateY(3px) rotate(45deg);
-    }
-
-    body.contact-is-open .nav-hamburger.is-active .hamburger-line:last-child {
-        transform: translateY(-3px) rotate(-45deg);
+        padding: 12px 24px calc(12px - 4px);
     }
 }
 
@@ -297,21 +306,6 @@ body.contact-is-open .nav-hamburger {
         right: 40px;
         bottom: 24px;
         border-radius: 54px;
-    }
-
-    body.contact-is-open .nav-hamburger {
-        gap: 10px;
-    }
-
-    body.contact-is-open .hamburger-line {
-        width: 32px;
-    }
-
-    body.contact-is-open .nav-hamburger.is-active .hamburger-line:first-child {
-        transform: translateY(6px) rotate(45deg);
-    }
-    body.contact-is-open .nav-hamburger.is-active .hamburger-line:last-child {
-        transform: translateY(-6px) rotate(-45deg);
     }
 }
 
