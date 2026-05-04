@@ -3,6 +3,9 @@
 /* variables */
 /* design base: 1920px — breakpoints at 1024 (touch/tablet+mobile), 768 (small mobile), 3840 (4K desktop) */
 :root {
+    /* Lock browser UI/theme interpretation to site-defined light palette. */
+    color-scheme: only light;
+
     --c-off-white: #FFFCFA;
     --c-bright-green: #30FA30;
     --c-mid-green: #23AA21;
@@ -101,6 +104,11 @@
 
 /* reset */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+/* Prevent browser/OS forced color substitutions from restyling the site. */
+*, *::before, *::after {
+    forced-color-adjust: none;
+}
 
 html, body {
     margin: 0; padding: 0; width: 100%; height: 100%;
