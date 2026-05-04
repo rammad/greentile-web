@@ -101,11 +101,7 @@
 }
 
 .team-title-text {
-    line-height: var(--lh-tight);
-}
-
-.team-title-text + .team-title-text {
-    margin-top: var(--gap-text);
+    line-height: var(--lh-single) !important;
 }
 
 .team-section .animate-line {
