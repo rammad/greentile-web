@@ -229,13 +229,6 @@
             "url": ""
           }
         },
-        "cl4": {
-          "type": "client",
-          "settings": {
-            "name": "Citi Bank",
-            "url": "https://www.citi.com"
-          }
-        },
         "client_EbHfL8": {
           "type": "client",
           "settings": {
@@ -449,7 +442,6 @@
         "client_jGTiUe",
         "client_ewqDHW",
         "client_aAn6FL",
-        "cl4",
         "client_EbHfL8",
         "client_JJwAJY",
         "client_KUTbGB",
