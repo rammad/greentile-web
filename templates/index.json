@@ -116,17 +116,16 @@
     "events": {
       "type": "home-events",
       "blocks": {
-        "event_card_YKiJmA": {
+        "event_card_KHargf": {
           "type": "event_card",
           "settings": {
             "title": "",
-            "poster": "shopify://shop_images/2026CafeChowClimb_2026April11CCC1x1.jpg",
             "url": ""
           }
         }
       },
       "block_order": [
-        "event_card_YKiJmA"
+        "event_card_KHargf"
       ],
       "settings": {
         "title": "upcoming events",
