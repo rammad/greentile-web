@@ -133,22 +133,7 @@
         "max_events": 4,
         "browse_label": "see all events",
         "browse_url": "shopify://pages/play-with-us",
-        "use_featured_layout": false,
-        "gradient_color_1_source": "palette_off_white",
-        "gradient_color_1": "#fffcfa",
-        "gradient_color_2_source": "palette_bright_green_30",
-        "gradient_color_2": "#c1fec1",
-        "gradient_color_3_source": "palette_off_white",
-        "gradient_color_3": "#fffcfa"
-      }
-    },
-    "featured": {
-      "type": "featured",
-      "settings": {
-        "featured_tag": "featured",
-        "product": "mahjong-after-hours-gtscs-4th-bday-edition",
-        "poster_alt": "",
-        "marquee_text": "FEATURING",
+        "use_featured_layout": true,
         "gradient_color_1_source": "palette_off_white",
         "gradient_color_1": "#fffcfa",
         "gradient_color_2_source": "palette_bright_green_30",
@@ -248,7 +233,6 @@
     "hero",
     "manifesto",
     "events",
-    "featured",
     "socials",
     "footer"
   ]
