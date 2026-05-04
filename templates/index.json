@@ -87,6 +87,8 @@
           "type": "inline_image",
           "settings": {
             "image": "shopify://shop_images/78AAC7B1-404B-4E01-8CA7-98885C0EC0BC.jpg",
+            "image_2": "shopify://shop_images/IMG_7356.jpg",
+            "image_3": "shopify://shop_images/IMG_8119.jpg",
             "word_position": 58
           }
         }
