@@ -168,6 +168,19 @@
         let menuJumpTargetIdx = 0;
         let menuJumpTargetScroll = 0;
 
+        function applyContactAttrsToSharedCta(idx) {
+            if (!sharedCta || !ctaData[idx]) return;
+            const d = ctaData[idx];
+            if (d.contactTrigger) {
+                sharedCta.setAttribute('data-contact-trigger', '');
+                if (d.contactTopic) sharedCta.setAttribute('data-contact-topic', d.contactTopic);
+                else sharedCta.removeAttribute('data-contact-topic');
+            } else {
+                sharedCta.removeAttribute('data-contact-trigger');
+                sharedCta.removeAttribute('data-contact-topic');
+            }
+        }
+
         function buildLayout() {
             const stickyContent = section.querySelector('.about-sticky-content');
             const blocks        = Array.from(section.querySelectorAll('.about-text-block'));
@@ -206,10 +219,12 @@
             if (!bodyEl) return;
             ctaData = _cachedBlocks.map((block) => {
                 const cta = block.querySelector('.cta-btn');
-                if (!cta) return { href: '#', text: '' };
+                if (!cta) return { href: '#', text: '', contactTopic: '', contactTrigger: false };
                 const data = {
                     href: cta.getAttribute('href') || '#',
                     text: (cta.querySelector('.ui-roll-visible')?.textContent || '').trim(),
+                    contactTopic: (cta.getAttribute('data-contact-topic') || '').trim(),
+                    contactTrigger: cta.hasAttribute('data-contact-trigger'),
                 };
                 cta.remove();
                 return data;
@@ -218,6 +233,7 @@
             sharedCta = document.createElement('a');
             sharedCta.className = 'cta-btn wwd-shared-cta';
             sharedCta.href = ctaData[0]?.href || '#';
+            applyContactAttrsToSharedCta(0);
             const t = ctaData[0]?.text || '';
             sharedCta.innerHTML =
                 '<div class="ui-roll roll-hover">' +
@@ -354,6 +370,7 @@
 
             if (vis.textContent.trim() === newText) {
                 sharedCta.href = newHref;
+                applyContactAttrsToSharedCta(idx);
                 return;
             }
 
@@ -384,6 +401,7 @@
             hid.style.transform = 'translateY(-100%)';
 
             sharedCta.href = newHref;
+            applyContactAttrsToSharedCta(idx);
 
             sharedCta._swapTimeout = setTimeout(() => {
                 hid.style.transition = 'none';

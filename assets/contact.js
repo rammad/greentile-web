@@ -215,13 +215,14 @@
     window.contactPanel = { open, close, isOpen: () => isOpen, selectTopic };
 
     function wireTriggers() {
-        document.querySelectorAll('[data-contact-trigger]').forEach(trigger => {
-            trigger.addEventListener('click', (e) => {
-                e.preventDefault();
-                const topic = trigger.dataset.contactTopic;
-                if (isOpen && !topic) close();
-                else open(topic);
-            });
+        // Delegation: What We Do (and similar) rebuilds CTAs after DOMContentLoaded; per-element listeners would miss or detach.
+        document.addEventListener('click', (e) => {
+            const trigger = e.target.closest('[data-contact-trigger]');
+            if (!trigger) return;
+            e.preventDefault();
+            const topic = trigger.dataset.contactTopic;
+            if (isOpen && !topic) close();
+            else open(topic);
         });
 
         // any <a href="#contact"> or <a href="#contact:topicValue"> anywhere on the page
