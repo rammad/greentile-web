@@ -62,27 +62,28 @@
 
 .contact-close {
     flex-shrink: 0;
-    align-self: flex-start;
     position: relative;
     width: 44px;
     height: 44px;
-    margin: -8px -8px 0 0;
+    margin: 0 -8px 0 0;
     padding: 0;
     border: none;
     background: none;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
     -webkit-tap-highlight-color: transparent;
 }
 
 .contact-close-line {
     position: absolute;
+    left: 50%;
+    top: calc(10px * 0.7071067812 - 0.5px);
     width: 20px;
     height: 1px;
+    margin-left: -10px;
     background: var(--c-dark-green);
     border-radius: 2px;
+    transform-origin: center;
 }
 
 .contact-close-line:first-child {
@@ -327,6 +328,10 @@ body.contact-is-open .nav-right {
 }
 
 @media (max-width: 1024px) {
+    .contact-close {
+        display: none;
+    }
+
     .contact-form {
         gap: 40px;
         margin-top: 40px;

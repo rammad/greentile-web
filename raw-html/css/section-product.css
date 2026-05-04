@@ -391,7 +391,6 @@
     .pdp-info .type-subRegular1,
     .pdp-info .type-subRegular2 {
         text-box: normal;
-        line-height: var(--lh-body);
     }
 
     .pdp-info {

@@ -34,10 +34,6 @@
     max-width: clamp(740px, 38.542vw, 1480px);
 }
 
-.clients-col .type-subBold2 {
-    line-height: 2;
-}
-
 .clients-list {
     line-height: 2;
     text-align: center;
