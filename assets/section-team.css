@@ -141,6 +141,11 @@
     font-size: clamp(16px, 1.4vw, var(--size-body2));
 }
 
+/* Theme editor newlines in the names textarea; single-line copy unchanged */
+.team-names {
+    white-space: pre-line;
+}
+
 /* @media (prefers-reduced-motion: reduce) {
     .team-poster-wrap {
         opacity: 1;
@@ -177,6 +182,7 @@
     .team-title-col {
         order: -1;
         margin-bottom: 40px;
+        min-width: 0; /* grid: allow column to shrink so long titles don’t overflow */
     }
 
     .team-title-inner {
@@ -185,11 +191,15 @@
         height: auto;
         padding-bottom: 0;
         text-align: center;
+        max-width: 100%;
     }
 
     .team-title-text {
         font-size: min(var(--size-display-xl), 17vw);
-        white-space: nowrap;
+        max-width: 100%;
+        margin-inline: auto;
+        overflow-wrap: break-word;
+        hyphens: auto;
     }
 
     .team-images-col {
