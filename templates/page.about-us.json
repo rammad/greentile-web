@@ -201,6 +201,13 @@
             "url": ""
           }
         },
+        "client_TwXBcW": {
+          "type": "client",
+          "settings": {
+            "name": "amex",
+            "url": ""
+          }
+        },
         "client_igcgft": {
           "type": "client",
           "settings": {
@@ -362,13 +369,6 @@
             "url": ""
           }
         },
-        "client_QrA4fQ": {
-          "type": "client",
-          "settings": {
-            "name": "visa",
-            "url": ""
-          }
-        },
         "client_Qj3VKp": {
           "type": "client",
           "settings": {
@@ -438,6 +438,7 @@
       "block_order": [
         "client_VAeECr",
         "client_c6bmTG",
+        "client_TwXBcW",
         "client_igcgft",
         "client_jGTiUe",
         "client_ewqDHW",
@@ -461,7 +462,6 @@
         "client_cfLiic",
         "client_YzfKNf",
         "client_WWjbxf",
-        "client_QrA4fQ",
         "client_Qj3VKp",
         "client_cWzYFG",
         "client_VgmgCz",
