@@ -92,6 +92,11 @@
     transition: none !important;
 }
 
+/* Theme editor line breaks in menu item description (textarea) */
+.what-we-do .about-content p.type-body2 {
+    white-space: pre-line;
+}
+
 /* about-content wrapper — scoped to .what-we-do-body because JS moves blocks there at runtime */
 .what-we-do-body .about-content {
     position: relative;
