@@ -506,15 +506,24 @@ function initMobileScrollSpy() {
         }
     });
 
-    /* initial state */
+    /* initial state — start at first non-sold-out item */
     document.fonts.ready.then(() => {
         requestAnimationFrame(() => {
             setSpacerWidths();
             sizeRailOverlap();
-            dateItems[0].scrollIntoView({ inline: 'center', block: 'nearest' });
-            activeIndex = 0;
-            dateItems[0].classList.add('is-active');
-            list.scrollTo({ left: 0 });
+
+            let startIdx = 0;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].getAttribute('data-status') !== 'sold-out') {
+                    startIdx = i;
+                    break;
+                }
+            }
+
+            activeIndex = startIdx;
+            dateItems[startIdx].classList.add('is-active');
+            dateItems[startIdx].scrollIntoView({ inline: 'center', block: 'nearest' });
+            list.scrollLeft = items[startIdx].offsetLeft;
         });
     });
 }
