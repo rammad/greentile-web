@@ -485,12 +485,11 @@ function initMobileScrollSpy() {
             setSpacerWidths();
             sizeRailOverlap();
 
+            const today = new Date().toISOString().slice(0, 10);
             let startIdx = 0;
             for (let i = 0; i < items.length; i++) {
-                if (items[i].getAttribute('data-status') !== 'sold-out') {
-                    startIdx = i;
-                    break;
-                }
+                const d = items[i].getAttribute('data-date');
+                if (d && d >= today) { startIdx = i; break; }
             }
 
             activeIndex = startIdx;
