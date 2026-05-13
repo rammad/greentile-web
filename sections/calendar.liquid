@@ -262,6 +262,7 @@
               data-title="{{ product.title | escape }}"
               {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
               data-status="coming-soon"
+              {%- if event_date_str %} data-date="{{ event_date_str }}"{% endif -%}
             >
               <span class="cal-date type-h3">{{ date_display | default: '—' }}</span>
               <span class="cal-name type-h3">{{ product.title }}</span>
@@ -273,6 +274,7 @@
               data-title="{{ product.title | escape }}"
               {%- if ev and ev.venue %} data-venue="{{ event_venue_name | escape }}"{% endif -%}
               {%- if row_status != blank %} data-status="{{ row_status }}"{% endif -%}
+              {%- if event_date_str %} data-date="{{ event_date_str }}"{% endif -%}
             >
               <span class="cal-date type-h3">{{ date_display | default: '—' }}</span>
               <span class="cal-name type-h3">{{ product.title }}</span>
