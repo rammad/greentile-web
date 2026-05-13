@@ -118,7 +118,8 @@
 
 @media (max-width: 1024px) {
     .featured-section {
-        min-height: 100svh;
+        min-height: 100vh;
+        min-height: 100lvh;
     }
 
     .featured-bg-img {
@@ -126,7 +127,8 @@
     }
 
     .featured-frame {
-        min-height: 100svh;
+        min-height: 100vh;
+        min-height: 100lvh;
         flex-direction: column;
         justify-content: center;
         padding-top: var(--space-for-nav);
