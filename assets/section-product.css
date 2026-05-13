@@ -562,7 +562,30 @@
         width: 20px;
         background-color: var(--c-dark-green);
     }
+
+    #pdp-add-to-cart .ui-roll {
+        width: 100%;
+    }
+
+    #pdp-add-to-cart .ui-roll-layer {
+        width: 100%;
+        gap: 0;
+    }
+
+    #pdp-add-to-cart .ui-roll-layer > span:first-child,
+    #pdp-add-to-cart .ui-roll-layer > span:last-child {
+        flex: 1;
+    }
+
+    #pdp-add-to-cart .ui-roll-layer > span:first-child {
+        text-align: left;
+    }
+
+    #pdp-add-to-cart .ui-roll-layer > span:last-child {
+        text-align: right;
+    }
 }
+
 
 #pdp-add-to-cart.is-sold-out {
     opacity: 0.5;
