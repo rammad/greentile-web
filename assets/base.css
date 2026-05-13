@@ -123,9 +123,11 @@ html {
 
 #gradient-canvas {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    height: 100lvh; /* overshoot into browser chrome on mobile */
     z-index: 0;
     pointer-events: none;
     will-change: transform;
@@ -150,11 +152,6 @@ html.native-scroll,
 html.native-scroll body {
     overflow: visible;
     height: auto;
-}
-@supports (padding: env(safe-area-inset-bottom)) {
-    html.native-scroll body {
-        padding-bottom: env(safe-area-inset-bottom);
-    }
 }
 .scroll-viewport.native-scroll {
     position: static;
