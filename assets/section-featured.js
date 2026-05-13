@@ -27,17 +27,21 @@
 
         const recalcLayout = () => {
             lastWidth = window.innerWidth;
-            cachedVH = window.innerHeight;
             if (isMobile && frame) {
-                sectionCenterY = section.offsetTop + frame.offsetTop + frame.offsetHeight * 0.5;
+                const frameDocTop = frame.getBoundingClientRect().top + window.scrollY;
+                sectionCenterY = frameDocTop + frame.offsetHeight * 0.5;
                 sectionHeight  = frame.offsetHeight;
+                cachedVH       = frame.offsetHeight; // cancels with sectionCenterY: delta = (scrollY - frameDocTop) / sectionHeight
             } else {
+                cachedVH       = window.innerHeight;
                 sectionCenterY = section.offsetTop + section.offsetHeight * 0.5;
                 sectionHeight  = section.offsetHeight;
             }
         };
 
+        recalcLayout();
         document.fonts.ready.then(recalcLayout);
+        window.addEventListener('load', recalcLayout);
         window.addEventListener('resize', () => {
             if (isMobile && window.innerWidth === lastWidth) return;
             recalcLayout();

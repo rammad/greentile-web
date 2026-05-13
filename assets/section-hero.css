@@ -38,8 +38,13 @@
 
 /* mobile — four lines, center-aligned */
 @media (max-width: 768px) {
+    .hero {
+        height: 100vh;
+        height: 100svh;
+    }
+    
     .hero .type-display-hero {
-        top: calc(48% + var(--space-for-nav) / 2);
+        top: calc(48svh + var(--space-for-nav) / 2);
         bottom: auto;
         transform: translate(-50%, -50%);
         font-size: var(--size-display-hero) !important;
