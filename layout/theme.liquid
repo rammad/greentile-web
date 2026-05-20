@@ -3,6 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <script>
+    (function () {
+      var ua = navigator.userAgent;
+      var ios = /iPad|iPhone|iPod/.test(ua)
+        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (!ios || !/WebKit/.test(ua) || /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)) return;
+      document.documentElement.classList.add('ios-body-scroll');
+    })();
+  </script>
 
   {% if page_title == blank %}
     <title>{{ shop.name }}</title>
