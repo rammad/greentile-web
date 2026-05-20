@@ -127,10 +127,30 @@ html {
     left: 0;
     width: 100%;
     height: 100%;
-    height: 100lvh; /* overshoot into browser chrome on mobile */
+    height: 100lvh;
     z-index: 0;
     pointer-events: none;
     will-change: transform;
+}
+
+/* iOS Safari only: scroll body inside 100dvh shell (SO #79753701) */
+html.ios-body-scroll {
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+}
+html.ios-body-scroll body {
+    height: 100%;
+    height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+}
+html.ios-body-scroll .scroll-viewport {
+    position: static;
+    overflow: visible;
+    height: auto;
 }
 
 .scroll-viewport {

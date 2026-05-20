@@ -53,7 +53,9 @@
         };
 
         window.addEventListener('lenis-scroll', ({ detail }) => { apply(detail.scroll); }, { passive: true });
-        requestAnimationFrame(() => { apply(window.lenis ? window.lenis.scroll : window.scrollY); });
+        requestAnimationFrame(() => {
+            apply(window.lenis ? window.lenis.scroll : (window.getPageScrollY ? window.getPageScrollY() : window.scrollY));
+        });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -294,7 +296,7 @@
                     card.style.opacity   = '';
                 });
 
-                const scrollNow   = window.scrollY;
+                const scrollNow   = window.getPageScrollY ? window.getPageScrollY() : window.scrollY;
                 const titleAbsTop = titleWrap.getBoundingClientRect().top + scrollNow;
                 const titleH      = titleWrap.offsetHeight;
 
@@ -353,7 +355,9 @@
                 startOffset   = ih;
             }
 
-            applyPositions(window.lenis ? window.lenis.scroll : window.scrollY);
+            applyPositions(
+                window.lenis ? window.lenis.scroll : (window.getPageScrollY ? window.getPageScrollY() : window.scrollY)
+            );
 
             if (ctaFooter) {
                 if (currentlyMobile) {

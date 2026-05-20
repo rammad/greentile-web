@@ -453,6 +453,9 @@
 
         function getAboutMaxScroll() {
             if (_isMobileScroll) {
+                if (document.documentElement.classList.contains('ios-body-scroll')) {
+                    return Math.max(0, document.body.scrollHeight - document.body.clientHeight);
+                }
                 return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
             }
             const vp = viewport;
@@ -482,7 +485,7 @@
                     ? window.lenis.scroll
                     : !_isMobileScroll && viewport
                         ? viewport.scrollTop
-                        : window.scrollY;
+                        : (window.getPageScrollY ? window.getPageScrollY() : window.scrollY);
 
             if (scrollRange <= 1) return;
 
@@ -513,6 +516,8 @@
                 });
             } else if (!_isMobileScroll && viewport) {
                 viewport.scrollTo({ top: nextScroll, behavior: 'smooth' });
+            } else if (document.documentElement.classList.contains('ios-body-scroll')) {
+                document.body.scrollTo({ top: nextScroll, behavior: 'smooth' });
             } else {
                 window.scrollTo({ top: nextScroll, behavior: 'smooth' });
             }
@@ -550,7 +555,7 @@
                     ? window.lenis.scroll
                     : !_isMobileScroll && viewport
                         ? viewport.scrollTop
-                        : window.scrollY;
+                        : (window.getPageScrollY ? window.getPageScrollY() : window.scrollY);
 
             // section progress
             const scrollStart  = revealVH * vpH;

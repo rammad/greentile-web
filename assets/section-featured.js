@@ -28,7 +28,8 @@
         const recalcLayout = () => {
             lastWidth = window.innerWidth;
             if (isMobile && frame) {
-                const frameDocTop = frame.getBoundingClientRect().top + window.scrollY;
+                const frameDocTop = frame.getBoundingClientRect().top
+                    + (window.getPageScrollY ? window.getPageScrollY() : window.scrollY);
                 sectionCenterY = frameDocTop + frame.offsetHeight * 0.5;
                 sectionHeight  = frame.offsetHeight;
                 cachedVH       = frame.offsetHeight; // cancels with sectionCenterY: delta = (scrollY - frameDocTop) / sectionHeight
@@ -76,7 +77,9 @@
         }, { passive: true });
 
         requestAnimationFrame(() => {
-            applyPositions(window.lenis ? window.lenis.scroll : window.scrollY);
+            applyPositions(
+                window.lenis ? window.lenis.scroll : (window.getPageScrollY ? window.getPageScrollY() : window.scrollY)
+            );
         });
     });
 })();

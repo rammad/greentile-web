@@ -2,8 +2,30 @@
 
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
-window.addEventListener('pageshow', (e) => {
-    window.scrollTo(0, 0);
+function isIOSSafari() {
+    const ua = navigator.userAgent;
+    const ios = /iPad|iPhone|iPod/.test(ua)
+        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (!ios || !/WebKit/.test(ua)) return false;
+    return !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+}
+
+function getPageScrollY() {
+    if (document.documentElement.classList.contains('ios-body-scroll')) {
+        return document.body.scrollTop;
+    }
+    return window.scrollY || document.documentElement.scrollTop || 0;
+}
+
+window.isIOSSafari = isIOSSafari;
+window.getPageScrollY = getPageScrollY;
+
+window.addEventListener('pageshow', () => {
+    if (document.documentElement.classList.contains('ios-body-scroll')) {
+        document.body.scrollTop = 0;
+    } else {
+        window.scrollTo(0, 0);
+    }
     if (window.lenis) window.lenis.scrollTo(0, { immediate: true });
     const viewport = document.getElementById('scroll-viewport');
     if (viewport) viewport.scrollTop = 0;

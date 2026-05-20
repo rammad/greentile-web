@@ -3,9 +3,12 @@
 (function () {
     let lenis = null;
     const isTouchDevice = matchMedia('(pointer: coarse)').matches;
+    const usesIOSSafariScroll = window.isIOSSafari && window.isIOSSafari();
 
     function init() {
-        if (isTouchDevice) {
+        if (usesIOSSafariScroll) {
+            initIOSSafari();
+        } else if (isTouchDevice) {
             initMobile();
         } else {
             initDesktop();
@@ -13,7 +16,21 @@
         initGradientSectionObserver();
     }
 
-    /* mobile: native document scroll, no wrapper */
+    /* iOS Safari: body scroll inside locked html (fixes fixed chrome gaps on iOS 26) */
+
+    function initIOSSafari() {
+        document.documentElement.classList.add('ios-body-scroll');
+
+        document.body.addEventListener('scroll', () => {
+            window.dispatchEvent(new CustomEvent('lenis-scroll', {
+                detail: { scroll: document.body.scrollTop }
+            }));
+        }, { passive: true });
+
+        initPullToRefresh(() => document.body.scrollTop);
+    }
+
+    /* other mobile: native window scroll */
 
     function initMobile() {
         const viewport = document.getElementById('scroll-viewport');
@@ -28,10 +45,10 @@
             }));
         }, { passive: true });
 
-        initPullToRefresh();
+        initPullToRefresh(() => window.scrollY);
     }
 
-    function initPullToRefresh() {
+    function initPullToRefresh(getScrollTop = () => window.scrollY) {
         let startY = 0;
         let lastDy = 0;
         let state = 'idle';
@@ -43,7 +60,7 @@
         document.body.appendChild(indicator);
 
         document.addEventListener('touchstart', (e) => {
-            if (window.scrollY <= 5) {
+            if (getScrollTop() <= 5) {
                 startY = e.touches[0].clientY;
                 lastDy = 0;
                 state = 'deciding';
@@ -148,7 +165,7 @@
     function initGradientSectionObserver() {
         const sections = document.querySelectorAll('section[data-colors]');
         if (!sections.length) return;
-        const root = isTouchDevice ? null : (document.getElementById('scroll-viewport') || null);
+        const root = (isTouchDevice || usesIOSSafariScroll) ? null : (document.getElementById('scroll-viewport') || null);
         const coverages = new Map();
         const observer = new IntersectionObserver(
             (entries) => {

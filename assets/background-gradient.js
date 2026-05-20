@@ -321,7 +321,9 @@ class GradientEngine {
         if (typeof window !== 'undefined' && window.lenis != null && typeof window.lenis.scroll === 'number') {
             return window.lenis.scroll;
         }
-        return typeof window !== 'undefined' ? (window.scrollY ?? document.documentElement.scrollTop) : 0;
+        if (typeof window === 'undefined') return 0;
+        if (window.getPageScrollY) return window.getPageScrollY();
+        return window.scrollY ?? document.documentElement.scrollTop ?? 0;
     }
 
     onResize() {
