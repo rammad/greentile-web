@@ -137,10 +137,19 @@ function initFitText() {
     });
 
     let resizeTimer;
-    window.addEventListener('resize', () => {
+    const scheduleFit = () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(runFit, 50);
-    });
+    };
+
+    window.addEventListener('resize', scheduleFit);
+
+    if (window.ResizeObserver) {
+        const observedParents = new Set();
+        buildGroups().forEach((_, parent) => observedParents.add(parent));
+        const ro = new ResizeObserver(scheduleFit);
+        observedParents.forEach(parent => ro.observe(parent));
+    }
 }
 
 const INTERACTION_LOCK_MS = 500;
