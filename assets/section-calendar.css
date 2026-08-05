@@ -13,7 +13,7 @@
 }
 
 .calendar-header {
-    padding: 0;
+    padding: 0 var(--page-gutter);
     flex-shrink: 0;
     width: 100%;
     opacity: 1;
