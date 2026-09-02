@@ -175,6 +175,18 @@ Use this as a practical "what should I fill in?" checklist.
 - Manual fallback:
   - if no auto archives, uses `archive_event` blocks
 - Fill: title, load-more label, empty state
+- **Collection size / sort order**: Liquid can only read a limited number of
+  products from a collection per page. The archives loop is wrapped in
+  `{% paginate ... by: 250 %}`, so it reads up to **250** products (vs the
+  default 50). Whichever 250 come back is decided by the collection's sort
+  order in Shopify admin — set the events collection to **Date: newest first**
+  so the oldest events are the ones dropped once the collection passes 250.
+  The calendar page is intentionally left at the 50 cap to keep it fast; a
+  single season never has that many events.
+- **"Load More" button not appearing**: it only renders when at least one
+  archived event exists, and `assets/section-archives.js` keeps it hidden
+  until there are more than 12 (`BATCH_SIZE`). Fewer archived events than that
+  is expected to show no button.
 
 ### Product Detail (`sections/main-product.liquid`)
 
@@ -223,6 +235,20 @@ Use this as a practical "what should I fill in?" checklist.
   - `tag == upcoming` => coming soon
   - `product.available == false` => sold out
 
+### Collection Product Caps
+
+- `collection.products` in Liquid returns at most 50 products unless the loop is
+  wrapped in `{% paginate collection.products by: N %}` (max `N` is 250).
+- `sections/archives.liquid` uses `{% paginate ... by: 250 %}`; the contents of
+  that 250 are ordered by the collection's admin sort order (keep it
+  **Date: newest first**).
+- `sections/calendar.liquid` and `sections/home-events.liquid` are left at the
+  default 50 cap on purpose (current-season lists are small; avoids paying the
+  higher scan cost on hot pages).
+- If archives ever needs more than 250, switch the load-more button to fetch
+  additional pages from an alternate JSON section template instead of raising
+  the number.
+
 ### Internationalization
 
 - Locale strings are in `locales/en.default.json`.
@@ -253,6 +279,15 @@ Typical Shopify workflow:
 - **Events missing from calendar**
   - check product is active and in selected collection
   - verify metafield namespace/key and storefront access
+  - the calendar only shows the current season's 3-month window; it also reads
+    at most 50 products from the collection (see "Collection Product Caps")
+- **Old events missing from archives**
+  - archives reads up to 250 products from the collection; set the collection
+    sort order to **Date: newest first** so older events aren't the ones cut
+  - archived products must stay **active** (draft/archived in admin = invisible
+    to the storefront)
+- **Archives "Load More" never shows**
+  - expected when there are 12 or fewer archived events (`BATCH_SIZE`)
 - **Featured event not showing**
   - ensure at least one active product has `featured` tag, or set manual product/image override
 - **Contact form not sending to expected email**

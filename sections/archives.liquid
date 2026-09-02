@@ -53,31 +53,33 @@
   {%- capture archive_cells_markup -%}
     {%- assign archive_count = 0 -%}
     {%- if archive_source.size > 0 -%}
-      {%- for product in archive_source -%}
-        {%- liquid
-          assign ev = product.metafields[evt_ns][evt_key].value
-          assign event_date_str = nil
-          assign month_label = nil
+      {%- paginate archive_source by: 250 -%}
+        {%- for product in archive_source -%}
+          {%- liquid
+            assign ev = product.metafields[evt_ns][evt_key].value
+            assign event_date_str = nil
+            assign month_label = nil
 
-          if ev
-            assign event_date_str = ev.starts_at | date: '%Y-%m-%d'
-            assign month_label = ev.starts_at | date: '%B %Y'
-          endif
+            if ev
+              assign event_date_str = ev.starts_at | date: '%Y-%m-%d'
+              assign month_label = ev.starts_at | date: '%B %Y'
+            endif
 
-          assign is_archive = false
-          if event_date_str and event_date_str < season_start
-            assign is_archive = true
-          endif
-        -%}
-        {%- if is_archive -%}
-          <a href="{{ product.url }}" class="archive-cell" data-month="{{ month_label | default: 'Undated' }}" data-event-date="{{ event_date_str }}">
-            {%- if product.featured_image -%}
-              <img src="{{ product.featured_image | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ product.title | escape }}">
-            {%- endif -%}
-          </a>
-          {%- assign archive_count = archive_count | plus: 1 -%}
-        {%- endif -%}
-      {%- endfor -%}
+            assign is_archive = false
+            if event_date_str and event_date_str < season_start
+              assign is_archive = true
+            endif
+          -%}
+          {%- if is_archive -%}
+            <a href="{{ product.url }}" class="archive-cell" data-month="{{ month_label | default: 'Undated' }}" data-event-date="{{ event_date_str }}">
+              {%- if product.featured_image -%}
+                <img src="{{ product.featured_image | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ product.title | escape }}">
+              {%- endif -%}
+            </a>
+            {%- assign archive_count = archive_count | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endpaginate -%}
     {%- endif -%}
 
     {%- comment -%} Manual block fallback if no auto-archives found {%- endcomment -%}
