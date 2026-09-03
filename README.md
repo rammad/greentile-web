@@ -198,6 +198,10 @@ Use this as a practical "what should I fill in?" checklist.
 - Fill in section:
   - buy button label
   - max quantity per order
+- Purchasing is disabled (button shows "Coming Soon", quantity hidden) when the
+  product is tagged `upcoming`, mirroring the sold-out / past-event behavior.
+  This is enforced even if someone reaches the product URL directly rather than
+  via the calendar.
 
 ## Engineering Reference
 
@@ -232,7 +236,9 @@ Use this as a practical "what should I fill in?" checklist.
   - `venue.name`
   - `venue.address` fields
 - Status derivation:
-  - `tag == upcoming` => coming soon
+  - `tag == upcoming` => coming soon; purchasing disabled on the PDP (Liquid
+    `sales_closed` flag + `data-event-upcoming` for `assets/section-product.js`)
+  - `starts_at` in the past => sold out; purchasing disabled
   - `product.available == false` => sold out
 
 ### Collection Product Caps
@@ -295,3 +301,6 @@ Typical Shopify workflow:
   - verify theme setting `Default contact email`
 - **Sold out / coming soon badge mismatch**
   - confirm product availability and `upcoming` tag usage
+- **"Coming Soon" event is still purchasable via direct URL**
+  - confirm the product carries the `upcoming` tag (exact, lowercase); the PDP
+    disables buying whenever that tag is present

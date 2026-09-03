@@ -40,9 +40,19 @@
   endif
 
   assign current_variant = product.selected_or_first_available_variant
+
+  assign event_is_upcoming = false
+  if product.tags contains 'upcoming'
+    assign event_is_upcoming = true
+  endif
+
+  assign sales_closed = false
+  if event_is_past or event_is_upcoming
+    assign sales_closed = true
+  endif
 -%}
 
-<section class="pdp-section" data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}" data-max-qty="{{ section.settings.max_qty | default: 4 }}" data-buy-label="{{ section.settings.buy_label | default: 'Buy Now' | escape }}" data-event-start-at="{{ event_date | default: '' | escape }}">
+<section class="pdp-section" data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}" data-max-qty="{{ section.settings.max_qty | default: 4 }}" data-buy-label="{{ section.settings.buy_label | default: 'Buy Now' | escape }}" data-event-start-at="{{ event_date | default: '' | escape }}" data-event-upcoming="{{ event_is_upcoming }}">
   <div class="pdp-sticky-wrapper">
     <div class="pdp-grid">
 
@@ -112,10 +122,10 @@
                 data-variant-id="{{ variant.id }}"
                 data-price="{{ variant.price }}"
                 data-abbr="{{ variant.option1 | truncate: 3, '' | upcase }}"
-                {% if event_is_past or variant.available == false %}disabled{% endif %}
+                {% if sales_closed or variant.available == false %}disabled{% endif %}
               >
                 {{ variant.title }} &ndash; {{ variant.price | money }}
-                {%- if event_is_past or variant.available == false %} ({{ 'product.sold_out' | t }}){% endif -%}
+                {%- if event_is_upcoming %} ({{ 'product.coming_soon' | t }}){% elsif event_is_past or variant.available == false %} ({{ 'product.sold_out' | t }}){% endif -%}
               </button>
             {%- endfor -%}
           </div>
@@ -143,7 +153,7 @@
         <div class="ticket-actions">
           <div class="max-qty-label pdp-tag type-subRegular2" id="max-qty-msg">{{ 'product.max_qty' | t }}</div>
 
-          <div class="qty-wrapper"{% if event_is_past or current_variant.available == false %} style="display:none"{% endif %}>
+          <div class="qty-wrapper"{% if sales_closed or current_variant.available == false %} style="display:none"{% endif %}>
             <div class="qty-selector">
               <button class="qty-btn type-subRegular1" type="button" data-qty-change="-1">&minus;</button>
               <span class="qty-val type-subRegular1" id="ticket-qty">1</span>
@@ -151,14 +161,14 @@
             </div>
           </div>
 
-          <button type="button" class="cta-btn buy-button-override{% if event_is_past or current_variant.available == false %} is-sold-out{% endif %}" id="pdp-add-to-cart"
+          <button type="button" class="cta-btn buy-button-override{% if sales_closed or current_variant.available == false %} is-sold-out{% endif %}" id="pdp-add-to-cart"
             data-variant-id="{{ current_variant.id }}"
             data-price="{{ current_variant.price }}"
-            {% if event_is_past or current_variant.available == false %}disabled{% endif %}
+            {% if sales_closed or current_variant.available == false %}disabled{% endif %}
           >
             <div class="ui-roll roll-hover">
               <span class="type-subRegular1 ui-roll-layer ui-roll-visible">
-                {%- if event_is_past == false and current_variant.available -%}
+                {%- if sales_closed == false and current_variant.available -%}
                   <span>
                     {%- if product.variants.size > 1 -%}
                       <span class="buy-abbr">{{ current_variant.option1 | truncate: 3, '' | upcase }}</span>
@@ -167,12 +177,14 @@
                     <span class="buy-price">{{ current_variant.price | money }}</span>
                   </span>
                   <span class="buy-label">{{ section.settings.buy_label | default: 'Buy Now' }}</span>
+                {%- elsif event_is_upcoming -%}
+                  <span class="buy-label">{{ 'product.coming_soon' | t }}</span>
                 {%- else -%}
                   <span class="buy-label">{{ 'product.sold_out' | t }}</span>
                 {%- endif -%}
               </span>
               <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">
-                {%- if event_is_past == false and current_variant.available -%}
+                {%- if sales_closed == false and current_variant.available -%}
                   <span>
                     {%- if product.variants.size > 1 -%}
                       <span class="buy-abbr">{{ current_variant.option1 | truncate: 3, '' | upcase }}</span>
@@ -181,6 +193,8 @@
                     <span class="buy-price">{{ current_variant.price | money }}</span>
                   </span>
                   <span class="buy-label">{{ section.settings.buy_label | default: 'Buy Now' }}</span>
+                {%- elsif event_is_upcoming -%}
+                  <span class="buy-label">{{ 'product.coming_soon' | t }}</span>
                 {%- else -%}
                   <span class="buy-label">{{ 'product.sold_out' | t }}</span>
                 {%- endif -%}

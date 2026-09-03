@@ -55,6 +55,8 @@
 
     const buyLabel = document.querySelector('.pdp-section')?.dataset.buyLabel || 'Buy Now';
     const eventStartAt = document.querySelector('.pdp-section')?.dataset.eventStartAt || '';
+    const eventUpcoming = document.querySelector('.pdp-section')?.dataset.eventUpcoming === 'true';
+    const closedLabel = eventUpcoming ? 'Coming Soon' : 'Sold Out';
     let wasSoldOut = false;
 
     function isEventPast() {
@@ -81,7 +83,7 @@
 
         if (buyBtn && productData) {
             const variant = productData.variants.find(v => v.id === currentVariantId);
-            const available = variant ? (variant.available && !isEventPast()) : false;
+            const available = variant ? (variant.available && !isEventPast() && !eventUpcoming) : false;
             const hasMultiple = productData.variants.length > 1;
 
             buyBtn.disabled = !available;
@@ -92,7 +94,7 @@
 
             if (!available) {
                 buyBtn.querySelectorAll('.ui-roll-layer').forEach(layer => {
-                    layer.innerHTML = '<span class="buy-label">Sold Out</span>';
+                    layer.innerHTML = '<span class="buy-label">' + closedLabel + '</span>';
                 });
                 wasSoldOut = true;
             } else if (wasSoldOut) {
