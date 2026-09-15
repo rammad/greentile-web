@@ -53,7 +53,7 @@
   {%- capture archive_cells_markup -%}
     {%- assign archive_count = 0 -%}
     {%- if archive_source.size > 0 -%}
-      {%- paginate archive_source by: 250 -%}
+      {%- paginate archive_source by nil -%}
         {%- for product in archive_source -%}
           {%- liquid
             assign ev = product.metafields[evt_ns][evt_key].value
@@ -320,3 +320,13 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{%- paginate archive_source by: 250 -%}"
+  to: "{%- paginate archive_source by nil -%}"
+  position: 2377..2415
+{% endcomment %}
