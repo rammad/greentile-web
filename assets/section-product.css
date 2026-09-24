@@ -660,7 +660,6 @@
 .ticket-modal-title {
     flex: 1;
     min-width: 0;
-    color: var(--c-dark-green);
 }
 
 .ticket-modal-close {
@@ -735,7 +734,6 @@
 .ticket-modal-body .event-ticketing-table td,
 .ticket-modal-body .event-ticketing-table th {
     padding: 12px 0;
-    border-bottom: 1px solid var(--c-dark-green-20);
     text-align: left;
 }
 
