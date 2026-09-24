@@ -146,10 +146,35 @@
     /* ticket question modal — opens instead of the direct add-to-cart flow when the
        Guest Manager Ticket Order Form block is attached (see data-ticket-modal) */
 
+    /* the app renders its own quantity options (0-20) server-side, independent of this
+       theme's max-quantity-per-order setting — trim them down to match on the client */
+
+    function trimSelectOptions(select) {
+        if (select.dataset.qtyCapped === 'true') return;
+        Array.from(select.options).forEach(opt => {
+            if (parseInt(opt.value, 10) > maxQty) opt.remove();
+        });
+        select.dataset.qtyCapped = 'true';
+    }
+
+    function limitTicketQuantities(modal) {
+        if (!maxQty) return;
+
+        const selector = 'select.ticket-select, select[name*="[quantity]"]';
+        modal.querySelectorAll(selector).forEach(trimSelectOptions);
+
+        const observer = new MutationObserver(() => {
+            modal.querySelectorAll(selector).forEach(trimSelectOptions);
+        });
+        observer.observe(modal, { childList: true, subtree: true });
+    }
+
     function initTicketModal() {
         const modal = document.getElementById('ticket-modal');
         const backdrop = document.getElementById('ticket-modal-backdrop');
         if (!modal || !backdrop) return null;
+
+        limitTicketQuantities(modal);
 
         let isOpen = false;
 
