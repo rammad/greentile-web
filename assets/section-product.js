@@ -174,6 +174,17 @@
         const backdrop = document.getElementById('ticket-modal-backdrop');
         if (!modal || !backdrop) return null;
 
+        /* Lenis applies a transform to #scroll-content for its virtual-scroll effect, which
+           creates a new containing block for position:fixed descendants — breaking true
+           viewport-fixed behavior (same reason the sticky buy bar gets reparented above).
+           Move the modal out to <body>, matching where .contact-panel already lives. */
+        const usesLenis = !document.documentElement.classList.contains('native-scroll');
+        const scrollViewport = document.getElementById('scroll-viewport');
+        if (usesLenis && scrollViewport) {
+            document.body.appendChild(backdrop);
+            document.body.appendChild(modal);
+        }
+
         limitTicketQuantities(modal);
 
         let isOpen = false;
