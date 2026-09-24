@@ -707,7 +707,7 @@
 .ticket-modal-body .event-container {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 64px; /* matches .contact-form's major-section gap */
 }
 
 /* one uniform text style throughout — matches .type-subRegular1, same as every label/button in the contact panel */
@@ -742,7 +742,7 @@
 .ticket-modal-body .ticket-custom-questions-container {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 64px; /* matches .contact-form's major-section gap */
 }
 
 .ticket-modal-body fieldset {
@@ -756,7 +756,6 @@
 
 .ticket-modal-body legend {
     padding: 0;
-    margin-bottom: 24px; /* extra breathing room below "Ticket #1..." before the first field, on top of the fieldset's own gap */
     width: 100%;
 }
 
