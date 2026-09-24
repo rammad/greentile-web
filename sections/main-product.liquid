@@ -111,7 +111,8 @@
           </div>
         {%- endif -%}
 
-        {%- comment -%} Ticket types — only shown when multiple variants exist {%- endcomment -%}
+        {%- comment -%} Ticket types — only shown when multiple variants exist, and only for the custom buy UI (the app's Ticket Order Form renders its own ticket rows) {%- endcomment -%}
+        {%- unless event_meta and section.blocks.size > 0 -%}
         {%- if product.variants.size > 1 -%}
           <div class="pdp-ticket-types">
             {%- for variant in product.variants -%}
@@ -130,6 +131,7 @@
             {%- endfor -%}
           </div>
         {%- endif -%}
+        {%- endunless -%}
 
         {%- comment -%} Tags {%- endcomment -%}
         {%- if product.tags.size > 0 -%}
@@ -149,7 +151,14 @@
           </div>
         </div>
 
-        {%- comment -%} Add to cart / Buy now {%- endcomment -%}
+        {%- comment -%} Add to cart / Buy now — the app's Ticket Order Form (added as a block on this section) replaces this entirely for products with an event metafield, since running both causes inconsistent pricing/limits per Guest Manager's own guidance {%- endcomment -%}
+        {%- if event_meta and section.blocks.size > 0 -%}
+          <div class="ticket-actions ticket-actions--app-form">
+            {%- for block in section.blocks -%}
+              {%- render block -%}
+            {%- endfor -%}
+          </div>
+        {%- else -%}
         <div class="ticket-actions">
           <div class="max-qty-label pdp-tag type-subRegular2" id="max-qty-msg">{{ 'product.max_qty' | t }}</div>
 
@@ -202,6 +211,7 @@
             </div>
           </button>
         </div>
+        {%- endif -%}
 
       </div>
     </div>
@@ -366,6 +376,11 @@
       "label": "Custom color 3",
       "default": "#FFFCFA",
       "info": "Used when source is set to Custom hex"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
     }
   ],
   "presets": [
