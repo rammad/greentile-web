@@ -766,7 +766,6 @@
 
 .ticket-modal-body label {
     display: block;
-    margin-bottom: 6px;
 }
 
 .ticket-modal-body label.required::after {
@@ -843,7 +842,7 @@
 .ticket-modal-body .gm-question-section {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px; /* matches the fieldset's own gap so nested questions (phone, checkboxes) keep the same rhythm as Name/Email */
 }
 
 .ticket-modal-body .product-ticket-button,
