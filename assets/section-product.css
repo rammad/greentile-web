@@ -809,7 +809,7 @@
 .ticket-modal-body select {
     display: block;
     width: 100%;
-    color: var(--color-text-main);
+    color: var(--c-dark-green);
     background-color: transparent;
     border: none;
     box-shadow: inset 0 0 0 1px var(--c-dark-green-20);
@@ -817,9 +817,11 @@
     padding: 12px 44px 12px 20px;
     outline: none;
     transition: box-shadow 0.3s ease;
-    font-family: var(--font-body);
+    font-family: var(--font-subheader); /* matches .qty-val (type-subRegular1) — this theme's existing quantity-display font */
+    font-weight: 300;
+    font-variation-settings: 'wdth' 450;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.05em;
     line-height: var(--lh-body);
     appearance: none;
     -webkit-appearance: none;

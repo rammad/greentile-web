@@ -146,14 +146,16 @@
     /* ticket question modal — opens instead of the direct add-to-cart flow when the
        Guest Manager Ticket Order Form block is attached (see data-ticket-modal) */
 
-    /* the app renders its own quantity options (0-20) server-side, independent of this
-       theme's max-quantity-per-order setting — trim them down to match on the client */
+    /* the app renders its own quantity options (0-20, including a "0 tickets" choice) server-side,
+       independent of this theme's max-quantity-per-order setting — trim to match on the client */
 
     function trimSelectOptions(select) {
         if (select.dataset.qtyCapped === 'true') return;
         Array.from(select.options).forEach(opt => {
-            if (parseInt(opt.value, 10) > maxQty) opt.remove();
+            const value = parseInt(opt.value, 10);
+            if (value === 0 || value > maxQty) opt.remove();
         });
+        if (select.selectedIndex === -1 && select.options.length) select.selectedIndex = 0;
         select.dataset.qtyCapped = 'true';
     }
 
