@@ -176,26 +176,35 @@ Use this as a practical "what should I fill in?" checklist.
   - if no auto archives, uses `archive_event` blocks
 - Fill: title, load-more label, empty state
 - **Pagination / infinite scroll**: the archives loop is wrapped in
-  `{% paginate archive_source by: 24 %}` — real Shopify pagination (`page=N`
-  in the URL), not a raised item cap. `assets/section-archives.js` fetches
-  subsequent pages via the Section Rendering API
-  (`?section_id=...&page=N`) as the "Load More" button scrolls into view
-  (`IntersectionObserver`), merges the new cells into the existing
-  month-packed grid, and stops once `paginate.next` is empty. The button
-  itself stays in the DOM as a manual click fallback. There is no fixed
-  ceiling — it keeps paging through the whole collection.
-  - Sort order still matters for a *different* reason now: it decides the
-    order events surface in as the visitor scrolls. Keep the events collection
-    sorted **Date: newest first** so newest-first scroll order matches display
+  `{% paginate collections.all.products by: 24 %}` — real Shopify pagination
+  (`page=N` in the URL), not a raised item cap, and no fixed ceiling; it keeps
+  paging through the whole store's products.
+  - `paginate` only accepts a fixed set of directly-referenced objects
+    (`collection.products`, `collections.all.products`, `search.results`, …),
+    not a plain assigned variable and not a bracket-indexed dynamic handle
+    like `collections[handle].products` — both were tried and rejected by
+    Shopify's own theme validator (`Liquid syntax error ... is not a valid
+    expression`). So this always paginates `collections.all.products`, and the
+    section's optional "Events collection" setting is applied as an ordinary
+    per-product filter *inside* the loop (`product.collections contains
+    collections[archive_collection]`), not as the paginate target.
+  - `assets/section-archives.js` fetches subsequent pages via the Section
+    Rendering API (`?section_id=...&page=N`) as the "Load More" button scrolls
+    into view (`IntersectionObserver`), merges the new cells into the existing
+    month-packed grid, and stops once `paginate.next` is empty. The button
+    itself stays in the DOM as a manual click fallback.
+  - Per-cell markup lives in `snippets/archive-cell.liquid`.
+  - Sort order matters for scroll order: keep the events collection sorted
+    **Date: newest first** so newest-first fetch order roughly matches display
     order (the grid re-sorts every fetched batch by event date, so this only
     affects fetch order, not final on-screen order).
-  - A raw 24-product page can land entirely on current-season (non-archived)
+  - A raw 24-product page can land entirely on current-season/non-matching
     products; the JS keeps auto-fetching subsequent pages until one actually
     contributes archive cells, so the "coming soon" empty state only shows once
     every page has been exhausted with zero matches.
 - **Known Shopify sync risk**: the GitHub theme-sync app has previously
-  rewritten `{% paginate ... by: 24 %}` to `{% paginate ... by nil %}` in an
-  auto-commit (breaks pagination — renders 0 items), with an auto-inserted
+  rewritten a `{% paginate ... by: N %}` tag to `{% paginate ... by nil %}` in
+  an auto-commit (breaks pagination — renders 0 items), with an auto-inserted
   `{% comment %}` explaining the "rewrite". If archives suddenly goes empty,
   check `sections/archives.liquid` for this before debugging anything else.
 
@@ -256,7 +265,9 @@ Use this as a practical "what should I fill in?" checklist.
 
 - `collection.products` in Liquid returns at most 50 products unless the loop is
   wrapped in `{% paginate collection.products by: N %}` (max `N` per page is 250).
-- `sections/archives.liquid` uses real `{% paginate archive_source by: 24 %}`
+  `paginate` only accepts specific documented objects directly — not a variable,
+  not a bracket-indexed dynamic handle.
+- `sections/archives.liquid` uses real `{% paginate collections.all.products by: 24 %}`
   pagination — `assets/section-archives.js` fetches additional `page=N` slices
   via the Section Rendering API as the visitor scrolls, so there's no fixed
   ceiling on total archived events. See "Archives Page" above for the full flow.

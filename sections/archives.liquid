@@ -8,10 +8,9 @@
   assign evt_key = settings.event_metafield_key | default: 'event_v2'
 
   assign archive_collection = section.settings.collection
-  if archive_collection != blank
-    assign archive_source = collections[archive_collection].products
-  else
-    assign archive_source = collections.all.products
+  assign archive_has_products = false
+  if collections.all.products.size > 0
+    assign archive_has_products = true
   endif
 
   assign current_month = 'now' | date: '%m' | plus: 0
@@ -33,18 +32,33 @@
   endif
 -%}
 
+{%- comment -%}
+  paginate only accepts a fixed set of directly-referenced objects (collection.products,
+  collections.all.products, search.results, ...), not a plain assigned variable or a
+  bracket-indexed dynamic handle — so this always paginates the documented-safe
+  collections.all.products and applies the section's collection setting (if any) as an
+  ordinary per-product filter inside the loop instead of as the paginate target.
+{%- endcomment -%}
 {%- assign archive_current_page = 1 -%}
 {%- assign archive_has_next = false -%}
 {%- capture archive_cells_markup -%}
   {%- assign archive_count = 0 -%}
-  {%- if archive_source.size > 0 -%}
-    {%- paginate archive_source by: 24 -%}
+  {%- if archive_has_products -%}
+    {%- paginate collections.all.products by: 24 -%}
       {%- assign archive_current_page = paginate.current_page -%}
       {%- if paginate.next -%}
         {%- assign archive_has_next = true -%}
       {%- endif -%}
-      {%- for product in archive_source -%}
+      {%- for product in collections.all.products -%}
         {%- liquid
+          assign in_selected_collection = true
+          if archive_collection != blank
+            assign in_selected_collection = false
+            if product.collections contains collections[archive_collection]
+              assign in_selected_collection = true
+            endif
+          endif
+
           assign ev = product.metafields[evt_ns][evt_key].value
           assign event_date_str = nil
           assign month_label = nil
@@ -55,16 +69,12 @@
           endif
 
           assign is_archive = false
-          if event_date_str and event_date_str < season_start
+          if in_selected_collection and event_date_str and event_date_str < season_start
             assign is_archive = true
           endif
         -%}
         {%- if is_archive -%}
-          <a href="{{ product.url }}" class="archive-cell" data-month="{{ month_label | default: 'Undated' }}" data-event-date="{{ event_date_str }}">
-            {%- if product.featured_image -%}
-              <img src="{{ product.featured_image | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ product.title | escape }}">
-            {%- endif -%}
-          </a>
+          {%- render 'archive-cell', product: product, event_date_str: event_date_str, month_label: month_label -%}
           {%- assign archive_count = archive_count | plus: 1 -%}
         {%- endif -%}
       {%- endfor -%}
@@ -91,7 +101,7 @@
   grid mount point and load-more control must not be gated on this page being non-blank.
 {%- endcomment -%}
 {%- assign archives_available = false -%}
-{%- if archive_source.size > 0 or archive_cells_markup_stripped != blank -%}
+{%- if archive_has_products or archive_cells_markup_stripped != blank -%}
   {%- assign archives_available = true -%}
 {%- endif -%}
 
