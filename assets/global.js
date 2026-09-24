@@ -489,9 +489,8 @@ const CURTAIN_TILE_SCATTER = window.innerWidth <= 1024 ? CURTAIN_TILE_SCATTER_MO
 
 function vwPx(px) { return px; }
 
-function getTileSnapX(count) {
-    const tileW  = window.innerWidth <= 768 ? 56 : 88;
-    const stride = vwPx(tileW + 4);
+function getTileSnapX(count, tileWidth) {
+    const stride = tileWidth + 4;
     const start  = -((count - 1) / 2) * stride;
     return Array.from({ length: count }, (_, i) => Math.round(start + i * stride));
 }
@@ -527,9 +526,10 @@ async function playTileAnimation(wrap) {
     const holdMs   = 240;
     const fadeEase = 'cubic-bezier(0, 0, 0.05, 1)';
     const snapEase = 'cubic-bezier(0.99, 0, 0.15, 1.6)';
-    const count   = tiles.length;
-    const scatter = CURTAIN_TILE_SCATTER[count] ?? CURTAIN_TILE_SCATTER[3];
-    const snapX   = getTileSnapX(count);
+    const count      = tiles.length;
+    const scatter    = CURTAIN_TILE_SCATTER[count] ?? CURTAIN_TILE_SCATTER[3];
+    const tileWidth  = tiles[0].getBoundingClientRect().width;
+    const snapX      = getTileSnapX(count, tileWidth);
 
     tiles.forEach((tile, i) => {
         const { x, y, r } = scatter[i];
