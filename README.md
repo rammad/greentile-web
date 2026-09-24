@@ -179,20 +179,32 @@ Use this as a practical "what should I fill in?" checklist.
   `{% paginate collections.all.products by: 24 %}` — real Shopify pagination
   (`page=N` in the URL), not a raised item cap, and no fixed ceiling; it keeps
   paging through the whole store's products.
-  - `paginate` only accepts a fixed set of directly-referenced objects
-    (`collection.products`, `collections.all.products`, `search.results`, …),
-    not a plain assigned variable and not a bracket-indexed dynamic handle
-    like `collections[handle].products` — both were tried and rejected by
-    Shopify's own theme validator (`Liquid syntax error ... is not a valid
-    expression`). So this always paginates `collections.all.products`, and the
-    section's optional "Events collection" setting is applied as an ordinary
-    per-product filter *inside* the loop (`product.collections contains
-    collections[archive_collection]`), not as the paginate target.
-  - `assets/section-archives.js` fetches subsequent pages via the Section
-    Rendering API (`?section_id=...&page=N`) as the "Load More" button scrolls
-    into view (`IntersectionObserver`), merges the new cells into the existing
-    month-packed grid, and stops once `paginate.next` is empty. The button
-    itself stays in the DOM as a manual click fallback.
+  - `paginate` has two constraints that both tripped Shopify's own GitHub
+    theme validator (`Liquid syntax error ... is not a valid expression`)
+    before landing on the current shape:
+    1. It only accepts a fixed set of directly-referenced objects
+       (`collection.products`, `collections.all.products`, `search.results`, …)
+       — not a plain assigned variable, and not a bracket-indexed dynamic
+       handle like `collections[handle].products`. So this always paginates
+       `collections.all.products`, and the section's optional "Events
+       collection" setting is applied as an ordinary per-product filter
+       *inside* the loop (`product.collections contains
+       collections[archive_collection]`), not as the paginate target.
+    2. It must render directly to the page — it cannot be nested inside
+       another block tag like `{% capture %}`. The whole cell-rendering block
+       writes straight into `#dynamic-archive-container`; nothing captures its
+       output into a variable first. Pagination state (`current_page`/`next`)
+       is exposed via a small `#archive-pagination-state` marker element
+       placed right after that container (it has to come after
+       `{% endpaginate %}` runs, so it can't live as data attributes on
+       `.archives-page`, whose opening tag is emitted before pagination runs).
+  - `assets/section-archives.js` reads `#archive-pagination-state` for
+    `data-section-id`/`data-current-page`/`data-has-next`, then fetches
+    subsequent pages via the Section Rendering API (`?section_id=...&page=N`)
+    as the "Load More" button scrolls into view (`IntersectionObserver`),
+    merges the new cells into the existing month-packed grid, and stops once
+    `paginate.next` is empty. The button itself stays in the DOM as a manual
+    click fallback.
   - Per-cell markup lives in `snippets/archive-cell.liquid`.
   - Sort order matters for scroll order: keep the events collection sorted
     **Date: newest first** so newest-first fetch order roughly matches display

@@ -205,10 +205,10 @@
 
         _state.items = Array.from(document.querySelectorAll('.archive-cell')).map(cellToItem);
 
-        const section = document.querySelector('.archives-page');
-        _state.sectionId = section?.dataset.sectionId || '';
-        _state.page = parseInt(section?.dataset.currentPage, 10) || 1;
-        _state.hasNext = section?.dataset.hasNext === 'true';
+        const pageState = document.getElementById('archive-pagination-state');
+        _state.sectionId = pageState?.dataset.sectionId || '';
+        _state.page = parseInt(pageState?.dataset.currentPage, 10) || 1;
+        _state.hasNext = pageState?.dataset.hasNext === 'true';
 
         rebuildGrid();
 
@@ -248,11 +248,11 @@
                 const html = await res.text();
                 const doc = new DOMParser().parseFromString(html, 'text/html');
                 const newCells = Array.from(doc.querySelectorAll('.archive-cell'));
-                const fetchedSection = doc.querySelector('.archives-page');
+                const fetchedPageState = doc.getElementById('archive-pagination-state');
 
                 _state.items.push(...newCells.map(cellToItem));
                 _state.page = nextPage;
-                _state.hasNext = fetchedSection?.dataset.hasNext === 'true';
+                _state.hasNext = fetchedPageState?.dataset.hasNext === 'true';
                 gained = newCells.length;
             }
 

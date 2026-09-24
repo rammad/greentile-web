@@ -13,6 +13,22 @@
     assign archive_has_products = true
   endif
 
+  assign archive_has_manual_blocks = false
+  for block in section.blocks
+    if block.type == 'archive_event' and block.settings.poster
+      assign archive_has_manual_blocks = true
+      break
+    endif
+  endfor
+
+  assign archives_available = false
+  if archive_has_products or archive_has_manual_blocks
+    assign archives_available = true
+  endif
+
+  assign archive_current_page = 1
+  assign archive_has_next = false
+
   assign current_month = 'now' | date: '%m' | plus: 0
   assign current_year = 'now' | date: '%Y'
 
@@ -33,84 +49,20 @@
 -%}
 
 {%- comment -%}
-  paginate only accepts a fixed set of directly-referenced objects (collection.products,
-  collections.all.products, search.results, ...), not a plain assigned variable or a
-  bracket-indexed dynamic handle — so this always paginates the documented-safe
-  collections.all.products and applies the section's collection setting (if any) as an
-  ordinary per-product filter inside the loop instead of as the paginate target.
+  paginate must render directly to the page, not be nested inside another block
+  tag such as capture (Shopify's own docs example does the same: a bare
+  {% paginate %}...{% endpaginate %} writing straight into the markup). It also
+  only accepts a fixed set of directly-referenced objects (collection.products,
+  collections.all.products, search.results, ...) — not a plain assigned variable
+  and not a bracket-indexed dynamic handle — so this always paginates the
+  documented-safe collections.all.products and applies the section's collection
+  setting (if any) as an ordinary per-product filter inside the loop instead of
+  as the paginate target.
 {%- endcomment -%}
-{%- assign archive_current_page = 1 -%}
-{%- assign archive_has_next = false -%}
-{%- capture archive_cells_markup -%}
-  {%- assign archive_count = 0 -%}
-  {%- if archive_has_products -%}
-    {%- paginate collections.all.products by: 24 -%}
-      {%- assign archive_current_page = paginate.current_page -%}
-      {%- if paginate.next -%}
-        {%- assign archive_has_next = true -%}
-      {%- endif -%}
-      {%- for product in collections.all.products -%}
-        {%- liquid
-          assign in_selected_collection = true
-          if archive_collection != blank
-            assign in_selected_collection = false
-            if product.collections contains collections[archive_collection]
-              assign in_selected_collection = true
-            endif
-          endif
-
-          assign ev = product.metafields[evt_ns][evt_key].value
-          assign event_date_str = nil
-          assign month_label = nil
-
-          if ev
-            assign event_date_str = ev.starts_at | date: '%Y-%m-%d'
-            assign month_label = ev.starts_at | date: '%B %Y'
-          endif
-
-          assign is_archive = false
-          if in_selected_collection and event_date_str and event_date_str < season_start
-            assign is_archive = true
-          endif
-        -%}
-        {%- if is_archive -%}
-          {%- render 'archive-cell', product: product, event_date_str: event_date_str, month_label: month_label -%}
-          {%- assign archive_count = archive_count | plus: 1 -%}
-        {%- endif -%}
-      {%- endfor -%}
-    {%- endpaginate -%}
-  {%- endif -%}
-
-  {%- comment -%} Manual block fallback if no auto-archives found {%- endcomment -%}
-  {%- if archive_count == 0 -%}
-    {%- for block in section.blocks -%}
-      {%- if block.type == 'archive_event' -%}
-        <a href="{{ block.settings.url | default: '#' }}" class="archive-cell" data-month="{{ block.settings.month }}" data-event-date="" {{ block.shopify_attributes }}>
-          {%- if block.settings.poster -%}
-            <img src="{{ block.settings.poster | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ block.settings.title | escape }}">
-          {%- endif -%}
-        </a>
-      {%- endif -%}
-    {%- endfor -%}
-  {%- endif -%}
-{%- endcapture -%}
-{%- assign archive_cells_markup_stripped = archive_cells_markup | strip -%}
-{%- comment -%}
-  A single 24-item page can legitimately contain zero archive matches (e.g. it's
-  all current-season products) while later pages still have real content, so the
-  grid mount point and load-more control must not be gated on this page being non-blank.
-{%- endcomment -%}
-{%- assign archives_available = false -%}
-{%- if archive_has_products or archive_cells_markup_stripped != blank -%}
-  {%- assign archives_available = true -%}
-{%- endif -%}
 
 <section class="archives-page"
   data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}"
   data-edge="0"
-  data-section-id="{{ section.id }}"
-  data-current-page="{{ archive_current_page }}"
-  data-has-next="{{ archive_has_next }}"
 >
   <div class="calendar-header archives-header desktop-only">
     <h1 class="type-display-hero animate-cascade desktop-only">
@@ -128,9 +80,59 @@
   <div class="archives-body">
     {%- if archives_available -%}
       <div id="dynamic-archive-container">
-        {{- archive_cells_markup -}}
+        {%- assign archive_count = 0 -%}
+        {%- paginate collections.all.products by: 24 -%}
+          {%- assign archive_current_page = paginate.current_page -%}
+          {%- if paginate.next -%}
+            {%- assign archive_has_next = true -%}
+          {%- endif -%}
+          {%- for product in collections.all.products -%}
+            {%- liquid
+              assign in_selected_collection = true
+              if archive_collection != blank
+                assign in_selected_collection = false
+                if product.collections contains collections[archive_collection]
+                  assign in_selected_collection = true
+                endif
+              endif
+
+              assign ev = product.metafields[evt_ns][evt_key].value
+              assign event_date_str = nil
+              assign month_label = nil
+
+              if ev
+                assign event_date_str = ev.starts_at | date: '%Y-%m-%d'
+                assign month_label = ev.starts_at | date: '%B %Y'
+              endif
+
+              assign is_archive = false
+              if in_selected_collection and event_date_str and event_date_str < season_start
+                assign is_archive = true
+              endif
+            -%}
+            {%- if is_archive -%}
+              {%- render 'archive-cell', product: product, event_date_str: event_date_str, month_label: month_label -%}
+              {%- assign archive_count = archive_count | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endpaginate -%}
+
+        {%- comment -%} Manual block fallback if no auto-archives found {%- endcomment -%}
+        {%- if archive_count == 0 -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'archive_event' -%}
+              <a href="{{ block.settings.url | default: '#' }}" class="archive-cell" data-month="{{ block.settings.month }}" data-event-date="" {{ block.shopify_attributes }}>
+                {%- if block.settings.poster -%}
+                  <img src="{{ block.settings.poster | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ block.settings.title | escape }}">
+                {%- endif -%}
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
       </div>
     {%- endif -%}
+
+    <div id="archive-pagination-state" data-section-id="{{ section.id }}" data-current-page="{{ archive_current_page }}" data-has-next="{{ archive_has_next }}" hidden></div>
 
     <div class="archives-coming-soon"><span class="type-h2">{{ section.settings.empty_message | default: 'more events coming soon!' }}</span></div>
 
