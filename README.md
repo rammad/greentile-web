@@ -175,18 +175,29 @@ Use this as a practical "what should I fill in?" checklist.
 - Manual fallback:
   - if no auto archives, uses `archive_event` blocks
 - Fill: title, load-more label, empty state
-- **Collection size / sort order**: Liquid can only read a limited number of
-  products from a collection per page. The archives loop is wrapped in
-  `{% paginate ... by: 250 %}`, so it reads up to **250** products (vs the
-  default 50). Whichever 250 come back is decided by the collection's sort
-  order in Shopify admin — set the events collection to **Date: newest first**
-  so the oldest events are the ones dropped once the collection passes 250.
-  The calendar page is intentionally left at the 50 cap to keep it fast; a
-  single season never has that many events.
-- **"Load More" button not appearing**: it only renders when at least one
-  archived event exists, and `assets/section-archives.js` keeps it hidden
-  until there are more than 12 (`BATCH_SIZE`). Fewer archived events than that
-  is expected to show no button.
+- **Pagination / infinite scroll**: the archives loop is wrapped in
+  `{% paginate archive_source by: 24 %}` — real Shopify pagination (`page=N`
+  in the URL), not a raised item cap. `assets/section-archives.js` fetches
+  subsequent pages via the Section Rendering API
+  (`?section_id=...&page=N`) as the "Load More" button scrolls into view
+  (`IntersectionObserver`), merges the new cells into the existing
+  month-packed grid, and stops once `paginate.next` is empty. The button
+  itself stays in the DOM as a manual click fallback. There is no fixed
+  ceiling — it keeps paging through the whole collection.
+  - Sort order still matters for a *different* reason now: it decides the
+    order events surface in as the visitor scrolls. Keep the events collection
+    sorted **Date: newest first** so newest-first scroll order matches display
+    order (the grid re-sorts every fetched batch by event date, so this only
+    affects fetch order, not final on-screen order).
+  - A raw 24-product page can land entirely on current-season (non-archived)
+    products; the JS keeps auto-fetching subsequent pages until one actually
+    contributes archive cells, so the "coming soon" empty state only shows once
+    every page has been exhausted with zero matches.
+- **Known Shopify sync risk**: the GitHub theme-sync app has previously
+  rewritten `{% paginate ... by: 24 %}` to `{% paginate ... by nil %}` in an
+  auto-commit (breaks pagination — renders 0 items), with an auto-inserted
+  `{% comment %}` explaining the "rewrite". If archives suddenly goes empty,
+  check `sections/archives.liquid` for this before debugging anything else.
 
 ### Product Detail (`sections/main-product.liquid`)
 
@@ -244,16 +255,19 @@ Use this as a practical "what should I fill in?" checklist.
 ### Collection Product Caps
 
 - `collection.products` in Liquid returns at most 50 products unless the loop is
-  wrapped in `{% paginate collection.products by: N %}` (max `N` is 250).
-- `sections/archives.liquid` uses `{% paginate ... by: 250 %}`; the contents of
-  that 250 are ordered by the collection's admin sort order (keep it
-  **Date: newest first**).
+  wrapped in `{% paginate collection.products by: N %}` (max `N` per page is 250).
+- `sections/archives.liquid` uses real `{% paginate archive_source by: 24 %}`
+  pagination — `assets/section-archives.js` fetches additional `page=N` slices
+  via the Section Rendering API as the visitor scrolls, so there's no fixed
+  ceiling on total archived events. See "Archives Page" above for the full flow.
 - `sections/calendar.liquid` and `sections/home-events.liquid` are left at the
   default 50 cap on purpose (current-season lists are small; avoids paying the
-  higher scan cost on hot pages).
-- If archives ever needs more than 250, switch the load-more button to fetch
-  additional pages from an alternate JSON section template instead of raising
-  the number.
+  higher scan cost on hot pages, and avoids depending on `{% paginate %}` there
+  at all).
+- The `{% paginate %}` tag has been rewritten once already by Shopify's GitHub
+  sync (`by: 250` → `by nil`, silently zeroing the archives page — see
+  "Known Shopify sync risk" above). If a future sync mangles it again, that's
+  the first place to check when a paginated section suddenly renders empty.
 
 ### Internationalization
 
@@ -288,12 +302,19 @@ Typical Shopify workflow:
   - the calendar only shows the current season's 3-month window; it also reads
     at most 50 products from the collection (see "Collection Product Caps")
 - **Old events missing from archives**
-  - archives reads up to 250 products from the collection; set the collection
-    sort order to **Date: newest first** so older events aren't the ones cut
-  - archived products must stay **active** (draft/archived in admin = invisible
-    to the storefront)
-- **Archives "Load More" never shows**
-  - expected when there are 12 or fewer archived events (`BATCH_SIZE`)
+  - archives now pages through the whole collection via scroll-triggered
+    fetches, so nothing should be permanently cut off; if events are still
+    missing, check they're actually **active** (draft/archived in admin =
+    invisible to the storefront) and dated before the current season start
+  - if the page renders completely empty, check `sections/archives.liquid` for
+    a Shopify-sync-mangled `{% paginate %}` tag (see "Known Shopify sync risk")
+- **Archives "Load More" never shows / stops appearing**
+  - expected once every page has been fetched and there's nothing left
+    (`data-has-next="false"` on `.archives-page`)
+  - if it's missing on first load with events still remaining, check the
+    browser console for a failed fetch (e.g. `section_id` mismatch) — the
+    button itself still works as a manual fallback if the auto-scroll fetch
+    silently fails
 - **Featured event not showing**
   - ensure at least one active product has `featured` tag, or set manual product/image override
 - **Contact form not sending to expected email**
