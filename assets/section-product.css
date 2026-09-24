@@ -710,15 +710,26 @@
     gap: 32px;
 }
 
-.ticket-modal-body .event-ticketing-table {
-    width: 100%;
-    border-collapse: collapse;
+/* one uniform text style throughout — matches .type-subRegular1, same as every label/button in the contact panel */
+.ticket-modal-body .event-ticketing-table,
+.ticket-modal-body legend,
+.ticket-modal-body label,
+.ticket-modal-body .gm-question-section,
+.ticket-modal-body .product-ticket-button,
+.ticket-modal-body .ticket-checkout-button {
     font-family: var(--font-subheader);
+    font-size: var(--size-subRegular1);
     font-weight: 300;
     font-variation-settings: 'wdth' 450;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    line-height: var(--lh-body);
     color: var(--c-dark-green);
+}
+
+.ticket-modal-body .event-ticketing-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .ticket-modal-body .event-ticketing-table td,
@@ -744,15 +755,8 @@
 }
 
 .ticket-modal-body legend {
-    font-family: var(--font-subheader);
-    font-size: var(--size-subBold2);
-    font-weight: 400;
-    font-variation-settings: 'wdth' 525;
-    color: var(--c-dark-green);
     padding: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    line-height: var(--lh-body);
+    margin-bottom: 24px; /* extra breathing room below "Ticket #1..." before the first field, on top of the fieldset's own gap */
     width: 100%;
 }
 
@@ -762,14 +766,6 @@
 
 .ticket-modal-body label {
     display: block;
-    color: var(--c-dark-green);
-    font-family: var(--font-subheader);
-    font-size: var(--size-subRegular2);
-    font-weight: 300;
-    font-variation-settings: 'wdth' 450;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    line-height: var(--lh-body);
     margin-bottom: 6px;
 }
 
@@ -855,17 +851,9 @@
     align-self: flex-start;
     margin-top: 0; /* the app's own stylesheet sets margin-top: 2rem here — .event-container's gap already provides that spacing */
     background: var(--c-bright-green);
-    color: var(--c-dark-green);
     border: none;
     border-radius: 100px;
     padding: 14px 32px;
-    font-family: var(--font-subheader);
-    font-size: var(--size-subRegular1);
-    font-weight: 400;
-    font-variation-settings: 'wdth' 525;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    line-height: var(--lh-body);
     cursor: pointer;
     transition: box-shadow 0.3s ease;
 }
