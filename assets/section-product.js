@@ -178,6 +178,18 @@
             if (e.key === 'Escape' && isOpen) close();
         });
 
+        /* #tickets in the URL force-opens the modal — same pattern as #contact on the contact panel */
+        function consumeHash() {
+            if (window.location.hash === '#tickets') open();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', consumeHash);
+        } else {
+            consumeHash();
+        }
+        window.addEventListener('hashchange', consumeHash);
+
         return { open, close };
     }
 
