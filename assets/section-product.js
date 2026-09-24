@@ -143,6 +143,44 @@
         });
     }
 
+    /* ticket question modal — opens instead of the direct add-to-cart flow when the
+       Guest Manager Ticket Order Form block is attached (see data-ticket-modal) */
+
+    function initTicketModal() {
+        const modal = document.getElementById('ticket-modal');
+        const backdrop = document.getElementById('ticket-modal-backdrop');
+        if (!modal || !backdrop) return null;
+
+        let isOpen = false;
+
+        function open() {
+            if (isOpen) return;
+            isOpen = true;
+            document.body.classList.add('ticket-modal-is-open');
+            modal.classList.add('is-open');
+            backdrop.classList.add('is-open');
+            if (window.lenis && window.lenis.stop) window.lenis.stop();
+        }
+
+        function close() {
+            if (!isOpen) return;
+            isOpen = false;
+            document.body.classList.remove('ticket-modal-is-open');
+            modal.classList.remove('is-open');
+            backdrop.classList.remove('is-open');
+            if (window.lenis && window.lenis.start) window.lenis.start();
+        }
+
+        backdrop.addEventListener('click', close);
+        const closeBtn = modal.querySelector('.ticket-modal-close');
+        if (closeBtn) closeBtn.addEventListener('click', close);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen) close();
+        });
+
+        return { open, close };
+    }
+
     function initAddToCart() {
         const buyBtn = document.getElementById('pdp-add-to-cart');
         if (!buyBtn) return;
@@ -153,6 +191,18 @@
             buyBtn.style.pointerEvents = '';
             buyBtn.style.opacity = '';
         });
+
+        if (buyBtn.dataset.ticketModal === 'true') {
+            const ticketModal = initTicketModal();
+            if (ticketModal) {
+                buyBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (buyBtn.disabled) return;
+                    ticketModal.open();
+                });
+                return;
+            }
+        }
 
         buyBtn.addEventListener('click', async (e) => {
             e.preventDefault();

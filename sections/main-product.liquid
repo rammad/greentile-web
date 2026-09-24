@@ -111,8 +111,7 @@
           </div>
         {%- endif -%}
 
-        {%- comment -%} Ticket types — only shown when multiple variants exist, and only for the custom buy UI (the app's Ticket Order Form renders its own ticket rows) {%- endcomment -%}
-        {%- unless event_meta and section.blocks.size > 0 -%}
+        {%- comment -%} Ticket types — only shown when multiple variants exist {%- endcomment -%}
         {%- if product.variants.size > 1 -%}
           <div class="pdp-ticket-types">
             {%- for variant in product.variants -%}
@@ -131,7 +130,6 @@
             {%- endfor -%}
           </div>
         {%- endif -%}
-        {%- endunless -%}
 
         {%- comment -%} Tags {%- endcomment -%}
         {%- if product.tags.size > 0 -%}
@@ -151,14 +149,11 @@
           </div>
         </div>
 
-        {%- comment -%} Add to cart / Buy now — the app's Ticket Order Form (added as a block on this section) replaces this entirely for products with an event metafield, since running both causes inconsistent pricing/limits per Guest Manager's own guidance {%- endcomment -%}
+        {%- comment -%} Add to cart / Buy now — for products with an event metafield and a Ticket Order Form block attached, this button opens that form in a modal instead of adding to cart directly (see data-ticket-modal + section-product.js) {%- endcomment -%}
+        {%- assign has_ticket_form = false -%}
         {%- if event_meta and section.blocks.size > 0 -%}
-          <div class="ticket-actions ticket-actions--app-form">
-            {%- for block in section.blocks -%}
-              {%- render block -%}
-            {%- endfor -%}
-          </div>
-        {%- else -%}
+          {%- assign has_ticket_form = true -%}
+        {%- endif -%}
         <div class="ticket-actions">
           <div class="max-qty-label pdp-tag type-subRegular2" id="max-qty-msg">{{ 'product.max_qty' | t }}</div>
 
@@ -173,6 +168,7 @@
           <button type="button" class="cta-btn buy-button-override{% if sales_closed or current_variant.available == false %} is-sold-out{% endif %}" id="pdp-add-to-cart"
             data-variant-id="{{ current_variant.id }}"
             data-price="{{ current_variant.price }}"
+            {% if has_ticket_form %}data-ticket-modal="true"{% endif %}
             {% if sales_closed or current_variant.available == false %}disabled{% endif %}
           >
             <div class="ui-roll roll-hover">
@@ -211,12 +207,32 @@
             </div>
           </button>
         </div>
-        {%- endif -%}
 
       </div>
     </div>
   </div>
 </section>
+
+{%- comment -%} Ticket question form — opens as an overlay from the Buy button above (see data-ticket-modal on #pdp-add-to-cart); the app's Ticket Order Form block renders inside it {%- endcomment -%}
+{%- if has_ticket_form -%}
+  <div class="ticket-modal-backdrop" id="ticket-modal-backdrop"></div>
+  <div class="ticket-modal" id="ticket-modal">
+    <div class="ticket-modal-inner">
+      <div class="ticket-modal-header">
+        <h2 class="ticket-modal-title type-h3">Attendee Details</h2>
+        <button type="button" class="ticket-modal-close" aria-label="Close">
+          <span class="ticket-modal-close-line" aria-hidden="true"></span>
+          <span class="ticket-modal-close-line" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="ticket-modal-body">
+        {%- for block in section.blocks -%}
+          {%- render block -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
 
 {%- comment -%} Product JSON for JS cart integration {%- endcomment -%}
 <script type="application/json" id="product-json">
