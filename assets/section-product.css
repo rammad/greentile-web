@@ -713,7 +713,11 @@
 .ticket-modal-body .event-ticketing-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: var(--font-body);
+    font-family: var(--font-subheader);
+    font-weight: 300;
+    font-variation-settings: 'wdth' 450;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--c-dark-green);
 }
 
@@ -740,12 +744,15 @@
 }
 
 .ticket-modal-body legend {
-    font-family: var(--font-body);
-    font-size: var(--size-subBold2, 16px);
+    font-family: var(--font-subheader);
+    font-size: var(--size-subBold2);
+    font-weight: 400;
+    font-variation-settings: 'wdth' 525;
     color: var(--c-dark-green);
     padding: 0 0 8px;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.05em;
+    line-height: var(--lh-body);
     width: 100%;
 }
 
@@ -756,8 +763,13 @@
 .ticket-modal-body label {
     display: block;
     color: var(--c-dark-green);
-    font-family: var(--font-body);
-    font-size: var(--size-subRegular2, 14px);
+    font-family: var(--font-subheader);
+    font-size: var(--size-subRegular2);
+    font-weight: 300;
+    font-variation-settings: 'wdth' 450;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: var(--lh-body);
     margin-bottom: 6px;
 }
 
@@ -782,8 +794,17 @@
     outline: none;
     transition: box-shadow 0.3s ease;
     font-family: var(--font-body);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     line-height: var(--lh-body);
     margin-bottom: 12px;
+}
+
+.ticket-modal-body input[type="text"]::placeholder,
+.ticket-modal-body input[type="email"]::placeholder,
+.ticket-modal-body input[type="tel"]::placeholder,
+.ticket-modal-body input[type="number"]::placeholder {
+    color: var(--c-dark-green-30);
 }
 
 .ticket-modal-body input[type="text"]:focus,
@@ -815,9 +836,13 @@
     border: none;
     border-radius: 100px;
     padding: 14px 32px;
-    font-family: var(--font-body);
+    font-family: var(--font-subheader);
+    font-size: var(--size-subRegular1);
+    font-weight: 400;
+    font-variation-settings: 'wdth' 525;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.05em;
+    line-height: var(--lh-body);
     cursor: pointer;
     transition: box-shadow 0.3s ease;
 }
