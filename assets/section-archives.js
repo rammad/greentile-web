@@ -26,10 +26,11 @@
         initRowPacker();
         initInfiniteScroll();
 
-        // A page can land entirely on non-archived products with more pages still
-        // to check; only resolve to "coming soon" once nothing is left to fetch.
-        if (_state.items.length === 0 && _state.hasNext) {
-            loadNextPage().then(checkEmptyState);
+        // Pull the rest of the catalogue immediately rather than on scroll, so the
+        // grid settles into its final date order once, early, instead of reshuffling
+        // later. Page 1 still paints right away; this just fills in behind it.
+        if (_state.hasNext) {
+            loadRemainingPages().then(checkEmptyState);
         } else {
             checkEmptyState();
         }
@@ -53,8 +54,9 @@
 
     const GRID_CARD_MIN_W = 200;
     const GRID_MAX_COLS = 6;
-    const MAX_EMPTY_FETCHES = 10;
-    const _state = { items: [], activeCols: 0, bound: false, page: 1, hasNext: false, sectionId: '', loading: false };
+    const PREFETCH_CONCURRENCY = 4;
+    const MAX_PREFETCH_PAGES = 30;
+    const _state = { items: [], activeCols: 0, bound: false, page: 1, totalPages: 1, hasNext: false, sectionId: '', loading: false };
 
     function getGridColCount() {
         if (window.innerWidth <= 1024) return GRID_MAX_COLS;
@@ -128,6 +130,7 @@
                     const card = document.createElement('a');
                     card.href = item.href;
                     card.className = 'grid-card';
+                    if (item.href) card.dataset.key = item.href;
                     card.innerHTML = `<img src="${item.imgSrc}" class="grid-card-poster">`;
                     gridEl.appendChild(card);
                 });
@@ -190,17 +193,64 @@
         return monthGroups;
     }
 
-    function rebuildGrid() {
+    /* Re-rendering the whole grid re-flows everything above the viewport too, so a
+       batch of newly-merged events would otherwise yank the page under the visitor.
+       Pin the topmost visible card and restore its screen position afterwards. */
+
+    function getScroller() {
+        if (document.documentElement.classList.contains('ios-body-scroll')) return document.body;
+        const viewport = document.getElementById('scroll-viewport');
+        if (viewport && viewport.scrollHeight > viewport.clientHeight + 1) return viewport;
+        return document.scrollingElement || document.documentElement;
+    }
+
+    function captureAnchor() {
+        const cards = document.querySelectorAll('#dynamic-archive-container .grid-card');
+        for (const card of cards) {
+            const rect = card.getBoundingClientRect();
+            if (rect.bottom > 0 && card.dataset.key) return { key: card.dataset.key, top: rect.top };
+        }
+        return null;
+    }
+
+    function restoreAnchor(anchor) {
+        if (!anchor) return;
+        const escaped = window.CSS && CSS.escape ? CSS.escape(anchor.key) : anchor.key.replace(/"/g, '\\"');
+        const card = document.querySelector(`#dynamic-archive-container .grid-card[data-key="${escaped}"]`);
+        if (!card) return;
+
+        const delta = card.getBoundingClientRect().top - anchor.top;
+        if (Math.abs(delta) < 1) return;
+
+        const scroller = getScroller();
+        const target = scroller.scrollTop + delta;
+        const viewport = document.getElementById('scroll-viewport');
+
+        if (window.lenis && scroller === viewport) {
+            window.lenis.scrollTo(target, { immediate: true, force: true });
+            return;
+        }
+        // html carries scroll-behavior:smooth, which would animate this correction
+        const previous = scroller.style.scrollBehavior;
+        scroller.style.scrollBehavior = 'auto';
+        scroller.scrollTop = target;
+        scroller.style.scrollBehavior = previous;
+    }
+
+    function rebuildGrid({ preserveScroll = false } = {}) {
         const container = document.getElementById('dynamic-archive-container');
         if (!container) return;
+        const anchor = preserveScroll ? captureAnchor() : null;
         _state.activeCols = getGridColCount();
         renderArchiveGrid(container, groupByMonth(sortItems(_state.items)), _state.activeCols);
+        if (anchor) restoreAnchor(anchor);
     }
 
     function initRowPacker() {
         const pageState = document.getElementById('archive-pagination-state');
         _state.sectionId = pageState?.dataset.sectionId || '';
         _state.page = parseInt(pageState?.dataset.currentPage, 10) || 1;
+        _state.totalPages = parseInt(pageState?.dataset.totalPages, 10) || 1;
         _state.hasNext = pageState?.dataset.hasNext === 'true';
 
         const container = document.getElementById('dynamic-archive-container');
@@ -221,50 +271,75 @@
                 timer = setTimeout(() => {
                     if (!_state.items.length) return;
                     const newCols = getGridColCount();
-                    if (newCols !== _state.activeCols) rebuildGrid();
+                    if (newCols !== _state.activeCols) rebuildGrid({ preserveScroll: true });
                 }, 150);
             });
         }
     }
 
-    /* infinite scroll — fetch the next page via the Section Rendering API when the
-       load-more control scrolls into view; the button itself stays as a manual/no-JS fallback */
+    /* page loading — Shopify pages collections.all in catalogue order, and the sort
+       key we actually want (the event date) lives in a metafield it can't order by.
+       So page N can hold events belonging anywhere in the final date order: loading
+       pages lazily on scroll means every arrival reshuffles the grid under the
+       visitor. Instead fetch all remaining pages up front and in parallel, then
+       render the complete, date-sorted set once. */
 
-    async function loadNextPage() {
+    function sectionUrlForPage(page) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('section_id', _state.sectionId);
+        url.searchParams.set('page', String(page));
+        return url.toString();
+    }
+
+    async function fetchPageItems(page) {
+        const res = await fetch(sectionUrlForPage(page));
+        if (!res.ok) throw new Error('Archive page fetch failed: ' + res.status);
+        const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+        return Array.from(doc.querySelectorAll('.archive-cell')).map(cellToItem);
+    }
+
+    async function loadRemainingPages() {
         if (_state.loading || !_state.hasNext || !_state.sectionId) return;
+
+        // MAX_PREFETCH_PAGES keeps a huge non-event catalogue from firing hundreds of
+        // requests at once; anything past it stays behind the load-more control.
+        const lastPage = Math.min(_state.totalPages, _state.page + MAX_PREFETCH_PAGES);
+        const pages = [];
+        for (let p = _state.page + 1; p <= lastPage; p++) pages.push(p);
+        if (!pages.length) {
+            _state.hasNext = false;
+            return;
+        }
+
         _state.loading = true;
-
         try {
-            let gained = 0;
-            let fetches = 0;
-            // A raw collection page can land entirely on current-season products with
-            // no archive matches; keep advancing until a page contributes cells or pages run out.
-            // MAX_EMPTY_FETCHES stops a large non-event catalogue from firing an unbounded
-            // chain of requests in one go — the next scroll/click resumes where this left off.
-            while (_state.hasNext && gained === 0 && fetches < MAX_EMPTY_FETCHES) {
-                fetches += 1;
-                const nextPage = _state.page + 1;
-                const url = new URL(window.location.href);
-                url.searchParams.set('section_id', _state.sectionId);
-                url.searchParams.set('page', String(nextPage));
-                const res = await fetch(url.toString());
-                if (!res.ok) throw new Error('Archive page fetch failed: ' + res.status);
+            // Results are slotted by index so the merged list stays in page order —
+            // the grid sorts by date anyway, but this keeps undated events stable.
+            const results = new Array(pages.length);
+            let cursor = 0;
 
-                const html = await res.text();
-                const doc = new DOMParser().parseFromString(html, 'text/html');
-                const newCells = Array.from(doc.querySelectorAll('.archive-cell'));
-                const fetchedPageState = doc.getElementById('archive-pagination-state');
+            const worker = async () => {
+                while (cursor < pages.length) {
+                    const index = cursor++;
+                    try {
+                        results[index] = await fetchPageItems(pages[index]);
+                    } catch (err) {
+                        // one bad page shouldn't cost us every other page in flight
+                        console.error('Failed to load archived events:', err);
+                        results[index] = [];
+                    }
+                }
+            };
 
-                _state.items.push(...newCells.map(cellToItem));
-                _state.page = nextPage;
-                _state.hasNext = fetchedPageState?.dataset.hasNext === 'true';
-                gained = newCells.length;
-            }
+            const workers = Math.min(PREFETCH_CONCURRENCY, pages.length);
+            await Promise.all(Array.from({ length: workers }, worker));
 
-            rebuildGrid();
+            results.forEach(items => { if (items) _state.items.push(...items); });
+            _state.page = lastPage;
+            _state.hasNext = lastPage < _state.totalPages;
+
+            rebuildGrid({ preserveScroll: true });
             checkEmptyState();
-        } catch (err) {
-            console.error('Failed to load more archived events:', err);
         } finally {
             _state.loading = false;
         }
@@ -274,11 +349,11 @@
         const loadBtn = document.getElementById('btn-load-more');
         if (!loadBtn) return;
 
-        loadBtn.addEventListener('click', loadNextPage);
+        loadBtn.addEventListener('click', loadRemainingPages);
 
         if ('IntersectionObserver' in window) {
             const observer = new IntersectionObserver((entries) => {
-                if (entries.some(entry => entry.isIntersecting)) loadNextPage();
+                if (entries.some(entry => entry.isIntersecting)) loadRemainingPages();
             }, { rootMargin: '600px 0px' });
             observer.observe(loadBtn);
         }
