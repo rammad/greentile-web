@@ -40,9 +40,28 @@
   endif
 
   assign current_variant = product.selected_or_first_available_variant
+
+  assign event_is_upcoming = false
+  if product.tags contains 'upcoming'
+    assign event_is_upcoming = true
+  endif
+
+  comment
+    TEMP TESTING ONLY — allows buying upcoming events so the ticket modal can be tested
+    before an event goes on sale. Set back to false (and remove this block) before shipping.
+  endcomment
+  assign allow_upcoming_purchase = true
+
+  assign sales_closed = false
+  if event_is_past
+    assign sales_closed = true
+  endif
+  if event_is_upcoming and allow_upcoming_purchase == false
+    assign sales_closed = true
+  endif
 -%}
 
-<section class="pdp-section" data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}" data-max-qty="{{ section.settings.max_qty | default: 4 }}" data-buy-label="{{ section.settings.buy_label | default: 'Buy Now' | escape }}" data-event-start-at="{{ event_date | default: '' | escape }}">
+<section class="pdp-section" data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}" data-max-qty="{{ section.settings.max_qty | default: 4 }}" data-buy-label="{{ section.settings.buy_label | default: 'Buy Now' | escape }}" data-event-start-at="{{ event_date | default: '' | escape }}" data-event-upcoming="{{ event_is_upcoming }}" data-allow-upcoming-purchase="{{ allow_upcoming_purchase }}">
   <div class="pdp-sticky-wrapper">
     <div class="pdp-grid">
 
@@ -112,10 +131,10 @@
                 data-variant-id="{{ variant.id }}"
                 data-price="{{ variant.price }}"
                 data-abbr="{{ variant.option1 | truncate: 3, '' | upcase }}"
-                {% if event_is_past or variant.available == false %}disabled{% endif %}
+                {% if sales_closed or variant.available == false %}disabled{% endif %}
               >
                 {{ variant.title }} &ndash; {{ variant.price | money }}
-                {%- if event_is_past or variant.available == false %} ({{ 'product.sold_out' | t }}){% endif -%}
+                {%- if event_is_upcoming %} ({{ 'product.coming_soon' | t }}){% elsif event_is_past or variant.available == false %} ({{ 'product.sold_out' | t }}){% endif -%}
               </button>
             {%- endfor -%}
           </div>
@@ -139,11 +158,15 @@
           </div>
         </div>
 
-        {%- comment -%} Add to cart / Buy now {%- endcomment -%}
+        {%- comment -%} Add to cart / Buy now — for products with an event metafield and a Ticket Order Form block attached, this button opens that form in a modal instead of adding to cart directly (see data-ticket-modal + section-product.js) {%- endcomment -%}
+        {%- assign has_ticket_form = false -%}
+        {%- if event_meta and section.blocks.size > 0 -%}
+          {%- assign has_ticket_form = true -%}
+        {%- endif -%}
         <div class="ticket-actions">
           <div class="max-qty-label pdp-tag type-subRegular2" id="max-qty-msg">{{ 'product.max_qty' | t }}</div>
 
-          <div class="qty-wrapper"{% if event_is_past or current_variant.available == false %} style="display:none"{% endif %}>
+          <div class="qty-wrapper"{% if sales_closed or current_variant.available == false %} style="display:none"{% endif %}>
             <div class="qty-selector">
               <button class="qty-btn type-subRegular1" type="button" data-qty-change="-1">&minus;</button>
               <span class="qty-val type-subRegular1" id="ticket-qty">1</span>
@@ -151,14 +174,15 @@
             </div>
           </div>
 
-          <button type="button" class="cta-btn buy-button-override{% if event_is_past or current_variant.available == false %} is-sold-out{% endif %}" id="pdp-add-to-cart"
+          <button type="button" class="cta-btn buy-button-override{% if sales_closed or current_variant.available == false %} is-sold-out{% endif %}" id="pdp-add-to-cart"
             data-variant-id="{{ current_variant.id }}"
             data-price="{{ current_variant.price }}"
-            {% if event_is_past or current_variant.available == false %}disabled{% endif %}
+            {% if has_ticket_form %}data-ticket-modal="true"{% endif %}
+            {% if sales_closed or current_variant.available == false %}disabled{% endif %}
           >
             <div class="ui-roll roll-hover">
               <span class="type-subRegular1 ui-roll-layer ui-roll-visible">
-                {%- if event_is_past == false and current_variant.available -%}
+                {%- if sales_closed == false and current_variant.available -%}
                   <span>
                     {%- if product.variants.size > 1 -%}
                       <span class="buy-abbr">{{ current_variant.option1 | truncate: 3, '' | upcase }}</span>
@@ -167,12 +191,14 @@
                     <span class="buy-price">{{ current_variant.price | money }}</span>
                   </span>
                   <span class="buy-label">{{ section.settings.buy_label | default: 'Buy Now' }}</span>
+                {%- elsif event_is_upcoming -%}
+                  <span class="buy-label">{{ 'product.coming_soon' | t }}</span>
                 {%- else -%}
                   <span class="buy-label">{{ 'product.sold_out' | t }}</span>
                 {%- endif -%}
               </span>
               <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">
-                {%- if event_is_past == false and current_variant.available -%}
+                {%- if sales_closed == false and current_variant.available -%}
                   <span>
                     {%- if product.variants.size > 1 -%}
                       <span class="buy-abbr">{{ current_variant.option1 | truncate: 3, '' | upcase }}</span>
@@ -181,6 +207,8 @@
                     <span class="buy-price">{{ current_variant.price | money }}</span>
                   </span>
                   <span class="buy-label">{{ section.settings.buy_label | default: 'Buy Now' }}</span>
+                {%- elsif event_is_upcoming -%}
+                  <span class="buy-label">{{ 'product.coming_soon' | t }}</span>
                 {%- else -%}
                   <span class="buy-label">{{ 'product.sold_out' | t }}</span>
                 {%- endif -%}
@@ -193,6 +221,33 @@
     </div>
   </div>
 </section>
+
+{%- comment -%} Ticket question form — opens as an overlay from the Buy button above (see data-ticket-modal on #pdp-add-to-cart); the app's Ticket Order Form block renders inside it {%- endcomment -%}
+{%- if has_ticket_form -%}
+  <div class="ticket-modal-backdrop" id="ticket-modal-backdrop"></div>
+  <div class="ticket-modal" id="ticket-modal" data-lenis-prevent>
+    <div class="ticket-modal-inner">
+      <div class="ticket-modal-header">
+        <div class="ticket-modal-heading">
+          <h2 class="ticket-modal-title contact-title type-h2">Attendee Details</h2>
+        </div>
+        <button type="button" class="ticket-modal-close" aria-label="Close">
+          <span class="ticket-modal-close-line" aria-hidden="true"></span>
+          <span class="ticket-modal-close-line" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      {%- comment -%} selected ticket type / qty / total — filled by updateTicketSummary() {%- endcomment -%}
+      <div class="ticket-modal-summary type-subBold2" id="ticket-modal-summary"></div>
+
+      <div class="ticket-modal-body">
+        {%- for block in section.blocks -%}
+          {%- render block -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
 
 {%- comment -%} Product JSON for JS cart integration {%- endcomment -%}
 <script type="application/json" id="product-json">
@@ -352,6 +407,11 @@
       "label": "Custom color 3",
       "default": "#FFFCFA",
       "info": "Used when source is set to Custom hex"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
     }
   ],
   "presets": [

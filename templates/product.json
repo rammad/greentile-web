@@ -1,15 +1,46 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "main-product",
+      "blocks": {
+        "event_ticketing_ticket_list_8Mnk36": {
+          "type": "shopify://apps/event-ticketing/blocks/ticket-list/199018a9-0aa7-490f-8364-2884847c5180",
+          "settings": {
+            "color": "#000000",
+            "checkout_button_redirect": "checkout",
+            "checkout_button_text": "Check Out",
+            "not_available_label": "-",
+            "show_remaining_inventory": false,
+            "show_fees": false,
+            "show_total_price": false
+          }
+        }
+      },
+      "block_order": [
+        "event_ticketing_ticket_list_8Mnk36"
+      ],
       "settings": {
         "buy_label": "Buy Now",
         "max_qty": 4,
-        "gradient_color_1": "#FFFCFA",
-        "gradient_color_2": "#D6FED6",
-        "gradient_color_3": "#FFFCFA"
+        "gradient_color_1_source": "palette_off_white",
+        "gradient_color_1": "#fffcfa",
+        "gradient_color_2_source": "palette_bright_green_20",
+        "gradient_color_2": "#d6fed6",
+        "gradient_color_3_source": "palette_off_white",
+        "gradient_color_3": "#fffcfa"
       }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }

@@ -1,0 +1,10 @@
+{%- comment -%}
+  Renders one archive grid cell. Params: product, event_date_str, month_label.
+  Kept as a separate snippet so the paginated product loop in archives.liquid
+  doesn't have to duplicate this markup across its collection/all-products branches.
+{%- endcomment -%}
+<a href="{{ product.url }}" class="archive-cell" data-month="{{ month_label | default: 'Undated' }}" data-event-date="{{ event_date_str }}">
+  {%- if product.featured_image -%}
+    <img src="{{ product.featured_image | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ product.title | escape }}">
+  {%- endif -%}
+</a>

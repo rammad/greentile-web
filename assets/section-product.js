@@ -55,6 +55,11 @@
 
     const buyLabel = document.querySelector('.pdp-section')?.dataset.buyLabel || 'Buy Now';
     const eventStartAt = document.querySelector('.pdp-section')?.dataset.eventStartAt || '';
+    const eventUpcoming = document.querySelector('.pdp-section')?.dataset.eventUpcoming === 'true';
+    /* TEMP TESTING ONLY — paired with allow_upcoming_purchase in main-product.liquid; remove both */
+    const allowUpcomingPurchase = document.querySelector('.pdp-section')?.dataset.allowUpcomingPurchase === 'true';
+    const upcomingBlocksSale = eventUpcoming && !allowUpcomingPurchase;
+    const closedLabel = eventUpcoming ? 'Coming Soon' : 'Sold Out';
     let wasSoldOut = false;
 
     function isEventPast() {
@@ -81,7 +86,7 @@
 
         if (buyBtn && productData) {
             const variant = productData.variants.find(v => v.id === currentVariantId);
-            const available = variant ? (variant.available && !isEventPast()) : false;
+            const available = variant ? (variant.available && !isEventPast() && !upcomingBlocksSale) : false;
             const hasMultiple = productData.variants.length > 1;
 
             buyBtn.disabled = !available;
@@ -92,7 +97,7 @@
 
             if (!available) {
                 buyBtn.querySelectorAll('.ui-roll-layer').forEach(layer => {
-                    layer.innerHTML = '<span class="buy-label">Sold Out</span>';
+                    layer.innerHTML = '<span class="buy-label">' + closedLabel + '</span>';
                 });
                 wasSoldOut = true;
             } else if (wasSoldOut) {
@@ -141,6 +146,227 @@
         });
     }
 
+    /* ticket question modal — opens instead of the direct add-to-cart flow when the
+       Guest Manager Ticket Order Form block is attached (see data-ticket-modal) */
+
+    /* The app's own ticket row is hidden; the PDP's ticket-type buttons and quantity stepper
+       drive it instead. Its <select> stays in the DOM because the app's script listens to it
+       to render one question fieldset per ticket. */
+
+    const QTY_SELECT = 'select.ticket-select, select[name*="[quantity]"]';
+
+    function variantIdFor(select) {
+        const fromName = select.name.match(/items\[(\d+)\]/);
+        if (fromName) return fromName[1];
+        const row = select.closest('tr');
+        const fromRow = row && row.className.match(/variant-(\d+)/);
+        return fromRow ? fromRow[1] : null;
+    }
+
+    /* clamp to an option the app actually rendered, so we can't exceed its purchase limit or stock */
+    function clampToOptions(select, desired) {
+        const values = Array.from(select.options).map(o => parseInt(o.value, 10)).filter(v => !Number.isNaN(v));
+        if (!values.length) return null;
+        if (values.includes(desired)) return String(desired);
+        const below = values.filter(v => v <= desired);
+        return String(below.length ? Math.max(...below) : Math.min(...values));
+    }
+
+    function syncTicketQuantity(modal) {
+        modal.querySelectorAll(QTY_SELECT).forEach(select => {
+            const isCurrent = String(variantIdFor(select)) === String(currentVariantId);
+            const value = clampToOptions(select, isCurrent ? qty : 0);
+            if (value === null || select.value === value) return;
+            select.value = value;
+            /* the app re-renders its question fieldsets off this event */
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+    }
+
+    function variantById(id) {
+        return productData && productData.variants.find(v => v.id === id);
+    }
+
+    /* whichever ticket types actually have a quantity on them */
+    function selectedTickets(modal) {
+        const rows = [];
+        modal.querySelectorAll(QTY_SELECT).forEach(select => {
+            const count = parseInt(select.value, 10);
+            if (count) rows.push({ variantId: parseInt(variantIdFor(select), 10), qty: count });
+        });
+        return rows;
+    }
+
+    /* "General Admission • $80.00 • 2 tickets" — same formatting as the PDP date/time row.
+       More than one ticket type just reads "Mixed"; each one is named on its own fieldset. */
+    function updateTicketSummary(modal) {
+        const el = document.getElementById('ticket-modal-summary');
+        if (!el) return;
+
+        let rows = modal ? selectedTickets(modal) : [];
+        if (!rows.length) rows = [{ variantId: currentVariantId, qty: qty }];
+
+        const totalQty = rows.reduce((n, row) => n + row.qty, 0);
+        const total = rows.reduce((sum, row) => {
+            const variant = variantById(row.variantId);
+            return sum + (variant ? variant.price : currentUnitPrice) * row.qty;
+        }, 0);
+
+        const parts = [];
+
+        if (rows.length > 1) {
+            parts.push('Mixed');
+        } else {
+            const title = (variantById(rows[0].variantId) || {}).title;
+            parts.push(title && title !== 'Default Title' ? title : 'General Admission');
+        }
+
+        if (total) parts.push(formatPrice(total));
+        parts.push(totalQty + (totalQty === 1 ? ' ticket' : ' tickets'));
+
+        el.textContent = parts.join(' • ');
+    }
+
+    /* Name/Email render as flat siblings (label, br, input, br) directly in the fieldset, so a
+       two-up grid would split each label from its input — pair them up first. Idempotent: once
+       wrapped, the label is no longer a direct child of the fieldset. */
+    function wrapBuiltInFields(root) {
+        root.querySelectorAll('fieldset').forEach(fieldset => {
+            Array.from(fieldset.children).forEach(child => {
+                if (child.tagName !== 'LABEL') return;
+
+                let field = child.nextElementSibling;
+                while (field && field.tagName === 'BR') field = field.nextElementSibling;
+                if (!field || field.tagName !== 'INPUT') return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'gm-field';
+                fieldset.insertBefore(wrapper, child);
+                wrapper.appendChild(child);
+                wrapper.appendChild(field);
+            });
+
+            layoutFields(fieldset);
+        });
+    }
+
+    /* The app's markup carries no theme classes, so hand its elements the same design-system
+       classes the rest of the site uses. Re-applied on every rebuild via the observer. */
+    function decorateAppMarkup(root) {
+        /* toggle questions read as body copy, not as field labels */
+        root.querySelectorAll('.gm-question-wrapper').forEach(wrapper => {
+            if (!wrapper.querySelector('input[type="checkbox"]')) return;
+            const label = wrapper.querySelector('label');
+            /* is-visible because type-body1 starts blurred/transparent for the PDP reveal */
+            if (label) label.classList.add('type-body1', 'is-visible');
+        });
+
+        root.querySelectorAll('.product-ticket-button, .ticket-checkout-button').forEach(asCtaButton);
+    }
+
+    /* rebuilds the app's plain <button> into the theme's standard CTA, roll-over and all
+       (same structure initTicketTypes and contact.js build) */
+    function asCtaButton(btn) {
+        if (!btn.querySelector('.ui-roll')) {
+            const label = btn.textContent.trim();
+            btn.textContent = '';
+
+            const roll = document.createElement('div');
+            roll.className = 'ui-roll roll-hover is-visible';
+
+            ['ui-roll-visible', 'ui-roll-hidden'].forEach(layer => {
+                const span = document.createElement('span');
+                /* type class sits on the layer, not the button — matches the PDP buy button and
+                   contact submit, and lets its colour beat .cta-btn.is-visible's black */
+                span.className = 'type-subRegular1 ui-roll-layer ' + layer;
+                span.textContent = label;
+                roll.appendChild(span);
+            });
+
+            btn.appendChild(roll);
+        }
+
+        btn.classList.add('cta-btn', 'is-visible');
+    }
+
+    /* Text fields pair up two per row; with an odd count the first one runs full width so the
+       remainder still pairs evenly (checkbox questions are always full width, handled in CSS). */
+    function layoutFields(fieldset) {
+        const fields = Array.from(fieldset.querySelectorAll('.gm-field, .gm-question-wrapper'))
+            .filter(el => !el.querySelector('input[type="checkbox"]'));
+
+        fields.forEach((el, i) => el.classList.toggle('gm-field--full', fields.length % 2 === 1 && i === 0));
+    }
+
+    function initTicketModal() {
+        const modal = document.getElementById('ticket-modal');
+        const backdrop = document.getElementById('ticket-modal-backdrop');
+        if (!modal || !backdrop) return null;
+
+        /* Lenis applies a transform to #scroll-content for its virtual-scroll effect, which
+           creates a new containing block for position:fixed descendants — breaking true
+           viewport-fixed behavior (same reason the sticky buy bar gets reparented above).
+           Move the modal out to <body>, matching where .contact-panel already lives. */
+        const usesLenis = !document.documentElement.classList.contains('native-scroll');
+        const scrollViewport = document.getElementById('scroll-viewport');
+        if (usesLenis && scrollViewport) {
+            document.body.appendChild(backdrop);
+            document.body.appendChild(modal);
+        }
+
+        wrapBuiltInFields(modal);
+        decorateAppMarkup(modal);
+
+        /* changing quantity makes the app rebuild its fieldsets, which drops our wrappers */
+        new MutationObserver(() => {
+            wrapBuiltInFields(modal);
+            decorateAppMarkup(modal);
+        }).observe(modal, { childList: true, subtree: true });
+
+        let isOpen = false;
+
+        function open() {
+            if (isOpen) return;
+            isOpen = true;
+            syncTicketQuantity(modal);
+            updateTicketSummary(modal);
+            document.body.classList.add('ticket-modal-is-open');
+            modal.classList.add('is-open');
+            backdrop.classList.add('is-open');
+            if (window.lenis && window.lenis.stop) window.lenis.stop();
+        }
+
+        function close() {
+            if (!isOpen) return;
+            isOpen = false;
+            document.body.classList.remove('ticket-modal-is-open');
+            modal.classList.remove('is-open');
+            backdrop.classList.remove('is-open');
+            if (window.lenis && window.lenis.start) window.lenis.start();
+        }
+
+        backdrop.addEventListener('click', close);
+        const closeBtn = modal.querySelector('.ticket-modal-close');
+        if (closeBtn) closeBtn.addEventListener('click', close);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen) close();
+        });
+
+        /* #tickets in the URL force-opens the modal — same pattern as #contact on the contact panel */
+        function consumeHash() {
+            if (window.location.hash === '#tickets') open();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', consumeHash);
+        } else {
+            consumeHash();
+        }
+        window.addEventListener('hashchange', consumeHash);
+
+        return { open, close };
+    }
+
     function initAddToCart() {
         const buyBtn = document.getElementById('pdp-add-to-cart');
         if (!buyBtn) return;
@@ -151,6 +377,18 @@
             buyBtn.style.pointerEvents = '';
             buyBtn.style.opacity = '';
         });
+
+        if (buyBtn.dataset.ticketModal === 'true') {
+            const ticketModal = initTicketModal();
+            if (ticketModal) {
+                buyBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (buyBtn.disabled) return;
+                    ticketModal.open();
+                });
+                return;
+            }
+        }
 
         buyBtn.addEventListener('click', async (e) => {
             e.preventDefault();

@@ -19,7 +19,7 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: calc(1024px - var(--page-gutter) * 2); /* todo: apply to shopify theme */
+    width: var(--drawer-width);
     height: 100%;
     background: var(--c-off-white);
     z-index: 1002;
@@ -63,7 +63,9 @@
     position: relative;
     width: 44px;
     height: 44px;
-    margin: 0 -8px 0 0;
+    /* the 20px glyph sits centred in a 44px hit area — pull it out by half the difference
+       so the icon's right edge lines up with the panel's content edge */
+    margin: 0 -12px 0 0;
     padding: 0;
     border: none;
     background: none;
@@ -94,7 +96,7 @@
 }
 
 .contact-title {
-    font-size: clamp(48px, 8vw, var(--size-h1));
+    /* size comes from .type-h2 on the element — shared with the ticket modal's title */
     text-align: left;
     opacity: 1;
     color: var(--c-dark-green);
@@ -277,10 +279,6 @@ body.contact-is-open .nav-right {
 
 /* 4K desktop — 2× scale */
 @media (min-width: 3840px) {
-    .contact-panel {
-        width: calc(2048px - var(--page-gutter) * 2);
-    }
-
     .contact-panel-inner {
         padding: calc(var(--space-for-nav) - 24px) calc(var(--page-gutter) * 2) 80px;
     }
@@ -357,10 +355,6 @@ body.contact-is-open .nav-right {
     }
     .contact-panel-inner {
         padding: calc(var(--space-for-nav) - 12px) var(--page-gutter) 40px;
-    }
-
-    .contact-title {
-        font-size: 48px;
     }
 
     .contact-fields-row {

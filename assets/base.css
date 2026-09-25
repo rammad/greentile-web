@@ -92,6 +92,8 @@
     --space-for-nav: 88px;
 
     --page-gutter: 20px;
+    /* shared by the contact panel and the ticket modal so both drawers stay in sync */
+    --drawer-width: calc((1024px - var(--page-gutter) * 2) * 0.75);
     --gap-text: 40px;
     --gap-display-lines: 16px;
     --travel-reveal: 20px;
@@ -698,6 +700,7 @@ body::after {
 
         --space-for-nav:          clamp(78px,  4.063vw, 156px);
         --page-gutter:            clamp(20px,  1.042vw, 40px);
+        --drawer-width:           calc((2048px - var(--page-gutter) * 2) * 0.75);
         --gap-text:               clamp(40px,  2.083vw, 80px);
         --gap-display-lines:      clamp(16px,  0.833vw, 32px);
         --travel-reveal:          clamp(20px,  1.042vw, 40px);

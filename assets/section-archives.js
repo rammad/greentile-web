@@ -1,7 +1,7 @@
 /* archives page */
 
 (() => {
-    const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils;
+    const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils || {};
 
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.style.overflow = 'auto';
@@ -21,19 +21,31 @@
         }
 
         const cta = document.querySelector('.cta-btn');
-        if(cta) transitionCta(cta, 'enter');
+        if (cta && transitionCta) transitionCta(cta, 'enter');
 
         initRowPacker();
-        initEmptyState();
+        initInfiniteScroll();
+
+        // A page can land entirely on non-archived products with more pages still
+        // to check; only resolve to "coming soon" once nothing is left to fetch.
+        if (_state.items.length === 0 && _state.hasNext) {
+            loadNextPage().then(checkEmptyState);
+        } else {
+            checkEmptyState();
+        }
     });
 
-    function initEmptyState() {
+    function checkEmptyState() {
         const comingSoon = document.querySelector('.archives-coming-soon');
+        const loadMoreContainer = document.querySelector('.load-more-container');
+        const isEmpty = _state.items.length === 0;
+
+        if (loadMoreContainer) loadMoreContainer.style.display = (isEmpty || !_state.hasNext) ? 'none' : '';
         if (!comingSoon) return;
-        if (_state.totalItems === 0) {
-            const loadBtn = document.getElementById('btn-load-more');
-            if (loadBtn) loadBtn.closest('.load-more-container').style.display = 'none';
-            setTimeout(() => comingSoon.classList.add('is-visible'), staggerTime);
+        if (isEmpty) {
+            setTimeout(() => comingSoon.classList.add('is-visible'), staggerTime || 0);
+        } else {
+            comingSoon.classList.remove('is-visible');
         }
     }
 
@@ -41,8 +53,8 @@
 
     const GRID_CARD_MIN_W = 200;
     const GRID_MAX_COLS = 6;
-    const BATCH_SIZE = 12;
-    const _state = { monthGroups: null, activeCols: 0, visibleCount: 0, totalItems: 0, bound: false };
+    const MAX_EMPTY_FETCHES = 10;
+    const _state = { items: [], activeCols: 0, bound: false, page: 1, hasNext: false, sectionId: '', loading: false };
 
     function getGridColCount() {
         if (window.innerWidth <= 1024) return GRID_MAX_COLS;
@@ -90,8 +102,6 @@
         });
         if (currentRow.chunks.length > 0) ROWS.push(currentRow);
 
-        const flatItemList = [];
-
         ROWS.forEach(rowData => {
             const rowEl = document.createElement('div');
             rowEl.className = 'packed-row';
@@ -120,7 +130,6 @@
                     card.className = 'grid-card';
                     card.innerHTML = `<img src="${item.imgSrc}" class="grid-card-poster">`;
                     gridEl.appendChild(card);
-                    flatItemList.push(card);
                 });
 
                 chunkEl.appendChild(gridEl);
@@ -135,89 +144,74 @@
             const deg  = sign * (2 + Math.random() * 2);
             card.style.setProperty('--hover-rotate', `${deg.toFixed(1)}deg`);
         });
-
-        return flatItemList;
     }
 
-    function applyPagination(flatItemList) {
-        flatItemList.forEach((item, index) => {
-            if (index >= _state.visibleCount) {
-                item.style.display = 'none';
-                item.style.opacity = '0';
-            } else {
-                item.style.display = '';
-                item.style.opacity = '1';
-            }
-        });
-
-        document.querySelectorAll('#dynamic-archive-container .packed-row').forEach(row => {
-            const cards = row.querySelectorAll('.grid-card');
-            const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
-            row.style.display = hasVisible ? 'grid' : 'none';
-        });
-
-        const loadBtn = document.getElementById('btn-load-more');
-        if (loadBtn) {
-            if (_state.visibleCount >= _state.totalItems) {
-                loadBtn.style.opacity = '0';
-                loadBtn.style.pointerEvents = 'none';
-            } else {
-                loadBtn.style.opacity = '';
-                loadBtn.style.pointerEvents = '';
-            }
-        }
+    function parseEventDate(cell) {
+        const raw = (cell.getAttribute('data-event-date') || '').trim();
+        if (!raw) return null;
+        const t = Date.parse(`${raw}T00:00:00`);
+        return Number.isNaN(t) ? null : t;
     }
 
-    function initRowPacker() {
-        const container = document.getElementById('dynamic-archive-container');
-        if (!container) return;
-
-        const allCells = Array.from(document.querySelectorAll('.archive-cell'));
-        const parseEventDate = (cell) => {
-            const raw = (cell.getAttribute('data-event-date') || '').trim();
-            if (!raw) return null;
-            const t = Date.parse(`${raw}T00:00:00`);
-            return Number.isNaN(t) ? null : t;
+    function cellToItem(cell) {
+        const img = cell.querySelector('img');
+        return {
+            imgSrc: img ? img.getAttribute('src') : '',
+            href: cell.getAttribute('href'),
+            month: cell.getAttribute('data-month'),
+            ts: parseEventDate(cell)
         };
-        const sortedCells = allCells
-            .map((cell, index) => ({ cell, index, ts: parseEventDate(cell) }))
-            .sort((a, b) => {
-                // Most recent first for dated events; keep undated entries stable at the end.
-                if (a.ts !== null && b.ts !== null) return b.ts - a.ts;
-                if (a.ts !== null) return -1;
-                if (b.ts !== null) return 1;
-                return a.index - b.index;
-            })
-            .map(entry => entry.cell);
-        container.innerHTML = '';
-        container.classList.add('calendar-grid-packed');
-        container.style.display = 'flex';
+    }
 
+    function sortItems(items) {
+        return items.slice().sort((a, b) => {
+            // Most recent first for dated events; keep undated entries stable at the end.
+            if (a.ts !== null && b.ts !== null) return b.ts - a.ts;
+            if (a.ts !== null) return -1;
+            if (b.ts !== null) return 1;
+            return 0;
+        });
+    }
+
+    function groupByMonth(items) {
         const monthGroups = [];
         let currentMonthName = null;
         let currentGroup = null;
 
-        sortedCells.forEach(cell => {
-            const m = cell.getAttribute('data-month');
-            const img = cell.querySelector('img');
-            const imgSrc = img ? img.getAttribute('src') : '';
-            const href = cell.getAttribute('href');
-
-            if (m !== currentMonthName) {
-                currentGroup = { name: m, items: [] };
+        items.forEach(item => {
+            if (item.month !== currentMonthName) {
+                currentGroup = { name: item.month, items: [] };
                 monthGroups.push(currentGroup);
-                currentMonthName = m;
+                currentMonthName = item.month;
             }
-
-            currentGroup.items.push({ imgSrc, href });
+            currentGroup.items.push({ imgSrc: item.imgSrc, href: item.href });
         });
 
-        _state.monthGroups = monthGroups;
-        _state.totalItems = sortedCells.length;
-        _state.activeCols = getGridColCount();
+        return monthGroups;
+    }
 
-        const flatItemList = renderArchiveGrid(container, monthGroups, _state.activeCols);
-        initPagination(flatItemList);
+    function rebuildGrid() {
+        const container = document.getElementById('dynamic-archive-container');
+        if (!container) return;
+        _state.activeCols = getGridColCount();
+        renderArchiveGrid(container, groupByMonth(sortItems(_state.items)), _state.activeCols);
+    }
+
+    function initRowPacker() {
+        const pageState = document.getElementById('archive-pagination-state');
+        _state.sectionId = pageState?.dataset.sectionId || '';
+        _state.page = parseInt(pageState?.dataset.currentPage, 10) || 1;
+        _state.hasNext = pageState?.dataset.hasNext === 'true';
+
+        const container = document.getElementById('dynamic-archive-container');
+        if (!container) return;
+
+        container.classList.add('calendar-grid-packed');
+        container.style.display = 'flex';
+
+        _state.items = Array.from(document.querySelectorAll('.archive-cell')).map(cellToItem);
+
+        rebuildGrid();
 
         if (!_state.bound) {
             _state.bound = true;
@@ -225,76 +219,68 @@
             window.addEventListener('resize', () => {
                 clearTimeout(timer);
                 timer = setTimeout(() => {
-                    if (!_state.monthGroups) return;
+                    if (!_state.items.length) return;
                     const newCols = getGridColCount();
-                    if (newCols !== _state.activeCols) {
-                        _state.activeCols = newCols;
-                        const c = document.getElementById('dynamic-archive-container');
-                        if (c) {
-                            const items = renderArchiveGrid(c, _state.monthGroups, newCols);
-                            applyPagination(items);
-                        }
-                    }
+                    if (newCols !== _state.activeCols) rebuildGrid();
                 }, 150);
             });
         }
     }
 
-    function initPagination(items) {
-        const loadBtn = document.getElementById('btn-load-more');
-        _state.visibleCount = Math.min(BATCH_SIZE, items.length);
+    /* infinite scroll — fetch the next page via the Section Rendering API when the
+       load-more control scrolls into view; the button itself stays as a manual/no-JS fallback */
 
-        items.forEach((item, index) => {
-            if (index >= BATCH_SIZE) {
-                item.style.display = 'none';
-                item.style.opacity = '0';
-            } else {
-                item.style.opacity = '1';
+    async function loadNextPage() {
+        if (_state.loading || !_state.hasNext || !_state.sectionId) return;
+        _state.loading = true;
+
+        try {
+            let gained = 0;
+            let fetches = 0;
+            // A raw collection page can land entirely on current-season products with
+            // no archive matches; keep advancing until a page contributes cells or pages run out.
+            // MAX_EMPTY_FETCHES stops a large non-event catalogue from firing an unbounded
+            // chain of requests in one go — the next scroll/click resumes where this left off.
+            while (_state.hasNext && gained === 0 && fetches < MAX_EMPTY_FETCHES) {
+                fetches += 1;
+                const nextPage = _state.page + 1;
+                const url = new URL(window.location.href);
+                url.searchParams.set('section_id', _state.sectionId);
+                url.searchParams.set('page', String(nextPage));
+                const res = await fetch(url.toString());
+                if (!res.ok) throw new Error('Archive page fetch failed: ' + res.status);
+
+                const html = await res.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const newCells = Array.from(doc.querySelectorAll('.archive-cell'));
+                const fetchedPageState = doc.getElementById('archive-pagination-state');
+
+                _state.items.push(...newCells.map(cellToItem));
+                _state.page = nextPage;
+                _state.hasNext = fetchedPageState?.dataset.hasNext === 'true';
+                gained = newCells.length;
             }
-        });
 
-        document.querySelectorAll('#dynamic-archive-container .packed-row').forEach(row => {
-            const cards = row.querySelectorAll('.grid-card');
-            const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
-            row.style.display = hasVisible ? 'grid' : 'none';
-        });
-
-        if (items.length <= BATCH_SIZE) {
-            if (loadBtn) loadBtn.style.display = 'none';
-            return;
+            rebuildGrid();
+            checkEmptyState();
+        } catch (err) {
+            console.error('Failed to load more archived events:', err);
+        } finally {
+            _state.loading = false;
         }
+    }
 
-        if (loadBtn) {
-            loadBtn.addEventListener('click', () => {
-                const currentCards = Array.from(document.querySelectorAll('#dynamic-archive-container .grid-card'));
-                const nextLimit = Math.min(_state.visibleCount + BATCH_SIZE, _state.totalItems);
-                let newlyVisible = [];
+    function initInfiniteScroll() {
+        const loadBtn = document.getElementById('btn-load-more');
+        if (!loadBtn) return;
 
-                for (let i = _state.visibleCount; i < nextLimit && i < currentCards.length; i++) {
-                    currentCards[i].style.display = '';
-                    newlyVisible.push(currentCards[i]);
-                }
+        loadBtn.addEventListener('click', loadNextPage);
 
-                _state.visibleCount = nextLimit;
-
-                document.querySelectorAll('#dynamic-archive-container .packed-row').forEach(row => {
-                    const cards = row.querySelectorAll('.grid-card');
-                    const hasVisible = Array.from(cards).some(el => el.style.display !== 'none');
-                    row.style.display = hasVisible ? 'grid' : 'none';
-                });
-
-                setTimeout(() => {
-                    newlyVisible.forEach(item => {
-                        item.style.transition = 'opacity 0.6s ease';
-                        item.style.opacity = '1';
-                    });
-                }, 50);
-
-                if (_state.visibleCount >= _state.totalItems) {
-                    loadBtn.style.opacity = '0';
-                    loadBtn.style.pointerEvents = 'none';
-                }
-            });
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                if (entries.some(entry => entry.isIntersecting)) loadNextPage();
+            }, { rootMargin: '600px 0px' });
+            observer.observe(loadBtn);
         }
     }
 })();
