@@ -56,9 +56,6 @@
     const buyLabel = document.querySelector('.pdp-section')?.dataset.buyLabel || 'Buy Now';
     const eventStartAt = document.querySelector('.pdp-section')?.dataset.eventStartAt || '';
     const eventUpcoming = document.querySelector('.pdp-section')?.dataset.eventUpcoming === 'true';
-    /* TEMP TESTING ONLY — paired with allow_upcoming_purchase in main-product.liquid; remove both */
-    const allowUpcomingPurchase = document.querySelector('.pdp-section')?.dataset.allowUpcomingPurchase === 'true';
-    const upcomingBlocksSale = eventUpcoming && !allowUpcomingPurchase;
     const closedLabel = eventUpcoming ? 'Coming Soon' : 'Sold Out';
     let wasSoldOut = false;
 
@@ -86,7 +83,7 @@
 
         if (buyBtn && productData) {
             const variant = productData.variants.find(v => v.id === currentVariantId);
-            const available = variant ? (variant.available && !isEventPast() && !upcomingBlocksSale) : false;
+            const available = variant ? (variant.available && !isEventPast() && !eventUpcoming) : false;
             const hasMultiple = productData.variants.length > 1;
 
             buyBtn.disabled = !available;

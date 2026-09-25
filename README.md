@@ -176,7 +176,7 @@ Use this as a practical "what should I fill in?" checklist.
   - if no auto archives, uses `archive_event` blocks
 - Fill: title, load-more label, empty state
 - **Pagination / infinite scroll**: the archives loop is wrapped in
-  `{% paginate collections.all.products by: 24 %}` — real Shopify pagination
+  `{% paginate collections.all.products by 24 %}` — real Shopify pagination
   (`page=N` in the URL), not a raised item cap, and no fixed ceiling; it keeps
   paging through the whole store's products.
   - `paginate` has two constraints that both tripped Shopify's own GitHub
@@ -198,22 +198,56 @@ Use this as a practical "what should I fill in?" checklist.
        placed right after that container (it has to come after
        `{% endpaginate %}` runs, so it can't live as data attributes on
        `.archives-page`, whose opening tag is emitted before pagination runs).
+    3. **`by` takes no colon.** `{% paginate x by: 24 %}` does not parse as a
+       page size — Liquid silently falls back to the default 20/page, and
+       Shopify's GitHub sync "helpfully" rewrites it to `by nil` (see the
+       auto-commit in `caa588c`). Always write `{% paginate x by 24 %}`.
+  - `#dynamic-archive-container`, `#archive-pagination-state` and the load-more
+    control are **always** rendered — never gated on a server-side "do we have
+    products?" probe. Page 1 can legitimately contain zero archive matches while
+    later pages have plenty, and if the mount point isn't in the DOM the JS pager
+    can't bootstrap at all, so the page renders permanently empty. Visibility is
+    the JS's job (`checkEmptyState`), not Liquid's.
   - `assets/section-archives.js` reads `#archive-pagination-state` for
-    `data-section-id`/`data-current-page`/`data-has-next`, then fetches
-    subsequent pages via the Section Rendering API (`?section_id=...&page=N`)
-    as the "Load More" button scrolls into view (`IntersectionObserver`),
-    merges the new cells into the existing month-packed grid, and stops once
-    `paginate.next` is empty. The button itself stays in the DOM as a manual
-    click fallback.
+    `data-section-id`/`data-current-page`/`data-total-pages`/`data-has-next`,
+    then fetches **every remaining page up front and in parallel** via the
+    Section Rendering API (`?section_id=...&page=N`), merges the cells, and
+    renders the complete date-sorted grid in one pass.
+  - **Why eager, not on-scroll**: Shopify pages `collections.all` in catalogue
+    order, and the sort key the grid actually uses — the event date — lives in a
+    metafield Liquid can't order by. So page N can contain events belonging
+    anywhere in the final date order. Loading pages lazily meant each arrival
+    re-sorted the whole grid, and events silently appeared *above* the visitor's
+    scroll position ("I had 1 event, scrolled down, scrolled back up and there
+    were 3"). Fetching everything before the first re-render collapses that into
+    a single early reorder, at the top of the page, before anyone has scrolled.
+  - Concurrency is capped at `PREFETCH_CONCURRENCY` (4) and total pages at
+    `MAX_PREFETCH_PAGES` (30). A failed page is logged and skipped rather than
+    aborting the pages in flight with it. Anything past the cap stays behind the
+    load-more control, which also remains a manual/no-JS click fallback.
+  - Every full re-render (new pages merged, or a resize that changes the column
+    count) goes through `rebuildGrid({ preserveScroll: true })`, which pins the
+    topmost visible card by `data-key` (its product URL) and restores its screen
+    position afterwards. `getScroller()` resolves the right scrolling element —
+    `document.body` under `ios-body-scroll`, `#scroll-viewport` when Lenis owns
+    it (corrected via `lenis.scrollTo(..., { immediate: true })`), otherwise
+    `document.scrollingElement` with `scroll-behavior` temporarily forced to
+    `auto`, since `html` carries `scroll-behavior: smooth`.
   - Per-cell markup lives in `snippets/archive-cell.liquid`.
   - Sort order matters for scroll order: keep the events collection sorted
     **Date: newest first** so newest-first fetch order roughly matches display
     order (the grid re-sorts every fetched batch by event date, so this only
     affects fetch order, not final on-screen order).
   - A raw 24-product page can land entirely on current-season/non-matching
-    products; the JS keeps auto-fetching subsequent pages until one actually
-    contributes archive cells, so the "coming soon" empty state only shows once
-    every page has been exhausted with zero matches.
+    products, so the "coming soon" empty state only resolves after the prefetch
+    has settled — never off page 1 alone.
+  - The manual `archive_event` fallback renders on **page 1 only**. It used to
+    render on any page with zero matches, which meant the JS pager appended the
+    same manual blocks once per fetched page.
+  - The optional "Events collection" setting resolves to a *collection object*,
+    not a handle — filter with `product.collections contains archive_collection`.
+    `collections[archive_collection]` is a nil lookup and silently excludes every
+    product, emptying the page whenever the setting is set.
 - **Known Shopify sync risk**: the GitHub theme-sync app has previously
   rewritten a `{% paginate ... by: N %}` tag to `{% paginate ... by nil %}` in
   an auto-commit (breaks pagination — renders 0 items), with an auto-inserted
@@ -279,7 +313,7 @@ Use this as a practical "what should I fill in?" checklist.
   wrapped in `{% paginate collection.products by: N %}` (max `N` per page is 250).
   `paginate` only accepts specific documented objects directly — not a variable,
   not a bracket-indexed dynamic handle.
-- `sections/archives.liquid` uses real `{% paginate collections.all.products by: 24 %}`
+- `sections/archives.liquid` uses real `{% paginate collections.all.products by 24 %}`
   pagination — `assets/section-archives.js` fetches additional `page=N` slices
   via the Section Rendering API as the visitor scrolls, so there's no fixed
   ceiling on total archived events. See "Archives Page" above for the full flow.
