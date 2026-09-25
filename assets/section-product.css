@@ -279,6 +279,10 @@
 
 /* 4K desktop */
 @media (min-width: 3840px) {
+    .ticket-modal-body .gm-question-wrapper:has(input[type="checkbox"]) {
+        --gm-toggle-size: 36px;
+    }
+
     .pdp-sticky-wrapper {
         padding-bottom: 80px;
     }
@@ -919,8 +923,8 @@
     display: block;
     /* integer px on purpose: calc() off the fluid type token landed on 16.8px, which
        rounded to 16 or 17 depending on where each box fell, so they rendered uneven */
-    width: 18px;
-    height: 18px;
+    width: var(--gm-toggle-size, 18px);
+    height: var(--gm-toggle-size, 18px);
     margin: 0;
     border-radius: 6px;
     background: none;
@@ -956,10 +960,18 @@
 
 /* checkbox questions run full width, box first, and keep their sentence casing */
 .ticket-modal-body .gm-question-wrapper:has(input[type="checkbox"]) {
+    --gm-toggle-size: 18px;
+
     grid-column: 1 / -1;
     flex-direction: row;
     align-items: flex-start; /* box tracks the first line, not the middle of a wrapped block */
     gap: 12px;
+}
+
+/* the box and the question's first line box are the same height, so aligning their top
+   edges also centres them on each other — and it holds when the text wraps */
+.ticket-modal-body .gm-question-wrapper:has(input[type="checkbox"]) > label {
+    line-height: var(--gm-toggle-size);
 }
 
 .ticket-modal-body .gm-question-wrapper:has(input[type="checkbox"]) > input[type="checkbox"] {

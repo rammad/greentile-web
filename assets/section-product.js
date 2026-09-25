@@ -192,10 +192,11 @@
         const parts = [];
 
         const title = variant && variant.title;
-        const name = title && title !== 'Default Title' ? title : 'General Admission';
-        parts.push(name + ' x' + qty);
+        parts.push(title && title !== 'Default Title' ? title : 'General Admission');
 
         if (currentUnitPrice) parts.push(formatPrice(currentUnitPrice * qty));
+
+        parts.push(qty + (qty === 1 ? ' ticket' : ' tickets'));
 
         el.textContent = parts.join(' • ');
     }
@@ -226,8 +227,8 @@
     /* The app's markup carries no theme classes, so hand its elements the same design-system
        classes the rest of the site uses. Re-applied on every rebuild via the observer. */
     function decorateAppMarkup(root) {
-        /* ticket heading — same subhead style as the drawer's "General Admission x2 • $80.00" line */
-        root.querySelectorAll('legend').forEach(el => el.classList.add('type-subBold2'));
+        /* ticket heading — one size up from the drawer's summary subhead */
+        root.querySelectorAll('legend').forEach(el => el.classList.add('type-subBold1'));
 
         /* toggle questions read as body copy, not as field labels */
         root.querySelectorAll('.gm-question-wrapper').forEach(wrapper => {
@@ -252,7 +253,9 @@
 
             ['ui-roll-visible', 'ui-roll-hidden'].forEach(layer => {
                 const span = document.createElement('span');
-                span.className = 'ui-roll-layer ' + layer;
+                /* type class sits on the layer, not the button — matches the PDP buy button and
+                   contact submit, and lets its colour beat .cta-btn.is-visible's black */
+                span.className = 'type-subRegular1 ui-roll-layer ' + layer;
                 span.textContent = label;
                 roll.appendChild(span);
             });
@@ -260,7 +263,7 @@
             btn.appendChild(roll);
         }
 
-        btn.classList.add('cta-btn', 'is-visible', 'type-subRegular1');
+        btn.classList.add('cta-btn', 'is-visible');
     }
 
     /* Text fields pair up two per row; with an odd count the first one runs full width so the
