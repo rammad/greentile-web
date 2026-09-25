@@ -805,11 +805,18 @@
     grid-column: 1 / -1;
 }
 
+/* with a single ticket there's nothing to tell apart, so drop the "Ticket #1 — ..." heading;
+   it comes back as soon as the quantity renders a second fieldset */
+.ticket-modal-body .ticket-custom-questions-container > fieldset:only-of-type > legend {
+    display: none;
+}
+
 .ticket-modal-body .gm-field {
     display: flex;
     flex-direction: column;
     gap: 16px;
     min-width: 0;
+    padding-bottom: 4px; /* squares these up against the app's own .gm-question-wrapper fields */
 }
 
 /* odd number of text fields — the first spans the row so the rest still pair up evenly */
@@ -860,7 +867,6 @@
     outline: none;
     transition: box-shadow 0.3s ease;
     font-family: var(--font-body);
-    text-transform: uppercase;
     letter-spacing: 0.03em;
     line-height: var(--lh-body);
 }
@@ -896,7 +902,6 @@
     /* no font-variation-settings here: native <option> popups render outside the normal CSS
        pipeline in most browsers and don't reliably resolve variable-font axes — it was
        producing missing/tofu glyphs for the numbers instead of an actual 'wdth' 450 instance */
-    text-transform: uppercase;
     letter-spacing: 0.05em;
     line-height: var(--lh-body);
     appearance: none;
