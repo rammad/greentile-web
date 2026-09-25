@@ -258,6 +258,17 @@
             if (label) label.classList.add('type-body1', 'is-visible');
         });
 
+        /* a question's help text renders as a block under the field; fold it into the
+           placeholder instead (checkbox questions have nowhere to put it, so they keep theirs) */
+        root.querySelectorAll('.gm-question-wrapper').forEach(wrapper => {
+            const details = wrapper.querySelector('.gm-question-details');
+            const input = wrapper.querySelector('input[type="text"], input[type="email"], input[type="tel"], input[type="number"]');
+            if (!details || !input) return;
+
+            const hint = details.textContent.trim();
+            if (hint && !input.placeholder) input.placeholder = hint;
+        });
+
         root.querySelectorAll('.product-ticket-button, .ticket-checkout-button').forEach(asCtaButton);
     }
 
@@ -332,12 +343,20 @@
             decorateAppMarkup(modal);
         }).observe(modal, { childList: true, subtree: true });
 
+        /* on mobile the drawer's own X is hidden and the nav hamburger morphs into the X
+           instead — same affordance the mobile menu and contact panel use */
+        const hamburger = document.querySelector('.nav-hamburger');
+
         let isOpen = false;
 
         function open() {
             if (isOpen) return;
             isOpen = true;
             clearCart();
+            if (hamburger) {
+                hamburger.classList.add('is-active');
+                hamburger.setAttribute('aria-expanded', 'true');
+            }
             syncTicketQuantity(modal);
             updateTicketSummary(modal);
             document.body.classList.add('ticket-modal-is-open');
@@ -353,6 +372,22 @@
             modal.classList.remove('is-open');
             backdrop.classList.remove('is-open');
             if (window.lenis && window.lenis.start) window.lenis.start();
+
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const menuStillOpen = mobileMenu && mobileMenu.classList.contains('is-open');
+            if (hamburger && !menuStillOpen) {
+                hamburger.classList.remove('is-active');
+                hamburger.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        /* capture phase so the hamburger closes the drawer instead of toggling the menu */
+        if (hamburger) {
+            hamburger.addEventListener('click', (e) => {
+                if (!isOpen) return;
+                e.stopImmediatePropagation();
+                close();
+            }, true);
         }
 
         backdrop.addEventListener('click', close);
