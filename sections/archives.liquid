@@ -8,23 +8,6 @@
   assign evt_key = settings.event_metafield_key | default: 'event_v2'
 
   assign archive_collection = section.settings.collection
-  assign archive_has_products = false
-  if collections.all.products.size > 0
-    assign archive_has_products = true
-  endif
-
-  assign archive_has_manual_blocks = false
-  for block in section.blocks
-    if block.type == 'archive_event' and block.settings.poster
-      assign archive_has_manual_blocks = true
-      break
-    endif
-  endfor
-
-  assign archives_available = false
-  if archive_has_products or archive_has_manual_blocks
-    assign archives_available = true
-  endif
 
   assign archive_current_page = 1
   assign archive_has_next = false
@@ -78,74 +61,74 @@
   </div>
 
   <div class="archives-body">
-    {%- if archives_available -%}
-      <div id="dynamic-archive-container">
-        {%- assign archive_count = 0 -%}
-        {%- paginate collections.all.products by: 24 -%}
-          {%- assign archive_current_page = paginate.current_page -%}
-          {%- if paginate.next -%}
-            {%- assign archive_has_next = true -%}
-          {%- endif -%}
-          {%- for product in collections.all.products -%}
-            {%- liquid
-              assign in_selected_collection = true
-              if archive_collection != blank
-                assign in_selected_collection = false
-                if product.collections contains collections[archive_collection]
-                  assign in_selected_collection = true
-                endif
-              endif
-
-              assign ev = product.metafields[evt_ns][evt_key].value
-              assign event_date_str = nil
-              assign month_label = nil
-
-              if ev
-                assign event_date_str = ev.starts_at | date: '%Y-%m-%d'
-                assign month_label = ev.starts_at | date: '%B %Y'
-              endif
-
-              assign is_archive = false
-              if in_selected_collection and event_date_str and event_date_str < season_start
-                assign is_archive = true
-              endif
-            -%}
-            {%- if is_archive -%}
-              {%- render 'archive-cell', product: product, event_date_str: event_date_str, month_label: month_label -%}
-              {%- assign archive_count = archive_count | plus: 1 -%}
-            {%- endif -%}
-          {%- endfor -%}
-        {%- endpaginate -%}
-
-        {%- comment -%} Manual block fallback if no auto-archives found {%- endcomment -%}
-        {%- if archive_count == 0 -%}
-          {%- for block in section.blocks -%}
-            {%- if block.type == 'archive_event' -%}
-              <a href="{{ block.settings.url | default: '#' }}" class="archive-cell" data-month="{{ block.settings.month }}" data-event-date="" {{ block.shopify_attributes }}>
-                {%- if block.settings.poster -%}
-                  <img src="{{ block.settings.poster | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ block.settings.title | escape }}">
-                {%- endif -%}
-              </a>
-            {%- endif -%}
-          {%- endfor -%}
+    <div id="dynamic-archive-container">
+      {%- assign archive_count = 0 -%}
+      {%- paginate collections.all.products by 24 -%}
+        {%- assign archive_current_page = paginate.current_page -%}
+        {%- if paginate.next -%}
+          {%- assign archive_has_next = true -%}
         {%- endif -%}
-      </div>
-    {%- endif -%}
+        {%- for product in collections.all.products -%}
+          {%- liquid
+            assign in_selected_collection = true
+            if archive_collection != blank
+              assign in_selected_collection = false
+              if product.collections contains archive_collection
+                assign in_selected_collection = true
+              endif
+            endif
+
+            assign ev = product.metafields[evt_ns][evt_key].value
+            assign event_date_str = nil
+            assign month_label = nil
+
+            if ev
+              assign event_date_str = ev.starts_at | date: '%Y-%m-%d'
+              assign month_label = ev.starts_at | date: '%B %Y'
+            endif
+
+            assign is_archive = false
+            if in_selected_collection and event_date_str and event_date_str < season_start
+              assign is_archive = true
+            endif
+          -%}
+          {%- if is_archive -%}
+            {%- render 'archive-cell', product: product, event_date_str: event_date_str, month_label: month_label -%}
+            {%- assign archive_count = archive_count | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endpaginate -%}
+
+      {%- comment -%}
+        Manual block fallback if no auto-archives found. Page 1 only: the JS pager
+        fetches later pages and merges their cells, so rendering these on every
+        empty page would append the same blocks once per fetch.
+      {%- endcomment -%}
+      {%- if archive_count == 0 and archive_current_page == 1 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'archive_event' -%}
+            <a href="{{ block.settings.url | default: '#' }}" class="archive-cell" data-month="{{ block.settings.month }}" data-event-date="" {{ block.shopify_attributes }}>
+              {%- if block.settings.poster -%}
+                <img src="{{ block.settings.poster | image_url: width: 600 }}" class="archive-poster" loading="lazy" alt="{{ block.settings.title | escape }}">
+              {%- endif -%}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
 
     <div id="archive-pagination-state" data-section-id="{{ section.id }}" data-current-page="{{ archive_current_page }}" data-has-next="{{ archive_has_next }}" hidden></div>
 
     <div class="archives-coming-soon"><span class="type-h2">{{ section.settings.empty_message | default: 'more events coming soon!' }}</span></div>
 
-    {%- if archives_available -%}
-      <div class="load-more-container"{% unless archive_has_next %} style="display:none"{% endunless %}>
-        <button id="btn-load-more" class="cta-btn">
-          <div class="ui-roll roll-hover">
-            <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ section.settings.load_more_label | default: 'Load More' }}</span>
-            <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ section.settings.load_more_label | default: 'Load More' }}</span>
-          </div>
-        </button>
-      </div>
-    {%- endif -%}
+    <div class="load-more-container"{% unless archive_has_next %} style="display:none"{% endunless %}>
+      <button id="btn-load-more" class="cta-btn">
+        <div class="ui-roll roll-hover">
+          <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ section.settings.load_more_label | default: 'Load More' }}</span>
+          <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ section.settings.load_more_label | default: 'Load More' }}</span>
+        </div>
+      </button>
+    </div>
   </div>
 </section>
 

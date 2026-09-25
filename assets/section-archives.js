@@ -1,7 +1,7 @@
 /* archives page */
 
 (() => {
-    const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils;
+    const { wait, transitionCta, transitionHeader, staggerTime } = window.AnimationUtils || {};
 
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.style.overflow = 'auto';
@@ -21,7 +21,7 @@
         }
 
         const cta = document.querySelector('.cta-btn');
-        if (cta) transitionCta(cta, 'enter');
+        if (cta && transitionCta) transitionCta(cta, 'enter');
 
         initRowPacker();
         initInfiniteScroll();
@@ -43,7 +43,7 @@
         if (loadMoreContainer) loadMoreContainer.style.display = (isEmpty || !_state.hasNext) ? 'none' : '';
         if (!comingSoon) return;
         if (isEmpty) {
-            setTimeout(() => comingSoon.classList.add('is-visible'), staggerTime);
+            setTimeout(() => comingSoon.classList.add('is-visible'), staggerTime || 0);
         } else {
             comingSoon.classList.remove('is-visible');
         }
@@ -53,6 +53,7 @@
 
     const GRID_CARD_MIN_W = 200;
     const GRID_MAX_COLS = 6;
+    const MAX_EMPTY_FETCHES = 10;
     const _state = { items: [], activeCols: 0, bound: false, page: 1, hasNext: false, sectionId: '', loading: false };
 
     function getGridColCount() {
@@ -197,6 +198,11 @@
     }
 
     function initRowPacker() {
+        const pageState = document.getElementById('archive-pagination-state');
+        _state.sectionId = pageState?.dataset.sectionId || '';
+        _state.page = parseInt(pageState?.dataset.currentPage, 10) || 1;
+        _state.hasNext = pageState?.dataset.hasNext === 'true';
+
         const container = document.getElementById('dynamic-archive-container');
         if (!container) return;
 
@@ -204,11 +210,6 @@
         container.style.display = 'flex';
 
         _state.items = Array.from(document.querySelectorAll('.archive-cell')).map(cellToItem);
-
-        const pageState = document.getElementById('archive-pagination-state');
-        _state.sectionId = pageState?.dataset.sectionId || '';
-        _state.page = parseInt(pageState?.dataset.currentPage, 10) || 1;
-        _state.hasNext = pageState?.dataset.hasNext === 'true';
 
         rebuildGrid();
 
@@ -235,9 +236,13 @@
 
         try {
             let gained = 0;
+            let fetches = 0;
             // A raw collection page can land entirely on current-season products with
             // no archive matches; keep advancing until a page contributes cells or pages run out.
-            while (_state.hasNext && gained === 0) {
+            // MAX_EMPTY_FETCHES stops a large non-event catalogue from firing an unbounded
+            // chain of requests in one go — the next scroll/click resumes where this left off.
+            while (_state.hasNext && gained === 0 && fetches < MAX_EMPTY_FETCHES) {
+                fetches += 1;
                 const nextPage = _state.page + 1;
                 const url = new URL(window.location.href);
                 url.searchParams.set('section_id', _state.sectionId);
