@@ -664,7 +664,7 @@
 }
 
 .ticket-modal-summary {
-    margin-top: 16px;
+    margin-top: 20px; /* matches .pdp-meta-row / .pdp-hero-title margin-bottom */
     flex-shrink: 0;
     color: var(--color-text-subheader);
 }
@@ -674,7 +674,9 @@
     position: relative;
     width: 44px;
     height: 44px;
-    margin: 0 -8px 0 0;
+    /* matches .contact-close — pulls the 20px glyph out of its 44px hit area so its
+       right edge lines up with the drawer's content edge */
+    margin: 0 -12px 0 0;
     padding: 0;
     border: none;
     background: none;
@@ -704,7 +706,7 @@
 }
 
 .ticket-modal-body {
-    margin-top: 64px;
+    margin-top: 24px; /* the scroller adds another 20px of fade padding inside */
     flex: 1 1 0;
     min-height: 0;
     display: flex;
@@ -741,11 +743,8 @@
 
 /* one uniform text style throughout — matches .type-subRegular1, same as every label/button in the contact panel */
 .ticket-modal-body .event-ticketing-table,
-.ticket-modal-body legend,
-.ticket-modal-body label,
-.ticket-modal-body .gm-question-section,
-.ticket-modal-body .product-ticket-button,
-.ticket-modal-body .ticket-checkout-button {
+.ticket-modal-body .gm-field > label,
+.ticket-modal-body .gm-question-wrapper:not(:has(input[type="checkbox"])) > label {
     font-family: var(--font-subheader);
     font-size: var(--size-subRegular1);
     font-weight: 300;
@@ -918,10 +917,10 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     display: block;
-    /* exactly one line box tall, so flex-start alignment lands it dead-on with the
-       first line of the question and stays there when the text wraps */
-    width: calc(var(--size-subRegular1) * var(--lh-body));
-    height: calc(var(--size-subRegular1) * var(--lh-body));
+    /* integer px on purpose: calc() off the fluid type token landed on 16.8px, which
+       rounded to 16 or 17 depending on where each box fell, so they rendered uneven */
+    width: 18px;
+    height: 18px;
     margin: 0;
     border-radius: 6px;
     background: none;
@@ -967,27 +966,14 @@
     order: -1;
 }
 
-.ticket-modal-body .gm-question-wrapper:has(input[type="checkbox"]) > label {
-    text-transform: none;
-    letter-spacing: normal;
-}
 
+/* styling comes from .cta-btn (added in section-product.js, same as every other CTA);
+   only layout and the app's own 2rem margin-top need overriding here */
 .ticket-modal-body .product-ticket-button,
 .ticket-modal-body .ticket-checkout-button {
     align-self: flex-start;
     flex-shrink: 0; /* stays pinned below the scrolling questions list */
-    margin-top: 0; /* the app's own stylesheet sets margin-top: 2rem here — .event-container's gap already provides that spacing */
-    background: var(--c-bright-green);
-    border: none;
-    border-radius: 100px;
-    padding: 14px 32px;
-    cursor: pointer;
-    transition: box-shadow 0.3s ease;
-}
-
-.ticket-modal-body .product-ticket-button:hover,
-.ticket-modal-body .ticket-checkout-button:hover {
-    box-shadow: inset 0 0 0 1px var(--c-dark-green-50);
+    margin-top: 0;
 }
 
 body.ticket-modal-is-open .nav-right {

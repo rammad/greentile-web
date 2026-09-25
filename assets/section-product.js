@@ -192,8 +192,8 @@
         const parts = [];
 
         const title = variant && variant.title;
-        if (title && title !== 'Default Title') parts.push(title + ' x' + qty);
-        else parts.push(qty + (qty === 1 ? ' ticket' : ' tickets'));
+        const name = title && title !== 'Default Title' ? title : 'General Admission';
+        parts.push(name + ' x' + qty);
 
         if (currentUnitPrice) parts.push(formatPrice(currentUnitPrice * qty));
 
@@ -223,6 +223,46 @@
         });
     }
 
+    /* The app's markup carries no theme classes, so hand its elements the same design-system
+       classes the rest of the site uses. Re-applied on every rebuild via the observer. */
+    function decorateAppMarkup(root) {
+        /* ticket heading — same subhead style as the drawer's "General Admission x2 • $80.00" line */
+        root.querySelectorAll('legend').forEach(el => el.classList.add('type-subBold2'));
+
+        /* toggle questions read as body copy, not as field labels */
+        root.querySelectorAll('.gm-question-wrapper').forEach(wrapper => {
+            if (!wrapper.querySelector('input[type="checkbox"]')) return;
+            const label = wrapper.querySelector('label');
+            /* is-visible because type-body1 starts blurred/transparent for the PDP reveal */
+            if (label) label.classList.add('type-body1', 'is-visible');
+        });
+
+        root.querySelectorAll('.product-ticket-button, .ticket-checkout-button').forEach(asCtaButton);
+    }
+
+    /* rebuilds the app's plain <button> into the theme's standard CTA, roll-over and all
+       (same structure initTicketTypes and contact.js build) */
+    function asCtaButton(btn) {
+        if (!btn.querySelector('.ui-roll')) {
+            const label = btn.textContent.trim();
+            btn.textContent = '';
+
+            const roll = document.createElement('div');
+            roll.className = 'ui-roll roll-hover is-visible';
+
+            ['ui-roll-visible', 'ui-roll-hidden'].forEach(layer => {
+                const span = document.createElement('span');
+                span.className = 'ui-roll-layer ' + layer;
+                span.textContent = label;
+                roll.appendChild(span);
+            });
+
+            btn.appendChild(roll);
+        }
+
+        btn.classList.add('cta-btn', 'is-visible', 'type-subRegular1');
+    }
+
     /* Text fields pair up two per row; with an odd count the first one runs full width so the
        remainder still pairs evenly (checkbox questions are always full width, handled in CSS). */
     function layoutFields(fieldset) {
@@ -249,10 +289,13 @@
         }
 
         wrapBuiltInFields(modal);
+        decorateAppMarkup(modal);
 
         /* changing quantity makes the app rebuild its fieldsets, which drops our wrappers */
-        new MutationObserver(() => wrapBuiltInFields(modal))
-            .observe(modal, { childList: true, subtree: true });
+        new MutationObserver(() => {
+            wrapBuiltInFields(modal);
+            decorateAppMarkup(modal);
+        }).observe(modal, { childList: true, subtree: true });
 
         let isOpen = false;
 
