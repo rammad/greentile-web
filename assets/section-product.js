@@ -183,20 +183,46 @@
         });
     }
 
-    /* "General Admission x2 • $80.00" — same formatting as the PDP date/time row */
-    function updateTicketSummary() {
+    function variantById(id) {
+        return productData && productData.variants.find(v => v.id === id);
+    }
+
+    /* whichever ticket types actually have a quantity on them */
+    function selectedTickets(modal) {
+        const rows = [];
+        modal.querySelectorAll(QTY_SELECT).forEach(select => {
+            const count = parseInt(select.value, 10);
+            if (count) rows.push({ variantId: parseInt(variantIdFor(select), 10), qty: count });
+        });
+        return rows;
+    }
+
+    /* "General Admission • $80.00 • 2 tickets" — same formatting as the PDP date/time row.
+       More than one ticket type just reads "Mixed"; each one is named on its own fieldset. */
+    function updateTicketSummary(modal) {
         const el = document.getElementById('ticket-modal-summary');
         if (!el) return;
 
-        const variant = productData && productData.variants.find(v => v.id === currentVariantId);
+        let rows = modal ? selectedTickets(modal) : [];
+        if (!rows.length) rows = [{ variantId: currentVariantId, qty: qty }];
+
+        const totalQty = rows.reduce((n, row) => n + row.qty, 0);
+        const total = rows.reduce((sum, row) => {
+            const variant = variantById(row.variantId);
+            return sum + (variant ? variant.price : currentUnitPrice) * row.qty;
+        }, 0);
+
         const parts = [];
 
-        const title = variant && variant.title;
-        parts.push(title && title !== 'Default Title' ? title : 'General Admission');
+        if (rows.length > 1) {
+            parts.push('Mixed');
+        } else {
+            const title = (variantById(rows[0].variantId) || {}).title;
+            parts.push(title && title !== 'Default Title' ? title : 'General Admission');
+        }
 
-        if (currentUnitPrice) parts.push(formatPrice(currentUnitPrice * qty));
-
-        parts.push(qty + (qty === 1 ? ' ticket' : ' tickets'));
+        if (total) parts.push(formatPrice(total));
+        parts.push(totalQty + (totalQty === 1 ? ' ticket' : ' tickets'));
 
         el.textContent = parts.join(' • ');
     }
@@ -227,9 +253,6 @@
     /* The app's markup carries no theme classes, so hand its elements the same design-system
        classes the rest of the site uses. Re-applied on every rebuild via the observer. */
     function decorateAppMarkup(root) {
-        /* ticket heading — one size up from the drawer's summary subhead */
-        root.querySelectorAll('legend').forEach(el => el.classList.add('type-subBold1'));
-
         /* toggle questions read as body copy, not as field labels */
         root.querySelectorAll('.gm-question-wrapper').forEach(wrapper => {
             if (!wrapper.querySelector('input[type="checkbox"]')) return;
@@ -306,7 +329,7 @@
             if (isOpen) return;
             isOpen = true;
             syncTicketQuantity(modal);
-            updateTicketSummary();
+            updateTicketSummary(modal);
             document.body.classList.add('ticket-modal-is-open');
             modal.classList.add('is-open');
             backdrop.classList.add('is-open');

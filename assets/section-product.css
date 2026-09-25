@@ -747,6 +747,7 @@
 
 /* one uniform text style throughout — matches .type-subRegular1, same as every label/button in the contact panel */
 .ticket-modal-body .event-ticketing-table,
+.ticket-modal-body legend,
 .ticket-modal-body .gm-field > label,
 .ticket-modal-body .gm-question-wrapper:not(:has(input[type="checkbox"])) > label {
     font-family: var(--font-subheader);
