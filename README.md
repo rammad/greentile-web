@@ -175,6 +175,50 @@ Use this as a practical "what should I fill in?" checklist.
 - Manual fallback:
   - if no auto archives, uses `archive_event` blocks
 - Fill: title, load-more label, empty state
+- **Pagination / infinite scroll**: the archives loop is wrapped in
+  `{% paginate collections.all.products by: 24 %}` — real Shopify pagination
+  (`page=N` in the URL), not a raised item cap, and no fixed ceiling; it keeps
+  paging through the whole store's products.
+  - `paginate` has two constraints that both tripped Shopify's own GitHub
+    theme validator (`Liquid syntax error ... is not a valid expression`)
+    before landing on the current shape:
+    1. It only accepts a fixed set of directly-referenced objects
+       (`collection.products`, `collections.all.products`, `search.results`, …)
+       — not a plain assigned variable, and not a bracket-indexed dynamic
+       handle like `collections[handle].products`. So this always paginates
+       `collections.all.products`, and the section's optional "Events
+       collection" setting is applied as an ordinary per-product filter
+       *inside* the loop (`product.collections contains
+       collections[archive_collection]`), not as the paginate target.
+    2. It must render directly to the page — it cannot be nested inside
+       another block tag like `{% capture %}`. The whole cell-rendering block
+       writes straight into `#dynamic-archive-container`; nothing captures its
+       output into a variable first. Pagination state (`current_page`/`next`)
+       is exposed via a small `#archive-pagination-state` marker element
+       placed right after that container (it has to come after
+       `{% endpaginate %}` runs, so it can't live as data attributes on
+       `.archives-page`, whose opening tag is emitted before pagination runs).
+  - `assets/section-archives.js` reads `#archive-pagination-state` for
+    `data-section-id`/`data-current-page`/`data-has-next`, then fetches
+    subsequent pages via the Section Rendering API (`?section_id=...&page=N`)
+    as the "Load More" button scrolls into view (`IntersectionObserver`),
+    merges the new cells into the existing month-packed grid, and stops once
+    `paginate.next` is empty. The button itself stays in the DOM as a manual
+    click fallback.
+  - Per-cell markup lives in `snippets/archive-cell.liquid`.
+  - Sort order matters for scroll order: keep the events collection sorted
+    **Date: newest first** so newest-first fetch order roughly matches display
+    order (the grid re-sorts every fetched batch by event date, so this only
+    affects fetch order, not final on-screen order).
+  - A raw 24-product page can land entirely on current-season/non-matching
+    products; the JS keeps auto-fetching subsequent pages until one actually
+    contributes archive cells, so the "coming soon" empty state only shows once
+    every page has been exhausted with zero matches.
+- **Known Shopify sync risk**: the GitHub theme-sync app has previously
+  rewritten a `{% paginate ... by: N %}` tag to `{% paginate ... by nil %}` in
+  an auto-commit (breaks pagination — renders 0 items), with an auto-inserted
+  `{% comment %}` explaining the "rewrite". If archives suddenly goes empty,
+  check `sections/archives.liquid` for this before debugging anything else.
 
 ### Product Detail (`sections/main-product.liquid`)
 
@@ -186,6 +230,10 @@ Use this as a practical "what should I fill in?" checklist.
 - Fill in section:
   - buy button label
   - max quantity per order
+- Purchasing is disabled (button shows "Coming Soon", quantity hidden) when the
+  product is tagged `upcoming`, mirroring the sold-out / past-event behavior.
+  This is enforced even if someone reaches the product URL directly rather than
+  via the calendar.
 
 ## Engineering Reference
 
@@ -220,8 +268,29 @@ Use this as a practical "what should I fill in?" checklist.
   - `venue.name`
   - `venue.address` fields
 - Status derivation:
-  - `tag == upcoming` => coming soon
+  - `tag == upcoming` => coming soon; purchasing disabled on the PDP (Liquid
+    `sales_closed` flag + `data-event-upcoming` for `assets/section-product.js`)
+  - `starts_at` in the past => sold out; purchasing disabled
   - `product.available == false` => sold out
+
+### Collection Product Caps
+
+- `collection.products` in Liquid returns at most 50 products unless the loop is
+  wrapped in `{% paginate collection.products by: N %}` (max `N` per page is 250).
+  `paginate` only accepts specific documented objects directly — not a variable,
+  not a bracket-indexed dynamic handle.
+- `sections/archives.liquid` uses real `{% paginate collections.all.products by: 24 %}`
+  pagination — `assets/section-archives.js` fetches additional `page=N` slices
+  via the Section Rendering API as the visitor scrolls, so there's no fixed
+  ceiling on total archived events. See "Archives Page" above for the full flow.
+- `sections/calendar.liquid` and `sections/home-events.liquid` are left at the
+  default 50 cap on purpose (current-season lists are small; avoids paying the
+  higher scan cost on hot pages, and avoids depending on `{% paginate %}` there
+  at all).
+- The `{% paginate %}` tag has been rewritten once already by Shopify's GitHub
+  sync (`by: 250` → `by nil`, silently zeroing the archives page — see
+  "Known Shopify sync risk" above). If a future sync mangles it again, that's
+  the first place to check when a paginated section suddenly renders empty.
 
 ### Internationalization
 
@@ -253,6 +322,22 @@ Typical Shopify workflow:
 - **Events missing from calendar**
   - check product is active and in selected collection
   - verify metafield namespace/key and storefront access
+  - the calendar only shows the current season's 3-month window; it also reads
+    at most 50 products from the collection (see "Collection Product Caps")
+- **Old events missing from archives**
+  - archives now pages through the whole collection via scroll-triggered
+    fetches, so nothing should be permanently cut off; if events are still
+    missing, check they're actually **active** (draft/archived in admin =
+    invisible to the storefront) and dated before the current season start
+  - if the page renders completely empty, check `sections/archives.liquid` for
+    a Shopify-sync-mangled `{% paginate %}` tag (see "Known Shopify sync risk")
+- **Archives "Load More" never shows / stops appearing**
+  - expected once every page has been fetched and there's nothing left
+    (`data-has-next="false"` on `.archives-page`)
+  - if it's missing on first load with events still remaining, check the
+    browser console for a failed fetch (e.g. `section_id` mismatch) — the
+    button itself still works as a manual fallback if the auto-scroll fetch
+    silently fails
 - **Featured event not showing**
   - ensure at least one active product has `featured` tag, or set manual product/image override
 - **Contact form not sending to expected email**
@@ -260,3 +345,6 @@ Typical Shopify workflow:
   - verify theme setting `Default contact email`
 - **Sold out / coming soon badge mismatch**
   - confirm product availability and `upcoming` tag usage
+- **"Coming Soon" event is still purchasable via direct URL**
+  - confirm the product carries the `upcoming` tag (exact, lowercase); the PDP
+    disables buying whenever that tag is present

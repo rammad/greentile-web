@@ -126,11 +126,12 @@
         left: auto;
         right: auto;
         flex: 1;
-        display: flex;
         align-items: center;
         justify-content: center;
         padding: 0 var(--page-gutter) 52px;
     }
+    /* stays display:none from the base rule until .is-visible — otherwise the
+       empty-state block reserves a screenful of space above the grid on mobile */
     .archives-coming-soon.is-visible {
         display: flex;
     }
