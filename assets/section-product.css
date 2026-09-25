@@ -623,20 +623,14 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: calc(1024px - var(--page-gutter) * 2);
+    width: var(--drawer-width);
     height: 100%;
     background: var(--c-off-white);
     z-index: 1002;
     transform: translateX(100%);
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: none;
-}
-
-.ticket-modal::-webkit-scrollbar {
-    display: none;
+    overflow: hidden; /* the questions list scrolls internally instead — header and Check Out stay put */
 }
 
 .ticket-modal.is-open {
@@ -647,7 +641,8 @@
     display: flex;
     flex-direction: column;
     padding: 44px calc(var(--page-gutter) * 2) 40px;
-    min-height: 100%;
+    height: 100%;
+    min-height: 0;
 }
 
 .ticket-modal-header {
@@ -698,15 +693,38 @@
 
 .ticket-modal-body {
     margin-top: 64px;
-    flex: 1;
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Guest Manager's injected markup — plain HTML, no shadow DOM, so we can restyle it directly */
 
+/* the app nests its form a few wrappers deep; each link has to pass the height down
+   or the questions list can't size itself against the drawer and scroll internally */
+.ticket-modal-body > .shopify-block,
+.ticket-modal-body .shopify-product-form,
+.ticket-modal-body #event-ticketing-ticketform {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+}
+
 .ticket-modal-body .event-container {
     display: flex;
     flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
     gap: 64px; /* matches .contact-form's major-section gap */
+}
+
+/* the ticket/quantity row is driven by the PDP's own ticket-type buttons and quantity
+   stepper instead — hidden, not removed, since the app's script watches that <select>
+   to render one question fieldset per ticket (see syncTicketQuantity in section-product.js) */
+.ticket-modal-body .event-ticketing-table {
+    display: none;
 }
 
 /* one uniform text style throughout — matches .type-subRegular1, same as every label/button in the contact panel */
@@ -737,19 +755,50 @@
     text-align: left;
 }
 
+/* the only scrolling region — title and Check Out stay pinned outside it.
+   Fade mask matches .pdp-desc-wrapper; vertical padding matches the fade distance
+   so content isn't clipped at rest. */
 .ticket-modal-body .ticket-custom-questions-container {
     display: flex;
     flex-direction: column;
     gap: 64px; /* matches .contact-form's major-section gap */
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 20px 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%);
 }
 
+.ticket-modal-body .ticket-custom-questions-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Name/Email sit as flat siblings in the fieldset (label, input, label, input) — section-product.js
+   wraps each pair in .gm-field so they can be laid out two-up without splitting label from input */
 .ticket-modal-body fieldset {
     border: none;
     padding: 0;
     margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    align-content: start;
+}
+
+.ticket-modal-body fieldset > legend,
+.ticket-modal-body fieldset > .gm-question-section {
+    grid-column: 1 / -1;
+}
+
+.ticket-modal-body .gm-field {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-width: 0;
 }
 
 .ticket-modal-body legend {
@@ -819,7 +868,9 @@
     transition: box-shadow 0.3s ease;
     font-family: var(--font-subheader); /* matches .qty-val (type-subRegular1) — this theme's existing quantity-display font */
     font-weight: 300;
-    font-variation-settings: 'wdth' 450;
+    /* no font-variation-settings here: native <option> popups render outside the normal CSS
+       pipeline in most browsers and don't reliably resolve variable-font axes — it was
+       producing missing/tofu glyphs for the numbers instead of an actual 'wdth' 450 instance */
     text-transform: uppercase;
     letter-spacing: 0.05em;
     line-height: var(--lh-body);
@@ -859,20 +910,39 @@
 }
 
 .ticket-modal-body .gm-question-section {
-    display: flex;
-    flex-direction: column;
-    gap: 16px; /* matches the fieldset's own gap so nested questions (phone, checkboxes) keep the same rhythm as Name/Email */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px; /* matches the fieldset's own gap so nested questions keep the same rhythm as Name/Email */
 }
 
 .ticket-modal-body .gm-question-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 16px; /* each question's own label-to-field gap — Name/Email get this for free from the fieldset's gap since they aren't wrapped; this wrapper needs it set explicitly */
+    gap: 16px; /* each question's own label-to-field gap — Name/Email get this from .gm-field instead */
+    min-width: 0;
+}
+
+/* checkbox questions run full width, box first, and keep their sentence casing */
+.ticket-modal-body .gm-question-wrapper:has(input[type="checkbox"]) {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.ticket-modal-body .gm-question-wrapper:has(input[type="checkbox"]) > input[type="checkbox"] {
+    order: -1;
+}
+
+.ticket-modal-body .gm-question-wrapper:has(input[type="checkbox"]) > label {
+    text-transform: none;
+    letter-spacing: normal;
 }
 
 .ticket-modal-body .product-ticket-button,
 .ticket-modal-body .ticket-checkout-button {
     align-self: flex-start;
+    flex-shrink: 0; /* stays pinned below the scrolling questions list */
     margin-top: 0; /* the app's own stylesheet sets margin-top: 2rem here — .event-container's gap already provides that spacing */
     background: var(--c-bright-green);
     border: none;
@@ -922,5 +992,10 @@ body.ticket-modal-is-open .nav-right {
 
     .ticket-modal-body {
         margin-top: 40px;
+    }
+
+    .ticket-modal-body fieldset,
+    .ticket-modal-body .gm-question-section {
+        grid-template-columns: 1fr;
     }
 }

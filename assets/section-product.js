@@ -56,6 +56,9 @@
     const buyLabel = document.querySelector('.pdp-section')?.dataset.buyLabel || 'Buy Now';
     const eventStartAt = document.querySelector('.pdp-section')?.dataset.eventStartAt || '';
     const eventUpcoming = document.querySelector('.pdp-section')?.dataset.eventUpcoming === 'true';
+    /* TEMP TESTING ONLY — paired with allow_upcoming_purchase in main-product.liquid; remove both */
+    const allowUpcomingPurchase = document.querySelector('.pdp-section')?.dataset.allowUpcomingPurchase === 'true';
+    const upcomingBlocksSale = eventUpcoming && !allowUpcomingPurchase;
     const closedLabel = eventUpcoming ? 'Coming Soon' : 'Sold Out';
     let wasSoldOut = false;
 
@@ -83,7 +86,7 @@
 
         if (buyBtn && productData) {
             const variant = productData.variants.find(v => v.id === currentVariantId);
-            const available = variant ? (variant.available && !isEventPast() && !eventUpcoming) : false;
+            const available = variant ? (variant.available && !isEventPast() && !upcomingBlocksSale) : false;
             const hasMultiple = productData.variants.length > 1;
 
             buyBtn.disabled = !available;
@@ -146,29 +149,59 @@
     /* ticket question modal — opens instead of the direct add-to-cart flow when the
        Guest Manager Ticket Order Form block is attached (see data-ticket-modal) */
 
-    /* the app renders its own quantity options (0-20, including a "0 tickets" choice) server-side,
-       independent of this theme's max-quantity-per-order setting — trim to match on the client */
+    /* The app's own ticket row is hidden; the PDP's ticket-type buttons and quantity stepper
+       drive it instead. Its <select> stays in the DOM because the app's script listens to it
+       to render one question fieldset per ticket. */
 
-    function trimSelectOptions(select) {
-        if (select.dataset.qtyCapped === 'true') return;
-        Array.from(select.options).forEach(opt => {
-            const value = parseInt(opt.value, 10);
-            if (value === 0 || value > maxQty) opt.remove();
-        });
-        if (select.selectedIndex === -1 && select.options.length) select.selectedIndex = 0;
-        select.dataset.qtyCapped = 'true';
+    const QTY_SELECT = 'select.ticket-select, select[name*="[quantity]"]';
+
+    function variantIdFor(select) {
+        const fromName = select.name.match(/items\[(\d+)\]/);
+        if (fromName) return fromName[1];
+        const row = select.closest('tr');
+        const fromRow = row && row.className.match(/variant-(\d+)/);
+        return fromRow ? fromRow[1] : null;
     }
 
-    function limitTicketQuantities(modal) {
-        if (!maxQty) return;
+    /* clamp to an option the app actually rendered, so we can't exceed its purchase limit or stock */
+    function clampToOptions(select, desired) {
+        const values = Array.from(select.options).map(o => parseInt(o.value, 10)).filter(v => !Number.isNaN(v));
+        if (!values.length) return null;
+        if (values.includes(desired)) return String(desired);
+        const below = values.filter(v => v <= desired);
+        return String(below.length ? Math.max(...below) : Math.min(...values));
+    }
 
-        const selector = 'select.ticket-select, select[name*="[quantity]"]';
-        modal.querySelectorAll(selector).forEach(trimSelectOptions);
-
-        const observer = new MutationObserver(() => {
-            modal.querySelectorAll(selector).forEach(trimSelectOptions);
+    function syncTicketQuantity(modal) {
+        modal.querySelectorAll(QTY_SELECT).forEach(select => {
+            const isCurrent = String(variantIdFor(select)) === String(currentVariantId);
+            const value = clampToOptions(select, isCurrent ? qty : 0);
+            if (value === null || select.value === value) return;
+            select.value = value;
+            /* the app re-renders its question fieldsets off this event */
+            select.dispatchEvent(new Event('change', { bubbles: true }));
         });
-        observer.observe(modal, { childList: true, subtree: true });
+    }
+
+    /* Name/Email render as flat siblings (label, br, input, br) directly in the fieldset, so a
+       two-up grid would split each label from its input — pair them up first. Idempotent: once
+       wrapped, the label is no longer a direct child of the fieldset. */
+    function wrapBuiltInFields(root) {
+        root.querySelectorAll('fieldset').forEach(fieldset => {
+            Array.from(fieldset.children).forEach(child => {
+                if (child.tagName !== 'LABEL') return;
+
+                let field = child.nextElementSibling;
+                while (field && field.tagName === 'BR') field = field.nextElementSibling;
+                if (!field || field.tagName !== 'INPUT') return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'gm-field';
+                fieldset.insertBefore(wrapper, child);
+                wrapper.appendChild(child);
+                wrapper.appendChild(field);
+            });
+        });
     }
 
     function initTicketModal() {
@@ -187,13 +220,18 @@
             document.body.appendChild(modal);
         }
 
-        limitTicketQuantities(modal);
+        wrapBuiltInFields(modal);
+
+        /* changing quantity makes the app rebuild its fieldsets, which drops our wrappers */
+        new MutationObserver(() => wrapBuiltInFields(modal))
+            .observe(modal, { childList: true, subtree: true });
 
         let isOpen = false;
 
         function open() {
             if (isOpen) return;
             isOpen = true;
+            syncTicketQuantity(modal);
             document.body.classList.add('ticket-modal-is-open');
             modal.classList.add('is-open');
             backdrop.classList.add('is-open');

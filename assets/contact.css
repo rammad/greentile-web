@@ -19,7 +19,7 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: calc(1024px - var(--page-gutter) * 2); /* todo: apply to shopify theme */
+    width: var(--drawer-width);
     height: 100%;
     background: var(--c-off-white);
     z-index: 1002;
@@ -277,10 +277,6 @@ body.contact-is-open .nav-right {
 
 /* 4K desktop — 2× scale */
 @media (min-width: 3840px) {
-    .contact-panel {
-        width: calc(2048px - var(--page-gutter) * 2);
-    }
-
     .contact-panel-inner {
         padding: calc(var(--space-for-nav) - 24px) calc(var(--page-gutter) * 2) 80px;
     }
