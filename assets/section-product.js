@@ -295,6 +295,18 @@
         fields.forEach((el, i) => el.classList.toggle('gm-field--full', fields.length % 2 === 1 && i === 0));
     }
 
+    /* The direct buy path clears the cart before adding (this store checks out one order at a
+       time). The modal path hands submission to the app's own form, which POSTs to /cart/add
+       and never clears — so clear here instead, on open. Deliberately not wrapped around the
+       form's submit: the app ships cart-submit-fixup.js that intercepts it. */
+    function clearCart() {
+        const cartClearUrl = window.THEME_SETTINGS?.routes?.cartClear || '/cart/clear.js';
+        return fetch(cartClearUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }).catch(err => console.error('Cart clear failed:', err));
+    }
+
     function initTicketModal() {
         const modal = document.getElementById('ticket-modal');
         const backdrop = document.getElementById('ticket-modal-backdrop');
@@ -325,6 +337,7 @@
         function open() {
             if (isOpen) return;
             isOpen = true;
+            clearCart();
             syncTicketQuantity(modal);
             updateTicketSummary(modal);
             document.body.classList.add('ticket-modal-is-open');
