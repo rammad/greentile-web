@@ -11,6 +11,7 @@
 
   assign archive_current_page = 1
   assign archive_has_next = false
+  assign archive_total_pages = 1
 
   assign current_month = 'now' | date: '%m' | plus: 0
   assign current_year = 'now' | date: '%Y'
@@ -65,6 +66,7 @@
       {%- assign archive_count = 0 -%}
       {%- paginate collections.all.products by 24 -%}
         {%- assign archive_current_page = paginate.current_page -%}
+        {%- assign archive_total_pages = paginate.pages -%}
         {%- if paginate.next -%}
           {%- assign archive_has_next = true -%}
         {%- endif -%}
@@ -117,7 +119,14 @@
       {%- endif -%}
     </div>
 
-    <div id="archive-pagination-state" data-section-id="{{ section.id }}" data-current-page="{{ archive_current_page }}" data-has-next="{{ archive_has_next }}" hidden></div>
+    {%- comment -%}
+      data-total-pages lets the JS fetch every remaining page in parallel up front.
+      Shopify pages collections.all in catalogue order and the sort key we actually
+      want (the event date) lives in a metafield, so a later page can contain events
+      belonging anywhere in the final order — without the total, the grid reshuffles
+      under the visitor every time a page lands.
+    {%- endcomment -%}
+    <div id="archive-pagination-state" data-section-id="{{ section.id }}" data-current-page="{{ archive_current_page }}" data-total-pages="{{ archive_total_pages }}" data-has-next="{{ archive_has_next }}" hidden></div>
 
     <div class="archives-coming-soon"><span class="type-h2">{{ section.settings.empty_message | default: 'more events coming soon!' }}</span></div>
 

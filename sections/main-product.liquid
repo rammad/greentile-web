@@ -46,22 +46,13 @@
     assign event_is_upcoming = true
   endif
 
-  comment
-    TEMP TESTING ONLY — allows buying upcoming events so the ticket modal can be tested
-    before an event goes on sale. Set back to false (and remove this block) before shipping.
-  endcomment
-  assign allow_upcoming_purchase = true
-
   assign sales_closed = false
-  if event_is_past
-    assign sales_closed = true
-  endif
-  if event_is_upcoming and allow_upcoming_purchase == false
+  if event_is_past or event_is_upcoming
     assign sales_closed = true
   endif
 -%}
 
-<section class="pdp-section" data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}" data-max-qty="{{ section.settings.max_qty | default: 4 }}" data-buy-label="{{ section.settings.buy_label | default: 'Buy Now' | escape }}" data-event-start-at="{{ event_date | default: '' | escape }}" data-event-upcoming="{{ event_is_upcoming }}" data-allow-upcoming-purchase="{{ allow_upcoming_purchase }}">
+<section class="pdp-section" data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}" data-max-qty="{{ section.settings.max_qty | default: 4 }}" data-buy-label="{{ section.settings.buy_label | default: 'Buy Now' | escape }}" data-event-start-at="{{ event_date | default: '' | escape }}" data-event-upcoming="{{ event_is_upcoming }}">
   <div class="pdp-sticky-wrapper">
     <div class="pdp-grid">
 
