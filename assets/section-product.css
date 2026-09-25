@@ -873,6 +873,7 @@
     font-family: var(--font-body);
     letter-spacing: 0.03em;
     line-height: var(--lh-body);
+    text-overflow: ellipsis; /* question help text can be longer than the field */
 }
 
 .ticket-modal-body input[type="text"]::placeholder,
@@ -959,6 +960,11 @@
     min-width: 0;
 }
 
+/* help text now lives in the field's placeholder (see decorateAppMarkup) */
+.ticket-modal-body .gm-question-wrapper:has(input[type="text"], input[type="email"], input[type="tel"], input[type="number"]) > .gm-question-details {
+    display: none;
+}
+
 /* checkbox questions run full width, box first, and keep their sentence casing */
 .ticket-modal-body .gm-question-wrapper:has(input[type="checkbox"]) {
     --gm-toggle-size: 18px;
@@ -989,7 +995,8 @@
     margin-top: 0;
 }
 
-body.ticket-modal-is-open .nav-right {
+body.ticket-modal-is-open .nav-right,
+body.ticket-modal-is-open .nav-back-link {
     display: none;
 }
 
