@@ -183,6 +183,23 @@
         });
     }
 
+    /* "General Admission x2 • $80.00" — same formatting as the PDP date/time row */
+    function updateTicketSummary() {
+        const el = document.getElementById('ticket-modal-summary');
+        if (!el) return;
+
+        const variant = productData && productData.variants.find(v => v.id === currentVariantId);
+        const parts = [];
+
+        const title = variant && variant.title;
+        if (title && title !== 'Default Title') parts.push(title + ' x' + qty);
+        else parts.push(qty + (qty === 1 ? ' ticket' : ' tickets'));
+
+        if (currentUnitPrice) parts.push(formatPrice(currentUnitPrice * qty));
+
+        el.textContent = parts.join(' • ');
+    }
+
     /* Name/Email render as flat siblings (label, br, input, br) directly in the fieldset, so a
        two-up grid would split each label from its input — pair them up first. Idempotent: once
        wrapped, the label is no longer a direct child of the fieldset. */
@@ -201,7 +218,18 @@
                 wrapper.appendChild(child);
                 wrapper.appendChild(field);
             });
+
+            layoutFields(fieldset);
         });
+    }
+
+    /* Text fields pair up two per row; with an odd count the first one runs full width so the
+       remainder still pairs evenly (checkbox questions are always full width, handled in CSS). */
+    function layoutFields(fieldset) {
+        const fields = Array.from(fieldset.querySelectorAll('.gm-field, .gm-question-wrapper'))
+            .filter(el => !el.querySelector('input[type="checkbox"]'));
+
+        fields.forEach((el, i) => el.classList.toggle('gm-field--full', fields.length % 2 === 1 && i === 0));
     }
 
     function initTicketModal() {
@@ -232,6 +260,7 @@
             if (isOpen) return;
             isOpen = true;
             syncTicketQuantity(modal);
+            updateTicketSummary();
             document.body.classList.add('ticket-modal-is-open');
             modal.classList.add('is-open');
             backdrop.classList.add('is-open');
