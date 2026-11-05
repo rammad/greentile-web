@@ -447,6 +447,15 @@
             "logo": "shopify://shop_images/Today_logo.svg",
             "url": "https://www.today.com/video/savannah-and-jenna-learn-why-mahjong-is-more-than-a-game-244691013835?search=mahjong"
           }
+        },
+        "press_logo_7bGhEE": {
+          "type": "press_logo",
+          "settings": {
+            "name": "Peerspace",
+            "slug": "peerspace",
+            "logo": "shopify://shop_images/unnamed.png",
+            "url": "https://www.peerspace.com/resources/nyc-organizers-offline-together/"
+          }
         }
       },
       "block_order": [
@@ -485,7 +494,8 @@
         "pr2",
         "pr3",
         "pr4",
-        "pr5"
+        "pr5",
+        "press_logo_7bGhEE"
       ],
       "settings": {
         "clients_title": "IN GOOD COMPANY",
