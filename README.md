@@ -295,16 +295,27 @@ Use this as a practical "what should I fill in?" checklist.
   - event date/time
   - venue details
   - variants as ticket types
-  - quantity picker + buy button
+  - quantity picker + Add to Cart button
 - Fill in section:
-  - buy button label
-  - max quantity per order
+  - add to cart button label
+- Quantity limit: **Theme settings → Cart → Max quantity per product**, minus whatever of
+  that product is already in the cart (all variants / ticket types count together). The
+  stepper caps at what's left; at zero the button shows "Max Limit Reached". Re-checked
+  against the live cart on every click.
+- Add to Cart adds the selection to the cart and opens the cart drawer — it never clears
+  the cart or goes to checkout.
 - Event Ticketing app block (`templates/product.json`): when a product has the event
-  metafield and the app's Ticket Order Form block is attached, the buy button opens
-  that form in an attendee-details drawer (`#ticket-modal`) instead of buying directly.
-  The app's own ticket row is hidden and driven by the PDP's ticket-type buttons and
-  quantity stepper; `assets/section-product.js` restyles the app markup with theme
-  classes.
+  metafield and the app's Ticket Order Form block is attached, Add to Cart first opens
+  that form in an attendee-details drawer (`#ticket-modal`). Flow:
+  **Add to Cart → attendee details → cart drawer**. The app's own ticket row is hidden and
+  driven by the PDP's ticket-type buttons and quantity stepper; `assets/section-product.js`
+  restyles the app markup with theme classes and intercepts the form's submit, posting its
+  fields (attendee answers included, as hidden line-item properties) to `/cart/add.js`
+  instead of following the app's redirect to checkout.
+  - This relies on the app's classic form submit (its checkout button is `type="submit"`).
+    The app has a newer "storefront cart" mode it can enable per shop, where that button
+    becomes `type="button"` and the app adds to the cart and redirects by itself — if ticket
+    purchases suddenly skip the cart drawer, check for that first.
 - Purchasing is disabled (button shows "Coming Soon", quantity hidden) when the
   product is tagged `upcoming`, mirroring the sold-out / past-event behavior.
   This is enforced even if someone reaches the product URL directly rather than
@@ -365,9 +376,10 @@ slide-out panel should too:
 - `assets/section-calendar.js`
   - list/grid toggles, month filtering, mobile rail UI, sticker randomization
 - `assets/section-product.js`
-  - variant select, quantity management, buy button state
-  - attendee-details drawer for ticketed products (Event Ticketing app form)
-  - direct buy flow clears cart, adds selected variant, redirects to `/checkout`
+  - variant select, quantity management (per-product limit), button state
+  - attendee-details drawer for ticketed products (Event Ticketing app form), submitting
+    into the cart
+  - add to cart via `window.Cart` (`assets/cart.js`), which opens the cart drawer
 
 ### Data Contracts
 
