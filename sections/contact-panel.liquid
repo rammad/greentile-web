@@ -4,17 +4,19 @@
   assign extra_fields = section.blocks | where: 'type', 'extra_field'
 -%}
 
-<div class="contact-panel" data-lenis-prevent
+<div class="drawer contact-panel" data-lenis-prevent
   data-default-email="{{ section.settings.default_email | default: settings.contact_email }}"
   data-success-msg="{{ section.settings.success_message | default: 'contact.success' | t }}"
   data-error-msg="{{ section.settings.error_message | default: 'contact.error' | t }}"
 >
-  <div class="contact-panel-inner">
-    <div class="contact-panel-header">
-      <h2 class="contact-title type-h2">{{ section.settings.title | default: 'SAY HELLO!' }}</h2>
-      <button type="button" class="contact-close" aria-label="Close">
-        <span class="contact-close-line" aria-hidden="true"></span>
-        <span class="contact-close-line" aria-hidden="true"></span>
+  <div class="drawer-inner">
+    <div class="drawer-header">
+      <div class="drawer-heading">
+        <h2 class="drawer-title type-h2">{{ section.settings.title | default: 'SAY HELLO!' }}</h2>
+      </div>
+      <button type="button" class="drawer-close" aria-label="Close">
+        <span class="drawer-close-line" aria-hidden="true"></span>
+        <span class="drawer-close-line" aria-hidden="true"></span>
       </button>
     </div>
 
@@ -116,7 +118,7 @@
     </form>
   </div>
 </div>
-<div class="contact-backdrop"></div>
+<div class="drawer-backdrop contact-backdrop"></div>
 
 {% schema %}
 {

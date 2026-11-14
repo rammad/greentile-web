@@ -314,6 +314,23 @@ Use this as a practical "what should I fill in?" checklist.
   - mobile menu
   - page transition curtain
   - fit-text/cascade text systems
+  - `window.Drawer` — shared open/close for slide-out panels (see below)
+
+### Drawers (slide-out panels)
+
+The contact panel and the PDP attendee-details form share one drawer shell, and any new
+slide-out panel should too:
+
+- Markup/CSS: `assets/drawer.css` — `.drawer-backdrop`, `.drawer` (optionally
+  `.drawer--fixed-body` when only an inner region should scroll), `.drawer-inner`,
+  `.drawer-header`, `.drawer-heading`, `.drawer-title`, `.drawer-close` /
+  `.drawer-close-line`. Panel-specific styles stay in that panel's own CSS.
+- Behaviour: `window.Drawer.create(panel, backdrop, { bodyClass, onOpen, onClose })` in
+  `assets/global.js` returns `{ open, close, isOpen }`. It handles Lenis stop/start, moving
+  the drawer out of `#scroll-content`, backdrop/X/Escape, the mobile hamburger-as-close
+  button, and handing over between drawers (only one is ever open).
+- `bodyClass` (e.g. `contact-is-open`, `ticket-modal-is-open`) is for per-drawer nav
+  tweaks; `drawer-is-open` is always set while any drawer is open.
 
 ### Key Front-End Modules
 

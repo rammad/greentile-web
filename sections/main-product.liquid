@@ -215,16 +215,16 @@
 
 {%- comment -%} Ticket question form — opens as an overlay from the Buy button above (see data-ticket-modal on #pdp-add-to-cart); the app's Ticket Order Form block renders inside it {%- endcomment -%}
 {%- if has_ticket_form -%}
-  <div class="ticket-modal-backdrop" id="ticket-modal-backdrop"></div>
-  <div class="ticket-modal" id="ticket-modal" data-lenis-prevent>
-    <div class="ticket-modal-inner">
-      <div class="ticket-modal-header">
-        <div class="ticket-modal-heading">
-          <h2 class="ticket-modal-title contact-title type-h2">Attendee Details</h2>
+  <div class="drawer-backdrop" id="ticket-modal-backdrop"></div>
+  <div class="drawer drawer--fixed-body" id="ticket-modal" data-lenis-prevent>
+    <div class="drawer-inner">
+      <div class="drawer-header">
+        <div class="drawer-heading">
+          <h2 class="drawer-title type-h2">Attendee Details</h2>
         </div>
-        <button type="button" class="ticket-modal-close" aria-label="Close">
-          <span class="ticket-modal-close-line" aria-hidden="true"></span>
-          <span class="ticket-modal-close-line" aria-hidden="true"></span>
+        <button type="button" class="drawer-close" aria-label="Close">
+          <span class="drawer-close-line" aria-hidden="true"></span>
+          <span class="drawer-close-line" aria-hidden="true"></span>
         </button>
       </div>
 
