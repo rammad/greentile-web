@@ -1,0 +1,751 @@
+{{ 'section-calendar.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Shop — every product that isn't an event ticket, shown with the events page's grid view
+  (grid only, no list view) and the same assets/section-calendar.css / .js.
+
+  The hidden .calendar-row links below are the data source the calendar JS packs into the grid
+  (same as on the events page); rows are grouped under their category (product type) instead of
+  a month, via data-group. Filters: All / In Stock (data-filter="in-stock").
+
+  Tickets are excluded by product type "Ticket" or the event metafield. Reads the selected
+  collection (or all products) — capped at Shopify's default 50 products per loop.
+{%- endcomment -%}
+
+{%- liquid
+  assign evt_ns = settings.event_metafield_namespace | default: 'event_ticketing'
+  assign evt_key = settings.event_metafield_key | default: 'event_v2'
+
+  if section.settings.collection != blank
+    assign shop_products = section.settings.collection.products
+  else
+    assign shop_products = collections.all.products
+  endif
+  assign shop_products = shop_products | sort: 'type'
+
+  assign page_title = section.settings.title | default: 'Shop'
+  assign placeholder_color = section.settings.placeholder_color | default: '#B7C9B7'
+  assign placeholder_font = section.settings.placeholder_font_color | default: '#87A587'
+-%}
+
+<section class="calendar-page mode-grid" id="cal-page-container" data-grid-only
+  style="--placeholder-bg: {{ placeholder_color }}; --placeholder-font: {{ placeholder_font }}"
+  data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}"
+  data-edge="0"
+  {% render 'calendar-stickers', settings_source: section.settings %}
+>
+  <div class="calendar-header">
+    <h1 class="type-display-hero animate-cascade fit-text desktop-only">
+      {{ page_title }}
+    </h1>
+    <div class="calendar-title-mobile mobile-only">
+      {%- assign title_words = page_title | split: ' ' -%}
+      {%- for word in title_words -%}
+        <div class="type-display-hero fit-text" data-fit-managed>{{ word }}</div>
+      {%- endfor -%}
+    </div>
+
+    <div class="calendar-controls">
+      <div class="filters-list">
+        <div class="text-mask">
+          <span class="type-subRegular1 text-reveal-inner">{{ 'events.filters' | t }}</span>
+        </div>
+        <button class="filter-btn type-subRegular1 ui-roll roll-hover active" data-filter="all">
+          <span class="ui-roll-layer ui-roll-visible">{{ 'events.all' | t }}</span>
+          <span class="ui-roll-layer ui-roll-hidden">{{ 'events.all' | t }}</span>
+        </button>
+        <button class="filter-btn type-subRegular1 ui-roll roll-hover" data-filter="in-stock">
+          <span class="ui-roll-layer ui-roll-visible">{{ 'shop.in_stock' | t }}</span>
+          <span class="ui-roll-layer ui-roll-hidden">{{ 'shop.in_stock' | t }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {%- capture shop_rows_markup -%}
+    {%- for product in shop_products -%}
+      {%- liquid
+        if product.type == 'Ticket' or product.metafields[evt_ns][evt_key] != blank
+          continue
+        endif
+
+        assign row_status = ''
+        if product.tags contains 'upcoming'
+          assign row_status = 'coming-soon'
+        elsif product.available == false
+          assign row_status = 'sold-out'
+        endif
+
+        assign row_group = product.type | default: page_title
+      -%}
+      <a href="{{ product.url }}" class="calendar-row"
+        data-img="{{ product.featured_image | image_url: width: 800 }}"
+        data-title="{{ product.title | escape }}"
+        data-group="{{ row_group | escape }}"
+        {%- if row_status != blank %} data-status="{{ row_status }}"{% endif -%}
+      >
+        <span class="cal-name type-h3">{{ product.title }}</span>
+      </a>
+    {%- endfor -%}
+  {%- endcapture -%}
+
+  {%- assign shop_rows_markup_stripped = shop_rows_markup | strip -%}
+  {%- if shop_rows_markup_stripped != blank -%}
+    <div class="calendar-body">
+      {%- comment -%} hidden in grid mode — the rows only feed the grid packer {%- endcomment -%}
+      <div class="calendar-interface-wrapper">
+        <div class="calendar-list">
+          {{- shop_rows_markup -}}
+        </div>
+      </div>
+
+      <div id="dynamic-grid-container" class="calendar-grid-packed"></div>
+    </div>
+  {%- endif -%}
+  <div class="calendar-coming-soon"><span class="type-h2">{{ section.settings.empty_message | default: 'more goods coming soon!' }}</span></div>
+</section>
+
+<script src="{{ 'section-calendar.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Shop",
+  "tag": "div",
+  "class": "calendar-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page title",
+      "default": "Shop"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Products collection",
+      "info": "Recommended: an automated collection with the condition 'Product type is not equal to Ticket'. Event tickets (product type Ticket, or products with event data) are always left out. Leave empty to use all products. Up to 50 products."
+    },
+    {
+      "type": "text",
+      "id": "empty_message",
+      "label": "Empty state message",
+      "default": "more goods coming soon!"
+    },
+    {
+      "type": "header",
+      "content": "Section gradient",
+      "visible_if": "{{ false }}"
+    },
+    {
+      "type": "select",
+      "id": "gradient_color_1_source",
+      "visible_if": "{{ false }}",
+      "label": "Gradient color 1",
+      "default": "palette_off_white",
+      "options": [
+        {
+          "value": "palette_dark_green",
+          "label": "Dark Green"
+        },
+        {
+          "value": "palette_dark_green_90",
+          "label": "Dark Green 90%"
+        },
+        {
+          "value": "palette_dark_green_80",
+          "label": "Dark Green 80%"
+        },
+        {
+          "value": "palette_dark_green_70",
+          "label": "Dark Green 70%"
+        },
+        {
+          "value": "palette_dark_green_60",
+          "label": "Dark Green 60%"
+        },
+        {
+          "value": "palette_dark_green_50",
+          "label": "Dark Green 50%"
+        },
+        {
+          "value": "palette_dark_green_40",
+          "label": "Dark Green 40%"
+        },
+        {
+          "value": "palette_dark_green_30",
+          "label": "Dark Green 30%"
+        },
+        {
+          "value": "palette_dark_green_20",
+          "label": "Dark Green 20%"
+        },
+        {
+          "value": "palette_dark_green_10",
+          "label": "Dark Green 10%"
+        },
+        {
+          "value": "palette_bright_green",
+          "label": "Bright Green"
+        },
+        {
+          "value": "palette_bright_green_90",
+          "label": "Bright Green 90%"
+        },
+        {
+          "value": "palette_bright_green_80",
+          "label": "Bright Green 80%"
+        },
+        {
+          "value": "palette_bright_green_70",
+          "label": "Bright Green 70%"
+        },
+        {
+          "value": "palette_bright_green_60",
+          "label": "Bright Green 60%"
+        },
+        {
+          "value": "palette_bright_green_50",
+          "label": "Bright Green 50%"
+        },
+        {
+          "value": "palette_bright_green_40",
+          "label": "Bright Green 40%"
+        },
+        {
+          "value": "palette_bright_green_30",
+          "label": "Bright Green 30%"
+        },
+        {
+          "value": "palette_bright_green_20",
+          "label": "Bright Green 20%"
+        },
+        {
+          "value": "palette_bright_green_10",
+          "label": "Bright Green 10%"
+        },
+        {
+          "value": "palette_black",
+          "label": "Black"
+        },
+        {
+          "value": "palette_off_white",
+          "label": "Off White"
+        },
+        {
+          "value": "palette_light_grey",
+          "label": "Light Grey"
+        },
+        {
+          "value": "palette_yellow",
+          "label": "Yellow"
+        },
+        {
+          "value": "custom",
+          "label": "Custom hex"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "visible_if": "{{ false }}",
+      "label": "Custom color 1",
+      "default": "#FFFCFA",
+      "info": "Used when source is set to Custom hex"
+    },
+    {
+      "type": "select",
+      "id": "gradient_color_2_source",
+      "visible_if": "{{ false }}",
+      "label": "Gradient color 2",
+      "default": "palette_bright_green_20",
+      "options": [
+        {
+          "value": "palette_dark_green",
+          "label": "Dark Green"
+        },
+        {
+          "value": "palette_dark_green_90",
+          "label": "Dark Green 90%"
+        },
+        {
+          "value": "palette_dark_green_80",
+          "label": "Dark Green 80%"
+        },
+        {
+          "value": "palette_dark_green_70",
+          "label": "Dark Green 70%"
+        },
+        {
+          "value": "palette_dark_green_60",
+          "label": "Dark Green 60%"
+        },
+        {
+          "value": "palette_dark_green_50",
+          "label": "Dark Green 50%"
+        },
+        {
+          "value": "palette_dark_green_40",
+          "label": "Dark Green 40%"
+        },
+        {
+          "value": "palette_dark_green_30",
+          "label": "Dark Green 30%"
+        },
+        {
+          "value": "palette_dark_green_20",
+          "label": "Dark Green 20%"
+        },
+        {
+          "value": "palette_dark_green_10",
+          "label": "Dark Green 10%"
+        },
+        {
+          "value": "palette_bright_green",
+          "label": "Bright Green"
+        },
+        {
+          "value": "palette_bright_green_90",
+          "label": "Bright Green 90%"
+        },
+        {
+          "value": "palette_bright_green_80",
+          "label": "Bright Green 80%"
+        },
+        {
+          "value": "palette_bright_green_70",
+          "label": "Bright Green 70%"
+        },
+        {
+          "value": "palette_bright_green_60",
+          "label": "Bright Green 60%"
+        },
+        {
+          "value": "palette_bright_green_50",
+          "label": "Bright Green 50%"
+        },
+        {
+          "value": "palette_bright_green_40",
+          "label": "Bright Green 40%"
+        },
+        {
+          "value": "palette_bright_green_30",
+          "label": "Bright Green 30%"
+        },
+        {
+          "value": "palette_bright_green_20",
+          "label": "Bright Green 20%"
+        },
+        {
+          "value": "palette_bright_green_10",
+          "label": "Bright Green 10%"
+        },
+        {
+          "value": "palette_black",
+          "label": "Black"
+        },
+        {
+          "value": "palette_off_white",
+          "label": "Off White"
+        },
+        {
+          "value": "palette_light_grey",
+          "label": "Light Grey"
+        },
+        {
+          "value": "palette_yellow",
+          "label": "Yellow"
+        },
+        {
+          "value": "custom",
+          "label": "Custom hex"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "visible_if": "{{ false }}",
+      "label": "Custom color 2",
+      "default": "#D6FED6",
+      "info": "Used when source is set to Custom hex"
+    },
+    {
+      "type": "select",
+      "id": "gradient_color_3_source",
+      "visible_if": "{{ false }}",
+      "label": "Gradient color 3",
+      "default": "palette_off_white",
+      "options": [
+        {
+          "value": "palette_dark_green",
+          "label": "Dark Green"
+        },
+        {
+          "value": "palette_dark_green_90",
+          "label": "Dark Green 90%"
+        },
+        {
+          "value": "palette_dark_green_80",
+          "label": "Dark Green 80%"
+        },
+        {
+          "value": "palette_dark_green_70",
+          "label": "Dark Green 70%"
+        },
+        {
+          "value": "palette_dark_green_60",
+          "label": "Dark Green 60%"
+        },
+        {
+          "value": "palette_dark_green_50",
+          "label": "Dark Green 50%"
+        },
+        {
+          "value": "palette_dark_green_40",
+          "label": "Dark Green 40%"
+        },
+        {
+          "value": "palette_dark_green_30",
+          "label": "Dark Green 30%"
+        },
+        {
+          "value": "palette_dark_green_20",
+          "label": "Dark Green 20%"
+        },
+        {
+          "value": "palette_dark_green_10",
+          "label": "Dark Green 10%"
+        },
+        {
+          "value": "palette_bright_green",
+          "label": "Bright Green"
+        },
+        {
+          "value": "palette_bright_green_90",
+          "label": "Bright Green 90%"
+        },
+        {
+          "value": "palette_bright_green_80",
+          "label": "Bright Green 80%"
+        },
+        {
+          "value": "palette_bright_green_70",
+          "label": "Bright Green 70%"
+        },
+        {
+          "value": "palette_bright_green_60",
+          "label": "Bright Green 60%"
+        },
+        {
+          "value": "palette_bright_green_50",
+          "label": "Bright Green 50%"
+        },
+        {
+          "value": "palette_bright_green_40",
+          "label": "Bright Green 40%"
+        },
+        {
+          "value": "palette_bright_green_30",
+          "label": "Bright Green 30%"
+        },
+        {
+          "value": "palette_bright_green_20",
+          "label": "Bright Green 20%"
+        },
+        {
+          "value": "palette_bright_green_10",
+          "label": "Bright Green 10%"
+        },
+        {
+          "value": "palette_black",
+          "label": "Black"
+        },
+        {
+          "value": "palette_off_white",
+          "label": "Off White"
+        },
+        {
+          "value": "palette_light_grey",
+          "label": "Light Grey"
+        },
+        {
+          "value": "palette_yellow",
+          "label": "Yellow"
+        },
+        {
+          "value": "custom",
+          "label": "Custom hex"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_3",
+      "visible_if": "{{ false }}",
+      "label": "Custom color 3",
+      "default": "#FFFCFA",
+      "info": "Used when source is set to Custom hex"
+    },
+    {
+      "type": "header",
+      "content": "Coming Soon sticker"
+    },
+    {
+      "type": "image_picker",
+      "id": "cs_shape_1",
+      "label": "Shape 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "cs_shape_2",
+      "label": "Shape 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "cs_shape_3",
+      "label": "Shape 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "cs_shape_4",
+      "label": "Shape 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "cs_text",
+      "label": "Text overlay"
+    },
+    {
+      "type": "select",
+      "id": "cs_color",
+      "label": "Shape color",
+      "options": [
+        {
+          "value": "#0E4A0E",
+          "label": "Dark Green"
+        },
+        {
+          "value": "#87A587",
+          "label": "Dark Green 50%"
+        },
+        {
+          "value": "#568056",
+          "label": "Dark Green 70%"
+        },
+        {
+          "value": "#B7C9B7",
+          "label": "Dark Green 30%"
+        },
+        {
+          "value": "#30FA30",
+          "label": "Bright Green"
+        },
+        {
+          "value": "#000000",
+          "label": "Black"
+        },
+        {
+          "value": "#FFFCFA",
+          "label": "Off White"
+        },
+        {
+          "value": "#FDE523",
+          "label": "Yellow"
+        },
+        {
+          "value": "#FF3B30",
+          "label": "Red"
+        },
+        {
+          "value": "#E2DEDB",
+          "label": "Light Grey"
+        }
+      ],
+      "default": "#87A587"
+    },
+    {
+      "type": "header",
+      "content": "Sold Out sticker"
+    },
+    {
+      "type": "image_picker",
+      "id": "so_shape_1",
+      "label": "Shape 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "so_shape_2",
+      "label": "Shape 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "so_shape_3",
+      "label": "Shape 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "so_shape_4",
+      "label": "Shape 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "so_text",
+      "label": "Text overlay"
+    },
+    {
+      "type": "select",
+      "id": "so_color",
+      "label": "Shape color",
+      "options": [
+        {
+          "value": "#000000",
+          "label": "Black"
+        },
+        {
+          "value": "#0E4A0E",
+          "label": "Dark Green"
+        },
+        {
+          "value": "#87A587",
+          "label": "Dark Green 50%"
+        },
+        {
+          "value": "#568056",
+          "label": "Dark Green 70%"
+        },
+        {
+          "value": "#B7C9B7",
+          "label": "Dark Green 30%"
+        },
+        {
+          "value": "#30FA30",
+          "label": "Bright Green"
+        },
+        {
+          "value": "#FFFCFA",
+          "label": "Off White"
+        },
+        {
+          "value": "#FDE523",
+          "label": "Yellow"
+        },
+        {
+          "value": "#FF3B30",
+          "label": "Red"
+        },
+        {
+          "value": "#E2DEDB",
+          "label": "Light Grey"
+        }
+      ],
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Placeholder poster"
+    },
+    {
+      "type": "select",
+      "id": "placeholder_color",
+      "label": "Background color",
+      "options": [
+        {
+          "value": "#B7C9B7",
+          "label": "Dark Green 30%"
+        },
+        {
+          "value": "#87A587",
+          "label": "Dark Green 50%"
+        },
+        {
+          "value": "#0E4A0E",
+          "label": "Dark Green"
+        },
+        {
+          "value": "#568056",
+          "label": "Dark Green 70%"
+        },
+        {
+          "value": "#30FA30",
+          "label": "Bright Green"
+        },
+        {
+          "value": "#FFFCFA",
+          "label": "Off White"
+        },
+        {
+          "value": "#000000",
+          "label": "Black"
+        },
+        {
+          "value": "#FDE523",
+          "label": "Yellow"
+        },
+        {
+          "value": "#FF3B30",
+          "label": "Red"
+        },
+        {
+          "value": "#E2DEDB",
+          "label": "Light Grey"
+        }
+      ],
+      "default": "#B7C9B7"
+    },
+    {
+      "type": "select",
+      "id": "placeholder_font_color",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "#87A587",
+          "label": "Dark Green 50%"
+        },
+        {
+          "value": "#0E4A0E",
+          "label": "Dark Green"
+        },
+        {
+          "value": "#568056",
+          "label": "Dark Green 70%"
+        },
+        {
+          "value": "#B7C9B7",
+          "label": "Dark Green 30%"
+        },
+        {
+          "value": "#FFFCFA",
+          "label": "Off White"
+        },
+        {
+          "value": "#000000",
+          "label": "Black"
+        },
+        {
+          "value": "#30FA30",
+          "label": "Bright Green"
+        },
+        {
+          "value": "#FDE523",
+          "label": "Yellow"
+        },
+        {
+          "value": "#FF3B30",
+          "label": "Red"
+        },
+        {
+          "value": "#E2DEDB",
+          "label": "Light Grey"
+        }
+      ],
+      "default": "#87A587"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop"
+    }
+  ]
+}
+{% endschema %}

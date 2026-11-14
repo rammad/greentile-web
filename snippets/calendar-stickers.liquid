@@ -1,0 +1,78 @@
+{%- comment -%}
+  Sold Out / Coming Soon sticker assets for the events-style pages (calendar, shop), output as
+  the data-sticker-* attributes assets/section-calendar.js reads off #cal-page-container.
+
+  Usage (inside the container's opening tag):
+    {% render 'calendar-stickers', settings_source: section.settings %}
+
+  Expects the section schema's cs_shape_1..4, cs_text, cs_color, so_shape_1..4, so_text and
+  so_color settings; blank image settings fall back to the bundled sticker SVGs.
+{%- endcomment -%}
+{%- liquid
+  if settings_source.cs_shape_1
+    assign cs1_url = settings_source.cs_shape_1 | image_url: width: 400
+  else
+    assign cs1_url = 'sticker-cs-shape-1-blank.svg' | asset_url
+  endif
+  if settings_source.cs_shape_2
+    assign cs2_url = settings_source.cs_shape_2 | image_url: width: 400
+  else
+    assign cs2_url = ''
+  endif
+  if settings_source.cs_shape_3
+    assign cs3_url = settings_source.cs_shape_3 | image_url: width: 400
+  else
+    assign cs3_url = 'sticker-cs-shape-3-blank.svg' | asset_url
+  endif
+  if settings_source.cs_shape_4
+    assign cs4_url = settings_source.cs_shape_4 | image_url: width: 400
+  else
+    assign cs4_url = 'sticker-cs-shape-4-blank.svg' | asset_url
+  endif
+  if settings_source.cs_text
+    assign cs_text_url = settings_source.cs_text | image_url: width: 400
+  else
+    assign cs_text_url = 'sticker-cs-text-white.svg' | asset_url
+  endif
+
+  if settings_source.so_shape_1
+    assign so1_url = settings_source.so_shape_1 | image_url: width: 400
+  else
+    assign so1_url = 'sticker-so-shape-1-blank.svg' | asset_url
+  endif
+  if settings_source.so_shape_2
+    assign so2_url = settings_source.so_shape_2 | image_url: width: 400
+  else
+    assign so2_url = 'sticker-so-shape-2-blank.svg' | asset_url
+  endif
+  if settings_source.so_shape_3
+    assign so3_url = settings_source.so_shape_3 | image_url: width: 400
+  else
+    assign so3_url = 'sticker-so-shape-3-blank.svg' | asset_url
+  endif
+  if settings_source.so_shape_4
+    assign so4_url = settings_source.so_shape_4 | image_url: width: 400
+  else
+    assign so4_url = 'sticker-so-shape-4-blank.svg' | asset_url
+  endif
+  if settings_source.so_text
+    assign so_text_url = settings_source.so_text | image_url: width: 400
+  else
+    assign so_text_url = 'sticker-so-text-white.svg' | asset_url
+  endif
+
+  assign cs_color = settings_source.cs_color | default: '#87A587'
+  assign so_color = settings_source.so_color | default: '#000000'
+-%}
+data-sticker-cs-blank1="{{ cs1_url }}"
+  data-sticker-cs-blank2="{{ cs2_url }}"
+  data-sticker-cs-blank3="{{ cs3_url }}"
+  data-sticker-cs-blank4="{{ cs4_url }}"
+  data-sticker-cs-text="{{ cs_text_url }}"
+  data-sticker-cs-color="{{ cs_color }}"
+  data-sticker-so-blank1="{{ so1_url }}"
+  data-sticker-so-blank2="{{ so2_url }}"
+  data-sticker-so-blank3="{{ so3_url }}"
+  data-sticker-so-blank4="{{ so4_url }}"
+  data-sticker-so-text="{{ so_text_url }}"
+  data-sticker-so-color="{{ so_color }}"

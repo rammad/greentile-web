@@ -29,8 +29,7 @@
         "event_ticketing_ticket_list_8Mnk36"
       ],
       "settings": {
-        "buy_label": "Buy Now",
-        "max_qty": 4,
+        "buy_label": "Add to Cart",
         "gradient_color_1_source": "palette_off_white",
         "gradient_color_1": "#fffcfa",
         "gradient_color_2_source": "palette_bright_green_20",

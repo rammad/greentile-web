@@ -21,6 +21,11 @@
     let currentVariantId = null;
     let currentUnitPrice = 0;
 
+    /* how many more of this product the per-product limit allows, given what's already in the
+       cart (all variants / ticket types count together) — refreshed from the cart on load and
+       on every cart:updated */
+    let remaining = maxQty;
+
     /* cart helpers */
 
     function formatPrice(cents) {
@@ -39,13 +44,30 @@
         if (!qtyDisplay) return;
 
         qty += change;
+        if (qty > remaining) qty = remaining;
         if (qty < 1) qty = 1;
-        if (qty > maxQty) qty = maxQty;
 
         qtyDisplay.innerText = qty;
-        if (maxMsg) maxMsg.classList.toggle('is-visible', qty >= maxQty);
+        if (maxMsg) maxMsg.classList.toggle('is-visible', remaining > 0 && qty >= remaining);
         syncPriceDisplay();
     };
+
+    function resetQty() {
+        qty = 1;
+        window.updateQty(0);
+    }
+
+    async function refreshRemaining() {
+        if (!window.Cart || !productData) return;
+        try {
+            remaining = await window.Cart.remainingFor(productData.id);
+        } catch (err) {
+            console.error('Cart lookup failed:', err);
+            return;
+        }
+        window.updateQty(0);
+        updateBuyButton();
+    }
 
     function syncPriceDisplay() {
         if (!currentUnitPrice) return;
@@ -53,9 +75,12 @@
         document.querySelectorAll('.buy-price').forEach(el => { el.textContent = formatPrice(total); });
     }
 
-    const buyLabel = document.querySelector('.pdp-section')?.dataset.buyLabel || 'Buy Now';
-    const eventStartAt = document.querySelector('.pdp-section')?.dataset.eventStartAt || '';
-    const eventUpcoming = document.querySelector('.pdp-section')?.dataset.eventUpcoming === 'true';
+    const sectionData = document.querySelector('.pdp-section')?.dataset || {};
+    const buyLabel = sectionData.buyLabel || 'Add to Cart';
+    const maxLabel = sectionData.maxLabel || 'Max Limit Reached';
+    const errorLabel = sectionData.errorLabel || 'Something went wrong — please try again';
+    const eventStartAt = sectionData.eventStartAt || '';
+    const eventUpcoming = sectionData.eventUpcoming === 'true';
     const closedLabel = eventUpcoming ? 'Coming Soon' : 'Sold Out';
     let wasSoldOut = false;
 
@@ -83,7 +108,9 @@
 
         if (buyBtn && productData) {
             const variant = productData.variants.find(v => v.id === currentVariantId);
-            const available = variant ? (variant.available && !isEventPast() && !eventUpcoming) : false;
+            const onSale = variant ? (variant.available && !isEventPast() && !eventUpcoming) : false;
+            const atLimit = onSale && remaining <= 0;
+            const available = onSale && !atLimit;
             const hasMultiple = productData.variants.length > 1;
 
             buyBtn.disabled = !available;
@@ -93,8 +120,9 @@
             if (qtyWrapper) qtyWrapper.style.display = available ? '' : 'none';
 
             if (!available) {
+                const label = atLimit ? maxLabel : closedLabel;
                 buyBtn.querySelectorAll('.ui-roll-layer').forEach(layer => {
-                    layer.innerHTML = '<span class="buy-label">' + closedLabel + '</span>';
+                    layer.innerHTML = '<span class="buy-label">' + label + '</span>';
                 });
                 wasSoldOut = true;
             } else if (wasSoldOut) {
@@ -309,18 +337,6 @@
         fields.forEach((el, i) => el.classList.toggle('gm-field--full', fields.length % 2 === 1 && i === 0));
     }
 
-    /* The direct buy path clears the cart before adding (this store checks out one order at a
-       time). The modal path hands submission to the app's own form, which POSTs to /cart/add
-       and never clears — so clear here instead, on open. Deliberately not wrapped around the
-       form's submit: the app ships cart-submit-fixup.js that intercepts it. */
-    function clearCart() {
-        const cartClearUrl = window.THEME_SETTINGS?.routes?.cartClear || '/cart/clear.js';
-        return fetch(cartClearUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        }).catch(err => console.error('Cart clear failed:', err));
-    }
-
     function initTicketModal() {
         const modal = document.getElementById('ticket-modal');
         const backdrop = document.getElementById('ticket-modal-backdrop');
@@ -340,13 +356,51 @@
         const drawer = window.Drawer.create(modal, backdrop, {
             bodyClass: 'ticket-modal-is-open',
             onOpen: () => {
-                clearCart();
                 syncTicketQuantity(modal);
                 updateTicketSummary(modal);
             }
         });
         const open = () => drawer.open();
         const close = () => drawer.close();
+
+        /* Submitting the app's form adds the tickets — with the attendee answers it carries as
+           hidden line-item properties (items[VID][properties][_1|Name] …) — to the cart instead
+           of the app's own redirect to checkout; window.Cart.add then opens the cart drawer,
+           which takes over from this one. Native required-field validation has already run by
+           the time submit fires. Bubble phase on purpose: the app's cart-submit-fixup.js scopes
+           the form's inputs in its capture-phase listener first, and FormData is read
+           synchronously here, before it restores them.
+           (If the app ever moves this shop to its newer storefront-cart mode, its checkout button
+           becomes type="button" and adds/redirects itself — this listener then never fires.) */
+        modal.addEventListener('submit', async (e) => {
+            const form = e.target;
+            if (!(form instanceof HTMLFormElement) || !window.Cart) return;
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const ticketCount = selectedTickets(modal).reduce((n, row) => n + row.qty, 0);
+            const summary = document.getElementById('ticket-modal-summary');
+            if (!ticketCount) return;
+
+            if (ticketCount > remaining) {
+                if (summary) summary.textContent = maxLabel;
+                return;
+            }
+
+            const submitBtn = form.querySelector('.ticket-checkout-button');
+            if (submitBtn) submitBtn.disabled = true;
+
+            try {
+                await window.Cart.add(formData);
+                form.reset();
+                resetQty();
+            } catch (err) {
+                console.error('Add tickets to cart failed:', err);
+                if (summary) summary.textContent = err.status === 422 && err.message ? err.message : errorLabel;
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        });
 
         /* #tickets in the URL force-opens the modal — same pattern as #contact on the contact panel */
         function consumeHash() {
@@ -369,18 +423,37 @@
 
         updateBuyButton();
 
+        /* limit = theme setting minus what's already in the cart, for both add paths */
+        refreshRemaining();
+        document.addEventListener('cart:updated', refreshRemaining);
+
         window.addEventListener('pageshow', () => {
             buyBtn.style.pointerEvents = '';
             buyBtn.style.opacity = '';
         });
 
+        function setBusy(busy) {
+            buyBtn.style.pointerEvents = busy ? 'none' : '';
+            buyBtn.style.opacity = busy ? '0.6' : '';
+        }
+
+        /* re-check the limit against the live cart before every add — the page may be stale
+           (another tab, the cart drawer) */
+        async function withinLimit() {
+            await refreshRemaining();
+            return remaining > 0 && qty <= remaining;
+        }
+
         if (buyBtn.dataset.ticketModal === 'true') {
             const ticketModal = initTicketModal();
             if (ticketModal) {
-                buyBtn.addEventListener('click', (e) => {
+                buyBtn.addEventListener('click', async (e) => {
                     e.preventDefault();
                     if (buyBtn.disabled) return;
-                    ticketModal.open();
+                    setBusy(true);
+                    const ok = await withinLimit();
+                    setBusy(false);
+                    if (ok) ticketModal.open();
                 });
                 return;
             }
@@ -388,36 +461,20 @@
 
         buyBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (!currentVariantId || buyBtn.disabled) return;
+            if (!currentVariantId || buyBtn.disabled || !window.Cart) return;
 
-            const routes = window.THEME_SETTINGS?.routes;
-            const cartAddUrl = routes?.cartAdd || '/cart/add.js';
-            const cartClearUrl = routes?.cartClear || '/cart/clear.js';
-
-            buyBtn.style.pointerEvents = 'none';
-            buyBtn.style.opacity = '0.6';
-
+            setBusy(true);
             try {
-                const clearRes = await fetch(cartClearUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                if (!clearRes.ok) throw new Error('Clear cart failed: ' + clearRes.status);
-
-                const addRes = await fetch(cartAddUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ items: [{ id: currentVariantId, quantity: qty }] })
-                });
-                if (!addRes.ok) throw new Error('Add to cart failed: ' + addRes.status);
-
-                window.location.href = '/checkout';
+                if (!(await withinLimit())) return;
+                await window.Cart.add([{ id: currentVariantId, quantity: qty }]);
+                resetQty();
             } catch (err) {
-                console.error('Buy now failed:', err);
-                buyBtn.style.pointerEvents = '';
-                buyBtn.style.opacity = '';
+                console.error('Add to cart failed:', err);
+            } finally {
+                setBusy(false);
             }
         });
+
     }
 
     /* qty buttons via data attributes */

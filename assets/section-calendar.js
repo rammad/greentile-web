@@ -1,4 +1,10 @@
-/* events / calendar page */
+/* events / calendar page — also drives the Shop page (sections/shop.liquid), which reuses
+   the same markup in grid-only mode:
+   - #cal-page-container[data-grid-only]: no list view, so the mobile list rails are skipped
+   - .calendar-row[data-group]: grid header label (product type) instead of the row's month
+   - filter "in-stock": hides sold-out / coming-soon rows instead of filtering by month */
+
+const isGridOnly = () => !!document.getElementById('cal-page-container')?.hasAttribute('data-grid-only');
 
 function buildStickerAssets() {
     const el = document.getElementById('cal-page-container');
@@ -253,7 +259,7 @@ function randomizeSticker(element, referenceEl) {
 
 /* mobile: two-rail layout — date strip on top, poster+title carousel below */
 function initMobileScrollSpy() {
-    if (window.innerWidth > 1024) return;
+    if (window.innerWidth > 1024 || isGridOnly()) return;
 
     const wrapper = document.querySelector('.calendar-interface-wrapper');
     const list = document.querySelector('.calendar-list');
@@ -662,8 +668,7 @@ function initRowPacker() {
     let currentGroup = null;
 
     listRows.forEach(row => {
-        const dateText = row.querySelector('.cal-date').innerText.trim();
-        const monthName = getMonthName(dateText);
+        const monthName = row.dataset.group || getMonthName(row.querySelector('.cal-date').innerText.trim());
 
         if (monthName !== currentMonthName) {
             currentGroup = { name: monthName, items: [] };
@@ -707,17 +712,18 @@ function initMobileFilterToggle() {
     const controls = document.querySelector('.calendar-controls');
     if (!controls) return;
 
+    /* events page: [filters] [view toggle + archives]; shop page: [filters] only */
     const filtersLists = controls.querySelectorAll('.filters-list');
-    if (filtersLists.length < 2) return;
+    if (filtersLists.length < 1) return;
 
     const filtersList1 = filtersLists[0];
-    const filtersList2 = filtersLists[1];
+    const filtersList2 = filtersLists[1] || null;
     const filterBtns = Array.from(filtersList1.querySelectorAll('.filter-btn'));
     const btnGrid = document.getElementById('btn-grid');
-    const archivesLink = filtersList2.querySelector('a.filter-btn');
+    const archivesLink = filtersList2 ? filtersList2.querySelector('a.filter-btn') : null;
 
     filtersList1.style.display = 'none';
-    filtersList2.style.display = 'none';
+    if (filtersList2) filtersList2.style.display = 'none';
 
     const topRow = document.createElement('div');
     topRow.className = 'mobile-controls-top';
@@ -729,19 +735,14 @@ function initMobileFilterToggle() {
         '<span class="ui-roll-layer ui-roll-hidden">Filters</span>';
     topRow.appendChild(filtersToggle);
 
-    const divider1 = document.createElement('span');
-    divider1.className = 'mobile-divider type-subRegular1';
-    divider1.textContent = '/';
-    topRow.appendChild(divider1);
-
-    if (btnGrid) topRow.appendChild(btnGrid);
-
-    const divider2 = document.createElement('span');
-    divider2.className = 'mobile-divider type-subRegular1';
-    divider2.textContent = '/';
-    topRow.appendChild(divider2);
-
-    if (archivesLink) topRow.appendChild(archivesLink);
+    [btnGrid, archivesLink].forEach(el => {
+        if (!el) return;
+        const divider = document.createElement('span');
+        divider.className = 'mobile-divider type-subRegular1';
+        divider.textContent = '/';
+        topRow.appendChild(divider);
+        topRow.appendChild(el);
+    });
 
     const optionsRow = document.createElement('div');
     optionsRow.className = 'mobile-filter-options';
@@ -833,7 +834,9 @@ function initMonthFilters() {
             const allRows = document.querySelectorAll('.calendar-row');
 
             allRows.forEach(row => {
-                if (filter === 'all' || row.dataset.month === monthNum) {
+                const matches = filter === 'all'
+                    || (filter === 'in-stock' ? !row.dataset.status /* not sold out or coming soon */ : row.dataset.month === monthNum);
+                if (matches) {
                     row.classList.remove('filtered-out');
                 } else {
                     row.classList.add('filtered-out');
