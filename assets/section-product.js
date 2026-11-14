@@ -270,6 +270,9 @@
         });
 
         root.querySelectorAll('.product-ticket-button, .ticket-checkout-button').forEach(asCtaButton);
+
+        /* the questions list is the drawer's scrolling region (fade + internal scroll) */
+        root.querySelectorAll('.ticket-custom-questions-container').forEach(el => el.classList.add('drawer-scroll'));
     }
 
     /* rebuilds the app's plain <button> into the theme's standard CTA, roll-over and all

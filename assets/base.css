@@ -822,6 +822,75 @@ body::after {
     to { transform: translateY(10px) rotate(360deg); }
 }
 
+/* quantity stepper + tag pill — shared by the PDP (section-product) and the cart drawer */
+
+.qty-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--c-dark-green-20);
+    border-radius: 100px;
+    padding: var(--cta-padding);
+    min-width: 140px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.qty-btn {
+    background: none; border: none;
+    cursor: pointer;
+    padding: 0;
+    color: var(--c-dark-green);
+    line-height: 1.2;
+    transition: opacity 0.3s ease;
+}
+
+.qty-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.qty-val {
+    min-width: 24px; text-align: center;
+    color: var(--c-dark-green);
+    line-height: 1.2;
+}
+
+
+.pdp-tag {
+    display: inline-block;
+    background-color: var(--c-dark-green-20);
+    padding: 4px 8px calc(4px / 2);
+    border-radius: 4px;
+    margin: 0 4px 8px 0;
+    opacity: 0;
+    transition: opacity var(--time-fade-in) ease;
+}
+
+.pdp-tag .type-subRegular2,.pdp-tag .type-subRegular1{
+    color: var(--c-dark-green-90);
+}
+
+.pdp-tag.is-visible{
+    opacity: 1;
+}
+
+@media (min-width: 3840px) {
+    .qty-selector {
+        min-width: 280px;
+    }
+
+    .qty-val {
+        min-width: 48px;
+    }
+
+    .pdp-tag {
+        padding: 8px 16px calc(8px / 2);
+        border-radius: 8px;
+        margin: 0 8px 16px 0;
+    }
+}
+
 /* responsive visibility utilities */
 .mobile-only  { display: none !important; }
 

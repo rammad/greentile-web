@@ -1,0 +1,194 @@
+{%- comment -%}
+  Cart drawer — global slide-out cart, rendered once from layout/theme.liquid.
+
+  Shell (backdrop, panel, header, close) is the shared drawer from assets/drawer.css.
+  Everything inside #cart-drawer-body is re-rendered by assets/cart.js through the Section
+  Rendering API (sections=cart-drawer on /cart/add.js, /cart/change.js and ?sections=), so
+  the line-item markup only lives here. The header stays static so its close button keeps
+  the listener window.Drawer attached to it.
+
+  Ticket lines (products with the event metafield) carry the attendee answers as hidden
+  line-item properties (_1|Name, _1|Email, …) — one set per ticket on the line — so their
+  quantity can only go down from here; more tickets are added from the event page, through
+  the attendee form.
+
+  The per-product limit (settings.cart_max_qty) counts every line of the same product,
+  across variants and ticket types.
+{%- endcomment -%}
+
+{%- liquid
+  assign evt_ns = settings.event_metafield_namespace | default: 'event_ticketing'
+  assign evt_key = settings.event_metafield_key | default: 'event_v2'
+  assign max_qty = settings.cart_max_qty | default: 4
+-%}
+
+<div class="drawer-backdrop" id="cart-drawer-backdrop"></div>
+<div class="drawer drawer--fixed-body cart-drawer" id="cart-drawer" data-lenis-prevent data-max-qty="{{ max_qty }}" data-error-msg="{{ 'cart.error' | t | escape }}">
+  <div class="drawer-inner">
+    <div class="drawer-header">
+      <div class="drawer-heading">
+        <h2 class="drawer-title type-h2">{{ section.settings.title | default: 'Your Cart' }}</h2>
+      </div>
+      <button type="button" class="drawer-close" aria-label="{{ 'cart.close' | t }}">
+        <span class="drawer-close-line" aria-hidden="true"></span>
+        <span class="drawer-close-line" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <div class="cart-drawer-body" id="cart-drawer-body" data-item-count="{{ cart.item_count }}">
+      {%- if cart.item_count > 0 -%}
+        <ul class="cart-lines drawer-scroll">
+          {%- for item in cart.items -%}
+            {%- liquid
+              assign is_ticket = false
+              if item.product.metafields[evt_ns][evt_key] != blank
+                assign is_ticket = true
+              endif
+
+              assign product_qty = 0
+              for other in cart.items
+                if other.product_id == item.product_id
+                  assign product_qty = product_qty | plus: other.quantity
+                endif
+              endfor
+
+              assign at_limit = false
+              if product_qty >= max_qty
+                assign at_limit = true
+              endif
+
+              assign attendees = ''
+              for property in item.properties
+                assign prop_key = property.first
+                if property.last != blank and prop_key contains '|Name'
+                  assign first_char = prop_key | slice: 0
+                  if first_char == '_'
+                    if attendees != blank
+                      assign attendees = attendees | append: ', '
+                    endif
+                    assign attendees = attendees | append: property.last
+                  endif
+                endif
+              endfor
+            -%}
+            <li class="cart-line" data-line-key="{{ item.key }}" data-product-id="{{ item.product_id }}" data-qty="{{ item.quantity }}">
+              <a href="{{ item.url }}" class="cart-line-image">
+                {%- if item.image -%}
+                  <img
+                    src="{{ item.image | image_url: width: 300 }}"
+                    alt="{{ item.image.alt | default: item.product.title | escape }}"
+                    width="{{ item.image.width }}"
+                    height="{{ item.image.height }}"
+                    loading="lazy"
+                  >
+                {%- endif -%}
+              </a>
+
+              <div class="cart-line-info">
+                <a href="{{ item.url }}" class="cart-line-title type-subBold2">{{ item.product.title }}</a>
+
+                {%- unless item.product.has_only_default_variant -%}
+                  <span class="type-subRegular2">{{ item.variant.title }}</span>
+                {%- endunless -%}
+
+                {%- if attendees != blank -%}
+                  <span class="type-subRegular2">{{ attendees }}</span>
+                {%- endif -%}
+
+                <span class="type-subRegular1">{{ item.final_line_price | money }}</span>
+
+                <div class="cart-line-actions">
+                  <div class="qty-selector">
+                    <button type="button" class="qty-btn type-subRegular1" data-cart-change="{{ item.quantity | minus: 1 }}" aria-label="{{ 'cart.decrease' | t }}">&minus;</button>
+                    <span class="qty-val type-subRegular1">{{ item.quantity }}</span>
+                    <button type="button" class="qty-btn type-subRegular1" data-cart-change="{{ item.quantity | plus: 1 }}" aria-label="{{ 'cart.increase' | t }}"
+                      {%- if is_ticket %} disabled title="{{ 'cart.ticket_add_more' | t }}"{% elsif at_limit %} disabled{% endif -%}
+                    >&plus;</button>
+                  </div>
+
+                  <button type="button" class="cart-line-remove type-subRegular2 ui-roll roll-hover is-visible" data-cart-change="0">
+                    <span class="ui-roll-layer ui-roll-visible">{{ 'cart.remove' | t }}</span>
+                    <span class="ui-roll-layer ui-roll-hidden">{{ 'cart.remove' | t }}</span>
+                  </button>
+                </div>
+
+                {%- if at_limit and is_ticket == false -%}
+                  <div class="pdp-tag is-visible"><span class="type-subRegular2">{{ 'product.max_qty' | t }}</span></div>
+                {%- endif -%}
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        <div class="cart-footer">
+          <div class="cart-status pdp-tag" id="cart-drawer-status"><span class="type-subRegular2"></span></div>
+
+          <form action="{{ routes.cart_url }}" method="post" class="cart-checkout-form">
+            <button type="submit" name="checkout" class="cta-btn is-visible cart-checkout">
+              <div class="ui-roll roll-hover is-visible">
+                <span class="type-subRegular1 ui-roll-layer ui-roll-visible">
+                  <span>{{ cart.total_price | money }}</span>
+                  <span>{{ section.settings.checkout_label | default: 'Checkout' }}</span>
+                </span>
+                <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">
+                  <span>{{ cart.total_price | money }}</span>
+                  <span>{{ section.settings.checkout_label | default: 'Checkout' }}</span>
+                </span>
+              </div>
+            </button>
+          </form>
+        </div>
+      {%- else -%}
+        <div class="cart-empty">
+          <span class="type-subRegular1">{{ section.settings.empty_message | default: 'Your cart is empty' }}</span>
+          {%- if section.settings.empty_cta_label != blank and section.settings.empty_cta_url != blank -%}
+            <a href="{{ section.settings.empty_cta_url }}" class="cta-btn is-visible">
+              <div class="ui-roll roll-hover is-visible">
+                <span class="type-subRegular1 ui-roll-layer ui-roll-visible">{{ section.settings.empty_cta_label }}</span>
+                <span class="type-subRegular1 ui-roll-layer ui-roll-hidden">{{ section.settings.empty_cta_label }}</span>
+              </div>
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "class": "cart-drawer-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Your Cart"
+    },
+    {
+      "type": "text",
+      "id": "checkout_label",
+      "label": "Checkout button label",
+      "default": "Checkout"
+    },
+    {
+      "type": "text",
+      "id": "empty_message",
+      "label": "Empty cart message",
+      "default": "Your cart is empty"
+    },
+    {
+      "type": "text",
+      "id": "empty_cta_label",
+      "label": "Empty cart button label",
+      "default": "Browse Events"
+    },
+    {
+      "type": "url",
+      "id": "empty_cta_url",
+      "label": "Empty cart button link"
+    }
+  ]
+}
+{% endschema %}

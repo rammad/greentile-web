@@ -3,6 +3,8 @@
   if template.name == 'product' or template.suffix == 'archives'
     assign is_subpage = true
   endif
+
+  assign cart_label = settings.nav_cart_label | default: 'CART'
 -%}
 
 <nav class="sticky-nav{% if is_subpage %} nav-subpage{% endif %}">
@@ -49,6 +51,11 @@
       <span class="ui-roll-layer ui-roll-visible">{{ settings.nav_contact_label | default: 'SAY HI' }}</span>
       <span class="ui-roll-layer ui-roll-hidden">{{ settings.nav_contact_label | default: 'SAY HI' }}</span>
     </a>
+    {%- comment -%} count text is kept in sync by assets/cart.js {%- endcomment -%}
+    <a href="#cart" class="type-subRegular1 ui-roll roll-hover" data-cart-trigger>
+      <span class="ui-roll-layer ui-roll-visible">{{ cart_label }}<span data-cart-count>{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}</span></span>
+      <span class="ui-roll-layer ui-roll-hidden">{{ cart_label }}<span data-cart-count>{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}</span></span>
+    </a>
   </div>
 
   <button class="nav-hamburger" aria-label="Menu" aria-expanded="false">
@@ -70,6 +77,8 @@
       {%- endif -%}
     {%- endfor -%}
     <a href="#" class="type-h2 mobile-menu-link animate-cascade" data-contact-trigger>{{ settings.nav_contact_label | default: 'Say Hi' }}</a>
+    {%- comment -%} animate-cascade splits this text into letters, so cart.js rewrites the whole label (data-cart-label) and re-splits it when the count changes {%- endcomment -%}
+    <a href="#cart" class="type-h2 mobile-menu-link animate-cascade" data-cart-trigger data-cart-label="{{ cart_label }}">{{ cart_label }}{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}</a>
   </div>
 </div>
 
