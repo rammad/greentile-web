@@ -323,17 +323,6 @@
         const backdrop = document.getElementById('ticket-modal-backdrop');
         if (!modal || !backdrop) return null;
 
-        /* Lenis applies a transform to #scroll-content for its virtual-scroll effect, which
-           creates a new containing block for position:fixed descendants — breaking true
-           viewport-fixed behavior (same reason the sticky buy bar gets reparented above).
-           Move the modal out to <body>, matching where .contact-panel already lives. */
-        const usesLenis = !document.documentElement.classList.contains('native-scroll');
-        const scrollViewport = document.getElementById('scroll-viewport');
-        if (usesLenis && scrollViewport) {
-            document.body.appendChild(backdrop);
-            document.body.appendChild(modal);
-        }
-
         wrapBuiltInFields(modal);
         decorateAppMarkup(modal);
 
@@ -343,59 +332,18 @@
             decorateAppMarkup(modal);
         }).observe(modal, { childList: true, subtree: true });
 
-        /* on mobile the drawer's own X is hidden and the nav hamburger morphs into the X
-           instead — same affordance the mobile menu and contact panel use */
-        const hamburger = document.querySelector('.nav-hamburger');
-
-        let isOpen = false;
-
-        function open() {
-            if (isOpen) return;
-            isOpen = true;
-            clearCart();
-            if (hamburger) {
-                hamburger.classList.add('is-active');
-                hamburger.setAttribute('aria-expanded', 'true');
+        /* open/close, moving out of the Lenis transform, backdrop, X, Escape and the mobile
+           hamburger are handled by window.Drawer (global.js) */
+        const drawer = window.Drawer.create(modal, backdrop, {
+            bodyClass: 'ticket-modal-is-open',
+            onOpen: () => {
+                clearCart();
+                syncTicketQuantity(modal);
+                updateTicketSummary(modal);
             }
-            syncTicketQuantity(modal);
-            updateTicketSummary(modal);
-            document.body.classList.add('ticket-modal-is-open');
-            modal.classList.add('is-open');
-            backdrop.classList.add('is-open');
-            if (window.lenis && window.lenis.stop) window.lenis.stop();
-        }
-
-        function close() {
-            if (!isOpen) return;
-            isOpen = false;
-            document.body.classList.remove('ticket-modal-is-open');
-            modal.classList.remove('is-open');
-            backdrop.classList.remove('is-open');
-            if (window.lenis && window.lenis.start) window.lenis.start();
-
-            const mobileMenu = document.querySelector('.mobile-menu');
-            const menuStillOpen = mobileMenu && mobileMenu.classList.contains('is-open');
-            if (hamburger && !menuStillOpen) {
-                hamburger.classList.remove('is-active');
-                hamburger.setAttribute('aria-expanded', 'false');
-            }
-        }
-
-        /* capture phase so the hamburger closes the drawer instead of toggling the menu */
-        if (hamburger) {
-            hamburger.addEventListener('click', (e) => {
-                if (!isOpen) return;
-                e.stopImmediatePropagation();
-                close();
-            }, true);
-        }
-
-        backdrop.addEventListener('click', close);
-        const closeBtn = modal.querySelector('.ticket-modal-close');
-        if (closeBtn) closeBtn.addEventListener('click', close);
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && isOpen) close();
         });
+        const open = () => drawer.open();
+        const close = () => drawer.close();
 
         /* #tickets in the URL force-opens the modal — same pattern as #contact on the contact panel */
         function consumeHash() {

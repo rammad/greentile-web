@@ -716,3 +716,117 @@ function initMobileMenu(nav) {
         link.addEventListener('click', () => {});
     });
 }
+
+/* Drawer — shared open/close for the right-hand slide-out panels (contact, PDP attendee
+   details, cart). Shell markup/CSS: assets/drawer.css.
+
+   const drawer = window.Drawer.create(panelEl, backdropEl, { bodyClass, onOpen, onClose });
+   drawer.open(); drawer.close(); drawer.isOpen();
+
+   - Only one drawer is open at a time. Opening one while another is open hands over
+     directly (the first closes without restarting scroll or resetting the hamburger), so
+     e.g. attendee details -> cart doesn't flash the page in between.
+   - Lenis is stopped while open and restarted on close unless the mobile menu is still open.
+   - On mobile the drawer's own X is hidden (drawer.css) and the nav hamburger morphs into
+     the X instead; clicking it closes the open drawer rather than toggling the menu.
+   - Backdrop click, .drawer-close and Escape all close. */
+window.Drawer = (() => {
+    let active = null;
+
+    const getHamburger = () => document.querySelector('.nav-hamburger');
+    const menuIsOpen = () => !!document.querySelector('.mobile-menu.is-open');
+
+    function setHamburger(isActive) {
+        const hamburger = getHamburger();
+        if (!hamburger) return;
+        hamburger.classList.toggle('is-active', isActive);
+        hamburger.setAttribute('aria-expanded', String(isActive));
+    }
+
+    function create(panel, backdrop, opts = {}) {
+        if (!panel || !backdrop) return null;
+        const { bodyClass = '', onOpen, onClose } = opts;
+
+        /* Lenis applies a transform to #scroll-content for its virtual-scroll effect, which
+           creates a new containing block for position:fixed descendants. Drawers rendered
+           inside page content are moved out to <body>, where the global ones already live. */
+        if (panel.closest('#scroll-content')) {
+            document.body.appendChild(backdrop);
+            document.body.appendChild(panel);
+        }
+
+        let isOpen = false;
+
+        const api = {
+            panel,
+            open() {
+                if (isOpen) return;
+                if (active && active !== api) active.close({ handoff: true });
+                isOpen = true;
+                active = api;
+
+                document.body.classList.add('drawer-is-open');
+                if (bodyClass) document.body.classList.add(bodyClass);
+                panel.classList.add('is-open');
+                backdrop.classList.add('is-open');
+                setHamburger(true);
+                if (window.lenis && window.lenis.stop) window.lenis.stop();
+
+                if (onOpen) onOpen();
+            },
+            close({ handoff = false } = {}) {
+                if (!isOpen) return;
+                isOpen = false;
+                if (active === api) active = null;
+
+                if (bodyClass) document.body.classList.remove(bodyClass);
+                panel.classList.remove('is-open');
+                backdrop.classList.remove('is-open');
+
+                if (onClose) onClose();
+                if (handoff) return;
+
+                document.body.classList.remove('drawer-is-open');
+                if (!menuIsOpen()) {
+                    if (window.lenis && window.lenis.start) window.lenis.start();
+                    setHamburger(false);
+                }
+            },
+            isOpen: () => isOpen
+        };
+
+        backdrop.addEventListener('click', () => api.close());
+        const closeBtn = panel.querySelector('.drawer-close');
+        if (closeBtn) closeBtn.addEventListener('click', () => api.close());
+
+        return api;
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && active) active.close();
+    });
+
+    /* capture phase on the hamburger itself, so this runs before the mobile menu's own
+       toggle listener and can swallow the click */
+    function wireHamburger() {
+        const hamburger = getHamburger();
+        if (!hamburger) return;
+        hamburger.addEventListener('click', (e) => {
+            if (!active) return;
+            e.stopImmediatePropagation();
+            active.close();
+        }, true);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', wireHamburger);
+    } else {
+        wireHamburger();
+    }
+
+    return {
+        create,
+        active: () => active,
+        closeActive: () => { if (active) active.close(); }
+    };
+})();

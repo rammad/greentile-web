@@ -33,7 +33,6 @@
     const statusEl = panel.querySelector('.contact-status');
     const infoFields = panel.querySelectorAll('.contact-info-field');
     const extraFields = panel.querySelectorAll('.contact-extra-field');
-    let isOpen = false;
     let selectedTopic = '';
     let selectedEmail = CONFIG.recipientEmail;
 
@@ -105,42 +104,18 @@
 
     updateExtraFields();
 
+    /* open/close, backdrop, X, Escape and the mobile hamburger are handled by window.Drawer (global.js) */
+    const drawer = window.Drawer.create(panel, backdrop, { bodyClass: 'contact-is-open' });
+    const isOpen = () => drawer.isOpen();
+
     function open(topic) {
         if (topic) selectTopic(topic);
-        if (isOpen) return;
-        isOpen = true;
-        document.body.classList.add('contact-is-open');
-        panel.classList.add('is-open');
-        backdrop.classList.add('is-open');
-        if (window.lenis && window.lenis.stop) window.lenis.stop();
+        drawer.open();
     }
 
     function close() {
-        if (!isOpen) return;
-        isOpen = false;
-        document.body.classList.remove('contact-is-open');
-        panel.classList.remove('is-open');
-        backdrop.classList.remove('is-open');
-        const hamburger = document.querySelector('.nav-hamburger');
-        const mobileMenu = document.querySelector('.mobile-menu');
-        const menuStillOpen = mobileMenu && mobileMenu.classList.contains('is-open');
-
-        if (!menuStillOpen && window.lenis && window.lenis.start) window.lenis.start();
-
-        if (hamburger && !menuStillOpen) {
-            hamburger.classList.remove('is-active');
-            hamburger.setAttribute('aria-expanded', 'false');
-        }
+        drawer.close();
     }
-
-    backdrop.addEventListener('click', close);
-
-    const closeBtn = panel.querySelector('.contact-close');
-    if (closeBtn) closeBtn.addEventListener('click', () => close());
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isOpen) close();
-    });
 
     topicBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -234,7 +209,7 @@
         sendViaMailto(data);
     });
 
-    window.contactPanel = { open, close, isOpen: () => isOpen, selectTopic };
+    window.contactPanel = { open, close, isOpen, selectTopic };
 
     function wireTriggers() {
         // Delegation: What We Do (and similar) rebuilds CTAs after DOMContentLoaded; per-element listeners would miss or detach.
@@ -243,7 +218,7 @@
             if (!trigger) return;
             e.preventDefault();
             const topic = trigger.dataset.contactTopic ? decodeURIComponent(trigger.dataset.contactTopic) : '';
-            if (isOpen && !topic) close();
+            if (isOpen() && !topic) close();
             else open(topic);
         });
 
@@ -258,16 +233,6 @@
             const topic = match[1] ? decodeURIComponent(match[1]) : null;
             open(topic);
         });
-
-        const hamburger = document.querySelector('.nav-hamburger');
-        if (hamburger) {
-            hamburger.addEventListener('click', (e) => {
-                if (isOpen) {
-                    e.stopImmediatePropagation();
-                    close();
-                }
-            }, true);
-        }
     }
 
     function consumeContactHash() {
