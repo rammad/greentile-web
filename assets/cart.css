@@ -1,0 +1,151 @@
+/* cart drawer — only the cart's own layout lives here. Reused from elsewhere:
+   shell/header/close + .drawer-scroll  -> drawer.css
+   .qty-selector/.qty-btn/.qty-val, .pdp-tag -> base.css
+   .cta-btn, .ui-roll, type-* -> base.css */
+
+/* body is the region cart.js re-renders; it fills the drawer under the header so the line
+   list scrolls (.drawer-scroll) while the checkout footer stays pinned */
+.cart-drawer-body {
+    margin-top: 24px; /* matches .ticket-modal-body */
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.3s ease;
+}
+
+.cart-drawer-body.is-busy {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.cart-lines {
+    list-style: none;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.cart-line {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.cart-line-image {
+    display: block;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--c-dark-green-20);
+}
+
+.cart-line-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.cart-line-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+}
+
+.cart-line-title {
+    color: var(--c-dark-green);
+    text-decoration: none;
+}
+
+.cart-line-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 4px;
+}
+
+.cart-line-remove {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--c-dark-green);
+}
+
+.cart-line .pdp-tag {
+    margin: 0;
+}
+
+.cart-footer {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding-top: 20px;
+}
+
+.cart-status:not(.is-visible) {
+    display: none;
+}
+
+.cart-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding-top: 20px;
+    color: var(--c-dark-green);
+}
+
+/* 4K desktop — 2× scale */
+@media (min-width: 3840px) {
+    .cart-drawer-body {
+        margin-top: 48px;
+    }
+
+    .cart-lines {
+        gap: 64px;
+    }
+
+    .cart-line {
+        grid-template-columns: 192px 1fr;
+        gap: 40px;
+    }
+
+    .cart-line-image {
+        border-radius: 16px;
+    }
+
+    .cart-line-info {
+        gap: 16px;
+    }
+
+    .cart-line-actions {
+        gap: 40px;
+        margin-top: 8px;
+    }
+
+    .cart-footer,
+    .cart-empty {
+        gap: 24px;
+        padding-top: 40px;
+    }
+
+    .cart-empty {
+        gap: 48px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .cart-drawer-body {
+        margin-top: 40px; /* matches .ticket-modal-body */
+    }
+
+    .cart-line {
+        grid-template-columns: 80px 1fr;
+        gap: 16px;
+    }
+}

@@ -187,7 +187,8 @@
     }
 
     body.mobile-menu-is-open .nav-left,
-    body.contact-is-open .nav-left {
+    body.contact-is-open .nav-left,
+    body.cart-is-open .nav-left {
         opacity: 0;
         pointer-events: none;
     }

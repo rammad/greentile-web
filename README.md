@@ -35,18 +35,23 @@ Branches:
   preview or prototype).
 - `feature/*` - optional short-lived branches off `develop` for larger pieces of work,
   merged back via PR.
-- `master` - source of truth for theme code; `develop` is merged in via PR once tested.
-- `shopify` - receives client/content changes synced from Shopify Admin/Theme Editor.
+- `master` - source of truth for theme code; `develop` is merged in via PR once tested. Not
+  connected to any theme.
+- `shopify` - the branch the **live theme** pulls from. It exists so `master` can stay the
+  clean source of truth for the code base while the client's Theme Editor / Admin changes
+  (content, section settings, layout) still have somewhere to be committed: the integration
+  writes those edits back to `shopify`, never to `master`.
 
-Expected flow:
+Release flow:
 
 1. Engineering work lands on `develop` (directly or via a `feature/*` PR) and is checked on the
    development theme once Shopify has synced it.
 2. Tested work is merged `develop` -> `master` via PR.
-3. Client or non-dev content/styling updates happen in Shopify Admin and are committed to
-   `shopify` by the integration.
-4. `master` stays clean of direct client portal edits; engineering changes are merged or
-   cherry-picked into `shopify` as needed for deployment sync.
+3. `master` is then merged into `shopify` — **this is the deploy step**; the live site only
+   changes once `shopify` is updated and Shopify has synced it.
+4. In parallel, the client's Theme Editor / Admin edits land on `shopify` as commits from the
+   integration. They are never merged back into `master`; the next `master` -> `shopify`
+   merge simply carries code changes on top of them.
 
 This keeps portal-driven content edits auditable without muddying core source history.
 
@@ -68,8 +73,11 @@ In **Theme settings**:
 - **Event settings**
   - `Event metafield namespace` (default: `event_ticketing`)
   - `Event metafield key` (default: `event_v2`)
+- **Cart**
+  - `Max quantity per product` (`cart_max_qty`, default 4) — counted per product across
+    all its variants / ticket types (2 GA + 2 VIP = 4); enforced in the cart drawer
 - **Navigation**
-  - Logo, nav labels/URLs, back link target
+  - Logo, nav labels/URLs, back link target, cart link label
 - **Footer**
   - Global footer title and links (up to 6 configurable links)
 - **Social links**
@@ -100,6 +108,7 @@ Important tags:
 Global sections rendered from layout:
 - `sections/header.liquid`
 - `sections/contact-panel.liquid`
+- `sections/cart-drawer.liquid`
 
 ## Maintainer Guide (Theme Editor)
 
@@ -315,6 +324,22 @@ Use this as a practical "what should I fill in?" checklist.
   - page transition curtain
   - fit-text/cascade text systems
   - `window.Drawer` — shared open/close for slide-out panels (see below)
+
+### Cart drawer
+
+- Markup: `sections/cart-drawer.liquid` (global, rendered from `theme.liquid`); styles:
+  `assets/cart.css` (line layout only — shell, stepper, tags and buttons are shared classes);
+  behaviour: `assets/cart.js` (`window.Cart`).
+- Every mutation re-renders the section through the Section Rendering API
+  (`sections=cart-drawer` on `/cart/add.js` and `/cart/change.js`, `/?sections=cart-drawer`
+  for a refresh) and swaps `#cart-drawer-body`, so line-item markup lives only in Liquid.
+- Opened by `[data-cart-trigger]` (header "CART (n)" link, mobile menu), `#cart` in the URL,
+  or `window.Cart.add(...)`. The header count is kept in sync by `cart.js`.
+- Ticket lines (products with the event metafield) hold one set of attendee answers per
+  ticket as hidden line-item properties (`_1|Name`, `_1|Email`, …), so in the cart their
+  quantity can only go down; more tickets are added from the event page. Attendee names are
+  shown on the line so duplicate lines for the same event can be told apart.
+- Checkout is a plain `POST /cart` with `checkout`, i.e. Shopify's standard checkout handoff.
 
 ### Drawers (slide-out panels)
 

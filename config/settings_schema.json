@@ -89,11 +89,27 @@
     ]
   },
   {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "range",
+        "id": "cart_max_qty",
+        "label": "Max quantity per product",
+        "min": 1,
+        "max": 20,
+        "step": 1,
+        "default": 4,
+        "info": "Limit per product across all of its variants / ticket types (e.g. 2 GA + 2 VIP = 4). Enforced on product pages and in the cart."
+      }
+    ]
+  },
+  {
     "name": "Navigation",
     "settings": [
       { "type": "paragraph", "content": "Site-wide navigation shown in the header and mobile menu." },
       { "type": "image_picker", "id": "nav_logo", "label": "Logo" },
       { "type": "text", "id": "nav_contact_label", "label": "Contact link label", "default": "SAY HI" },
+      { "type": "text", "id": "nav_cart_label", "label": "Cart link label", "default": "CART", "info": "The item count is added automatically, e.g. CART (2)" },
       { "type": "text", "id": "nav_back_label", "label": "Back link label (subpages)", "default": "BACK" },
       { "type": "url", "id": "nav_back_link", "label": "Back link URL (subpages)", "info": "Where the BACK button goes on product/archive pages" },
 

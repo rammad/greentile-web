@@ -144,18 +144,22 @@
     color: var(--c-red);
 }
 
-/* desktop: hide "SAY HI" while panel is open — close control lives in the panel */
-body.contact-is-open .nav-right {
+/* desktop: hide "SAY HI" / "CART" while the contact panel or cart is open — close control lives in the panel */
+body.contact-is-open .nav-right,
+body.cart-is-open .nav-right {
     display: none;
 }
 
 @media (min-width: 1025px) {
-    body.contact-is-open .sticky-nav {
+    body.contact-is-open .sticky-nav,
+    body.cart-is-open .sticky-nav {
         z-index: 1012;
     }
 
     body.contact-is-open .nav-left,
-    body.contact-is-open .nav-center {
+    body.contact-is-open .nav-center,
+    body.cart-is-open .nav-left,
+    body.cart-is-open .nav-center {
         opacity: 0;
         pointer-events: none;
     }

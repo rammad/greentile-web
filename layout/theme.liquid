@@ -67,6 +67,7 @@
   {{ 'nav.css' | asset_url | stylesheet_tag }}
   {{ 'drawer.css' | asset_url | stylesheet_tag }}
   {{ 'contact.css' | asset_url | stylesheet_tag }}
+  {{ 'cart.css' | asset_url | stylesheet_tag }}
 
   {{ content_for_header }}
 
@@ -77,6 +78,7 @@
   <script src="{{ 'background-gradient.js' | asset_url }}" defer></script>
   <script src="{{ 'scroll.js' | asset_url }}" defer></script>
   <script src="{{ 'contact.js' | asset_url }}" defer></script>
+  <script src="{{ 'cart.js' | asset_url }}" defer></script>
 </head>
 <body class="template-{{ template.name }}{% if template.suffix %} template-{{ template.suffix }}{% endif %}">
 
@@ -85,6 +87,7 @@
 
   {% section 'header' %}
   {% section 'contact-panel' %}
+  {% section 'cart-drawer' %}
 
   <div id="scroll-viewport" class="scroll-viewport">
     <div id="scroll-content" class="scroll-content">
