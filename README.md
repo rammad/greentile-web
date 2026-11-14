@@ -1,6 +1,6 @@
 # Green Tile Social Club Web
 
-Custom Shopify theme for the Green Tile Social Club site, plus a static prototype snapshot used during design/development.
+Custom Shopify theme for the Green Tile Social Club site.
 
 This README is written for two audiences:
 - **Site maintainers**: what to update in Shopify admin and what each section does.
@@ -8,29 +8,55 @@ This README is written for two audiences:
 
 ## Project Structure
 
-- Root-level `assets/`, `sections/`, `templates/`, `snippets/`, `layout/`, `locales/`, and `config/` - active Shopify theme runtime files.
-- `raw-html/` - static prototype/reference implementation used during design and for behavior parity checks.
-  - `raw-html/css/` - prototype styles.
-  - `raw-html/scripts/` - prototype JS behavior modules.
-  - `raw-html/*.html` - section/page reference markup.
+The repo root *is* the theme — Shopify's GitHub integration reads it directly, so the
+standard theme folders must stay at the top level:
 
-If you are editing live storefront behavior, work in the Shopify theme files (not the static `raw-html/` reference files).
+- `layout/` - `theme.liquid`, the single page shell
+- `sections/` - every page section, plus the global header and contact panel
+- `snippets/` - shared Liquid partials
+- `templates/` - JSON templates composing sections per page type
+- `assets/` - CSS, JS, fonts and image assets (one CSS/JS pair per section, plus globals)
+- `config/` - theme settings schema and saved values
+- `locales/` - translation strings
+
+There is no build step; files are committed exactly as Shopify serves them.
 
 ## Shopify Integration & Branch Workflow
 
-This repo separates client-managed Shopify changes from core code maintenance:
+Deployment is handled entirely by **Shopify's built-in GitHub integration** — there are no
+workflow files or CI config in this repo. Each connected theme tracks one branch: Shopify
+periodically pulls that branch and updates the theme to match, and edits made in the
+Theme Editor / Admin are committed back to the same branch by Shopify.
 
-- `master` - source of truth for underlying theme code and engineering changes.
-- `shopify` - branch that receives client/content changes synced from Shopify Admin/Theme Editor.
+Branches:
+
+- `develop` - day-to-day engineering branch. Connected to a development theme in Shopify,
+  so pushing here is how changes are tested on a real storefront (there is no local
+  preview or prototype).
+- `feature/*` - optional short-lived branches off `develop` for larger pieces of work,
+  merged back via PR.
+- `master` - source of truth for theme code; `develop` is merged in via PR once tested.
+- `shopify` - receives client/content changes synced from Shopify Admin/Theme Editor.
 
 Expected flow:
 
-1. Client or non-dev content/styling updates happen in Shopify Admin.
-2. Those Shopify-side changes are pulled/committed to `shopify`.
-3. `master` stays clean of direct client portal edits and remains the canonical engineering baseline.
-4. Engineering work is developed/reviewed against `master`, then selectively merged/cherry-picked into `shopify` as needed for deployment sync.
+1. Engineering work lands on `develop` (directly or via a `feature/*` PR) and is checked on the
+   development theme once Shopify has synced it.
+2. Tested work is merged `develop` -> `master` via PR.
+3. Client or non-dev content/styling updates happen in Shopify Admin and are committed to
+   `shopify` by the integration.
+4. `master` stays clean of direct client portal edits; engineering changes are merged or
+   cherry-picked into `shopify` as needed for deployment sync.
 
 This keeps portal-driven content edits auditable without muddying core source history.
+
+Things to know about the integration:
+
+- Sync is periodic, not instant — allow a short delay after pushing before testing.
+- JSON templates (`templates/*.json`) and `config/settings_data.json` are rewritten by the
+  Theme Editor (note the auto-generated header comment). Expect Shopify-authored commits to
+  touch them, and avoid hand-editing them on a branch the editor is also writing to.
+- The integration has rewritten Liquid before (see "Known Shopify sync risk" under Archives).
 
 ## Shopify Setup
 
@@ -264,6 +290,12 @@ Use this as a practical "what should I fill in?" checklist.
 - Fill in section:
   - buy button label
   - max quantity per order
+- Event Ticketing app block (`templates/product.json`): when a product has the event
+  metafield and the app's Ticket Order Form block is attached, the buy button opens
+  that form in an attendee-details drawer (`#ticket-modal`) instead of buying directly.
+  The app's own ticket row is hidden and driven by the PDP's ticket-type buttons and
+  quantity stepper; `assets/section-product.js` restyles the app markup with theme
+  classes.
 - Purchasing is disabled (button shows "Coming Soon", quantity hidden) when the
   product is tagged `upcoming`, mirroring the sold-out / past-event behavior.
   This is enforced even if someone reaches the product URL directly rather than
@@ -292,7 +324,8 @@ Use this as a practical "what should I fill in?" checklist.
   - list/grid toggles, month filtering, mobile rail UI, sticker randomization
 - `assets/section-product.js`
   - variant select, quantity management, buy button state
-  - buy flow clears cart, adds selected variant, redirects to `/checkout`
+  - attendee-details drawer for ticketed products (Event Ticketing app form)
+  - direct buy flow clears cart, adds selected variant, redirects to `/checkout`
 
 ### Data Contracts
 
@@ -310,13 +343,15 @@ Use this as a practical "what should I fill in?" checklist.
 ### Collection Product Caps
 
 - `collection.products` in Liquid returns at most 50 products unless the loop is
-  wrapped in `{% paginate collection.products by: N %}` (max `N` per page is 250).
+  wrapped in `{% paginate collection.products by N %}` (max `N` per page is 250; no colon
+  after `by` — see the Archives notes).
   `paginate` only accepts specific documented objects directly — not a variable,
   not a bracket-indexed dynamic handle.
 - `sections/archives.liquid` uses real `{% paginate collections.all.products by 24 %}`
-  pagination — `assets/section-archives.js` fetches additional `page=N` slices
-  via the Section Rendering API as the visitor scrolls, so there's no fixed
-  ceiling on total archived events. See "Archives Page" above for the full flow.
+  pagination — `assets/section-archives.js` prefetches the remaining `page=N`
+  slices up front via the Section Rendering API (up to `MAX_PREFETCH_PAGES`), so
+  there's no small fixed ceiling on archived events. See "Archives Page" above for
+  the full flow.
 - `sections/calendar.liquid` and `sections/home-events.liquid` are left at the
   default 50 cap on purpose (current-season lists are small; avoids paying the
   higher scan cost on hot pages, and avoids depending on `{% paginate %}` there
@@ -331,14 +366,16 @@ Use this as a practical "what should I fill in?" checklist.
 - Locale strings are in `locales/en.default.json`.
 - Sections use translation keys for menu/contact/product/events labels where applicable.
 
-## Local Development
+## Development Workflow
 
 No Node build pipeline is configured in this repo. Theme assets are committed directly.
 
-Typical Shopify workflow:
-- Shopify CLI serve/pull/push against `shopify-theme/`
-- edit Liquid/CSS/JS directly
-- validate in Theme Editor + storefront preview
+- edit Liquid/CSS/JS directly in the repo root
+- push to `develop` (or merge a `feature/*` PR into it)
+- wait for Shopify's GitHub integration to sync the development theme
+- validate in the storefront preview and Theme Editor for that theme
+- Shopify's sync validates Liquid on import; a syntax error shows up as a failed sync in
+  the theme's GitHub connection status rather than on the storefront
 
 ## Editing Guidelines
 
@@ -359,19 +396,21 @@ Typical Shopify workflow:
   - the calendar only shows the current season's 3-month window; it also reads
     at most 50 products from the collection (see "Collection Product Caps")
 - **Old events missing from archives**
-  - archives now pages through the whole collection via scroll-triggered
-    fetches, so nothing should be permanently cut off; if events are still
+  - archives prefetches every page of the catalogue up front (capped at
+    `MAX_PREFETCH_PAGES`, with load-more beyond that), so nothing should be
+    permanently cut off; if events are still
     missing, check they're actually **active** (draft/archived in admin =
     invisible to the storefront) and dated before the current season start
   - if the page renders completely empty, check `sections/archives.liquid` for
     a Shopify-sync-mangled `{% paginate %}` tag (see "Known Shopify sync risk")
 - **Archives "Load More" never shows / stops appearing**
   - expected once every page has been fetched and there's nothing left
-    (`data-has-next="false"` on `.archives-page`)
-  - if it's missing on first load with events still remaining, check the
-    browser console for a failed fetch (e.g. `section_id` mismatch) — the
-    button itself still works as a manual fallback if the auto-scroll fetch
-    silently fails
+    (`data-has-next="false"` on `#archive-pagination-state`) — normally the
+    prefetch covers everything, so the button only appears past
+    `MAX_PREFETCH_PAGES`
+  - if events are missing, check the browser console for a failed page fetch
+    (e.g. `section_id` mismatch); failed pages are logged and skipped, and the
+    button remains a manual fallback
 - **Featured event not showing**
   - ensure at least one active product has `featured` tag, or set manual product/image override
 - **Contact form not sending to expected email**
