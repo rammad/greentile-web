@@ -44,60 +44,6 @@
   assign auto_title = season_label | append: ' Calendar ' | append: current_year
   assign page_title = section.settings.title | default: auto_title
 
-  if section.settings.cs_shape_1
-    assign cs1_url = section.settings.cs_shape_1 | image_url: width: 400
-  else
-    assign cs1_url = 'sticker-cs-shape-1-blank.svg' | asset_url
-  endif
-  if section.settings.cs_shape_2
-    assign cs2_url = section.settings.cs_shape_2 | image_url: width: 400
-  else
-    assign cs2_url = ''
-  endif
-  if section.settings.cs_shape_3
-    assign cs3_url = section.settings.cs_shape_3 | image_url: width: 400
-  else
-    assign cs3_url = 'sticker-cs-shape-3-blank.svg' | asset_url
-  endif
-  if section.settings.cs_shape_4
-    assign cs4_url = section.settings.cs_shape_4 | image_url: width: 400
-  else
-    assign cs4_url = 'sticker-cs-shape-4-blank.svg' | asset_url
-  endif
-  if section.settings.cs_text
-    assign cs_text_url = section.settings.cs_text | image_url: width: 400
-  else
-    assign cs_text_url = 'sticker-cs-text-white.svg' | asset_url
-  endif
-
-  if section.settings.so_shape_1
-    assign so1_url = section.settings.so_shape_1 | image_url: width: 400
-  else
-    assign so1_url = 'sticker-so-shape-1-blank.svg' | asset_url
-  endif
-  if section.settings.so_shape_2
-    assign so2_url = section.settings.so_shape_2 | image_url: width: 400
-  else
-    assign so2_url = 'sticker-so-shape-2-blank.svg' | asset_url
-  endif
-  if section.settings.so_shape_3
-    assign so3_url = section.settings.so_shape_3 | image_url: width: 400
-  else
-    assign so3_url = 'sticker-so-shape-3-blank.svg' | asset_url
-  endif
-  if section.settings.so_shape_4
-    assign so4_url = section.settings.so_shape_4 | image_url: width: 400
-  else
-    assign so4_url = 'sticker-so-shape-4-blank.svg' | asset_url
-  endif
-  if section.settings.so_text
-    assign so_text_url = section.settings.so_text | image_url: width: 400
-  else
-    assign so_text_url = 'sticker-so-text-white.svg' | asset_url
-  endif
-
-  assign cs_color = section.settings.cs_color | default: '#87A587'
-  assign so_color = section.settings.so_color | default: '#000000'
   assign placeholder_color = section.settings.placeholder_color | default: '#B7C9B7'
   assign placeholder_font = section.settings.placeholder_font_color | default: '#87A587'
 -%}
@@ -106,18 +52,7 @@
   style="--placeholder-bg: {{ placeholder_color }}; --placeholder-font: {{ placeholder_font }}"
   data-colors="{% render 'palette-color', source: section.settings.gradient_color_1_source, custom: section.settings.gradient_color_1 %}, {% render 'palette-color', source: section.settings.gradient_color_2_source, custom: section.settings.gradient_color_2 %}, {% render 'palette-color', source: section.settings.gradient_color_3_source, custom: section.settings.gradient_color_3 %}"
   data-edge="0"
-  data-sticker-cs-blank1="{{ cs1_url }}"
-  data-sticker-cs-blank2="{{ cs2_url }}"
-  data-sticker-cs-blank3="{{ cs3_url }}"
-  data-sticker-cs-blank4="{{ cs4_url }}"
-  data-sticker-cs-text="{{ cs_text_url }}"
-  data-sticker-cs-color="{{ cs_color }}"
-  data-sticker-so-blank1="{{ so1_url }}"
-  data-sticker-so-blank2="{{ so2_url }}"
-  data-sticker-so-blank3="{{ so3_url }}"
-  data-sticker-so-blank4="{{ so4_url }}"
-  data-sticker-so-text="{{ so_text_url }}"
-  data-sticker-so-color="{{ so_color }}"
+  {% render 'calendar-stickers', settings_source: section.settings %}
 >
   <div class="calendar-header">
     <h1 class="type-display-hero animate-cascade fit-text desktop-only">

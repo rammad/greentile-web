@@ -48,5 +48,8 @@
     "decrease": "Decrease quantity",
     "ticket_add_more": "To add more tickets, go back to the event page",
     "error": "Something went wrong — please try again"
+  },
+  "shop": {
+    "in_stock": "In Stock"
   }
 }

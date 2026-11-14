@@ -101,6 +101,7 @@ Important tags:
 - `templates/page.about-us.json` - About page
 - `templates/page.events.json` - Events calendar page
 - `templates/page.archives.json` - Archives page
+- `templates/page.shop.json` - Shop page (non-ticket products)
 - `templates/product.json` - Event/product detail page
 - `templates/collection.json` - currently renders the calendar section
 - `templates/404.json` - 404 template
@@ -200,7 +201,23 @@ Use this as a practical "what should I fill in?" checklist.
 - Event status handling:
   - `upcoming` tag -> Coming Soon sticker behavior
   - unavailable product -> Sold Out sticker behavior
-- Sticker artwork/colors are configurable in section settings.
+- Sticker artwork/colors are configurable in section settings (resolved by
+  `snippets/calendar-stickers.liquid`, shared with the Shop page).
+
+### Shop Page (`sections/shop.liquid`)
+
+- Setup: create a page in Admin → Online Store → Pages using the `page.shop` template, and
+  link it from Theme settings → Navigation.
+- Shows every product that **isn't an event ticket** — product type `Ticket` or having the
+  event metafield excludes it — from the selected collection, or all products if none is set.
+  Recommended: an automated collection with "Product type is not equal to Ticket", so the
+  50-product loop limit is spent on shop products only.
+- Same design and code as the events page (`section-calendar.css` / `.js`), but **grid view
+  only**: products are grouped under their category (product type) where events show months.
+- Filters: **All** / **In Stock** (hides sold-out and `upcoming` products).
+- `upcoming` tag -> Coming Soon sticker (not clickable); sold out -> Sold Out sticker. Sticker
+  artwork/colours are section settings, same as the calendar.
+- Fill: title, empty-state message, optional collection.
 
 ### Archives Page (`sections/archives.liquid`)
 
