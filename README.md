@@ -291,11 +291,19 @@ Use this as a practical "what should I fill in?" checklist.
 
 ### Product Detail (`sections/main-product.liquid`)
 
-- Uses product data + event metafield to render:
+One section and template for every product; the layout follows the data:
+
+- **Events** (product has the event metafield):
   - event date/time
   - venue details
   - variants as ticket types
-  - quantity picker + Add to Cart button
+  - attendee-details form before adding to cart (see below)
+- **Everything else** (no event metafield, e.g. merch):
+  - category (the product's **Product type**) in place of the date row; no venue row
+  - variants as plain option buttons
+  - adds straight to the cart
+- Both: title, tags, description, quantity picker + Add to Cart button. The `upcoming` tag
+  and sold-out handling apply to all products; the past-date check only to events.
 - Fill in section:
   - add to cart button label
 - Quantity limit: **Theme settings → Cart → Max quantity per product**, minus whatever of

@@ -80,8 +80,12 @@
       {%- comment -%} Info column {%- endcomment -%}
       <div class="pdp-info">
 
-        {%- comment -%} Date row {%- endcomment -%}
-        {%- if date_full or event_time -%}
+        {%- comment -%} Top row — events: date/time; everything else (no event metafield): category (product type) {%- endcomment -%}
+        {%- if event_meta == blank and product.type != blank -%}
+          <div class="pdp-meta-row text-mask">
+            <span class="type-subBold2 text-reveal-inner">{{ product.type }}</span>
+          </div>
+        {%- elsif date_full or event_time -%}
           <div class="pdp-meta-row text-mask">
             <span class="type-subBold2 text-reveal-inner">
               {%- if date_full -%}
@@ -111,7 +115,7 @@
           </div>
         {%- endif -%}
 
-        {%- comment -%} Ticket types — only shown when multiple variants exist {%- endcomment -%}
+        {%- comment -%} Variants (ticket types for events) — only shown when multiple variants exist {%- endcomment -%}
         {%- if product.variants.size > 1 -%}
           <div class="pdp-ticket-types">
             {%- for variant in product.variants -%}
