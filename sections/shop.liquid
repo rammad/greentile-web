@@ -8,20 +8,23 @@
   (same as on the events page); rows are grouped under their category (product type) instead of
   a month, via data-group. Filters: All / In Stock (data-filter="in-stock").
 
-  Tickets are excluded by product type "Ticket" or the event metafield. Reads the selected
-  collection (or all products) — capped at Shopify's default 50 products per loop.
+  Tickets are excluded by product type "Ticket" or the event metafield.
+
+  Products: a plain collection loop stops at 50 products, and tickets make up most of the
+  store, so shop products past the first 50 would silently disappear. Instead this pages
+  through collections.all with {% paginate %} at the 250 maximum and only renders page 1 — 250
+  products total, tickets included — and applies the optional collection setting as a filter
+  inside the loop. Same {% paginate %} constraints as sections/archives.liquid: it must target
+  collections.all.products directly, `by` takes no colon, and its output can't be captured —
+  so the rows always render straight into the page, and the empty state is left to the JS
+  (it shows .calendar-coming-soon when there are no rows).
 {%- endcomment -%}
 
 {%- liquid
   assign evt_ns = settings.event_metafield_namespace | default: 'event_ticketing'
   assign evt_key = settings.event_metafield_key | default: 'event_v2'
 
-  if section.settings.collection != blank
-    assign shop_products = section.settings.collection.products
-  else
-    assign shop_products = collections.all.products
-  endif
-  assign shop_products = shop_products | sort: 'type'
+  assign shop_collection = section.settings.collection
 
   assign page_title = section.settings.title | default: 'Shop'
   assign placeholder_color = section.settings.placeholder_color | default: '#B7C9B7'
@@ -62,46 +65,47 @@
     </div>
   </div>
 
-  {%- capture shop_rows_markup -%}
-    {%- for product in shop_products -%}
-      {%- liquid
-        if product.type == 'Ticket' or product.metafields[evt_ns][evt_key] != blank
-          continue
-        endif
+  <div class="calendar-body">
+    {%- comment -%} hidden in grid mode — the rows only feed the grid packer {%- endcomment -%}
+    <div class="calendar-interface-wrapper">
+      <div class="calendar-list">
+        {%- paginate collections.all.products by 250 -%}
+          {%- assign shop_products = collections.all.products | sort: 'type' -%}
+          {%- for product in shop_products -%}
+            {%- liquid
+              if product.type == 'Ticket' or product.metafields[evt_ns][evt_key] != blank
+                continue
+              endif
+              if shop_collection != blank
+                unless product.collections contains shop_collection
+                  continue
+                endunless
+              endif
 
-        assign row_status = ''
-        if product.tags contains 'upcoming'
-          assign row_status = 'coming-soon'
-        elsif product.available == false
-          assign row_status = 'sold-out'
-        endif
+              assign row_status = ''
+              if product.tags contains 'upcoming'
+                assign row_status = 'coming-soon'
+              elsif product.available == false
+                assign row_status = 'sold-out'
+              endif
 
-        assign row_group = product.type | default: page_title
-      -%}
-      <a href="{{ product.url }}" class="calendar-row"
-        data-img="{{ product.featured_image | image_url: width: 800 }}"
-        data-title="{{ product.title | escape }}"
-        data-group="{{ row_group | escape }}"
-        {%- if row_status != blank %} data-status="{{ row_status }}"{% endif -%}
-      >
-        <span class="cal-name type-h3">{{ product.title }}</span>
-      </a>
-    {%- endfor -%}
-  {%- endcapture -%}
-
-  {%- assign shop_rows_markup_stripped = shop_rows_markup | strip -%}
-  {%- if shop_rows_markup_stripped != blank -%}
-    <div class="calendar-body">
-      {%- comment -%} hidden in grid mode — the rows only feed the grid packer {%- endcomment -%}
-      <div class="calendar-interface-wrapper">
-        <div class="calendar-list">
-          {{- shop_rows_markup -}}
-        </div>
+              assign row_group = product.type | default: page_title
+            -%}
+            <a href="{{ product.url }}" class="calendar-row"
+              data-img="{{ product.featured_image | image_url: width: 800 }}"
+              data-title="{{ product.title | escape }}"
+              data-group="{{ row_group | escape }}"
+              {%- if row_status != blank %} data-status="{{ row_status }}"{% endif -%}
+            >
+              <span class="cal-name type-h3">{{ product.title }}</span>
+            </a>
+          {%- endfor -%}
+        {%- endpaginate -%}
       </div>
-
-      <div id="dynamic-grid-container" class="calendar-grid-packed"></div>
     </div>
-  {%- endif -%}
+
+    <div id="dynamic-grid-container" class="calendar-grid-packed"></div>
+  </div>
   <div class="calendar-coming-soon"><span class="type-h2">{{ section.settings.empty_message | default: 'more goods coming soon!' }}</span></div>
 </section>
 
@@ -123,7 +127,7 @@
       "type": "collection",
       "id": "collection",
       "label": "Products collection",
-      "info": "Recommended: an automated collection with the condition 'Product type is not equal to Ticket'. Event tickets (product type Ticket, or products with event data) are always left out. Leave empty to use all products. Up to 50 products."
+      "info": "Optional — only show products from this collection. Event tickets (product type Ticket, or products with event data) are always left out. Leave empty to show every non-ticket product (looks through the first 250 products in the store)."
     },
     {
       "type": "text",

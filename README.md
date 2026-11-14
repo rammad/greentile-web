@@ -209,9 +209,12 @@ Use this as a practical "what should I fill in?" checklist.
 - Setup: create a page in Admin → Online Store → Pages using the `page.shop` template, and
   link it from Theme settings → Navigation.
 - Shows every product that **isn't an event ticket** — product type `Ticket` or having the
-  event metafield excludes it — from the selected collection, or all products if none is set.
-  Recommended: an automated collection with "Product type is not equal to Ticket", so the
-  50-product loop limit is spent on shop products only.
+  event metafield excludes it. The optional collection setting narrows it further.
+- Loads products via `{% paginate collections.all.products by 250 %}` (page 1 only), because
+  a plain collection loop stops at 50 products and tickets make up most of the catalogue — a
+  new shop product would otherwise fall off the end. Limit: the store's first 250 products,
+  tickets included. Same `{% paginate %}` rules as Archives apply (direct target, no colon
+  after `by`, no `capture` around it), so the empty state is decided in JS.
 - Same design and code as the events page (`section-calendar.css` / `.js`), but **grid view
   only**: products are grouped under their category (product type) where events show months.
 - Filters: **All** / **In Stock** (hides sold-out and `upcoming` products).
